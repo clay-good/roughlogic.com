@@ -827,6 +827,8 @@ KITCHEN_RENDERERS["brine-cure"] = renderBrineCure;
 // dims: in { flour_g: M, hydration_pct: dimensionless, salt_pct: dimensionless, yeast_pct: dimensionless, other_pct: dimensionless, pieces: dimensionless } out: { water_g: M, salt_g: M, yeast_g: M, total_dough_g: M, total_pct: dimensionless, hydration_pct: dimensionless, pieces: dimensionless, flour_g: M, other_g: M, per_piece_g: M, total_dough_oz: M, water_oz: M }
 export function computeBakersPercentage({ flour_g = 0, hydration_pct = 0, salt_pct = 0, yeast_pct = 0, other_pct = 0, pieces = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (pieces != null && pieces !== "" && !Number.isInteger(Number(pieces))) return { error: "Number of pieces must be a whole number." };
   const flour = Number(flour_g) || 0;
   if (!(flour > 0)) return { error: "Flour weight must be positive (g)." };
   const hyd = Number(hydration_pct) || 0, salt = Number(salt_pct) || 0, yeast = Number(yeast_pct) || 0, other = Number(other_pct) || 0;
@@ -1023,6 +1025,8 @@ KITCHEN_RENDERERS["pour-cost"] = renderPourCost;
 // dims: in { units_sold: dimensionless, menu_price: dimensionless, food_cost: dimensionless, total_units: dimensionless, item_count: dimensionless, average_margin: dimensionless } out: { contribution_margin: dimensionless, popularity_share: dimensionless, popularity_threshold: dimensionless }
 export function computeMenuEngineering({ units_sold = 0, menu_price = 0, food_cost = 0, total_units = 0, item_count = 0, average_margin = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (item_count != null && item_count !== "" && !Number.isInteger(Number(item_count))) return { error: "Number of menu items must be a whole number." };
   const units = Number(units_sold) || 0;
   const price = Number(menu_price) || 0;
   const fcost = Number(food_cost) || 0;

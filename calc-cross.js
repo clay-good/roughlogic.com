@@ -2702,6 +2702,8 @@ export function computeGearCascade({
     const nOut = Number(s && s.n_out) || 0;
     if (nIn === 0 && nOut === 0) continue; // blank stage ignored
     if (!(nIn > 0) || !(nOut > 0)) return { error: "Each used stage needs a positive input and output tooth count." };
+    // A gear has a whole number of teeth; 20.5 passed silently until 2026-11-15.
+    if (!Number.isInteger(nIn) || !Number.isInteger(nOut)) return { error: "Tooth counts must be whole numbers." };
     valid.push({ n_in: nIn, n_out: nOut });
   }
   if (valid.length === 0) return { error: "Enter at least one gear stage (input and output tooth counts)." };

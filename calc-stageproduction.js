@@ -93,6 +93,8 @@ const _speedOfSound = (temp_f) => 49.03 * Math.sqrt(temp_f + 459.67);
 // dims: in { trim_height_ft: L, ear_height_ft: L, near_throw_ft: L, far_throw_ft: L, cabinets: dimensionless } out: { coverage_deg: dimensionless, avg_splay_deg: dimensionless, level_taper_db: dimensionless, angle_far_deg: dimensionless, angle_near_deg: dimensionless, dh_ft: L }
 export function computeLineArraySplay({ trim_height_ft = 0, ear_height_ft = 4, near_throw_ft = 0, far_throw_ft = 0, cabinets = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (cabinets != null && cabinets !== "" && !Number.isInteger(Number(cabinets))) return { error: "Number of cabinets must be a whole number." };
   if (!(trim_height_ft > 0)) return { error: "Trim height must be positive." };
   if (!(ear_height_ft >= 0)) return { error: "Ear height cannot be negative." };
   if (!(trim_height_ft > ear_height_ft)) return { error: "Trim height must be above the listener's ear height." };
@@ -670,6 +672,8 @@ STAGEPRODUCTION_RENDERERS["haze-machine-sizing"] = _r({
 // dims: in { length_ft: L, width_ft: L, legs: dimensionless, design_psf: M L^-1 T^-2, deck_dead_lb: M L T^-2, leg_rating_lb: M L T^-2, point_load_lb: M L T^-2, bearing_sqin: L^2, deck_point_rating_lb: M L T^-2 } out: { deck_area_sqft: L^2, live_load_lb: M L T^-2, load_per_leg_lb: M L T^-2, leg_utilization_pct: dimensionless, bearing_psi: M L^-1 T^-2, point_utilization_pct: dimensionless, total_load_lb: M L T^-2 }
 export function computeStageDeckLiveLoad({ length_ft = 0, width_ft = 0, legs = 4, design_psf = 150, deck_dead_lb = 0, leg_rating_lb = 0, point_load_lb = 0, bearing_sqin = 0, deck_point_rating_lb = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (legs != null && legs !== "" && !Number.isInteger(Number(legs))) return { error: "Number of legs must be a whole number." };
   if (!(length_ft > 0 && width_ft > 0)) return { error: "Deck length and width must be positive." };
   if (!(legs >= 1)) return { error: "Leg count must be at least 1." };
   if (!(design_psf > 0)) return { error: "Design live load must be positive." };

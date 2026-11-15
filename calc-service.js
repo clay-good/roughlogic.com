@@ -466,6 +466,8 @@ function _dryerDemandFactor(n) {
 // dims: in { num_dryers: dimensionless, nameplate_w: M L^2 T^-3, supply_v: M L^2 T^-3 I^-1 } out: { per_dryer_w: M L^2 T^-3, demand_w: M L^2 T^-3, demand_a: I, connected_w: M L^2 T^-3, demand_factor: dimensionless }
 export function computeDryerDemand22054({ num_dryers = 1, nameplate_w = 5000, supply_v = 240 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (num_dryers != null && num_dryers !== "" && !Number.isInteger(Number(num_dryers))) return { error: "Number of dryers must be a whole number." };
   const n = Math.round(Number(num_dryers) || 0);
   const w = Number(nameplate_w) || 0;
   const v = Number(supply_v) || 0;
@@ -765,6 +767,8 @@ SERVICE_RENDERERS["vfd-energy-savings"] = renderVfdEnergySavings;
 // dims: in { fixtures: dimensionless, watts_existing: M L^2 T^-3, watts_new: M L^2 T^-3, annual_hours: T, rate_kwh: dimensionless, demand_per_kw_mo: dimensionless, install_cost: dimensionless } out: { kw_saved: M L^2 T^-3, kwh_saved: M L^2 T^-2, energy_usd: dimensionless, demand_usd: dimensionless, annual_usd: dimensionless, payback_years: T }
 export function computeLightingRetrofitSavings({ fixtures = 0, watts_existing = 0, watts_new = 0, annual_hours = 0, rate_kwh = 0, demand_per_kw_mo = 0, install_cost = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (fixtures != null && fixtures !== "" && !Number.isInteger(Number(fixtures))) return { error: "Fixtures retrofitted must be a whole number." };
   if (!(fixtures > 0)) return { error: "Fixture count must be positive." };
   if (!(annual_hours > 0)) return { error: "Annual operating hours must be positive." };
   if (watts_existing < 0 || watts_new < 0) return { error: "Wattages must be non-negative." };

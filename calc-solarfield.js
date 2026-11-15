@@ -371,6 +371,8 @@ SOLARFIELD_RENDERERS["pv-rail-clamp-takeoff"] = _v896renderPvRailClampTakeoff;
 // dims: in { modules: dimensionless, module_wt_lb: M L T^-2, ballast_per_module_lb: M L T^-2, racking_wt_lb: M L T^-2, array_area_sf: L^2, allowable_psf: M L^-1 T^-2 } out: { total_wt_lb: M L T^-2, added_psf: M L^-1 T^-2, pass: dimensionless }
 export function computePvBallastWeight({ modules = 30, module_wt_lb = 50, ballast_per_module_lb = 40, racking_wt_lb = 0, array_area_sf = 630, allowable_psf = 5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (modules != null && modules !== "" && !Number.isInteger(Number(modules))) return { error: "Module count must be a whole number." };
   if (!(modules > 0)) return { error: "Module count must be positive." };
   if (!(module_wt_lb > 0)) return { error: "Module weight must be positive (lb)." };
   if (!(array_area_sf > 0)) return { error: "Array area must be positive (ft^2)." };

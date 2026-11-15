@@ -1068,6 +1068,8 @@ export const GEAR_TOOTH_SYSTEMS = {
 // dims: in { transmitted_load_lb: M L T^-2, diametral_pitch_1_in: L^-1, face_width_in: L, number_of_teeth: dimensionless, tooth_system: dimensionless } out: { bending_stress_psi: M L^-1 T^-2, circular_pitch_in: L, lewis_form_factor_y: dimensionless, lewis_Y_diametral: dimensionless }
 export function computeGearToothBendingStress({ transmitted_load_lb = 0, diametral_pitch_1_in = 0, face_width_in = 0, number_of_teeth = 0, tooth_system = "20-full-depth" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (number_of_teeth != null && number_of_teeth !== "" && !Number.isInteger(Number(number_of_teeth))) return { error: "Number of teeth must be a whole number." };
   const Wt = Number(transmitted_load_lb) || 0;
   const Pd = Number(diametral_pitch_1_in) || 0;
   const F = Number(face_width_in) || 0;
@@ -1134,6 +1136,9 @@ MECHANIC_RENDERERS["gear-tooth-bending-stress"] = _simpleRenderer({
 // dims: in { transmitted_load_lb: M L T^-2, diametral_pitch_1_in: L^-1, pinion_teeth: dimensionless, gear_teeth: dimensionless, face_width_in: L, pressure_angle_deg: dimensionless, elastic_coefficient_cp: dimensionless } out: { contact_stress_psi: M L^-1 T^-2, geometry_factor_I: dimensionless, pinion_pitch_diameter_in: L, gear_ratio_mG: dimensionless }
 export function computeGearContactStress({ transmitted_load_lb = 0, diametral_pitch_1_in = 0, pinion_teeth = 0, gear_teeth = 0, face_width_in = 0, pressure_angle_deg = 20, elastic_coefficient_cp = 2300 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (pinion_teeth != null && pinion_teeth !== "" && !Number.isInteger(Number(pinion_teeth))) return { error: "Pinion teeth must be a whole number." };
+  if (gear_teeth != null && gear_teeth !== "" && !Number.isInteger(Number(gear_teeth))) return { error: "Gear teeth must be a whole number." };
   const Wt = Number(transmitted_load_lb) || 0;
   const Pd = Number(diametral_pitch_1_in) || 0;
   const Np = Number(pinion_teeth) || 0;
@@ -1299,6 +1304,9 @@ const PLANETARY_CONFIGS = {
 // dims: in { sun_teeth: dimensionless, ring_teeth: dimensionless, input_speed_rpm: T^-1, configuration: dimensionless } out: { gear_ratio: dimensionless, output_speed_rpm: T^-1, planet_teeth: dimensionless, basic_ratio_R0: dimensionless }
 export function computePlanetaryGearRatio({ sun_teeth = 0, ring_teeth = 0, input_speed_rpm = 0, configuration = "ring-fixed-sun-carrier" } = {}) {
   const _g = _finiteGuard({ sun_teeth, ring_teeth, input_speed_rpm }); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (sun_teeth != null && sun_teeth !== "" && !Number.isInteger(Number(sun_teeth))) return { error: "Sun teeth must be a whole number." };
+  if (ring_teeth != null && ring_teeth !== "" && !Number.isInteger(Number(ring_teeth))) return { error: "Ring teeth must be a whole number." };
   const Ns = Number(sun_teeth) || 0;
   const Nr = Number(ring_teeth) || 0;
   const nin = Number(input_speed_rpm) || 0;
@@ -4259,6 +4267,8 @@ MECHANIC_RENDERERS["belt-deflection-tension"] = _simpleRenderer({
 // dims: in { horsepower: M L^2 T^-3, rpm: T^-1, number_of_teeth: dimensionless, diametral_pitch_1_in: L^-1, face_width_in: L, tooth_system: dimensionless, y_diametral_override: dimensionless, tooth_cut: dimensionless, is_idler: dimensionless, sut_psi: M L^-1 T^-2 } out: { pitch_diameter_in: L, torque_inlb: M L^2 T^-2, wt_lb: M L T^-2, velocity_fpm: L T^-1, kv: dimensionless, static_stress_psi: M L^-1 T^-2, dynamic_stress_psi: M L^-1 T^-2, allowable_psi: M L^-1 T^-2, safety_factor: dimensionless, dynamic_penalty_pct: dimensionless, ki: dimensionless, kv_base: L T^-1, lewis_Y_diametral: dimensionless }
 export function computeGearDynamicToothStress({ horsepower = 0, rpm = 0, number_of_teeth = 0, diametral_pitch_1_in = 0, face_width_in = 0, tooth_system = "20-full-depth", y_diametral_override = 0, tooth_cut = "cut", is_idler = "no", sut_psi = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (number_of_teeth != null && number_of_teeth !== "" && !Number.isInteger(Number(number_of_teeth))) return { error: "Number of teeth must be a whole number." };
   if (arguments[0]?.is_idler !== undefined && !["yes", "no"].includes(arguments[0].is_idler)) return { error: "is_idler must be yes or no." };
   if (arguments[0]?.tooth_cut !== undefined && !["cut", "cast"].includes(String(arguments[0].tooth_cut))) return { error: "Tooth cut must be cut or cast." };
   const hp = Number(horsepower) || 0, N = Number(rpm) || 0, T = Number(number_of_teeth) || 0;

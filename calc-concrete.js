@@ -2462,6 +2462,8 @@ CONCRETE_RENDERERS["concrete-isolation-joint"] = _simpleRenderer({
 // dims: in { num_risers: dimensionless, riser_in: L, tread_in: L, width_in: L, throat_in: L } out: { volume_in3: L^3, volume_ft3: L^3, volume_cy: L^3 }
 export function computeConcreteStairVolume({ num_risers = 4, riser_in = 7, tread_in = 11, width_in = 48, throat_in = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (num_risers != null && num_risers !== "" && !Number.isInteger(Number(num_risers))) return { error: "Number of risers must be a whole number." };
   if (!(num_risers >= 1)) return { error: "Number of risers must be at least 1." };
   if (!(riser_in > 0)) return { error: "Riser height must be positive (in)." };
   if (!(tread_in > 0)) return { error: "Tread depth must be positive (in)." };
@@ -2507,6 +2509,8 @@ CONCRETE_RENDERERS["concrete-stair-volume"] = _simpleRenderer({
 // dims: in { joint_length_ft: L, slab_thickness_in: L, dowel_spacing_in: L, edge_clearance_in: L, num_joints: dimensionless } out: { dowels_per_joint: dimensionless, total_dowels: dimensionless, dowel_diameter_in: L }
 export function computeSlabDowelSchedule({ joint_length_ft = 40, slab_thickness_in = 6, dowel_spacing_in = 12, edge_clearance_in = 6, num_joints = 5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (num_joints != null && num_joints !== "" && !Number.isInteger(Number(num_joints))) return { error: "Number of dowelled joints must be a whole number." };
   if (!(joint_length_ft > 0)) return { error: "Joint length must be positive (ft)." };
   if (!(slab_thickness_in > 0)) return { error: "Slab thickness must be positive (in)." };
   if (!(dowel_spacing_in > 0)) return { error: "Dowel spacing must be positive (in)." };

@@ -307,6 +307,8 @@ FIREWATER_RENDERERS["vacuum-lift-reading"] = renderVacuumLiftReading;
 // dims: in { nominal_tank_gal: L^3, usable_fraction: dimensionless, tanker_count: dimensionless, cycle_time_min: T } out: { usable_gal: L^3, shuttle_flow_gpm: L^3 T^-1 }
 export function computeTankerShuttleFlow({ nominal_tank_gal = 0, usable_fraction = 0.9, tanker_count = 0, cycle_time_min = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (tanker_count != null && tanker_count !== "" && !Number.isInteger(Number(tanker_count))) return { error: "Number of tankers must be a whole number." };
   const nom = Number(nominal_tank_gal) || 0;
   const frac = Number(usable_fraction) || 0;
   const count = Number(tanker_count) || 0;

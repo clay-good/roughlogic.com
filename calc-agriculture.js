@@ -1998,6 +1998,8 @@ AGRICULTURE_RENDERERS["pearson-square-ration"] = renderPearsonSquareRation;
 // temperature breakpoints. Intake-ratio method: gal = DMI * ratio / 8.345.
 // dims: in { method: dimensionless, head: dimensionless, temp_f: T, t_low_f: T, gal_low: L^3, t_high_f: T, gal_high: L^3, dmi_lb: M, water_per_dmi: dimensionless, lactating: dimensionless } out: { per_head_gpd: L^3 T^-1, herd_gpd: L^3 T^-1 }
 export function computeLivestockWaterRequirement({ method = "table", head = 1, temp_f = 0, t_low_f = 0, gal_low = 0, t_high_f = 0, gal_high = 0, dmi_lb = 0, water_per_dmi = 3.5, lactating = false } = {}) {
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (head != null && head !== "" && !Number.isInteger(Number(head))) return { error: "Head count must be a whole number." };
   if (method !== "table" && method !== "intake") return { error: "Method must be table or intake." };
   if (Number(gal_low) < 0 || Number(gal_high) < 0) return { error: "Water intakes cannot be negative (gal)." };
   const n = Math.round(Number(head) || 0);

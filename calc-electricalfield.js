@@ -117,6 +117,8 @@ ELECTRICALFIELD_RENDERERS["wire-pulling-lubricant"] = _v852renderWirePullingLubr
 // dims: in { circuits: dimensionless, avg_homerun_ft: L, makeup_ft: L, conductors_per_circuit: dimensionless, roll_ft: L } out: { total_ft: L, rolls: dimensionless, ft_per_color: L, rolls_bought: dimensionless, rolls_per_color: dimensionless }
 export function computeBranchCircuitWireFootage({ circuits = 20, avg_homerun_ft = 45, makeup_ft = 15, conductors_per_circuit = 3, roll_ft = 1000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (circuits != null && circuits !== "" && !Number.isInteger(Number(circuits))) return { error: "Number of branch circuits must be a whole number." };
   if (!(circuits > 0)) return { error: "Circuit count must be positive." };
   if (!(avg_homerun_ft > 0)) return { error: "Home-run length must be positive (ft)." };
   if (!(conductors_per_circuit > 0)) return { error: "Conductors per circuit must be positive." };

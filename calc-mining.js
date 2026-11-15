@@ -849,6 +849,8 @@ MINING_RENDERERS["belt-feeder-pull"] = _simpleRenderer({
 // dims: in { airflow_cfm: L^3 T^-1, bag_count: dimensionless, bag_diameter_in: L, bag_length_ft: L, range_low: L T^-1, range_high: L T^-1, bags_out_of_service: dimensionless } out: { cloth_area_sqft: L^2, air_to_cloth: L T^-1, derated_cloth_area_sqft: L^2, derated_air_to_cloth: L T^-1, max_airflow_cfm: L^3 T^-1, derated_max_airflow_cfm: L^3 T^-1, airflow_headroom_cfm: L^3 T^-1, derated_increase_pct: dimensionless, area_per_bag_sqft: L^2 }
 export function computeDustCollectorAirToCloth({ airflow_cfm = 0, bag_count = 0, bag_diameter_in = 0, bag_length_ft = 0, range_low = 3, range_high = 5, bags_out_of_service = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (bag_count != null && bag_count !== "" && !Number.isInteger(Number(bag_count))) return { error: "Number of bags must be a whole number." };
   if (!(airflow_cfm > 0)) return { error: "System airflow must be positive." };
   if (!(bag_count >= 1)) return { error: "Bag count must be at least 1." };
   if (!(bag_diameter_in > 0)) return { error: "Bag diameter must be positive." };
@@ -1105,6 +1107,8 @@ MINING_RENDERERS["pit-dewatering-staging"] = _simpleRenderer({
 // dims: in { bench_height_ft: L, bench_width_ft: L, face_angle_deg: dimensionless, bench_count: dimensionless, alternative_bench_width_ft: L, target_overall_angle_deg: dimensionless } out: { run_per_bench_ft: L, overall_angle_deg: dimensionless, total_height_ft: L, total_run_ft: L, alternative_overall_angle_deg: dimensionless, width_for_target_ft: L, face_run_ft: L, flattening_deg: dimensionless }
 export function computeHighwallBenchGeometry({ bench_height_ft = 0, bench_width_ft = 0, face_angle_deg = 0, bench_count = 1, alternative_bench_width_ft = 0, target_overall_angle_deg = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (bench_count != null && bench_count !== "" && !Number.isInteger(Number(bench_count))) return { error: "Number of benches must be a whole number." };
   if (!(bench_height_ft > 0)) return { error: "Bench height must be positive." };
   if (!(bench_width_ft > 0)) return { error: "Bench width must be positive." };
   if (!(face_angle_deg > 0 && face_angle_deg < 90)) return { error: "Face angle must be in (0, 90) degrees." };
@@ -1272,6 +1276,8 @@ MINING_RENDERERS["blast-fume-clearance-time"] = _simpleRenderer({
 // dims: in { conveyance_lb: M L T^-2, people_count: dimensionless, person_weight_lb: M L T^-2, rope_length_ft: L, rope_weight_per_ft: M T^-2, rope_count: dimensionless, rope_breaking_lb: M L T^-2, minimum_fs: dimensionless } out: { rope_weight_lb: M L T^-2, payload_lb: M L T^-2, total_load_lb: M L T^-2, factor_of_safety: dimensionless, max_payload_lb: M L T^-2, depth_at_limit_ft: L, margin: dimensionless, rope_share_pct: dimensionless, breaking_total_lb: M L T^-2, fs_without_rope: dimensionless, overstatement: dimensionless }
 export function computeHoistRopeSafetyFactor({ conveyance_lb = 0, people_count = 0, person_weight_lb = 180, rope_length_ft = 0, rope_weight_per_ft = 0, rope_count = 0, rope_breaking_lb = 0, minimum_fs = 8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (rope_count != null && rope_count !== "" && !Number.isInteger(Number(rope_count))) return { error: "Number of ropes must be a whole number." };
   if (!(conveyance_lb > 0)) return { error: "Conveyance weight must be positive." };
   if (!(people_count >= 1)) return { error: "Occupant count must be at least 1." };
   if (!(person_weight_lb > 0)) return { error: "Weight per person must be positive." };

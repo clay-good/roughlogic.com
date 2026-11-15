@@ -3026,6 +3026,8 @@ RESTORATION_RENDERERS["hardwood-floor-drying-mat"] = renderHardwoodFloorDryingMa
 //  `L^2 T^-1` is a time `T`; dividing by the dimensionless crew size keeps `T`.)
 export function computeMoldCleaningLabor({ affected_sf = 0, production_sf_per_hr = 100, passes = 2, crew_size = 2 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (crew_size != null && crew_size !== "" && !Number.isInteger(Number(crew_size))) return { error: "Crew size must be a whole number." };
   const area = Number(affected_sf), prod = Number(production_sf_per_hr), pass = Number(passes), crew = Number(crew_size);
   if (!(area > 0)) return { error: "Affected area must be positive." };
   if (!(prod > 0)) return { error: "Production rate must be positive." };

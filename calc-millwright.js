@@ -525,6 +525,8 @@ MILLWRIGHT_RENDERERS["vibration-severity-zone"] = _simpleRenderer({
 // dims: in { rpm: T^-1, blade_count: dimensionless, gear_tooth_count: dimensionless, belt_length_in: L, sheave_diameter_in: L, line_frequency_hz: T^-1, rotor_bar_count: dimensionless } out: { one_x_hz: T^-1, blade_pass_hz: T^-1, gear_mesh_hz: T^-1, belt_frequency_hz: T^-1, twice_line_hz: T^-1, rotor_bar_pass_hz: T^-1, four_x_hz: T^-1, gear_sideband_high_hz: T^-1, gear_sideband_low_hz: T^-1, three_x_hz: T^-1, two_x_hz: T^-1, two_x_to_line_gap_hz: T^-1, blade_pass_order: dimensionless, one_x_cpm: T^-1 }
 export function computeVibrationForcingFrequencies({ rpm = 0, blade_count = 0, gear_tooth_count = 0, belt_length_in = 0, sheave_diameter_in = 0, line_frequency_hz = 60, rotor_bar_count = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (gear_tooth_count != null && gear_tooth_count !== "" && !Number.isInteger(Number(gear_tooth_count))) return { error: "Gear teeth on this shaft must be a whole number." };
   if (!(rpm > 0)) return { error: "Shaft speed must be positive (rpm)." };
   if (blade_count < 0 || gear_tooth_count < 0 || rotor_bar_count < 0) return { error: "Blade, tooth, and rotor bar counts cannot be negative." };
   if (belt_length_in < 0 || sheave_diameter_in < 0) return { error: "Belt length and sheave diameter cannot be negative." };
@@ -865,6 +867,11 @@ MILLWRIGHT_RENDERERS["gear-reducer-service-factor"] = _simpleRenderer({
 // dims: in { tool1_qty: dimensionless, tool1_cfm: L^3 / T, tool1_duty: dimensionless, tool2_qty: dimensionless, tool2_cfm: L^3 / T, tool2_duty: dimensionless, tool3_qty: dimensionless, tool3_cfm: L^3 / T, tool3_duty: dimensionless, tool4_qty: dimensionless, tool4_cfm: L^3 / T, tool4_duty: dimensionless, leak_allowance_pct: dimensionless, growth_allowance_pct: dimensionless, cfm_per_hp: M^-1 L T^2 } out: { connected_cfm: L^3 / T, average_cfm: L^3 / T, with_leaks_cfm: L^3 / T, design_cfm: L^3 / T, motor_hp: M L^2 T^-3, cfm_per_hp: M^-1 L T^2, connected_hp: M L^2 T^-3, growth_allowance_pct: dimensionless, growth_cfm: L^3 T^-1, largest_tool_cfm: L^3 T^-1, largest_tool_hp: M L^2 T^-3, leak_allowance_pct: dimensionless, leak_cfm: L^3 T^-1, tool_count: dimensionless, oversize_ratio: dimensionless, peak_to_average: dimensionless }
 export function computeAirCompressorCfmSizing({ tool1_qty = 0, tool1_cfm = 0, tool1_duty = 0, tool2_qty = 0, tool2_cfm = 0, tool2_duty = 0, tool3_qty = 0, tool3_cfm = 0, tool3_duty = 0, tool4_qty = 0, tool4_cfm = 0, tool4_duty = 0, leak_allowance_pct = 15, growth_allowance_pct = 20, cfm_per_hp = 4 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (tool1_qty != null && tool1_qty !== "" && !Number.isInteger(Number(tool1_qty))) return { error: "Tool 1 quantity must be a whole number." };
+  if (tool2_qty != null && tool2_qty !== "" && !Number.isInteger(Number(tool2_qty))) return { error: "Tool 2 quantity must be a whole number." };
+  if (tool3_qty != null && tool3_qty !== "" && !Number.isInteger(Number(tool3_qty))) return { error: "Tool 3 quantity must be a whole number." };
+  if (tool4_qty != null && tool4_qty !== "" && !Number.isInteger(Number(tool4_qty))) return { error: "Tool 4 quantity must be a whole number." };
   for (const [q, c, d] of [[tool1_qty, tool1_cfm, tool1_duty], [tool2_qty, tool2_cfm, tool2_duty], [tool3_qty, tool3_cfm, tool3_duty], [tool4_qty, tool4_cfm, tool4_duty]]) {
     if (q > 0 && c > 0 && !(d > 0)) return { error: "Enter a duty factor for every tool with a quantity and a cfm (0.5 for half the time); a blank duty counted that tool as no demand." };
     if (d > 1) return { error: "Duty is a fraction of the time, 1 or less." };

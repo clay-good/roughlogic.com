@@ -493,6 +493,8 @@ const _H2_CFM_PER_AMP_CELL = 0.000269;
 // dims: in { cell_count: dimensionless, charge_current_a: I, room_volume_ft3: L^3, h2_limit_pct: dimensionless } out: { q_cfm: L^3 T^-1, ach: T^-1, h2_limit_pct: dimensionless }
 export function computeBatteryHydrogenVent({ cell_count = 0, charge_current_a = 0, room_volume_ft3 = 0, h2_limit_pct = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (cell_count != null && cell_count !== "" && !Number.isInteger(Number(cell_count))) return { error: "Cell count must be a whole number." };
   const n = Number(cell_count) || 0;
   const i = Number(charge_current_a) || 0;
   const vol = Number(room_volume_ft3) || 0;
@@ -536,6 +538,8 @@ ELECTRICALANALYSIS_RENDERERS["battery-hydrogen-vent"] = _v518renderBatteryHydrog
 // dims: in { available_cfm: L^3 T^-1, cell_count: dimensionless, h2_limit_pct: dimensionless } out: { max_charge_current_a: I }
 export function computeBatteryVentMaxCurrent({ available_cfm = 0, cell_count = 0, h2_limit_pct = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (cell_count != null && cell_count !== "" && !Number.isInteger(Number(cell_count))) return { error: "Cell count must be a whole number." };
   const q = Number(available_cfm) || 0;
   const n = Number(cell_count) || 0;
   if (!(q > 0)) return { error: "Available exhaust airflow must be positive (cfm)." };

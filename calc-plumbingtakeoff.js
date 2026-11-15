@@ -93,6 +93,8 @@ PLUMBINGTAKEOFF_RENDERERS["solder-joint-quantity"] = _v856renderSolderJointQuant
 // dims: in { pipe_ft: L, waste_pct: dimensionless, num_fittings: dimensionless, fitting_allow_ft: L, section_len_ft: L, insul_od_in: L } out: { cut_ft: L, sections: dimensionless, jacket_sf: L^2, derived_jacket_od_in: L, jacket_circumference_ft: L, jacket_with_lap_sf: L^2, pipe_circumference_ft: L, fitting_covers: dimensionless, total_covers: dimensionless, valve_covers: dimensionless }
 export function computePipeInsulationTakeoff({ pipe_ft = 250, waste_pct = 5, num_fittings = 12, fitting_allow_ft = 1, section_len_ft = 3, insul_od_in = 4.5, pipe_od_in = 0, insul_thickness_in = 0, jacket_overlap_pct = 0, elbow_count = 0, tee_count = 0, valve_count = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (num_fittings != null && num_fittings !== "" && !Number.isInteger(Number(num_fittings))) return { error: "Ells / tees / valves must be a whole number." };
   if (!(pipe_ft > 0)) return { error: "Pipe length must be positive (ft)." };
   if (!(fitting_allow_ft > 0)) return { error: "Fitting allowance must be positive (ft)." };
   if (!(section_len_ft > 0)) return { error: "Section length must be positive (ft)." };

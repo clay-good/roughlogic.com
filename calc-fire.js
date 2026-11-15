@@ -550,6 +550,8 @@ export function renderSmokeReading(inputRegion, outputRegion, citationEl) {
 //        out: { single_pump_psi: M L^-1 T^-2, per_pump_psi: M L^-1 T^-2, n_pumps: dimensionless, coefficient: dimensionless }
 export function computeReverseLayFriction({ hose_diameter, gpm, length_ft, n_pumps = 1 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (n_pumps != null && n_pumps !== "" && !Number.isInteger(Number(n_pumps))) return { error: "Number of parallel supply lines must be a whole number." };
   const C = HOSE_FRICTION_COEFFICIENTS[hose_diameter];
   if (C === undefined) return { error: "Unknown hose diameter." };
   // DR-08: flow and length cannot be negative.

@@ -523,6 +523,8 @@ FEEDER_RENDERERS["existing-load-220-87"] = _v519renderExistingLoad22087;
 // dims: in { charger_count: dimensionless, per_charger_a: I, evems_limit_a: I, apply_125_setpoint: dimensionless } out: { unmanaged_sum_a: I, managed_demand_a: I, freed_headroom_a: I }
 export function computeEvLoadManagementEms({ charger_count = 0, per_charger_a = 0, evems_limit_a = 0, apply_125_setpoint = true } = {}) {
   const _g = _finiteGuard({ charger_count, per_charger_a, evems_limit_a }); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (charger_count != null && charger_count !== "" && !Number.isInteger(Number(charger_count))) return { error: "The number of chargers must be a whole number." };
   const n = Number(charger_count) || 0;
   const per = Number(per_charger_a) || 0;
   const limit = Number(evems_limit_a) || 0;

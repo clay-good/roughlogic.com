@@ -619,6 +619,8 @@ MACHINING_RENDERERS["spur-gear-geometry"] = renderSpurGearGeometry;
 // dims: in { axial_pitch_in: L, worm_starts: dimensionless, worm_pitch_dia_in: L, wheel_teeth: dimensionless } out: { lead_in: L, lead_angle_deg: dimensionless, gear_ratio: dimensionless, wheel_pitch_dia_in: L, center_distance_in: L }
 export function computeWormGearGeometry({ axial_pitch_in = 0, worm_starts = 0, worm_pitch_dia_in = 0, wheel_teeth = 0 } = {}) {
   const _g = _finiteGuard({ axial_pitch_in, worm_starts, worm_pitch_dia_in, wheel_teeth }); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (wheel_teeth != null && wheel_teeth !== "" && !Number.isInteger(Number(wheel_teeth))) return { error: "Worm-wheel teeth must be a whole number." };
   const px = Number(axial_pitch_in) || 0;
   const nw = Number(worm_starts) || 0;
   const dw = Number(worm_pitch_dia_in) || 0;
@@ -671,6 +673,8 @@ const _STD_PD = [2, 2.5, 3, 4, 5, 6, 8, 10, 12, 14, 16, 18, 20, 24, 32, 40, 48, 
 // dims: in { teeth: dimensionless, outside_dia_in: L } out: { pd: dimensionless, pitch_dia_in: L, module_mm: L, nearest_std_pd: dimensionless, pct_off: dimensionless }
 export function computeGearIdentification({ teeth = 0, outside_dia_in = 0 } = {}) {
   const _g = _finiteGuard({ teeth, outside_dia_in }); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (teeth != null && teeth !== "" && !Number.isInteger(Number(teeth))) return { error: "Number of teeth must be a whole number." };
   const n = Number(teeth) || 0;
   const od = Number(outside_dia_in) || 0;
   if (!(n > 0)) return { error: "Number of teeth must be positive." };
@@ -1768,6 +1772,8 @@ MACHINING_RENDERERS["thick-wall-cylinder-stress"] = renderThickWallCylinderStres
 // dims: in { pinion_teeth: dimensionless, diametral_pitch_1_in: L^-1, pinion_torque_in_lb: M L^2 T^-2, pinion_rpm: T^-1 } out: { pitch_diameter_in: L, travel_per_rev_in: L, travel_per_tooth_in: L, linear_speed_in_min: L T^-1, rack_force_lbf: M L T^-2, linear_speed_ft_min: L T^-1 }
 export function computeRackAndPinion({ pinion_teeth = 0, diametral_pitch_1_in = 0, pinion_torque_in_lb = 0, pinion_rpm = 0 } = {}) {
   const _g = _finiteGuard({ pinion_teeth, diametral_pitch_1_in, pinion_torque_in_lb, pinion_rpm }); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (pinion_teeth != null && pinion_teeth !== "" && !Number.isInteger(Number(pinion_teeth))) return { error: "Pinion teeth must be a whole number." };
   const N = Number(pinion_teeth) || 0;
   const Pd = Number(diametral_pitch_1_in) || 0;
   const T = Number(pinion_torque_in_lb) || 0;
@@ -1875,6 +1881,8 @@ MACHINING_RENDERERS["plain-bearing-pressure-pv"] = renderPlainBearingPressurePv;
 // dims: in { bolt_count: dimensionless, bolt_diameter_in: L, allowable_shear_psi: M L^-1 T^-2, bolt_circle_diameter_in: L } out: { torque_capacity_in_lb: M L^2 T^-2, torque_capacity_ft_lb: M L^2 T^-2, shear_per_bolt_lbf: M L T^-2, shear_area_per_bolt_in2: L^2, bolt_circle_radius_in: L }
 export function computeFlangeCouplingTorque({ bolt_count = 0, bolt_diameter_in = 0, allowable_shear_psi = 0, bolt_circle_diameter_in = 0 } = {}) {
   const _g = _finiteGuard({ bolt_count, bolt_diameter_in, allowable_shear_psi, bolt_circle_diameter_in }); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (bolt_count != null && bolt_count !== "" && !Number.isInteger(Number(bolt_count))) return { error: "Number of bolts must be a whole number." };
   const n = Number(bolt_count) || 0;
   const d = Number(bolt_diameter_in) || 0;
   const tau = Number(allowable_shear_psi) || 0;

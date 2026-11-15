@@ -303,6 +303,9 @@ STEEL_RENDERERS["steel-column-capacity"] = _simpleRenderer({
 // dims: in { load_kip: M L T^-2, ecc_in: L, ncols: dimensionless, nrows: dimensionless, gage_in: L, pitch_in: L } out: { n: dimensionless, moment: M L^2 T^-2, ip: L^2, direct_kip: M L T^-2, tors_h: M L T^-2, tors_v: M L T^-2, resultant_kip: M L T^-2, ix: L^2, iy: L^2 }
 export function computeBoltGroupEccentric({ load_kip = 0, ecc_in = 0, ncols = 2, nrows = 3, gage_in = 3, pitch_in = 3 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (ncols != null && ncols !== "" && !Number.isInteger(Number(ncols))) return { error: "Number of bolt columns must be a whole number." };
+  if (nrows != null && nrows !== "" && !Number.isInteger(Number(nrows))) return { error: "Number of bolt rows must be a whole number." };
   if (!(load_kip > 0)) return { error: "Load P must be positive (kip)." };
   if (ecc_in < 0) return { error: "Eccentricity cannot be negative (in)." };
   const nc = Math.round(ncols);

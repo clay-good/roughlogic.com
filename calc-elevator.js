@@ -104,6 +104,8 @@ const _AIR_BTU_PER_CUFT_F = 0.018;
 // dims: in { roping_ratio: dimensionless, car_speed_fpm: L T^-1, sheave_diameter_in: L, unbalanced_load_lb: M L T^-2, suspended_load_lb: M L T^-2, rope_count: dimensionless, machine_rated_torque_ftlb: M L^2 T^-2, alternative_roping_ratio: dimensionless } out: { rope_speed_fpm: L T^-1, sheave_rpm: T^-1, sheave_torque_ftlb: M L^2 T^-2, tension_per_rope_lb: M L T^-2, power_hp: M L^2 T^-3, alt_rope_speed_fpm: L T^-1, alt_sheave_rpm: T^-1, torque_margin_pct: dimensionless, rope_travel_per_car_ft: dimensionless, alt_sheave_torque_ftlb: M L^2 T^-2, alt_tension_per_rope_lb: M L T^-2 }
 export function computeTractionRopingRatio({ roping_ratio = 2, car_speed_fpm = 0, sheave_diameter_in = 0, unbalanced_load_lb = 0, suspended_load_lb = 0, rope_count = 0, machine_rated_torque_ftlb = 0, alternative_roping_ratio = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (rope_count != null && rope_count !== "" && !Number.isInteger(Number(rope_count))) return { error: "Number of suspension ropes must be a whole number." };
   if (!(roping_ratio >= 1)) return { error: "Roping ratio must be at least 1." };
   if (!(alternative_roping_ratio >= 1)) return { error: "Alternative roping ratio must be at least 1." };
   if (!(car_speed_fpm > 0)) return { error: "Car speed must be positive." };
@@ -215,6 +217,8 @@ ELEVATOR_RENDERERS["counterweight-balance"] = _simpleRenderer({
 // dims: in { car_weight_lb: M L T^-2, rated_load_lb: M L T^-2, travelling_cable_lb: M L T^-2, rope_count: dimensionless, rope_weight_per_ft: M T^-2, rope_breaking_strength_lb: M L T^-2, rise_ft: L, code_minimum_fs: dimensionless } out: { rope_weight_lb: M L T^-2, suspended_load_lb: M L T^-2, breaking_total_lb: M L T^-2, factor_of_safety: dimensionless, max_rated_load_lb: M L T^-2, margin: dimensionless, fs_without_rope_weight: dimensionless, overstatement: dimensionless }
 export function computeElevatorRopeSafetyFactor({ car_weight_lb = 0, rated_load_lb = 0, travelling_cable_lb = 0, rope_count = 0, rope_weight_per_ft = 0, rope_breaking_strength_lb = 0, rise_ft = 0, code_minimum_fs = 0, roping_ratio = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (rope_count != null && rope_count !== "" && !Number.isInteger(Number(rope_count))) return { error: "Number of suspension ropes must be a whole number." };
   if (!(car_weight_lb > 0)) return { error: "Car weight must be positive." };
   if (!(rated_load_lb > 0)) return { error: "Rated load must be positive." };
   if (!(travelling_cable_lb >= 0)) return { error: "Travelling cable weight cannot be negative." };
@@ -517,6 +521,8 @@ ELEVATOR_RENDERERS["hydraulic-jack-pressure"] = _simpleRenderer({
 // dims: in { total_load_lb: M L T^-2, incline_deg: dimensionless, friction_coefficient: dimensionless, chain_speed_fpm: L T^-1, chain_count: dimensionless, alternative_incline_deg: dimensionless } out: { gravity_lb: M L T^-2, friction_lb: M L T^-2, tension_lb: M L T^-2, per_chain_lb: M L T^-2, power_hp: M L^2 T^-3, gravity_share_pct: dimensionless, alt_friction_lb: M L T^-2, alt_gravity_lb: M L T^-2, alt_tension_lb: M L T^-2, descending_brake_lb: M L T^-2 }
 export function computeStepChainTension({ total_load_lb = 0, incline_deg = 30, friction_coefficient = 0.03, chain_speed_fpm = 0, chain_count = 2, alternative_incline_deg = 6 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (chain_count != null && chain_count !== "" && !Number.isInteger(Number(chain_count))) return { error: "Number of step chains must be a whole number." };
   if (!(total_load_lb > 0)) return { error: "Total moving load must be positive." };
   if (!(incline_deg > 0 && incline_deg < 90)) return { error: "Incline angle must be in (0, 90) degrees." };
   if (!(alternative_incline_deg > 0 && alternative_incline_deg < 90)) return { error: "Alternative incline must be in (0, 90) degrees." };

@@ -587,6 +587,8 @@ export function computePcrMix({
   number_of_reactions = 1, components = [], fudge_factor_pct = 10,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (number_of_reactions != null && number_of_reactions !== "" && !Number.isInteger(Number(number_of_reactions))) return { error: "Number of reactions must be a whole number." };
   if (!(number_of_reactions >= 1)) return { error: "Need at least one reaction." };
   if (!Array.isArray(components) || components.length === 0) return { error: "Provide at least one component." };
   if (!(fudge_factor_pct >= 0)) return { error: "Fudge factor cannot be negative." };

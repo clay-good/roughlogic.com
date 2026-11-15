@@ -298,6 +298,8 @@ DOORHARDWARE_RENDERERS["panic-hardware-force"] = _simpleRenderer({
 // dims: in { device_count: dimensionless, holding_current_a: I, inrush_current_a: I, standby_hours: T, battery_derate: dimensionless, supply_rating_a: I, installed_battery_ah: I T, alarm_current_a: I, alarm_minutes: T } out: { steady_current_a: I, peak_inrush_a: I, amp_hours_required: I T, amp_hours_after_derate: I T, supply_margin_a: I, alarm_amp_hours: I T, batteries_needed: dimensionless, battery_margin_ah: I T, standby_amp_hours: I T }
 export function computeElectricLockPowerBudget({ device_count = 0, holding_current_a = 0, inrush_current_a = 0, standby_hours = 24, battery_derate = 0.8, supply_rating_a = 0, installed_battery_ah = 0, alarm_current_a = 0, alarm_minutes = 5 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (device_count != null && device_count !== "" && !Number.isInteger(Number(device_count))) return { error: "Number of locking devices must be a whole number." };
   if (!(device_count >= 1)) return { error: "Device count must be at least 1." };
   if (!(holding_current_a > 0)) return { error: "Holding current must be positive." };
   if (!(inrush_current_a > 0)) return { error: "Inrush current must be positive." };
@@ -430,6 +432,9 @@ DOORHARDWARE_RENDERERS["maglock-holding-leverage"] = _simpleRenderer({
 // dims: in { cut_positions: dimensionless, usable_depths: dimensionless, mastered_positions: dimensionless, alternative_mastered_positions: dimensionless, change_keys_required: dimensionless } out: { theoretical_total: dimensionless, per_mastered_position: dimensionless, change_keys_available: dimensionless, alternative_change_keys: dimensionless, margin: dimensionless, utilisation_pct: dimensionless }
 export function computeMasterKeyCapacity({ cut_positions = 0, usable_depths = 0, mastered_positions = 0, alternative_mastered_positions = 0, change_keys_required = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (cut_positions != null && cut_positions !== "" && !Number.isInteger(Number(cut_positions))) return { error: "Cut positions must be a whole number." };
+  if (alternative_mastered_positions != null && alternative_mastered_positions !== "" && !Number.isInteger(Number(alternative_mastered_positions))) return { error: "Alternative mastered position count must be a whole number." };
   if (!(cut_positions >= 1)) return { error: "Cut positions must be at least 1." };
   if (!(usable_depths >= 2)) return { error: "Usable depths must be at least 2." };
   if (!(mastered_positions >= 1)) return { error: "Mastered positions must be at least 1." };
@@ -749,6 +754,8 @@ DOORHARDWARE_RENDERERS["gate-operator-duty-cycle"] = _simpleRenderer({
 // dims: in { rpm: T^-1, wings: dimensionless, people_per_compartment: dimensionless, utilization_pct: dimensionless, building_population: dimensionless, peak_fraction_pct: dimensionless, peak_window_min: T, device_count: dimensionless, operating_hours: T } out: { theoretical_per_hour: T^-1, effective_per_hour: T^-1, peak_rate_per_hour: T^-1, devices_required: dimensionless, queue_at_peak: dimensionless, average_rate_per_hour: T^-1, cleared_in_peak: dimensionless, devices_by_average: dimensionless, peak_people: dimensionless, total_per_hour: T^-1 }
 export function computeRevolvingDoorThroughput({ rpm = 0, wings = 0, people_per_compartment = 0, utilization_pct = 60, building_population = 0, peak_fraction_pct = 0, peak_window_min = 0, device_count = 1, operating_hours = 8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (wings != null && wings !== "" && !Number.isInteger(Number(wings))) return { error: "Number of wings must be a whole number." };
   if (!(rpm > 0)) return { error: "Rotation rate must be positive." };
   if (!(wings >= 2)) return { error: "A revolving door needs at least 2 wings." };
   if (!(people_per_compartment > 0)) return { error: "People per compartment must be positive." };

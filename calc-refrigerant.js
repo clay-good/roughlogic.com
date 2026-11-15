@@ -1192,6 +1192,8 @@ REFRIGERANT_RENDERERS["flash-gas-subcool"] = _v586renderFlashGasSubcool;
 // dims: in { bore_in: L, stroke_in: L, cylinders: dimensionless, rpm: T^-1 } out: { displacement_cid_per_rev: L^3, displacement_cfm: L^3 T^-1, displacement_cid_per_min: L^3 T^-1 }
 export function computeCompressorDisplacement({ bore_in = 0, stroke_in = 0, cylinders = 0, rpm = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (cylinders != null && cylinders !== "" && !Number.isInteger(Number(cylinders))) return { error: "Number of cylinders must be a whole number." };
   const bore = Number(bore_in) || 0;
   const stroke = Number(stroke_in) || 0;
   const n = Number(cylinders) || 0;

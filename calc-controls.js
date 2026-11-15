@@ -302,6 +302,8 @@ CONTROLS_RENDERERS["trend-log-storage"] = _simpleRenderer({
 // dims: in { baud: T^-1, device_count: dimensionless, token_octets: dimensionless, turnaround_bits: dimensionless, frame_octets: dimensionless, transmitting_share: dimensionless, alt_device_count: dimensionless, alt_baud: T^-1 } out: { token_frame_ms: T, turnaround_ms: T, idle_rotation_ms: T, frame_time_ms: T, loop_time_ms: T, alt_baud_ratio: dimensionless, alt_devices_ratio: dimensionless, alt_baud_loop_ms: T, alt_devices_idle_ms: T, alt_devices_loop_ms: T, data_ms: T, per_device_ms: T, transmitting_devices: dimensionless, worst_case_response_ms: T }
 export function computeMstpSegmentLoading({ baud = 76800, device_count = 0, token_octets = 8, turnaround_bits = 40, frame_octets = 50, transmitting_share = 0.5, alt_device_count = 0, alt_baud = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (alt_device_count != null && alt_device_count !== "" && !Number.isInteger(Number(alt_device_count))) return { error: "Compare at device count must be a whole number." };
   if (!(baud > 0)) return { error: "Baud rate must be positive." };
   if (!(device_count > 0)) return { error: "Device count must be positive." };
   if (!(token_octets > 0)) return { error: "Token frame length must be positive (octets)." };

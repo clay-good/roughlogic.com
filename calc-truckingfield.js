@@ -630,6 +630,8 @@ TRUCKINGFIELD_RENDERERS["flatbed-tarp-size"] = _simpleRenderer({
 // dims: in { load_lb: M L T^-2, feet_count: dimensionless, foot_area_sqin: L^2, dunnage_bearing_ft: L, deck_rating_plf: M T^-2 } out: { bearing_pressure_psf: M L^-1 T^-2, linear_load_plf: M T^-2, utilization_pct: dimensionless, required_length_ft: L, shortfall_ft: L, total_bearing_sqft: L^2 }
 export function computeDeckPointLoadDunnage({ load_lb = 0, feet_count = 4, foot_area_sqin = 0, dunnage_bearing_ft = 0, deck_rating_plf = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (feet_count != null && feet_count !== "" && !Number.isInteger(Number(feet_count))) return { error: "Number of bearing feet must be a whole number." };
   if (!(load_lb > 0)) return { error: "Concentrated load must be positive." };
   if (!(feet_count >= 1)) return { error: "Bearing-foot count must be at least 1." };
   if (!(foot_area_sqin >= 0)) return { error: "Bearing-foot area cannot be negative." };

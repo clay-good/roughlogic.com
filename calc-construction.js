@@ -150,6 +150,8 @@ export const areaExample = {
 // dims: in { thickness_in: L, width_in: L, length_ft: L, count: dimensionless } out: { total_board_feet: L^3, board_feet_each: L^3, count: dimensionless }
 export function computeBoardFootage({ thickness_in, width_in, length_ft, count = 1 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (count != null && count !== "" && !Number.isInteger(Number(count))) return { error: "Board count must be a whole number." };
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
   if (["thickness_in", "width_in", "length_ft", "count"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Board dimensions and count cannot be negative." };
   count = Number(count);
@@ -1685,6 +1687,8 @@ export const MORTAR_TYPES = ["N", "S", "M"];
 // dims: in { unit_count: dimensionless, unit_kind: dimensionless, joint_in: L, mortar_type: dimensionless } out: { bags: dimensionless, joint_factor: dimensionless }
 export function computeMortarMix({ unit_count = 0, unit_kind = "brick", joint_in = 0.375, mortar_type = "N" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (unit_count != null && unit_count !== "" && !Number.isInteger(Number(unit_count))) return { error: "Unit count must be a whole number." };
   if (!(Number(joint_in) > 0)) return { error: "Mortar joint thickness must be positive (in); 3/8 in is standard." };
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
   if (["unit_count", "joint_in"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Unit count and joint thickness cannot be negative." };
@@ -6002,6 +6006,9 @@ CONSTRUCTION_RENDERERS["scaffold-mudsill-bearing"] = _renderScaffoldMudsillBeari
 // dims: in { platform_dead_lb: M L T^-2, num_workers: dimensionless, worker_lb: M L T^-2, material_lb: M L T^-2, n_legs: dimensionless, component_rating_lb: M L T^-2 } out: { total_load_lb: M L T^-2, leg_load_lb: M L T^-2, swl_lb: M L T^-2, allowable_intended_per_leg_lb: M L T^-2, utilization: dimensionless }
 export function computeScaffoldLegLoad({ platform_dead_lb = 100, num_workers = 2, worker_lb = 250, material_lb = 500, n_legs = 4, component_rating_lb = 2500 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (num_workers != null && num_workers !== "" && !Number.isInteger(Number(num_workers))) return { error: "Workers on the bay must be a whole number." };
+  if (n_legs != null && n_legs !== "" && !Number.isInteger(Number(n_legs))) return { error: "Legs sharing the bay must be a whole number." };
   if (!(n_legs > 0)) return { error: "Leg count must be positive." };
   if (!(component_rating_lb > 0)) return { error: "Component rating must be positive (lb)." };
   if (!(worker_lb > 0)) return { error: "Worker weight must be positive (lb)." };

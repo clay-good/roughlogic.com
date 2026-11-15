@@ -844,6 +844,8 @@ STAGE_RENDERERS["power-distro"] = renderPowerDistro;
 // dims: in { topology: dimensionless, z_ohm: M L^2 T^-3 I^-2, count: dimensionless, series_per_branch: dimensionless, branches: dimensionless, amp_min_ohm: M L^2 T^-3 I^-2, power_w: M L^2 T^-3 } out: { z_total_ohm: M L^2 T^-3 I^-2, safe: dimensionless, per_driver_power_w: M L^2 T^-3, n_drivers: dimensionless }
 export function computeSpeakerImpedance({ topology, z_ohm, count, series_per_branch, branches, amp_min_ohm, power_w }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (count != null && count !== "" && !Number.isInteger(Number(count))) return { error: "Driver count must be a whole number." };
   if (!(z_ohm > 0)) return { error: "Driver impedance must be greater than zero (Ohm)." };
   let n_drivers;
   let z_total_ohm;

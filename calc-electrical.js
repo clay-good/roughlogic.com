@@ -227,6 +227,8 @@ export function computeConduitFill({ conduit, trade_size, conductors }) {
     const a = ins[c.awg];
     if (a === undefined) return { error: "No Chapter 9 Table 5 area is bundled for " + c.awg + " AWG " + c.insulation + "; this calculator carries " + c.insulation + " from " + Object.keys(ins).sort((x, y) => ins[x] - ins[y])[0] + " to " + Object.keys(ins).sort((x, y) => ins[x] - ins[y]).slice(-1)[0] + " AWG." };
     if (Number(c.count) < 0) return { error: "Conductor counts cannot be negative." };
+    // 2.5 conductors picked neither the 31% (two) nor the 40% (over two) column until 2026-11-15.
+    if (c.count != null && c.count !== "" && !Number.isInteger(Number(c.count))) return { error: "Conductor counts must be whole numbers." };
     total += a * (c.count || 1);
     count += (Number(c.count) || 1);
   }
@@ -291,6 +293,7 @@ export function computeBoxFill({ box_volume_in3, conductors_by_size, devices = 0
     const v = BOX_FILL_PER_CONDUCTOR_IN3[awg];
     if (v === undefined) return { error: "Unknown AWG for box fill: " + awg };
     if (Number(count) < 0) return { error: "Conductor counts cannot be negative." };
+    if (count != null && count !== "" && !Number.isInteger(Number(count))) return { error: "Conductor counts must be whole numbers." };
     fill += v * (count || 0);
   }
   // An unknown size used to count the clamp and device allowances as zero, understating the fill.
@@ -1042,6 +1045,9 @@ export function computeServiceLoad({
   hvac_heating_W = 0,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (small_appliance_circuits != null && small_appliance_circuits !== "" && !Number.isInteger(Number(small_appliance_circuits))) return { error: "Small-appliance circuits must be a whole number." };
+  if (laundry_circuits != null && laundry_circuits !== "" && !Number.isInteger(Number(laundry_circuits))) return { error: "Laundry circuits must be a whole number." };
   // A negative load subtracted from the service; none is meaningful.
   if ([area_ft2, small_appliance_circuits, laundry_circuits, fixed_appliances_W, range_W, dryer_W, hvac_cooling_W, hvac_heating_W].some((x) => Number(x) < 0)) return { error: "Area, circuit counts and loads cannot be negative." };
   const lighting = (Number(area_ft2) || 0) * 3;
@@ -2432,6 +2438,10 @@ export function computeServiceLoadStandard({
   service_voltage = 240,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (small_appliance_circuits != null && small_appliance_circuits !== "" && !Number.isInteger(Number(small_appliance_circuits))) return { error: "Small-appliance circuits must be a whole number." };
+  if (laundry_circuit != null && laundry_circuit !== "" && !Number.isInteger(Number(laundry_circuit))) return { error: "Laundry circuits must be a whole number." };
+  if (fixed_appliance_count != null && fixed_appliance_count !== "" && !Number.isInteger(Number(fixed_appliance_count))) return { error: "Fixed appliance count must be a whole number." };
   if ([small_appliance_circuits, laundry_circuit].some((x) => Number(x) < 0)) return { error: "Circuit counts cannot be negative." };
   if (!(area_ft2 >= 0)) return { error: "Area must be non-negative." };
   if ([fixed_appliances_W, fixed_appliance_count, range_W, dryer_W, largest_motor_W, hvac_cooling_W, hvac_heating_W].some((x) => Number(x) < 0)) return { error: "Loads cannot be negative." };
@@ -3882,6 +3892,9 @@ export function computeServiceLoadOptional({
   heating_type = "heat_pump",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (small_appliance_circuits != null && small_appliance_circuits !== "" && !Number.isInteger(Number(small_appliance_circuits))) return { error: "Small-appliance circuits must be a whole number." };
+  if (laundry_circuits != null && laundry_circuits !== "" && !Number.isInteger(Number(laundry_circuits))) return { error: "Laundry circuits must be a whole number." };
   const area = Number(area_ft2) || 0;
   // NEC 220.52 requires two small-appliance circuits and one laundry circuit; a blank field is
   // that minimum, not zero, and fewer than the minimum is not a dwelling this method covers.

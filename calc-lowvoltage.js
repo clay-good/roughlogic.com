@@ -507,6 +507,8 @@ LOWVOLTAGE_RENDERERS["cctv-storage"] = _renderCctvStorage;
 // dims: in { disk_capacity_gb: dimensionless, camera_count: dimensionless, bitrate_mbps: dimensionless, motion_duty_percent: dimensionless } out: { retention_days: T, per_camera_day_gb: dimensionless, aggregate_bandwidth_mbps: dimensionless, recording_hours_per_day: T, retention_weeks: T }
 export function computeCctvRetentionDays({ disk_capacity_gb = 0, camera_count = 1, bitrate_mbps = 0, recording_mode = "continuous", motion_duty_percent } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (camera_count != null && camera_count !== "" && !Number.isInteger(Number(camera_count))) return { error: "Camera count must be a whole number." };
   const cap = Number(disk_capacity_gb);
   if (!(cap > 0)) return { error: "Available disk capacity must be positive (GB)." };
   const base = computeCctvStorage({ camera_count, bitrate_mbps, recording_mode, motion_duty_percent, retention_days: 1 });
@@ -554,6 +556,8 @@ LOWVOLTAGE_RENDERERS["cctv-retention-days"] = _renderCctvRetentionDays;
 // dims: in { amp_rated_w: M L^2 T^-3, headroom_percent: dimensionless, tap_watts: M L^2 T^-3, tap_count: dimensionless, line_voltage_v: M L^2 T^-3 I^-1 } out: { total_tap_w: M L^2 T^-3, reflected_impedance_ohm: M L^2 T^-3 I^-2, budget_limit_w: M L^2 T^-3, line_voltage_v: M L^2 T^-3 I^-1, max_additional_taps: dimensionless }
 export function computeSpeaker70vLine({ amp_rated_w = 0, headroom_percent = 20, tap_watts = 0, tap_count = 0, line_voltage_v = 70.7, run_length_ft = 0, wire_ohms_per_1000ft = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (tap_count != null && tap_count !== "" && !Number.isInteger(Number(tap_count))) return { error: "Number of taps must be a whole number." };
   const rating = Number(amp_rated_w);
   const V = Number(line_voltage_v);
   if (!(rating > 0)) return { error: "Amplifier rated power must be positive (W)." };
@@ -1042,6 +1046,8 @@ LOWVOLTAGE_RENDERERS["structured-cabling-channel"] = _renderStructuredCablingCha
 // dims: in { drops: dimensionless, avg_run_ft: L, slack_ft: L, box_ft: L } out: { total_ft: L, boxes: dimensionless }
 export function computeLvCablePullFootage({ drops = 48, avg_run_ft = 120, slack_ft = 15, box_ft = 1000 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (drops != null && drops !== "" && !Number.isInteger(Number(drops))) return { error: "Number of cable drops must be a whole number." };
   if (!(drops > 0)) return { error: "Drop count must be positive." };
   if (!(avg_run_ft > 0)) return { error: "Average run must be positive (ft)." };
   if (!(box_ft > 0)) return { error: "Box length must be positive (ft)." };

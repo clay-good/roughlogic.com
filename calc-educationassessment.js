@@ -212,6 +212,8 @@ EDUCATIONASSESSMENT_RENDERERS["two-sample-t-test"] = renderTwoSampleTTest;
 // On the n differences d_i (before-after / matched pairs): t = d_bar / (s_d / sqrt(n)), df = n-1, p from tcdf.
 // dims: in { mean_diff: dimensionless, sd_diff: dimensionless, n_pairs: dimensionless, tail: dimensionless, alpha: dimensionless } out: { t_stat: dimensionless, df: dimensionless, p_value: dimensionless, se: dimensionless }
 export function computePairedTTest({ mean_diff = 0, sd_diff = 0, n_pairs = 0, tail = "two", alpha = 0.05 } = {}) {
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (n_pairs != null && n_pairs !== "" && !Number.isInteger(Number(n_pairs))) return { error: "Number of pairs must be a whole number." };
   if (!(Number(alpha) > 0 && Number(alpha) < 1)) return { error: "Alpha is a probability between 0 and 1 (0.05)." };
   if ([alpha].some((x) => Number(x) < 0)) return { error: "Significance level alpha cannot be negative." };
   const d = Number(mean_diff), sd = Number(sd_diff), n = Number(n_pairs);

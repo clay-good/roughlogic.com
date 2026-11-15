@@ -3087,6 +3087,8 @@ SHOP_RENDERERS["cyclone-separator-sizing"] = _simpleRenderer({
 // dims: in { lid_weight_lb: M L T^-2, cg_distance_in: L, opening_angle_deg: dimensionless, moment_arm_in: L, struts: dimensionless, second_angle_deg: dimensionless, second_moment_arm_in: L } out: { lid_moment_in_lb: M L^2 T^-2, force_per_strut_lb: M L T^-2, horizontal_cg_in: L, second_horizontal_in: L, total_force_lb: M L T^-2, second_moment_in_lb: M L^2 T^-2, second_force_per_strut_lb: M L T^-2 }
 export function computeGasStrutForce({ lid_weight_lb = 0, cg_distance_in = 0, opening_angle_deg = 0, moment_arm_in = 0, struts = 2, second_angle_deg = 0, second_moment_arm_in = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (struts != null && struts !== "" && !Number.isInteger(Number(struts))) return { error: "Number of struts must be a whole number." };
   if (!(lid_weight_lb > 0)) return { error: "Lid weight must be positive." };
   if (!(cg_distance_in > 0)) return { error: "Hinge-to-center-of-gravity distance must be positive." };
   if (!(opening_angle_deg >= 0 && opening_angle_deg < 90)) return { error: "Opening angle must be at least 0 and below 90 degrees." };

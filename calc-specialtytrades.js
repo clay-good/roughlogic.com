@@ -308,6 +308,8 @@ SPECIALTYTRADES_RENDERERS["awning-canopy-load"] = _simpleRenderer({
 // dims: in { door_weight_lb: M L T^-2, door_height_in: L, drum_radius_in: L, springs: dimensionless, extra_turns: dimensionless } out: { required_torque_inlb: M L^2 T^-2, turns: dimensionless, lift_turns: dimensionless, required_ippt: M L^2 T^-2, extra_turns: dimensionless, ippt_per_spring: M L^2 T^-2, travel_per_turn_in: L }
 export function computeGarageDoorTorsionSpring({ door_weight_lb = 0, door_height_in = 0, drum_radius_in = 0, springs = 1, extra_turns = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (springs != null && springs !== "" && !Number.isInteger(Number(springs))) return { error: "Number of springs must be a whole number." };
   if (!(door_weight_lb > 0)) return { error: "Door weight must be positive." };
   if (!(door_height_in > 0)) return { error: "Door height must be positive." };
   if (!(drum_radius_in > 0)) return { error: "Cable drum radius must be positive." };

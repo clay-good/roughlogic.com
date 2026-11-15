@@ -44,7 +44,8 @@ function noteOf(result) {
 //
 // A tile that takes a count (stages, legs, strings) rejects 2.85 of them, so a
 // last attempt keeps whole numbers whole: it would otherwise drop out of the
-// set the day it gained that guard, as crusher-reduction-ratio did.
+// set the day it gained that guard, as crusher-reduction-ratio did. The last
+// attempt does the same on the downward twin.
 function perturb(inputs, m = 1.37, c = 0.11, keepWhole = false) {
   const out = {};
   for (const [k, v] of Object.entries(inputs || {})) {
@@ -75,6 +76,9 @@ async function collect() {
       b = fn(perturb(inputs));
       if (b && b.error) b = fn(perturb(inputs, 0.73, 0.01));
       if (b && b.error) b = fn(perturb(inputs, 1.37, 0.11, true));
+      // A count beside a 0-1 fraction at its ceiling (tanker count and usable
+      // fraction 0.9) needs both: down, and whole (2026-11-15).
+      if (b && b.error) b = fn(perturb(inputs, 0.73, 0.01, true));
     } catch { continue; }
     const na = noteOf(a);
     const nb = noteOf(b);

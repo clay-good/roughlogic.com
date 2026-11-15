@@ -220,6 +220,8 @@ export const septicTankForIntervalExample = { inputs: { target_years: 5, people:
 // dims: in { orifice_dia_in: L, squirt_ft: L, cd: dimensionless, orifices_per_lateral: dimensionless, num_laterals: dimensionless } out: { per_orifice_gpm: L^3 T^-1, total_orifices: dimensionless, system_gpm: L^3 T^-1, squirt_psi: M L^-1 T^-2 }
 export function computeSepticLppOrifice({ orifice_dia_in, squirt_ft, cd = 0.6, orifices_per_lateral, num_laterals } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (num_laterals != null && num_laterals !== "" && !Number.isInteger(Number(num_laterals))) return { error: "Number of laterals must be a whole number." };
   const dia = Number(orifice_dia_in);
   const squirt = Number(squirt_ft);
   const c = Number(cd);
@@ -508,6 +510,8 @@ export const SEPTIC_RENDERERS = {
 // dims: in { num_trenches: dimensionless, trench_length_ft: L, trench_width_in: L, stone_depth_in: L, waste_pct: dimensionless } out: { stone_cf: L^3, stone_cy: L^3, stone_tons: M }
 export function computeLeachFieldAggregate({ num_trenches = 3, trench_length_ft = 60, trench_width_in = 24, stone_depth_in = 12, waste_pct = 10 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (num_trenches != null && num_trenches !== "" && !Number.isInteger(Number(num_trenches))) return { error: "Number of trenches must be a whole number." };
   if (!(num_trenches > 0)) return { error: "Trench count must be positive." };
   if (!(trench_length_ft > 0)) return { error: "Trench length must be positive (ft)." };
   if (!(trench_width_in > 0)) return { error: "Trench width must be positive (in)." };

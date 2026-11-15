@@ -667,6 +667,8 @@ export function computeRecircPumpHead({
   equivalent_length_per_fitting_ft = 2,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (fittings_count != null && fittings_count !== "" && !Number.isInteger(Number(fittings_count))) return { error: "Fittings count must be a whole number." };
   if (Number(arguments[0]?.fittings_count) < 0 || (arguments[0]?.fittings_count !== undefined && !Number.isFinite(Number(arguments[0].fittings_count)))) return { error: "Fittings count must be a number, zero or more." };
   const d = Number(internal_diameter_in) || 0;
   const L = Number(pipe_length_ft) || 0;

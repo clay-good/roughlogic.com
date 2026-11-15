@@ -541,6 +541,7 @@ export function computeEquivalentLength({ items = [] }) {
     const ft = t[String(it.diameter)];
     if (ft === undefined) return { error: "Unknown diameter for " + it.type + ": " + it.diameter };
     const c = Number(it.count) || 0;
+    if (!Number.isInteger(c)) return { error: "Fitting counts must be whole numbers." };
     total += ft * c;
     detail.push({ type: it.type, diameter: it.diameter, count: c, equivalent_ft_each: ft });
   }
@@ -2140,6 +2141,7 @@ export function computeDuctFrictionStatic({
     else if (fit.kind && DUCT_FITTINGS_C_O[fit.kind] !== undefined) C_o = DUCT_FITTINGS_C_O[fit.kind];
     else return { error: "Each fitting needs a C_o or a known kind." };
     const count = Number(fit.count) || 1;
+    if (!Number.isInteger(count)) return { error: "Fitting counts must be whole numbers." };
     const loss = C_o * VP_in_wc * count;
     fitting_loss_in_wc += loss;
     fitting_breakdown.push({ kind: fit.kind || "user", C_o, count, loss_in_wc: loss });

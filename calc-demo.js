@@ -384,6 +384,8 @@ DEMO_RENDERERS["abatement-waste-containers"] = _simpleRenderer({
 // dims: in { lab_result_ug: M, wipe_area_ft2: L^2, clearance_limit_ug_ft2: M L^-2, rooms: dimensionless, surfaces_per_room: dimensionless, blanks_per_job: dimensionless } out: { dust_loading_ug_ft2: M L^-2, limit_margin_ug_ft2: M L^-2, loading_ratio: dimensionless, max_lab_result_ug: M, wipe_count: dimensionless, total_samples: dimensionless, rooms: dimensionless, wipe_area_ft2: L^2, blanks_per_job: dimensionless, clearance_limit_ug_ft2: M L^-2, lab_result_ug: M, surfaces_per_room: dimensionless }
 export function computeLeadDustClearance({ lab_result_ug = 0, wipe_area_ft2 = 1, clearance_limit_ug_ft2 = 0, rooms = 0, surfaces_per_room = 3, blanks_per_job = 1 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A count of things is whole: fractional entries passed silently until 2026-11-15.
+  if (rooms != null && rooms !== "" && !Number.isInteger(Number(rooms))) return { error: "Rooms to sample must be a whole number." };
   for (const k of ["lab_result_ug"]) { const v = arguments[0]?.[k]; if (v === undefined || v === null || v === "") return { error: "Enter the laboratory result (micrograms); a blank result read as a pass at zero." }; }
   if (!(lab_result_ug >= 0)) return { error: "The laboratory result cannot be negative (micrograms)." };
   if (!(wipe_area_ft2 > 0)) return { error: "The wiped area must be positive (sq ft) -- it is measured with a template, commonly one square foot." };
