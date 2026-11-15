@@ -255,7 +255,7 @@ function renderSlingAngle(inputRegion, outputRegion, citationEl) {
   const oHaz = _moF(outputRegion, "Angle factor", "sa-out-haz");
   function fillExample(x) { w.input.value = x.load_lb; c.select.value = x.sling_config; a.input.value = x.included_angle_deg; n.input.value = x.n_legs; cap.input.value = ""; dd.input.value = ""; update(); }
   const update = _debF(() => {
-    const r = computeSlingAngle({ load_lb: Number(w.input.value) || 0, sling_config: c.select.value, included_angle_deg: Number(a.input.value) || 0, n_legs: Number(n.input.value) || 1, sling_rated_capacity_lb: Number(cap.input.value) || 0, dd_ratio: Number(dd.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["load_lb", "sling_config", "included_angle_deg", "n_legs", "sling_rated_capacity_lb", "dd_ratio"], r);
+    const r = computeSlingAngle({ load_lb: Number(w.input.value) || 0, sling_config: c.select.value, included_angle_deg: Number(a.input.value) || 0, n_legs: n.input.value === "" ? 2 : Number(n.input.value), sling_rated_capacity_lb: Number(cap.input.value) || 0, dd_ratio: Number(dd.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["load_lb", "sling_config", "included_angle_deg", "n_legs", "sling_rated_capacity_lb", "dd_ratio"], r);
     if (r.error) { oT.textContent = r.error; oReq.textContent = "-"; oHaz.textContent = "-"; return; }
     oT.textContent = _fmtF(r.tension_per_leg_lb, 0) + " lb";
     if (r.angle_ignored) oT.textContent += " for legs hanging straight down. THE ANGLE ENTERED IS NOT USED for a vertical hitch: legs spread at that angle carry " + _fmtF(r.spread_tension_per_leg_lb, 0) + " lb each -- choose bridle or basket if they spread";

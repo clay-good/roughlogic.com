@@ -588,7 +588,7 @@ function _renderPipePressureRating(inputRegion, outputRegion, citationEl) {
       allow_stress: Number(S.input.value) || 0, joint_factor: Number(E.input.value) || 0,
       y_coeff: Number(y.input.value) || 0, mill_tol_frac: Number(mt.input.value) || 0,
       allowance_in: Number(A.input.value) || 0, design_p: Number(dp.input.value) || 0,
-      mode: mode.select.value, weld_strength_reduction: Number(Wf.input.value) || 1,
+      mode: mode.select.value, weld_strength_reduction: Wf.input.value === "" ? 1 : Number(Wf.input.value),
     }); stepsFor(outputRegion, inputRegion, ["od_in", "wall_in", "allow_stress", "joint_factor", "y_coeff", "mill_tol_frac", "allowance_in", "design_p", "mode", "weld_strength_reduction"], r);
     if (r.error) { oOut.textContent = r.error; oWall.textContent = "-"; return; }
     if (r.mode === "required_wall") {
@@ -792,6 +792,8 @@ export function computeBranchSaddleCutback({ branch_od_in = 0, run_od_in = 0, st
   if (!(rod > 0)) return { error: "Run OD must be positive (in)." };
   if (bod > rod) return { error: "Branch OD must be <= run OD (no saddle geometry for an equal-or-larger branch by this method)." };
   let n = Math.round(Number(stations));
+  // A typed 0 was quietly replaced by the default until 2026-11-15.
+  if (stations != null && stations !== "" && !(n >= 1 && n <= 24)) return { error: "Marks per quarter must be a whole number from 1 to 24." };
   if (!(n >= 1 && n <= 24)) n = 6;
   const r = bod / 2;
   const R = rod / 2;
@@ -818,7 +820,7 @@ function _renderBranchSaddleCutback(inputRegion, outputRegion, citationEl) {
   const oMax = makeOutputLine(outputRegion, "Maximum cutback (at the sides)", "bs-out-max");
   const oTab = makeOutputLine(outputRegion, "Ordinates (angle: cutback, in)", "bs-out-tab");
   const update = debounce(() => {
-    const r = computeBranchSaddleCutback({ branch_od_in: Number(bod.input.value) || 0, run_od_in: Number(rod.input.value) || 0, stations: Number(st.input.value) || 6 }); stepsFor(outputRegion, inputRegion, ["branch_od_in", "run_od_in", "stations"], r);
+    const r = computeBranchSaddleCutback({ branch_od_in: Number(bod.input.value) || 0, run_od_in: Number(rod.input.value) || 0, stations: st.input.value === "" ? 6 : Number(st.input.value) }); stepsFor(outputRegion, inputRegion, ["branch_od_in", "run_od_in", "stations"], r);
     if (r.error) { oMax.textContent = r.error; oTab.textContent = "-"; return; }
     oMax.textContent = fmt(r.max_cutback_in, 3) + " in (r " + fmt(r.r_in, 3) + ", R " + fmt(r.R_in, 3) + ")";
     oTab.textContent = r.ordinates.map((o) => fmt(o.angle_deg, 0) + "°: " + fmt(o.cutback_in, 3)).join(", ");

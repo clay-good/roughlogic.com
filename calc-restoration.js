@@ -364,7 +364,7 @@ export function renderDryingGoal(inputRegion, outputRegion, citationEl) {
       outdoor_RH_percent: oR.input.value === "" ? null : Number(oR.input.value),
       // A blank indoor box takes the compute's own default; a typed 0 is no longer replaced by it.
       indoor_temperature_F: iT.input.value === "" ? undefined : Number(iT.input.value),
-      margin_GPP: Number(m.input.value) || 10,
+      margin_GPP: m.input.value === "" ? 10 : Number(m.input.value),
     }); stepsFor(outputRegion, inputRegion, ["outdoor_temperature_F", "outdoor_RH_percent", "margin_GPP"], r);
     if (r.error) { ogpp.textContent = r.error; tgpp.textContent = "-"; trh.textContent = "-"; return; }
     ogpp.textContent = fmt(r.outdoor_GPP, 1);
@@ -418,7 +418,7 @@ export function renderAirMovers(inputRegion, outputRegion, citationEl) {
   const oP = makeOutputLine(outputRegion, "Placement pattern", "am-out-p");
   const oN = makeOutputLine(outputRegion, "Placement note", "am-out-n");
   const update = debounce(() => {
-    const r = computeAirMovers({ affected_area_ft2: Number(a.input.value) || 0, rooms: Number(rm.input.value) || 1, wall_ceiling_ft2: Number(wcf.input.value) || 0, insets: Number(ins.input.value) || 0, water_class: c.select.value }); stepsFor(outputRegion, inputRegion, ["affected_area_ft2", "rooms", "wall_ceiling_ft2", "insets", "water_class"], r);
+    const r = computeAirMovers({ affected_area_ft2: Number(a.input.value) || 0, rooms: rm.input.value === "" ? 1 : Number(rm.input.value), wall_ceiling_ft2: Number(wcf.input.value) || 0, insets: Number(ins.input.value) || 0, water_class: c.select.value }); stepsFor(outputRegion, inputRegion, ["affected_area_ft2", "rooms", "wall_ceiling_ft2", "insets", "water_class"], r);
     if (r.error) { oC.textContent = r.error; oCFM.textContent = "-"; oP.textContent = "-"; oN.textContent = "-"; return; }
     oC.textContent = String(r.air_mover_count) + " to " + String(r.air_mover_count_high) + " (IICRC low and high range)";
     oCFM.textContent = fmt(r.total_cfm, 0) + " CFM";

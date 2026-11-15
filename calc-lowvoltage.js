@@ -1032,7 +1032,7 @@ function _renderStructuredCablingChannel(inputRegion, outputRegion, citationEl) 
   const oCh = makeOutputLine(outputRegion, "Channel vs 100 m", "scc-out-ch");
   const oNote = makeOutputLine(outputRegion, "Note", "scc-out-n");
   const update = debounce(() => {
-    const r = computeStructuredCablingChannel({ permanent_link_m: Number(pl.input.value) || 0, cords_m: Number(cd.input.value) || 0, temp_c: tc.input.value === "" ? 20 : Number(tc.input.value), derate_per_c: Number(dr.input.value) || 0.004 }); stepsFor(outputRegion, inputRegion, ["permanent_link_m", "cords_m", "temp_c", "derate_per_c"], r);
+    const r = computeStructuredCablingChannel({ permanent_link_m: Number(pl.input.value) || 0, cords_m: Number(cd.input.value) || 0, temp_c: tc.input.value === "" ? 20 : Number(tc.input.value), derate_per_c: dr.input.value === "" ? 0.004 : Number(dr.input.value) }); stepsFor(outputRegion, inputRegion, ["permanent_link_m", "cords_m", "temp_c", "derate_per_c"], r);
     if (r.error) { oPl.textContent = r.error; oCh.textContent = "-"; oNote.textContent = ""; return; }
     oPl.textContent = fmt(r.max_pl_m, 1) + " m max -- link " + (r.pl_ok ? "OK" : "TOO LONG");
     oCh.textContent = fmt(r.channel_m, 1) + " m -- channel " + (r.chan_ok ? "OK" : "OVER 100 m") + (r.cords_ok ? "" : "; cords over the 10 m TIA total");

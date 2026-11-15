@@ -467,7 +467,7 @@ function renderPlateCost(inputRegion, outputRegion, citationEl) {
   function update() {
     const ingredients = rows.map((r) => ({ name: r.n.value, lbs: Number(r.lbs.value) || 0, cost_per_lb: Number(r.c.value) || 0 })).filter((i) => i.lbs > 0);
     if (ingredients.length === 0) { for (const o of [oP, oS, oM, oF]) o.textContent = "-"; return; }
-    const r = computePlateCost({ ingredients, target_food_cost_pct: Number(fc.input.value) || 30 }); stepsFor(outputRegion, inputRegion, ["ingredients", "target_food_cost_pct"], r);
+    const r = computePlateCost({ ingredients, target_food_cost_pct: fc.input.value === "" ? 30 : Number(fc.input.value) }); stepsFor(outputRegion, inputRegion, ["ingredients", "target_food_cost_pct"], r);
     if (r.error) { oP.textContent = r.error; for (const o of [oS, oM, oF]) o.textContent = "-"; return; }
     oP.textContent = "$" + fmt(r.plate_cost, 2);
     oS.textContent = "$" + fmt(r.suggested_price, 2);

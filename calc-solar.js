@@ -116,6 +116,9 @@ export function computeBatteryRuntime({ amp_hours, system_V, dod_percent = 100, 
   if (!(eff > 0 && eff <= 1)) return { error: "Inverter efficiency must be over 0 and at most 100 percent (use 100 for a DC load)." };
   const usable_Ah = Ah * dod;
   const usable_Wh = usable_Ah * V;
+  // A typed 0 was quietly replaced by the default until 2026-11-15.
+  if (peukert_k != null && peukert_k !== "" && !(Number(peukert_k) > 0)) return { error: "Peukert exponent must be above 0 (1 if unknown)." };
+  if (rated_hours != null && rated_hours !== "" && !(Number(rated_hours) > 0)) return { error: "Capacity rating time must be above 0 hours (20 for the C/20 rate)." };
   const k = Number(peukert_k) || 1;
   if (k < 1) return { error: "The Peukert exponent is 1 or more (1.0 ideal, about 1.1 to 1.3 lead-acid)." };
   // An AC load draws through the inverter, so the battery must supply load/eff.
@@ -226,10 +229,10 @@ export function renderBatteryRuntime(inputRegion, outputRegion, citationEl, para
       amp_hours: Number(ah.input.value) || 0,
       system_V: Number(v.input.value) || 0,
       dod_percent: Number(dod.input.value) || 0,
-      inverter_efficiency_pct: Number(eff.input.value) || 100,
+      inverter_efficiency_pct: eff.input.value === "" ? 100 : Number(eff.input.value),
       load_W: Number(load.input.value) || 0,
-      peukert_k: Number(k.input.value) || 1,
-      rated_hours: Number(rh.input.value) || 20,
+      peukert_k: k.input.value === "" ? 1 : Number(k.input.value),
+      rated_hours: rh.input.value === "" ? 20 : Number(rh.input.value),
     }); stepsFor(outputRegion, inputRegion, ["amp_hours", "system_V", "dod_percent", "inverter_efficiency_pct", "load_W", "peukert_k", "rated_hours"], r);
     if (r.error) { oH.textContent = r.error; oM.textContent = "-"; oWh.textContent = "-"; return; }
     oH.textContent = fmt(r.hours, 2) + " hr";

@@ -115,6 +115,8 @@ export function computeWireAmpacity({ awg, material, insulation_rating_C, ambien
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // A blank ambient read as 0 C overstated the ampacity of a conductor in a 30 C room.
   if (ambient_C === null || ambient_C === undefined || ambient_C === "") return { error: "Enter the ambient temperature (C)." };
+  // A typed 0 was quietly replaced by the default until 2026-11-15.
+  if (bundle_count != null && bundle_count !== "" && !(Number.isInteger(Number(bundle_count)) && Number(bundle_count) >= 1)) return { error: "Conductor bundle count must be a whole number, 1 or more." };
   const I = ampacityFromPhysics({ awg, material, insulation_rating_C, ambient_C, bundle_count });
   return { ampacity_A: I };
 }
@@ -637,7 +639,7 @@ export function renderWireAmpacity(inputRegion, outputRegion, citationEl, params
       material: mat.select.value,
       insulation_rating_C: Number(ins.select.value),
       ambient_C: amb.input.value === "" ? null : Number(amb.input.value),
-      bundle_count: Number(bun.input.value) || 1,
+      bundle_count: bun.input.value === "" ? 1 : Number(bun.input.value),
     }); stepsFor(outputRegion, inputRegion, ["awg", "material", "insulation_rating_C", "ambient_C", "bundle_count"], r);
     if (r.error) { out.textContent = r.error; outBasis.textContent = "-"; return; }
     out.textContent = fmt(r.ampacity_A, 1) + " A";
@@ -843,7 +845,7 @@ export function renderBreakerSize(inputRegion, outputRegion, citationEl, params)
       load_W: Number(watts.input.value) || 0,
       voltage_V: Number(volts.input.value) || 0,
       phase: phase.select.value,
-      power_factor: Number(pf.input.value) || 1,
+      power_factor: pf.input.value === "" ? 1 : Number(pf.input.value),
       continuous: continuous.input.checked,
     }); stepsFor(outputRegion, inputRegion, ["load_A", "load_W", "voltage_V", "phase", "power_factor", "continuous"], r);
     if (r.error) { outReq.textContent = r.error; outNext.textContent = "-"; outWA.textContent = "-"; return; }
@@ -911,7 +913,7 @@ export function renderTransformerSize(inputRegion, outputRegion, citationEl, par
   const update = debounce(() => {
     const r = computeTransformerSize({
       load_kW: Number(load.input.value) || 0,
-      power_factor: Number(pf.input.value) || 1,
+      power_factor: pf.input.value === "" ? 1 : Number(pf.input.value),
       primary_V: Number(primary.input.value) || 0,
       secondary_V: Number(secondary.input.value) || 0,
       phase: phase.select.value,
@@ -1724,6 +1726,8 @@ export function computeMultiLoadVoltageDrop({
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Array.isArray(loads) || loads.length === 0) return { error: "Provide at least one load." };
+  // A 0 V source printed a negative load voltage until 2026-11-15.
+  if (!(Number(source_voltage_V) > 0)) return { error: "Source voltage must be above 0 (V)." };
   const knownAwg = ["18","16","14","12","10","8","6","4","2","1","1/0","2/0","3/0","4/0"];
   if (!knownAwg.includes(awg)) return { error: "Unknown AWG." };
   // 75 C stranded, the NEC Chapter 9 Table 8 basis the citation names, on the
@@ -2118,7 +2122,7 @@ function renderMultiLoadVD(inputRegion, outputRegion, citationEl, params) {
     const loads = rows.map((r) => ({ distance_ft: Number(r.d.value) || 0, current_A: Number(r.c.value) || 0 })).filter((l) => l.distance_ft > 0);
     if (loads.length === 0) { oW.textContent = "-"; oV.textContent = "-"; oP.textContent = "-"; return; }
     const r = computeMultiLoadVoltageDrop({
-      material: mat.select.value, awg: aw.select.value, source_voltage_V: Number(sv.input.value) || 120, loads,
+      material: mat.select.value, awg: aw.select.value, source_voltage_V: sv.input.value === "" ? 120 : Number(sv.input.value), loads,
     }); stepsFor(outputRegion, inputRegion, ["material", "awg", "source_voltage_V", "loads"], r);
     if (r.error) { oW.textContent = r.error; oV.textContent = "-"; oP.textContent = "-"; return; }
     oW.textContent = fmt(r.worst_drop_V, 3) + " V";
@@ -2579,7 +2583,7 @@ function _v7renderShortCircuitPP(inputRegion, outputRegion, citationEl) {
       utility_kVA: Number(kVA.input.value) || 0, utility_Z_pct: Number(z.input.value) || 0,
       secondary_V: Number(v.input.value) || 0, phase: phase.select.value,
       C_value: Number(c.input.value) || 0, length_ft: Number(len.input.value) || 0,
-      parallel_sets: Number(sets.input.value) || 1,
+      parallel_sets: sets.input.value === "" ? 1 : Number(sets.input.value),
     }); stepsFor(outputRegion, inputRegion, ["utility_kVA", "utility_Z_pct", "secondary_V", "phase", "C_value", "length_ft", "parallel_sets"], r);
     if (r.error) { oS.textContent = r.error; oF.textContent = "-"; oM.textContent = "-"; oP.textContent = "-"; return; }
     oS.textContent = _v7fmt(r.I_sca_secondary_A, 0) + " A";
@@ -2630,8 +2634,8 @@ function _v7renderGeneratorMotorStarting(inputRegion, outputRegion, citationEl) 
       motors: [{ hp: Number(hp.input.value) || 0, code_letter: code.select.value }],
       // Running motors add load at the compute's 0.746 kW/hp; they do not set the start.
       non_motor_kW: (Number(nonMotor.input.value) || 0) + Math.max(0, Number(others.input.value) || 0) * 0.746,
-      dip_factor: Number(dip.input.value) || 0.30,
-      generator_xd: Number(xdIn.input.value) || 0.25,
+      dip_factor: dip.input.value === "" ? 0.30 : Number(dip.input.value),
+      generator_xd: xdIn.input.value === "" ? 0.25 : Number(xdIn.input.value),
       starts_per_hour: starts.select.value,
     }); stepsFor(outputRegion, inputRegion, ["motors", "dip_factor", "generator_xd", "starts_per_hour"], r);
     if (r.error) { oR.textContent = r.error; oS.textContent = "-"; oReq.textContent = "-"; oRec.textContent = "-"; return; }
@@ -2687,7 +2691,7 @@ function _v7renderServiceLoadStandard(inputRegion, outputRegion, citationEl) {
       largest_motor_W: Number(motor.input.value) || 0,
       hvac_cooling_W: Number(cool.input.value) || 0,
       hvac_heating_W: Number(heat.input.value) || 0,
-      service_voltage: Number(v.input.value) || 240,
+      service_voltage: v.input.value === "" ? 240 : Number(v.input.value),
     }); stepsFor(outputRegion, inputRegion, ["area_ft2", "small_appliance_circuits", "laundry_circuit", "fixed_appliances_W", "fixed_appliance_count", "range_W", "dryer_W", "largest_motor_W", "hvac_cooling_W", "hvac_heating_W", "service_voltage"], r);
     if (r.error) { oT.textContent = r.error; oA.textContent = "-"; oRec.textContent = "-"; oG.textContent = "-"; oR.textContent = "-"; return; }
     oT.textContent = _v7fmt(r.total_VA, 0) + " VA";
@@ -4372,7 +4376,7 @@ function renderBondingJumper(inputRegion, outputRegion, citationEl) {
   const oRule = makeOutputLine(outputRegion, "Basis", "bj-out-rule");
   const oNote = makeOutputLine(outputRegion, "Note", "bj-out-note");
   const update = debounce(() => {
-    const r = computeBondingJumper({ mode: mode.select.value, material: mat.select.value, service_kcmil: Number(kcmil.input.value) || 0, ocpd_A: Number(ocpd.input.value) || 0, parallel_sets: Number(psets.input.value) || 1 }); stepsFor(outputRegion, inputRegion, ["mode", "material", "service_kcmil", "ocpd_A", "parallel_sets"], r);
+    const r = computeBondingJumper({ mode: mode.select.value, material: mat.select.value, service_kcmil: Number(kcmil.input.value) || 0, ocpd_A: Number(ocpd.input.value) || 0, parallel_sets: psets.input.value === "" ? 1 : Number(psets.input.value) }); stepsFor(outputRegion, inputRegion, ["mode", "material", "service_kcmil", "ocpd_A", "parallel_sets"], r);
     if (r.error) { oReq.textContent = r.error; oRule.textContent = "-"; oNote.textContent = "-"; return; }
     oReq.textContent = r.required_jumper + " AWG/kcmil " + mat.select.value + (r.parallel_sets > 1 ? " in each of " + r.parallel_sets + " " + (r.parallel_sets === 1 ? "raceway" : "raceways") : "");
     oRule.textContent = r.rule;

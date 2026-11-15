@@ -196,7 +196,7 @@ export function renderGasPipeSizing(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeGasPipeSizing({
       btu_load: Number(btu.input.value) || 0, length_ft: Number(length.input.value) || 0,
-      gas: gas.select.value, dP_in_wc: Number(dP.input.value) || 0.5,
+      gas: gas.select.value, dP_in_wc: dP.input.value === "" ? 0.5 : Number(dP.input.value),
     }); stepsFor(outputRegion, inputRegion, ["btu_load", "length_ft", "gas", "dP_in_wc"], r);
     if (r.error) { oR.textContent = r.error; oS.textContent = "-"; oD.textContent = "-"; return; }
     oR.textContent = fmt(r.required_cfh, 1) + " ft^3/hr";
@@ -266,7 +266,7 @@ export function renderGasLeakRate(inputRegion, outputRegion, citationEl) {
     const r = computeGasLeakRate({
       orifice_diameter_in: Number(dia.input.value) || 0,
       upstream_psi: Number(psi.input.value) || 0,
-      c: Number(c.input.value) || 0.7,
+      c: c.input.value === "" ? 0.7 : Number(c.input.value),
       gas: gas.select.value,
     }); stepsFor(outputRegion, inputRegion, ["orifice_diameter_in", "upstream_psi", "c", "gas"], r);
     if (r.error) { oQ.textContent = r.error; oA.textContent = "-"; return; }
@@ -327,7 +327,7 @@ function renderGasLeakHoleDiameter(inputRegion, outputRegion, citationEl) {
     const r = computeGasLeakHoleDiameter({
       leak_rate_cfh: Number(q.input.value) || 0,
       upstream_psi: Number(psi.input.value) || 0,
-      c: Number(c.input.value) || 0.7,
+      c: c.input.value === "" ? 0.7 : Number(c.input.value),
       gas: gas.select.value,
     }); stepsFor(outputRegion, inputRegion, ["leak_rate_cfh", "upstream_psi", "c", "gas"], r);
     if (r.error) { oD.textContent = r.error; oA.textContent = "-"; oN.textContent = ""; return; }

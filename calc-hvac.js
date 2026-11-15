@@ -1050,7 +1050,7 @@ export function renderEvaporativeCooling(inputRegion, outputRegion, citationEl) 
   const update = debounce(() => {
     const r = computeEvaporativeCooling({
       evaporation_rate_lb_hr: Number(m.input.value) || 0,
-      hfg_btu_per_lb: Number(h.input.value) || HFG_WATER_BTU_PER_LB,
+      hfg_btu_per_lb: h.input.value === "" ? HFG_WATER_BTU_PER_LB : Number(h.input.value),
     }); stepsFor(outputRegion, inputRegion, ["evaporation_rate_lb_hr", "hfg_btu_per_lb"], r);
     if (r.error) { oQ.textContent = r.error; oT.textContent = "-"; return; }
     oQ.textContent = fmt(r.cooling_btu_hr, 0) + " BTU/hr";
@@ -1652,6 +1652,8 @@ export function computeBaseboardOutput({ water_temp_F = 0, flow_gpm = 1, length_
   if (!m) return { error: "Unknown baseboard model." };
   if (!(water_temp_F > 0)) return { error: "Water temperature must be positive." };
   if (!(length_ft >= 0)) return { error: "Length must be non-negative." };
+  // A typed 0 was quietly replaced by the default until 2026-11-15.
+  if (flow_gpm != null && flow_gpm !== "" && !(Number(flow_gpm) > 0)) return { error: "Flow must be above 0 gpm (1 gpm is the rating basis)." };
   const at4 = Number(flow_gpm) >= 4;
   const pts = at4 && m.points_4gpm ? m.points_4gpm : m.points;
   // Below the lowest rated temperature, holding the first row would overstate
@@ -1891,7 +1893,7 @@ function renderAirReceiver(inputRegion, outputRegion, citationEl) {
     const tools = rows.map((r) => ({ cfm: Number(r.cf.value) || 0, duty_cycle: Number(r.dc.value) || 0 })).filter((t) => t.cfm > 0);
     const r = computeAirReceiver({
       tools, pump_scfm: Number(ps.input.value) || 0, p_high_psi: Number(ph.input.value) || 0,
-      p_low_psi: Number(pl.input.value) || 0, drawdown_minutes: Number(dr.input.value) || 1,
+      p_low_psi: Number(pl.input.value) || 0, drawdown_minutes: dr.input.value === "" ? 1 : Number(dr.input.value),
     }); stepsFor(outputRegion, inputRegion, ["tools", "pump_scfm", "p_high_psi", "p_low_psi", "drawdown_minutes"], r);
     if (r.error) { oD.textContent = r.error; oG.textContent = "-"; oC.textContent = "-"; return; }
     oD.textContent = fmt(r.demand_scfm, 2) + " scfm";
@@ -1939,7 +1941,7 @@ function renderBaseboardOutput(inputRegion, outputRegion, citationEl) {
   function fillExample(v) { t.input.value = v.water_temp_F; fw.input.value = v.flow_gpm; l.input.value = v.length_ft; m.select.value = v.model; update(); }
   const update = debounce(() => {
     const r = computeBaseboardOutput({
-      water_temp_F: Number(t.input.value) || 0, flow_gpm: Number(fw.input.value) || 1,
+      water_temp_F: Number(t.input.value) || 0, flow_gpm: fw.input.value === "" ? 1 : Number(fw.input.value),
       length_ft: Number(l.input.value) || 0, model: m.select.value,
     }); stepsFor(outputRegion, inputRegion, ["water_temp_F", "flow_gpm", "length_ft", "model"], r);
     if (r.error) { oP.textContent = r.error; oT.textContent = "-"; oA.textContent = "-"; return; }
@@ -1962,7 +1964,7 @@ function renderBaseboardLengthForLoad(inputRegion, outputRegion, citationEl) {
   const oP = makeOutputLine(outputRegion, "BTU/ft at this temp", "bll-out-p");
   const oNote = makeOutputLine(outputRegion, "Note", "bll-out-n");
   const update = debounce(() => {
-    const r = computeBaseboardLengthForLoad({ target_btuhr: Number(q.input.value) || 0, water_temp_F: Number(t.input.value) || 0, flow_gpm: Number(fw.input.value) || 1, model: m.select.value }); stepsFor(outputRegion, inputRegion, ["target_btuhr", "water_temp_F", "flow_gpm", "model"], r);
+    const r = computeBaseboardLengthForLoad({ target_btuhr: Number(q.input.value) || 0, water_temp_F: Number(t.input.value) || 0, flow_gpm: fw.input.value === "" ? 1 : Number(fw.input.value), model: m.select.value }); stepsFor(outputRegion, inputRegion, ["target_btuhr", "water_temp_F", "flow_gpm", "model"], r);
     if (r.error) { oL.textContent = r.error; oP.textContent = "-"; oNote.textContent = ""; return; }
     oL.textContent = fmt(r.length_ft, 1) + " ft";
     oP.textContent = fmt(r.btu_per_ft, 0) + " BTU/ft";
@@ -2400,7 +2402,7 @@ function _v7h_renderInsulationHeatLoss(inputRegion, outputRegion, citationEl) {
       surface_T_F: ts.input.value === "" ? null : Number(ts.input.value), ambient_T_F: ta.input.value === "" ? null : Number(ta.input.value),
       air_velocity_fpm: Number(v.input.value) || 0,
       insulation: ins.select.value, thickness_in: Number(t.input.value) || 0,
-      jacket_emissivity: Number(eps.input.value) || 0.9,
+      jacket_emissivity: eps.input.value === "" ? 0.9 : Number(eps.input.value),
     }); stepsFor(outputRegion, inputRegion, ["pipe_OD_in", "surface_T_F", "ambient_T_F", "air_velocity_fpm", "insulation", "thickness_in", "jacket_emissivity"], r);
     if (r.error) { oB.textContent = r.error; oI.textContent = "-"; oS.textContent = "-"; oE.textContent = "-"; return; }
     oB.textContent = _v7h_fmt(r.Q_bare_BTU_hr_ft, 1) + " BTU/hr·ft";

@@ -62,9 +62,11 @@ test("Reverse-lay: doubled length -> 2x friction", () => {
   assert.ok(close(b.single_pump_psi, 2 * a.single_pump_psi, 0.05));
 });
 
-test("Reverse-lay: n_pumps clamps to 1 minimum", () => {
-  const r = computeReverseLayFriction({ ...reverseLayExample.inputs, n_pumps: 0 });
-  assert.equal(r.n_pumps, 1);
+// Until 2026-11-15 a typed 0 was clamped to 1 without a word; now it is refused.
+test("Reverse-lay: n_pumps below 1 is refused, and a blank takes 1", () => {
+  assert.match(computeReverseLayFriction({ ...reverseLayExample.inputs, n_pumps: 0 }).error, /at least 1/);
+  const { n_pumps, ...rest } = reverseLayExample.inputs;
+  assert.equal(computeReverseLayFriction(rest).n_pumps, 1);
 });
 
 test("Reverse-lay: 5 in lower friction than 2.5 in same GPM/length", () => {

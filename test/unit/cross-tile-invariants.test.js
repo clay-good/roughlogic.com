@@ -7198,8 +7198,7 @@ test("monotonicity: computeReverseLayFriction (n_pumps split) single_pump_psi is
   assert.ok(Math.abs(q4.single_pump_psi - 16 * q1.single_pump_psi) < 1e-9,
     `4x Q: psi = ${q4.single_pump_psi} != 16 * ${q1.single_pump_psi}`);
   const nZero = computeReverseLayFriction({ hose_diameter: "5_in", gpm: 1000, length_ft: 1000, n_pumps: 0 });
-  assert.equal(nZero.n_pumps, 1);
-  assert.equal(nZero.per_pump_psi, nZero.single_pump_psi);
+  assert.ok(nZero.error, "a typed 0 supply lines is refused (clamped to 1 until 2026-11-15)");
   const bad = computeReverseLayFriction({ hose_diameter: "7_in", gpm: 1000, length_ft: 1000 });
   assert.ok(bad.error, `expected error for unknown hose, got ${JSON.stringify(bad)}`);
 });

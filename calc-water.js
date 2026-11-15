@@ -496,7 +496,7 @@ function renderDilution(inputRegion, outputRegion, citationEl) {
     const r = computeDilution({
       c1: Number(c1.input.value) || 0, v1: Number(v1.input.value) || 0,
       c2: Number(c2.input.value) || 0, v2: Number(v2.input.value) || 0,
-      mode: mode.select.value, steps: Number(steps.input.value) || 1, dilution_factor: Number(df.input.value) || 10,
+      mode: mode.select.value, steps: steps.input.value === "" ? 1 : Number(steps.input.value), dilution_factor: df.input.value === "" ? 10 : Number(df.input.value),
     }); stepsFor(outputRegion, inputRegion, ["c1", "v1", "c2", "v2", "mode", "steps", "dilution_factor"], r);
     if (r.error) { oC1.textContent = r.error; oV1.textContent = "-"; oC2.textContent = "-"; oV2.textContent = "-"; oD.textContent = "-"; return; }
     if (r.mode === "serial") {

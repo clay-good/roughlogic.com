@@ -406,7 +406,7 @@ export function renderHydrantFlow(inputRegion, outputRegion, citationEl) {
   const oQ = makeOutputLine(outputRegion, "Flow", "hf-out");
   const oNR = makeOutputLine(outputRegion, "Nozzle reaction (smooth bore)", "hf-out-nr");
   const update = debounce(() => {
-    const r = computeHydrantFlow({ pitot_psi: Number(P.input.value) || 0, outlet_diameter_in: Number(d.input.value) || 0, c: Number(c.input.value) || 0.9 }); stepsFor(outputRegion, inputRegion, ["pitot_psi", "outlet_diameter_in", "c"], r);
+    const r = computeHydrantFlow({ pitot_psi: Number(P.input.value) || 0, outlet_diameter_in: Number(d.input.value) || 0, c: c.input.value === "" ? 0.9 : Number(c.input.value) }); stepsFor(outputRegion, inputRegion, ["pitot_psi", "outlet_diameter_in", "c"], r);
     oQ.textContent = fmt(r.flow_gpm, 0) + " gpm";
     oNR.textContent = r.reaction_lb === null ? "-" : fmt(r.reaction_lb, 1) + " lb (NR = 1.57 d^2 NP)";
   }, DEBOUNCE_MS);
@@ -437,7 +437,7 @@ export function renderRequiredFireFlow(inputRegion, outputRegion, citationEl) {
     const r = computeRequiredFireFlow({
       structure_area_ft2: Number(A.input.value) || 0,
       construction_class: cls.select.value,
-      occupancy_factor: Number(O.input.value) || 1.0,
+      occupancy_factor: O.input.value === "" ? 1.0 : Number(O.input.value),
       exposure_factor: Number(X.input.value) || 0,
       communication_factor: Number(Pf.input.value) || 0,
       volume_ft3: Number(Vol.input.value) || 0,
@@ -557,6 +557,8 @@ export function computeReverseLayFriction({ hose_diameter, gpm, length_ft, n_pum
   // DR-08: flow and length cannot be negative.
   if (!(gpm >= 0) || !(length_ft >= 0)) return { error: "Flow and length cannot be negative." };
   const single = fireHoseFrictionLoss({ C, gpm, length_ft });
+  // A typed 0 was quietly replaced by the default until 2026-11-15.
+  if (n_pumps != null && n_pumps !== "" && Number(n_pumps) < 1) return { error: "Number of parallel supply lines must be at least 1." };
   const n = Math.max(1, Number(n_pumps) || 1);
   const per_pump = single * Math.pow(1 / n, 2);
   return {
@@ -746,7 +748,7 @@ export function renderReverseLayFriction(inputRegion, outputRegion, citationEl) 
       hose_diameter: dia.select.value,
       gpm: Number(gpm.input.value) || 0,
       length_ft: Number(len.input.value) || 0,
-      n_pumps: Number(np.input.value) || 1,
+      n_pumps: np.input.value === "" ? 1 : Number(np.input.value),
     }); stepsFor(outputRegion, inputRegion, ["hose_diameter", "gpm", "length_ft", "n_pumps"], r);
     if (r.error) { oS.textContent = r.error; oP.textContent = "-"; oN.textContent = "-"; return; }
     oS.textContent = fmt(r.single_pump_psi, 1) + " psi";
@@ -1016,8 +1018,8 @@ function _v7f_renderIsoNFF(inputRegion, outputRegion, citationEl) {
   function fillExample(x) { a.input.value = x.area_ft2; s.input.value = x.stories; c.select.value = String(x.construction_class); o.input.value = x.occupancy_factor; e.input.value = x.exposure_distance_ft; p.input.value = x.exposure_communication_factor; vo.select.value = x.vertical_openings || "protected"; update(); }
   const update = _v7f_debounce(() => {
     const r = computeIsoNeededFireFlow({
-      area_ft2: Number(a.input.value) || 0, stories: Number(s.input.value) || 1,
-      construction_class: Number(c.select.value), occupancy_factor: Number(o.input.value) || 1.0,
+      area_ft2: Number(a.input.value) || 0, stories: s.input.value === "" ? 1 : Number(s.input.value),
+      construction_class: Number(c.select.value), occupancy_factor: o.input.value === "" ? 1.0 : Number(o.input.value),
       exposure_distance_ft: Number(e.input.value) || 100,
       exposure_communication_factor: Number(p.input.value) || 0,
       vertical_openings: vo.select.value,

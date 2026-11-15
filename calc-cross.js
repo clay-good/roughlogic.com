@@ -997,7 +997,7 @@ export function renderMileageCost(inputRegion, outputRegion, citationEl) {
       round_trip_miles: Number(m.input.value) || 0,
       mpg: Number(mpg.input.value) || 0,
       fuel_price_per_gallon: Number(p.input.value) || 0,
-      irs_rate_per_mile: Number(irs.input.value) || IRS_STANDARD_MILEAGE_RATE,
+      irs_rate_per_mile: irs.input.value === "" ? IRS_STANDARD_MILEAGE_RATE : Number(irs.input.value),
     }); stepsFor(outputRegion, inputRegion, ["round_trip_miles", "mpg", "fuel_price_per_gallon", "irs_rate_per_mile"], r);
     if (r.error) { oG.textContent = r.error; oC.textContent = "-"; oR.textContent = "-"; return; }
     oG.textContent = fmt(r.gallons, 3) + " gal";
@@ -1028,9 +1028,9 @@ export function renderOvertime(inputRegion, outputRegion, citationEl) {
     const x = computeOvertime({
       total_hours: Number(h.input.value) || 0,
       regular_rate: Number(r.input.value) || 0,
-      overtime_multiplier: Number(om.input.value) || 1.5,
-      double_time_multiplier: Number(dm.input.value) || 2.0,
-      double_time_threshold_hr: Number(dt.input.value) || 60,
+      overtime_multiplier: om.input.value === "" ? 1.5 : Number(om.input.value),
+      double_time_multiplier: dm.input.value === "" ? 2.0 : Number(dm.input.value),
+      double_time_threshold_hr: dt.input.value === "" ? 60 : Number(dt.input.value),
     }); stepsFor(outputRegion, inputRegion, ["total_hours", "regular_rate", "overtime_multiplier", "double_time_multiplier", "double_time_threshold_hr"], x);
     if (x.error) { oR.textContent = x.error; oO.textContent = "-"; oD.textContent = "-"; oG.textContent = "-"; return; }
     oR.textContent = "$" + fmt(x.regular_pay, 2) + " (" + fmt(x.regular_hours, 1) + " hr)";
@@ -1768,7 +1768,7 @@ function renderRainwaterYield(inputRegion, outputRegion, citationEl) {
     update();
   }
   const update = _debG(() => {
-    const r = computeRainwaterYield({ catchment_ft2: Number(a.input.value) || 0, efficiency: Number(e.input.value) || 0.85, annual_in: Number(an.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["catchment_ft2", "efficiency", "annual_in"], r);
+    const r = computeRainwaterYield({ catchment_ft2: Number(a.input.value) || 0, efficiency: e.input.value === "" ? 0.85 : Number(e.input.value), annual_in: Number(an.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["catchment_ft2", "efficiency", "annual_in"], r);
     if (r.error) { oA.textContent = r.error; return; }
     oA.textContent = _fmtG(r.annual_gal, 0) + " gal";
   }, _DG);

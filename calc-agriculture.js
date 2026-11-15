@@ -1201,6 +1201,8 @@ export function computeGrainBin({
   const d = Number(diameter_ft);
   const eave = Number(eave_height_ft);
   const peak = Number(peak_height_ft) || 0;
+  // A typed 0 was quietly replaced by the default until 2026-11-15.
+  if (packing_factor != null && packing_factor !== "" && !(Number(packing_factor) > 0)) return { error: "Packing factor must be above 0 (1.0 for no packing)." };
   const pack = Number(packing_factor) || 1.0;
   const tw = GRAIN_TEST_WEIGHT_LB_BU[grain];
   if (tw === undefined) return { error: "Unknown grain '" + grain + "'." };
@@ -1251,6 +1253,8 @@ export function computeGrainBinHeightForCapacity({ target_bushels = 0, diameter_
   const target = Number(target_bushels) || 0;
   const d = Number(diameter_ft) || 0;
   const peak = Number(peak_height_ft) || 0;
+  // A typed 0 was quietly replaced by the default until 2026-11-15.
+  if (packing_factor != null && packing_factor !== "" && !(Number(packing_factor) > 0)) return { error: "Packing factor must be above 0 (1.0 for no packing)." };
   const pack = Number(packing_factor) || 1.0;
   if (!(target > 0)) return { error: "Target capacity must be positive (bushels)." };
   if (!(d > 0)) return { error: "Bin diameter must be positive (ft)." };
@@ -1280,7 +1284,7 @@ function renderGrainBinHeightForCapacity(inputRegion, outputRegion, citationEl) 
   const oEave = makeOutputLine(outputRegion, "Required eave (wall) height", "gbh-out-eave");
   const oNote = makeOutputLine(outputRegion, "Note", "gbh-out-note");
   const update = debounce(() => {
-    const r = computeGrainBinHeightForCapacity({ target_bushels: Number(bu.input.value) || 0, diameter_ft: Number(d.input.value) || 0, peak_height_ft: Number(peak.input.value) || 0, packing_factor: Number(pack.input.value) || 1.0 }); stepsFor(outputRegion, inputRegion, ["target_bushels", "diameter_ft", "peak_height_ft", "packing_factor"], r);
+    const r = computeGrainBinHeightForCapacity({ target_bushels: Number(bu.input.value) || 0, diameter_ft: Number(d.input.value) || 0, peak_height_ft: Number(peak.input.value) || 0, packing_factor: pack.input.value === "" ? 1.0 : Number(pack.input.value) }); stepsFor(outputRegion, inputRegion, ["target_bushels", "diameter_ft", "peak_height_ft", "packing_factor"], r);
     if (r.error) { oEave.textContent = r.error; oNote.textContent = ""; return; }
     oEave.textContent = fmt(r.eave_height_ft, 1) + " ft";
     oNote.textContent = r.note;
@@ -1477,6 +1481,8 @@ export function computeNpkBlend({
   if (demand === undefined) return { error: "Unknown crop '" + crop + "'." };
   const area = Number(area_acres);
   if (!(area > 0)) return { error: "Enter a positive field area (acres)." };
+  // A typed 0 was quietly read as a 50 lb bag until 2026-11-15.
+  if (bag_weight_lb != null && bag_weight_lb !== "" && !(Number(bag_weight_lb) > 0)) return { error: "Bag weight must be positive (lb)." };
   const soilN = Math.max(0, Number(soil_n_lb_per_acre) || 0);
   const soilP = Math.max(0, Number(soil_p_lb_per_acre) || 0);
   const soilK = Math.max(0, Number(soil_k_lb_per_acre) || 0);
@@ -1602,7 +1608,7 @@ function renderNpkBlend(inputRegion, outputRegion, citationEl) {
       soil_p_lb_per_acre: readNum(soilP.input),
       soil_k_lb_per_acre: readNum(soilK.input),
       area_acres: readNum(area.input),
-      bag_weight_lb: readNum(bag.input) || 50,
+      bag_weight_lb: bag.input.value === "" ? 50 : readNum(bag.input),
     }); stepsFor(outputRegion, inputRegion, ["crop", "soil_n_lb_per_acre", "soil_p_lb_per_acre", "soil_k_lb_per_acre", "area_acres", "bag_weight_lb"], r);
     if (r.error) { oRec.textContent = r.error; oRate.textContent = "-"; oKg.textContent = "-"; oTotal.textContent = "-"; oBags.textContent = "-"; oNote.textContent = ""; return; }
     oRec.textContent = fmt(r.rec_n_lb_per_acre, 0) + " N / " + fmt(r.rec_p_lb_per_acre, 0) + " P2O5 / " + fmt(r.rec_k_lb_per_acre, 0) + " K2O lb/acre still needed";

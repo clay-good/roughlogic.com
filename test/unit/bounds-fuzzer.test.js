@@ -7990,9 +7990,9 @@ test("bounds: calc-plumbing computePumpSize pins HP_h = Q*H*SG/3960 and shaft = 
   // SG branch.
   const sg = computePumpSize({ flow_gpm: 100, total_dynamic_head_ft: 80, efficiency: 0.65, fluid_specific_gravity: 1.2 });
   assert.ok(Math.abs(sg.hydraulic_hp - (100 * 80 * 1.2) / 3960) < 1e-9);
-  // Zero efficiency -> shaft_hp null.
+  // Zero efficiency is refused (it returned shaft_hp null, a blank page line, until 2026-11-15).
   const z = computePumpSize({ flow_gpm: 10, total_dynamic_head_ft: 10, efficiency: 0 });
-  assert.strictEqual(z.shaft_hp, null);
+  assert.ok(z.error);
 });
 
 test("bounds: calc-plumbing computeStaticPressureLossPiping pins elev_psi = h*rho/144 plus friction", () => {

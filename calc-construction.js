@@ -594,7 +594,7 @@ export function renderBoardFootage(inputRegion, outputRegion, citationEl) {
   const oE = makeOutputLine(outputRegion, "Per piece", "bf-out-e");
   const oT = makeOutputLine(outputRegion, "Total", "bf-out-t");
   const update = debounce(() => {
-    const r = computeBoardFootage({ thickness_in: Number(t.input.value) || 0, width_in: Number(w.input.value) || 0, length_ft: Number(l.input.value) || 0, count: Number(c.input.value) || 1 }); stepsFor(outputRegion, inputRegion, ["thickness_in", "width_in", "length_ft", "count"], r);
+    const r = computeBoardFootage({ thickness_in: Number(t.input.value) || 0, width_in: Number(w.input.value) || 0, length_ft: Number(l.input.value) || 0, count: c.input.value === "" ? 1 : Number(c.input.value) }); stepsFor(outputRegion, inputRegion, ["thickness_in", "width_in", "length_ft", "count"], r);
     oE.textContent = fmt(r.board_feet_each, 2) + " bf";
     oT.textContent = fmt(r.total_board_feet, 2) + " bf";
   }, DEBOUNCE_MS);
@@ -702,7 +702,7 @@ export function renderLumberSpans(inputRegion, outputRegion, citationEl) {
       nominal_size: sz.select.value,
       total_load_psf: Number(tl.input.value) || 0,
       tributary_width_in: Number(tw.input.value) || 0,
-      deflection_limit: Number(dl.input.value) || 360,
+      deflection_limit: dl.input.value === "" ? 360 : Number(dl.input.value),
       live_load_psf: Number(ll.input.value) || 0,
     }); stepsFor(outputRegion, inputRegion, ["species_grade", "nominal_size", "total_load_psf", "tributary_width_in", "deflection_limit", "live_load_psf"], r);
     if (r.error) { oS.textContent = r.error; oB.textContent = "-"; oD.textContent = "-"; oG.textContent = "-"; oDef.textContent = "-"; return; }
@@ -1074,6 +1074,8 @@ export function computeWindPressure({ V_mph, exposure = "C", Kz = 0, Kzt = 1.0, 
   // An unknown exposure used to be C, which reads 15% low for a D site.
   if (exposure !== "B" && exposure !== "C" && exposure !== "D") return { error: "Exposure must be B, C or D." };
   if (Number(Kzt) < 0 || Number(Kd) < 0 || Number(G) < 0 || Number(Kz) < 0) return { error: "Kz, Kzt, Kd and G cannot be negative." };
+  // A typed 0 was quietly replaced by the default until 2026-11-15.
+  if ([Kzt, Kd, G].some((x) => x != null && x !== "" && Number(x) === 0)) return { error: "Kzt, Kd and G must be above 0 (leave a box blank for its default: Kzt 1.0, Kd 0.85, G 0.85)." };
   const V = Number(V_mph) || 0;
   if (V <= 0) return { error: "Wind speed must be positive." };
   const q_psf = 0.00256 * V * V;
@@ -1357,7 +1359,7 @@ export function renderPaintCoverage(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computePaintCoverage({
       area_ft2: Number(a.input.value) || 0,
-      coats: Number(c.input.value) || 1,
+      coats: c.input.value === "" ? 2 : Number(c.input.value),
       primer_needed: prim.input.checked,
       surface_porosity: sp.select.value,
     }); stepsFor(outputRegion, inputRegion, ["area_ft2", "coats", "primer_needed", "surface_porosity"], r);
@@ -1386,7 +1388,7 @@ export function renderExcavation(inputRegion, outputRegion, citationEl) {
       length_ft: Number(L.input.value) || 0,
       width_ft: Number(W.input.value) || 0,
       depth_ft: Number(D.input.value) || 0,
-      side_slope_angle_deg: Number(ang.input.value) || 90,
+      side_slope_angle_deg: ang.input.value === "" ? 90 : Number(ang.input.value),
     }); stepsFor(outputRegion, inputRegion, ["length_ft", "width_ft", "depth_ft", "side_slope_angle_deg"], r);
     if (r.error) { oV.textContent = r.error; oY.textContent = "-"; oT.textContent = "-"; return; }
     oV.textContent = fmt(r.volume_ft3, 1) + " ft^3";
@@ -1443,7 +1445,7 @@ export function renderWindPressure(inputRegion, outputRegion, citationEl) {
     const r = computeWindPressure({
       V_mph: Number(V.input.value) || 0,
       exposure: exp.select.value,
-      Kz: Number(kz.input.value) || 0, Kzt: Number(kzt.input.value) || 1, Kd: Number(kd.input.value) || 0.85, G: Number(g.input.value) || 0.85,
+      Kz: Number(kz.input.value) || 0, Kzt: kzt.input.value === "" ? 1 : Number(kzt.input.value), Kd: kd.input.value === "" ? 0.85 : Number(kd.input.value), G: g.input.value === "" ? 0.85 : Number(g.input.value),
     }); stepsFor(outputRegion, inputRegion, ["V_mph", "exposure", "Kz", "Kzt", "Kd", "G"], r);
     if (r.error) { oQ.textContent = r.error; oZ.textContent = "-"; oW.textContent = "-"; oL.textContent = "-"; oD.textContent = "-"; return; }
     oQ.textContent = fmt(r.q_psf, 2) + " psf";
@@ -1475,11 +1477,11 @@ export function renderSnowLoad(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeSnowLoad({
       Pg_psf: Number(Pg.input.value) || 0,
-      Ce: Number(Ce.input.value) || 1,
-      Ct: Number(Ct.input.value) || 1,
-      Cs: Number(Cs.input.value) || 1,
+      Ce: Ce.input.value === "" ? 1 : Number(Ce.input.value),
+      Ct: Ct.input.value === "" ? 1 : Number(Ct.input.value),
+      Cs: Cs.input.value === "" ? 1 : Number(Cs.input.value),
       drift_upwind_length_ft: Number(lu.input.value) || 0,
-      w2: Number(w2.input.value) || SNOW_W2_DEFAULT,
+      w2: w2.input.value === "" ? SNOW_W2_DEFAULT : Number(w2.input.value),
     }); stepsFor(outputRegion, inputRegion, ["Pg_psf", "Ce", "Ct", "Cs", "drift_upwind_length_ft", "w2"], r);
     if (r.error) { oP.textContent = r.error; oPs.textContent = "-"; oDr.textContent = "-"; return; }
     oP.textContent = fmt(r.Pf_psf, 2) + " psf";
@@ -2892,7 +2894,7 @@ function _v7c_renderHelicalPile(inputRegion, outputRegion, citationEl) {
   const oA = _v7c_makeOut(outputRegion, "Allowable capacity", "hp-out-a");
   function fillExample(x) { sh.select.value = x.shaft; tq.input.value = x.torque_ft_lb; fs.input.value = x.factor_of_safety; update(); }
   const update = _v7c_debounce(() => {
-    const r = computeHelicalPile({ shaft: sh.select.value, torque_ft_lb: Number(tq.input.value) || 0, factor_of_safety: Number(fs.input.value) || 2.0 }); stepsFor(outputRegion, inputRegion, ["shaft", "torque_ft_lb", "factor_of_safety"], r);
+    const r = computeHelicalPile({ shaft: sh.select.value, torque_ft_lb: Number(tq.input.value) || 0, factor_of_safety: fs.input.value === "" ? 2.0 : Number(fs.input.value) }); stepsFor(outputRegion, inputRegion, ["shaft", "torque_ft_lb", "factor_of_safety"], r);
     if (r.error) { oU.textContent = r.error; oA.textContent = "-"; return; }
     oU.textContent = _v7c_fmt(r.ultimate_lb, 0) + " lb (Kt=" + r.Kt + ")";
     oA.textContent = _v7c_fmt(r.allowable_lb, 0) + " lb";
@@ -2912,7 +2914,7 @@ function renderHelicalPileTorque(inputRegion, outputRegion, citationEl) {
   const oT = _v7c_makeOut(outputRegion, "Required installation torque", "hpt-out-t");
   const oN = _v7c_makeOut(outputRegion, "Note", "hpt-out-n");
   const update = _v7c_debounce(() => {
-    const r = computeHelicalPileTorque({ shaft: sh.select.value, target_capacity_lb: Number(cap.input.value) || 0, capacity_basis: basis.select.value, factor_of_safety: Number(fs.input.value) || 2.0 }); stepsFor(outputRegion, inputRegion, ["shaft", "target_capacity_lb", "capacity_basis", "factor_of_safety"], r);
+    const r = computeHelicalPileTorque({ shaft: sh.select.value, target_capacity_lb: Number(cap.input.value) || 0, capacity_basis: basis.select.value, factor_of_safety: fs.input.value === "" ? 2.0 : Number(fs.input.value) }); stepsFor(outputRegion, inputRegion, ["shaft", "target_capacity_lb", "capacity_basis", "factor_of_safety"], r);
     if (r.error) { oT.textContent = r.error; oN.textContent = ""; return; }
     oT.textContent = _v7c_fmt(r.torque_ft_lb, 0) + " ft-lb (Kt=" + r.Kt + ", ultimate " + _v7c_fmt(r.ultimate_lb, 0) + " lb)";
     oN.textContent = r.note;
@@ -2942,7 +2944,7 @@ function _v7c_renderCraneLiftCheck(inputRegion, outputRegion, citationEl) {
     const r = computeCraneLiftCheck({
       load_lb: Number(ld.input.value) || 0, rigging_lb: Number(rg.input.value) || 0,
       block_lb: Number(bk.input.value) || 0, jib_deduct_lb: Number(jb.input.value) || 0,
-      sling_legs: Number(sl.input.value) || 1, sling_angle_deg: Number(ang.input.value) || 90,
+      sling_legs: sl.input.value === "" ? 1 : Number(sl.input.value), sling_angle_deg: ang.input.value === "" ? 90 : Number(ang.input.value),
       chart_capacity_lb: Number(cap.input.value) || 0,
     }); stepsFor(outputRegion, inputRegion, ["load_lb", "rigging_lb", "block_lb", "jib_deduct_lb", "sling_legs", "sling_angle_deg", "chart_capacity_lb"], r);
     if (r.error) { oG.textContent = r.error; oS.textContent = "-"; oP.textContent = "-"; oF.textContent = "-"; return; }

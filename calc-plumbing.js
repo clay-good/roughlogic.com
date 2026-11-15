@@ -306,7 +306,7 @@ export const pipeVolumeExample = {
 export function computePumpSize({ flow_gpm, total_dynamic_head_ft, efficiency = 0.65, fluid_specific_gravity = 1 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(Number(flow_gpm) > 0) || !(Number(total_dynamic_head_ft) > 0)) return { error: "Flow (gpm) and total dynamic head (ft) must be positive." };
-  if (Number(efficiency) > 1 || Number(efficiency) < 0) return { error: "Pump efficiency is a fraction between 0 and 1 (0.65, not 65)." };
+  if (Number(efficiency) > 1 || Number(efficiency) <= 0) return { error: "Pump efficiency is a fraction above 0 and at most 1 (0.65, not 65)." };
   if ([fluid_specific_gravity].some((x) => Number(x) < 0)) return { error: "Fluid specific gravity cannot be negative." };
   // Hydraulic horsepower: HP_h = (Q * H * SG) / 3960.  Pump shaft hp = HP_h / efficiency.
   const hp_h = (flow_gpm * total_dynamic_head_ft * fluid_specific_gravity) / 3960;
@@ -531,7 +531,7 @@ export function renderPumpSizing(inputRegion, outputRegion, citationEl) {
   const oH = makeOutputLine(outputRegion, "Hydraulic hp", "pm-out-h");
   const oS = makeOutputLine(outputRegion, "Shaft hp", "pm-out-s");
   const update = debounce(() => {
-    const r = computePumpSize({ flow_gpm: Number(flow.input.value) || 0, total_dynamic_head_ft: Number(tdh.input.value) || 0, efficiency: Number(eff.input.value) || 0.65 }); stepsFor(outputRegion, inputRegion, ["flow_gpm", "total_dynamic_head_ft", "efficiency"], r);
+    const r = computePumpSize({ flow_gpm: Number(flow.input.value) || 0, total_dynamic_head_ft: Number(tdh.input.value) || 0, efficiency: eff.input.value === "" ? 0.65 : Number(eff.input.value) }); stepsFor(outputRegion, inputRegion, ["flow_gpm", "total_dynamic_head_ft", "efficiency"], r);
     oH.textContent = fmt(r.hydraulic_hp, 2);
     oS.textContent = r.shaft_hp === null ? "-" : fmt(r.shaft_hp, 2);
   }, DEBOUNCE_MS);
@@ -719,6 +719,8 @@ export function computeTrapArm({ pipe_diameter_in, slope_in_per_ft = 0.25 }) {
   // be above the weir). Limit length so total fall does not exceed one
   // pipe diameter (engineering practice).
   const max_fall_in = Number(pipe_diameter_in);
+  // A typed 0 was quietly replaced by the default until 2026-11-15.
+  if (slope_in_per_ft != null && slope_in_per_ft !== "" && !(Number(slope_in_per_ft) > 0)) return { error: "Slope must be above 0 in/ft (a trap arm is never laid flat)." };
   const slope = Number(slope_in_per_ft) || 0.25;
   const fall_limited_ft = slope > 0 ? max_fall_in / slope : max_ft;
   return {
@@ -933,7 +935,7 @@ export function renderTrapArm(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const r = computeTrapArm({
       pipe_diameter_in: dia.select.value,
-      slope_in_per_ft: Number(slope.input.value) || 0.25,
+      slope_in_per_ft: slope.input.value === "" ? 0.25 : Number(slope.input.value),
     }); stepsFor(outputRegion, inputRegion, ["pipe_diameter_in", "slope_in_per_ft"], r);
     if (r.error) { oM.textContent = r.error; oT.textContent = "-"; return; }
     oM.textContent = fmt(r.max_length_ft, 2) + " ft";
@@ -995,7 +997,7 @@ export function renderTanklessGPM(inputRegion, outputRegion, citationEl) {
       solve_for: solve.select.value,
       target_gpm: Number(tgpm.input.value) || 0,
       inlet_override_F: Number(ovr.input.value) || 0,
-      thermal_efficiency: Number(eff.input.value) || 0.82,
+      thermal_efficiency: eff.input.value === "" ? 0.82 : Number(eff.input.value),
     }); stepsFor(outputRegion, inputRegion, ["kbtu_input", "climate_zone", "target_outlet_F", "solve_for", "target_gpm", "inlet_override_F", "thermal_efficiency"], r);
     if (r.error) { oG.textContent = r.error; oI.textContent = "-"; oD.textContent = "-"; return; }
     oG.textContent = r.solve_for === "kbtu" ? (fmt(r.kbtu_input, 1) + " kBTU/hr") : r.solve_for === "dt" ? (fmt(r.delta_T_F, 1) + " F rise") : (fmt(r.gpm, 2) + " gpm");
@@ -1482,7 +1484,7 @@ export function renderGreaseTrap(inputRegion, outputRegion, citationEl) {
   const oN = makeOutputLine(outputRegion, "Basis", "gt-out-n");
   function fillExample(v) { pf.input.value = v.peak_flow_gpm; rt.input.value = v.retention_minutes; lf.input.value = v.loading_factor; ml.input.value = v.meals_per_day || ""; update(); }
   const update = debounce(() => {
-    const r = computeGreaseTrap({ peak_flow_gpm: Number(pf.input.value) || 0, retention_minutes: Number(rt.input.value) || 30, loading_factor: Number(lf.input.value) || 1.25, meals_per_day: Number(ml.input.value) || 0, grease_class: gc.select.value, with_flatware: fw.select.value, service_days: Number(sd.input.value) || 90 }); stepsFor(outputRegion, inputRegion, ["peak_flow_gpm", "retention_minutes", "loading_factor", "meals_per_day", "grease_class", "with_flatware", "service_days"], r);
+    const r = computeGreaseTrap({ peak_flow_gpm: Number(pf.input.value) || 0, retention_minutes: rt.input.value === "" ? 30 : Number(rt.input.value), loading_factor: lf.input.value === "" ? 1.25 : Number(lf.input.value), meals_per_day: Number(ml.input.value) || 0, grease_class: gc.select.value, with_flatware: fw.select.value, service_days: sd.input.value === "" ? 90 : Number(sd.input.value) }); stepsFor(outputRegion, inputRegion, ["peak_flow_gpm", "retention_minutes", "loading_factor", "meals_per_day", "grease_class", "with_flatware", "service_days"], r);
     if (r.error) { oV.textContent = r.error; oR.textContent = "-"; oN.textContent = ""; return; }
     oV.textContent = fmt(r.volume_gal, 0) + " gal" + (r.fog_storage_gal > 0 ? " (" + fmt(r.separation_gal, 0) + " separation + " + fmt(r.fog_storage_gal, 0) + " grease storage)" : "");
     oN.textContent = r.note;
@@ -1505,7 +1507,7 @@ function renderGreaseInterceptorFlowCapacity(inputRegion, outputRegion, citation
   const oN = makeOutputLine(outputRegion, "Note", "gifc-out-n");
   function fillExample(v) { vol.input.value = v.interceptor_volume_gal; rt.input.value = v.retention_minutes; lf.input.value = v.loading_factor; update(); }
   const update = debounce(() => {
-    const r = computeGreaseInterceptorFlowCapacity({ interceptor_volume_gal: Number(vol.input.value) || 0, retention_minutes: Number(rt.input.value) || 30, loading_factor: Number(lf.input.value) || 1.25 }); stepsFor(outputRegion, inputRegion, ["interceptor_volume_gal", "retention_minutes", "loading_factor"], r);
+    const r = computeGreaseInterceptorFlowCapacity({ interceptor_volume_gal: Number(vol.input.value) || 0, retention_minutes: rt.input.value === "" ? 30 : Number(rt.input.value), loading_factor: lf.input.value === "" ? 1.25 : Number(lf.input.value) }); stepsFor(outputRegion, inputRegion, ["interceptor_volume_gal", "retention_minutes", "loading_factor"], r);
     if (r.error) { oF.textContent = r.error; oN.textContent = "-"; return; }
     oF.textContent = fmt(r.peak_flow_gpm, 1) + " gpm";
     oN.textContent = r.note;
@@ -2846,7 +2848,7 @@ function _v16p_renderSanitaryDfu(inputRegion, outputRegion, citationEl) {
       fixtures,
       config: config.select.value,
       slope_in_per_ft: Number(slope.select.value),
-      branch_intervals: Number(intervals.input.value) || 3,
+      branch_intervals: intervals.input.value === "" ? 3 : Number(intervals.input.value),
     }); stepsFor(outputRegion, inputRegion, ["fixtures", "config", "slope_in_per_ft", "branch_intervals"], r);
     if (r.error) { oDfu.textContent = r.error; oSize.textContent = "-"; oNote.textContent = ""; return; }
     oDfu.textContent = fmt(r.total_dfu, 1) + " DFU";
