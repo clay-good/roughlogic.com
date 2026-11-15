@@ -2101,6 +2101,8 @@ export function computeRecircLoopSizing({
   // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
   if ([ambient_F].some((x) => x === null || x === "")) return { error: "Enter the ambient temperature around the pipe (F)." };
   const L = Number(loop_length_ft) || 0;
+  // A negative entry was quietly read as 0 until 2026-11-15.
+  if (Number(insulation_in) < 0) return { error: "Insulation thickness cannot be negative." };
   const t_ins = Math.max(0, Number(insulation_in) || 0);
   const T_h = Number(hot_supply_F);
   const T_a = Number(ambient_F);

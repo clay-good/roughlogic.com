@@ -78,3 +78,24 @@ test("compute zero default: every `Number(param) || nonzero` is guarded or revie
   }
   assert.deepEqual(bad, [], "guard the param above the line, or add it to ZERO_MEANS_UNSET with the reason 0 means unset");
 });
+
+// The negative twin: `Math.max(0, Number(param) || 0)` turned a typed -4 cameras
+// into 0 cameras without a word (16 inputs until 2026-11-15). A clamp on a
+// caller's own input needs a guard that refuses the negative first.
+test("compute zero default: no input is clamped from negative to 0 without a guard", async () => {
+  const { readdirSync } = await import("node:fs");
+  const root = new URL("../../", import.meta.url);
+  const bad = [];
+  for (const f of readdirSync(root).filter((n) => /^calc-.*\.js$/.test(n))) {
+    const lines = readFileSync(new URL(f, root), "utf8").split("\n");
+    lines.forEach((line, i) => {
+      const m = /= Math\.max\(0, Number\(([a-z_][a-z0-9_]*)\) \|\| 0\);/.exec(line);
+      if (!m) return;
+      let start = i;
+      while (start > 0 && !/^export function /.test(lines[start])) start--;
+      if (new RegExp("\\bif \\([^\\n]*\\b" + m[1] + "\\b[^\\n]*\\) return \\{ error").test(lines.slice(start, i).join("\n"))) return;
+      bad.push(`${f}:${i + 1} ${m[1]}`);
+    });
+  }
+  assert.deepEqual(bad, [], 'refuse the negative above the clamp: `if (Number(p) < 0) return { error: "... cannot be negative." }`');
+});

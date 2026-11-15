@@ -1483,8 +1483,14 @@ export function computeNpkBlend({
   if (!(area > 0)) return { error: "Enter a positive field area (acres)." };
   // A typed 0 was quietly read as a 50 lb bag until 2026-11-15.
   if (bag_weight_lb != null && bag_weight_lb !== "" && !(Number(bag_weight_lb) > 0)) return { error: "Bag weight must be positive (lb)." };
+  // A negative entry was quietly read as 0 until 2026-11-15.
+  if (Number(soil_n_lb_per_acre) < 0) return { error: "Soil-test nitrogen cannot be negative." };
   const soilN = Math.max(0, Number(soil_n_lb_per_acre) || 0);
+  // A negative entry was quietly read as 0 until 2026-11-15.
+  if (Number(soil_p_lb_per_acre) < 0) return { error: "Soil-test phosphorus cannot be negative." };
   const soilP = Math.max(0, Number(soil_p_lb_per_acre) || 0);
+  // A negative entry was quietly read as 0 until 2026-11-15.
+  if (Number(soil_k_lb_per_acre) < 0) return { error: "Soil-test potassium cannot be negative." };
   const soilK = Math.max(0, Number(soil_k_lb_per_acre) || 0);
   const ureaN = Number(urea_n_pct) / 100;
   const dapN = Number(dap_n_pct) / 100;
@@ -1655,6 +1661,8 @@ export function computeTankMix({
   if (!(tank > 0)) return { error: "Enter a positive tank capacity (gal)." };
   if (!(gpa > 0)) return { error: "Enter a positive spray volume (GPA)." };
   if (!(rate > 0)) return { error: "Enter a positive " + (isLiquid ? "liquid" : "dry") + " product rate per acre." };
+  // A negative entry was quietly read as 0 until 2026-11-15.
+  if (Number(field_area_acres) < 0) return { error: "Field area cannot be negative." };
   const area = Math.max(0, Number(field_area_acres) || 0);
 
   const acres_per_tank = tank / gpa;

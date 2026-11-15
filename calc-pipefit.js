@@ -193,7 +193,11 @@ export function computePipeSpacingRack({ pipe_od_in = 0, insulation_thickness_in
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const od = Number(pipe_od_in);
   if (!(od > 0)) return { error: "Pipe outside diameter must be positive (in)." };
+  // A negative entry was quietly read as 0 until 2026-11-15.
+  if (Number(insulation_thickness_in) < 0) return { error: "Insulation thickness cannot be negative." };
   const ins = Math.max(0, Number(insulation_thickness_in) || 0);
+  // A negative entry was quietly read as 0 until 2026-11-15.
+  if (Number(clearance_in) < 0) return { error: "Clearance cannot be negative." };
   const gap = Math.max(0, Number(clearance_in) || 0);
   // A typed 0 or negative was quietly read as the default until 2026-11-15.
   if (pipe_count != null && pipe_count !== "" && !(Number.isInteger(Number(pipe_count)) && Number(pipe_count) >= 1)) return { error: "Pipe count must be a whole number, 1 or more." };
@@ -616,6 +620,8 @@ export function computePipeFilledSupportLoad({ od_in = 0, wall_in = 0, pipe_dens
   const wall = Number(wall_in);
   const pd = Number(pipe_density);
   const fd = Number(fluid_density);
+  // A negative entry was quietly read as 0 until 2026-11-15.
+  if (Number(insul_thk_in) < 0) return { error: "Insulation thickness cannot be negative." };
   const thk = Math.max(0, Number(insul_thk_in) || 0);
   const idns = Number(insul_density);
   const spacing = Number(spacing_ft);

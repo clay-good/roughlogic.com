@@ -965,6 +965,8 @@ export function computeIsoNeededFireFlow({
   } else if (exposure_distance_ft >= 0 && exposure_distance_ft <= 40) {
     return { error: "An exposure within 40 ft carries a charge that depends on its wall construction and length-height value: read X from ISO Table 330A(1-3) and enter it." };
   }
+  // A negative entry was quietly read as 0 until 2026-11-15.
+  if (Number(exposure_communication_factor) < 0) return { error: "The exposure and communication factor cannot be negative." };
   const P = Math.max(0, Number(exposure_communication_factor) || 0);
   // ISO limits (X + P) to 0.60.
   const XP = Math.min(X + P, 0.6);

@@ -1172,6 +1172,8 @@ export function computeEquipmentCircuitLoad({
     hepa_500: Math.max(0, Math.floor(Number(qty_hepa_500) || 0)),
     heat_dryer: Math.max(0, Math.floor(Number(qty_heat_dryer) || 0)),
   };
+  // A negative entry was quietly read as 0 until 2026-11-15.
+  if (Number(other_amps) < 0) return { error: "Other load cannot be negative." };
   const other = Math.max(0, Number(other_amps) || 0);
   const breaker = Number(breaker_A) || 0;
   // A typed 0 was quietly read as the default until 2026-11-15.

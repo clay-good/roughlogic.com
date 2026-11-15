@@ -44,7 +44,11 @@ export function computeFiberLossBudget({ length_m = 0, attenuation_db_km = 0, co
   const att = Number(attenuation_db_km);
   if (!(len > 0)) return { error: "Link length must be positive (m)." };
   if (!(att >= 0)) return { error: "Attenuation coefficient must be non-negative (dB/km)." };
+  // A negative entry was quietly read as 0 until 2026-11-15.
+  if (Number(connector_count) < 0) return { error: "Connector count cannot be negative." };
   const nc = Math.max(0, Number(connector_count) || 0);
+  // A negative entry was quietly read as 0 until 2026-11-15.
+  if (Number(splice_count) < 0) return { error: "Splice count cannot be negative." };
   const ns = Math.max(0, Number(splice_count) || 0);
   const lpc = Number(loss_per_connector_db) || 0;
   const lps = Number(loss_per_splice_db) || 0;
@@ -277,7 +281,11 @@ export function computeFiberMaxLength({ max_channel_loss_db = 0, attenuation_db_
   const att = Number(attenuation_db_km);
   if (!(maxch > 0)) return { error: "Max channel loss must be positive (dB)." };
   if (!(att > 0)) return { error: "Attenuation coefficient must be positive (dB/km)." };
+  // A negative entry was quietly read as 0 until 2026-11-15.
+  if (Number(connector_count) < 0) return { error: "Connector count cannot be negative." };
   const nc = Math.max(0, Number(connector_count) || 0);
+  // A negative entry was quietly read as 0 until 2026-11-15.
+  if (Number(splice_count) < 0) return { error: "Splice count cannot be negative." };
   const ns = Math.max(0, Number(splice_count) || 0);
   const lpc = Number(loss_per_connector_db) || 0;
   const lps = Number(loss_per_splice_db) || 0;
@@ -443,6 +451,8 @@ LOWVOLTAGE_RENDERERS["cable-tray-fill"] = _renderCableTrayFill;
 // dims: in { camera_count: dimensionless, bitrate_mbps: dimensionless, motion_duty_percent: dimensionless, retention_days: T } out: { total_storage_gb: dimensionless, aggregate_bandwidth_mbps: dimensionless, camera_count: dimensionless, per_camera_day_gb: dimensionless, recording_hours_per_day: T, total_storage_tb: dimensionless }
 export function computeCctvStorage({ camera_count = 1, bitrate_mbps = 0, recording_mode = "continuous", motion_duty_percent, retention_days = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was quietly read as 0 until 2026-11-15.
+  if (Number(camera_count) < 0) return { error: "Camera count cannot be negative." };
   const n = Math.max(0, Number(camera_count) || 0);
   const br = Number(bitrate_mbps);
   const days = Number(retention_days);
@@ -562,6 +572,8 @@ export function computeSpeaker70vLine({ amp_rated_w = 0, headroom_percent = 20, 
   const V = Number(line_voltage_v);
   if (!(rating > 0)) return { error: "Amplifier rated power must be positive (W)." };
   if (!(V > 0)) return { error: "Line voltage must be positive (V)." };
+  // A negative entry was quietly read as 0 until 2026-11-15.
+  if (Number(tap_watts) < 0) return { error: "Tap wattage cannot be negative." };
   const tw = Math.max(0, Number(tap_watts) || 0);
   const tc = Math.max(0, Number(tap_count) || 0);
   const total_tap_w = tw * tc;
