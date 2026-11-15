@@ -231,9 +231,12 @@ export function computeConduitFill({ conduit, trade_size, conductors }) {
     if (Number(c.count) < 0) return { error: "Conductor counts cannot be negative." };
     // 2.5 conductors picked neither the 31% (two) nor the 40% (over two) column until 2026-11-15.
     if (c.count != null && c.count !== "" && !Number.isInteger(Number(c.count))) return { error: "Conductor counts must be whole numbers." };
-    total += a * (c.count || 1);
-    count += (Number(c.count) || 1);
+    // A blank count is one conductor; a typed 0 is none (it added one until 2026-11-15).
+    const n = c.count == null || c.count === "" ? 1 : Number(c.count);
+    total += a * n;
+    count += n;
   }
+  if (count === 0) return { error: "Enter at least one conductor." };
 
   const fill_in2 = total;
   const fill_percent = (fill_in2 / conduit_area) * 100;

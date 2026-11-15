@@ -6,7 +6,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
-- **The duct friction tile takes three fitting kinds.** Its form had one fitting slot, so the worked example's filter and two diffusers fell out of the page's total static: it showed 0.288 in WC where the full example is 0.448. The form now has three kind-and-count slots, filled from the example. A fitting count of 0 now means none; the renderer and the compute both read it as 1 before.
+- **The duct friction tile takes three fitting kinds.** Its form had one fitting slot, so the worked example's filter and two diffusers fell out of the page's total static: it showed 0.288 in WC where the full example is 0.448. The form now has three kind-and-count slots, filled from the example. A fitting count of 0 now means none; the renderer and the compute both read it as 1 before. The same nested slip is fixed in conduit fill, where a conductor row with a count of 0 added one conductor. A fill with no conductors left is now refused.
 
 - **The rebar schedule takes a schedule.** The tile's form held one bar row with one bend, so its own printed example, three rows with two 90-degree bends on the first, could not be entered. It showed 254 lb where the printed schedule weighs 951 lb. Row 1 keeps its pickers and gains a second bend. Further rows go one per line in a "More rows" box (`#4,16,stirrup,30`, bends joined with `+`). The page now reports the total across all rows and the weight by bar size. A typed 0 or a fractional piece count is refused (0 used to be read as 1). Checked in a browser: the example shows 951.0 lb across 3 rows. Rebar leaves the example-result-parity reviewed list, so two exceptions remain (both rounding in a published table).
 
