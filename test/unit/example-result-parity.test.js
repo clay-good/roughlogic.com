@@ -17,7 +17,6 @@ import { fileURLToPath } from "node:url";
 // row did not use. Each entry says which.
 const REVIEWED = {
   "rebar-schedule": "the form edits one bar row with one bend; the printed example is a three-row schedule",
-  "mileage-rollup": "the trips box takes date, miles, purpose; the row's odometer readings have no column, and the implied-mile figures they feed are not printed on the page",
   "grout-lift-pour-height": "the row rounds the limit to 5.33 ft; the page carries 16/3, and a 0.33 ft margin magnifies the 0.003 difference",
   "vibration-severity-zone": "the row rounds the zone boundaries to 0.044 / 0.11 / 0.28 in/s; the page converts the ISO mm/s values exactly, and the margin magnifies it",
 };

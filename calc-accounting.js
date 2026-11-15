@@ -1183,12 +1183,15 @@ function renderMileageRollup(inputRegion, outputRegion, citationEl) {
     Object.keys(STANDARD_MILEAGE_RATES).map((y) => ({ value: y, label: y })));
   yr.select.value = "2026";
   inputRegion.appendChild(yr.wrap);
-  const ta = makeTextarea("Trips (date,miles,purpose; one per line)", "ml-trips", { rows: "4" });
-  ta.input.placeholder = "2025-03-01,42,Client visit";
+  // Optional start and end odometer readings let the tile check the personal miles the
+  // compute already derives (the published example carries them; the box could not, until 2026-11-15).
+  const ta = makeTextarea("Trips (date,miles,purpose[,start odometer,end odometer]; one per line)", "ml-trips", { rows: "4" });
+  ta.input.placeholder = "2025-03-01,42,Client visit,12300,12342";
   inputRegion.appendChild(ta.wrap);
   const milesOut = makeOutputLine(outputRegion, "Total business miles", "ml-out-m");
   const dedOut = makeOutputLine(outputRegion, "Deductible amount", "ml-out-d");
   const rateOut = makeOutputLine(outputRegion, "Rate applied", "ml-out-r");
+  const odoOut = makeOutputLine(outputRegion, "Odometer check", "ml-out-o");
   const tableWrap = document.createElement("div");
   tableWrap.id = "ml-out-schedule";
   tableWrap.className = "tabular-tool";
@@ -1196,16 +1199,21 @@ function renderMileageRollup(inputRegion, outputRegion, citationEl) {
   const update = debounce(() => {
     const trips = String(ta.input.value || "").split("\n").map((line) => {
       const parts = line.split(",").map((s) => s.trim());
-      return { date: parts[0] || "", business_miles: Number(parts[1]) || 0, purpose: parts[2] || "" };
+      const trip = { date: parts[0] || "", business_miles: Number(parts[1]) || 0, purpose: parts[2] || "" };
+      if (parts[3] !== undefined && parts[3] !== "" && parts[4] !== undefined && parts[4] !== "") { trip.start_odometer = Number(parts[3]); trip.end_odometer = Number(parts[4]); }
+      return trip;
     }).filter((t) => t.business_miles > 0);
     const r = computeMileageRollup({ trips, tax_year: Number(yr.select.value) }); stepsFor(outputRegion, inputRegion, ["trips", "tax_year"], r);
     while (tableWrap.firstChild) tableWrap.removeChild(tableWrap.firstChild);
-    if (r.error) { milesOut.textContent = r.error; dedOut.textContent = rateOut.textContent = ""; return; }
+    if (r.error) { milesOut.textContent = r.error; dedOut.textContent = rateOut.textContent = odoOut.textContent = ""; return; }
     milesOut.textContent = fmt(r.business_miles, 1);
     dedOut.textContent = "$" + fmt(r.deductible_amount, 2);
     rateOut.textContent = r.rate_split
       ? "$" + r.standard_rate.toFixed(3) + " / mile (blended: " + r.rate_split + ")"
       : "$" + r.standard_rate.toFixed(3) + " / mile";
+    odoOut.textContent = r.total_miles_implied === null
+      ? "(add start and end odometer readings to a line to check its personal miles)"
+      : fmt(r.total_miles_implied, 1) + " mi on the odometer across the logged trips, " + fmt(r.personal_miles_implied || 0, 1) + " of them personal";
     if (trips.length === 0) return;
     const table = document.createElement("table");
     const thead = document.createElement("thead");
@@ -1233,7 +1241,7 @@ function renderMileageRollup(inputRegion, outputRegion, citationEl) {
   ta.input.addEventListener("input", update);
   attachExampleButton(inputRegion, () => {
     yr.select.value = "2025";
-    ta.input.value = "2025-03-01,42,Client visit\n2025-03-04,18,Supply run";
+    ta.input.value = "2025-03-01,42,Client visit,12300,12342\n2025-03-04,18,Supply run,12342,12361";
     update();
   });
 }

@@ -546,7 +546,7 @@ export const BESPOKE_LABELS = {
   "michaelis-menten": {"vmax":"Vmax (maximum velocity)","km":"Km (substrate at half Vmax)","substrate":"Substrate concentration [S]"},
   "microinverter-branch-count": {"branch_ocpd_a":"Branch OCPD (A)","unit_max_current_a":"Microinverter max AC current (A)"},
   "mileage-cost": {"round_trip_miles":"Round-trip miles","mpg":"MPG","fuel_price_per_gallon":"Fuel price ($/gal)","irs_rate_per_mile":"IRS rate ($/mi)"},
-  "mileage-rollup": {"trips":"Trips (date,miles,purpose; one per line)","tax_year":"Tax year"},
+  "mileage-rollup": {"trips":"Trips (date,miles,purpose[,start odometer,end odometer]; one per line)","tax_year":"Tax year"},
   "min-bend-radius": {"thickness_in":"Plate / sheet thickness (in)","elongation_pct":"Elongation in 2 in (%)"},
   "min-conductor-for-vd": {"phase":"Phase","material":"Material","current_A":"Load current (A)","length_ft":"One-way run length (ft)","source_voltage_V":"Source voltage (V)","target_percent":"Target drop (%)"},
   "mixed-water-temp": {"mode":"Mode","hot_temp_F":"Hot supply temp (°F)","cold_temp_F":"Cold supply temp (°F)","hot_gpm":"Hot flow (gpm)","cold_gpm":"Cold flow (gpm)","target_temp_F":"Target delivered temp (°F)"},
