@@ -325,6 +325,9 @@ export function computeHOS({ profile = "property_70_8", events = [], weekly_on_d
   if (current_time_iso) {
     const t = new Date(current_time_iso);
     if (Number.isNaN(t.getTime())) return { error: "current_time_iso must be a valid ISO date string." };
+    // "2025-02-30T10:00" rolled over to March 2 until 2026-11-15.
+    const ymd = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(current_time_iso));
+    if (ymd && new Date(Date.UTC(+ymd[1], +ymd[2] - 1, +ymd[3])).getUTCDate() !== +ymd[3]) return { error: "current_time_iso is not a real calendar date." };
     if (weekly_exhausted) {
       // Hours roll back on as old days drop off; the 34-hour restart is the route that does not need the log.
       const next = new Date(t.getTime() + 34 * 3600 * 1000);

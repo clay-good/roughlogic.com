@@ -906,6 +906,8 @@ export function decimalYearFromIso(iso) {
   if (typeof iso !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return NaN;
   const d = new Date(iso + "T00:00:00Z");
   if (Number.isNaN(d.getTime())) return NaN;
+  // "2025-02-30" rolled over to March 2 until 2026-11-15.
+  if (d.getUTCDate() !== Number(iso.slice(8, 10))) return NaN;
   const y = d.getUTCFullYear();
   const start = Date.UTC(y, 0, 1);
   const end = Date.UTC(y + 1, 0, 1);

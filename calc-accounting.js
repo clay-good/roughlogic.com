@@ -501,6 +501,12 @@ export function computeAmortization({
   const rows = [];
   let total_interest = 0;
   let payoff_month = null;
+  // "2025-02-30" rolled over to a schedule starting March 2 until 2026-11-15.
+  if (first_payment_date) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(first_payment_date));
+    const d = m ? new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])) : null;
+    if (!d || d.getUTCMonth() !== +m[2] - 1 || d.getUTCDate() !== +m[3]) return { error: "First payment date must be a real calendar date, YYYY-MM-DD." };
+  }
   let date = first_payment_date ? new Date(first_payment_date + "T00:00:00Z") : null;
   // DR-10 (RC-3): a first payment on the 31st must keep the last-day-of-month
   // convention, not overflow through Date.UTC (Jan-31 -> Mar-03), which skips
