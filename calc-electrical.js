@@ -3918,6 +3918,8 @@ export function computeServiceLoadOptional({
   const heat = Number(hvac_heating_kw) || 0;
   const cool = Number(hvac_cooling_kw) || 0;
   const ev = Number(ev_charger_a) || 0;
+  // A typed 0 was quietly read as the default until 2026-11-15.
+  if (service_voltage != null && service_voltage !== "" && !(Number(service_voltage) > 0)) return { error: "Service voltage must be above 0 (V)." };
   const V = Number(service_voltage) || 240;
   if (!(area > 0)) return { error: "Dwelling area must be positive (ft^2)." };
   if (!(V > 0)) return { error: "Service voltage must be positive (V)." };

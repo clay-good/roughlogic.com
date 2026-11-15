@@ -1174,6 +1174,8 @@ export function computeEquipmentCircuitLoad({
   };
   const other = Math.max(0, Number(other_amps) || 0);
   const breaker = Number(breaker_A) || 0;
+  // A typed 0 was quietly read as the default until 2026-11-15.
+  if (voltage != null && voltage !== "" && !(Number(voltage) > 0)) return { error: "Voltage must be above 0 (V)." };
   const volts = Number(voltage) || 120;
   if (!(breaker > 0)) return { error: "Enter a positive branch-circuit breaker rating (A)." };
 

@@ -42,3 +42,32 @@ test("compute zero default: no compute reads a passed 0 as its nonzero default",
   assert.ok(probed > 300, `only ${probed} inputs probed`);
   assert.deepEqual(swallowed, [], 'refuse a 0 the compute cannot use (`if (k != null && k !== "" && !(Number(k) > 0)) return { error }`) instead of reading it as the default');
 });
+
+// The probe above sees only inputs a first fixture row sets. This reads the
+// source: every `const x = Number(param) || <nonzero>;` must have a guard on
+// that param earlier in the same function, so a passed 0 is refused rather than
+// read as the default. Ten more were found this way on 2026-11-15.
+const ZERO_MEANS_UNSET = new Map([
+  ["calc-lowvoltage.js:derate_per_c", "a blank or zero coefficient means 'not entered' (the line says so); no cable has a zero de-rate"],
+]);
+
+test("compute zero default: every `Number(param) || nonzero` is guarded or reviewed", async () => {
+  const { readdirSync } = await import("node:fs");
+  const root = new URL("../../", import.meta.url);
+  const bad = [];
+  for (const f of readdirSync(root).filter((n) => /^calc-.*\.js$/.test(n))) {
+    const lines = readFileSync(new URL(f, root), "utf8").split("\n");
+    lines.forEach((line, i) => {
+      const m = /= Number\(([a-z_][a-z0-9_]*)\) \|\| [0-9.]*[1-9][0-9.]*;/.exec(line);
+      if (!m) return;
+      const p = m[1];
+      let start = i;
+      while (start > 0 && !/^export function /.test(lines[start])) start--;
+      const above = lines.slice(start, i).join("\n");
+      if (new RegExp("\\bif \\([^\\n]*\\b" + p + "\\b[^\\n]*\\) return \\{ error").test(above)) return;
+      if (ZERO_MEANS_UNSET.has(f + ":" + p)) return;
+      bad.push(`${f}:${i + 1} ${p}`);
+    });
+  }
+  assert.deepEqual(bad, [], "guard the param above the line, or add it to ZERO_MEANS_UNSET with the reason 0 means unset");
+});

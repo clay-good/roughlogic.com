@@ -3395,6 +3395,8 @@ export function computeHeaderSizing({
   const trib = Number(tributary_width_ft) || 0;
   const floors = Math.max(0, Math.round(Number(floors_above) || 0));
   const snow = Number(ground_snow_psf) || 0;
+  // A typed 0 was quietly read as the default until 2026-11-15.
+  if (deflection_limit != null && deflection_limit !== "" && !(Number(deflection_limit) > 0)) return { error: "Deflection limit must be above 0 (L/360 is 360)." };
   const limit = Number(deflection_limit) || 360;
   const props = LUMBER_SPECIES_GRADES[species_grade];
   if (!props) return { error: "Unknown species/grade." };
@@ -3603,6 +3605,8 @@ export function computeDeckBeamPost({
   const postH = Number(post_height_ft) || 0;
   const live = Number(live_load_psf) || 0;
   const dead = Number(dead_load_psf) || 0;
+  // A typed 0 was quietly read as the default until 2026-11-15.
+  if (deflection_limit != null && deflection_limit !== "" && !(Number(deflection_limit) > 0)) return { error: "Deflection limit must be above 0 (L/360 is 360)." };
   const limit = Number(deflection_limit) || 360;
   const props = LUMBER_SPECIES_GRADES[species_grade];
   if (!props) return { error: "Unknown species/grade." };
@@ -3931,6 +3935,8 @@ export function computeColumnBucklingWood({ b_in = 0, d_in = 0, le_in = 0, fc_st
   const le0 = Number(le_in) || 0;
   const fcStar = Number(fc_star_psi) || 0;
   const emin = Number(emin_psi) || 0;
+  // A typed 0 was quietly read as the default until 2026-11-15.
+  if (ke != null && ke !== "" && !(Number(ke) > 0)) return { error: "The effective length factor Ke must be above 0 (1.0 pinned-pinned)." };
   const Ke = Number(ke) || 1;
   if (!(b > 0 && d > 0 && Number.isFinite(b) && Number.isFinite(d))) return { error: "Column dimensions b and d must be positive (in)." };
   if (!(le0 > 0 && Number.isFinite(le0))) return { error: "Unbraced length must be positive (in)." };

@@ -194,6 +194,8 @@ export function computeAdpiSelection({ diffuser_type = "circular-ceiling", cooli
   } else {
     const t = _ADPI_TABLE[diffuser_type];
     if (!t) return { error: "Unknown diffuser type." };
+    // A typed 0 was quietly read as the default until 2026-11-15.
+    if (cooling_load != null && cooling_load !== "" && !(Number(cooling_load) > 0)) return { error: "Cooling load must be above 0 (Btu/hr per ft^2)." };
     const load = Number(cooling_load) || 40;
     load_used = _ADPI_LOADS.reduce((a, b) => (Math.abs(b - load) < Math.abs(a - load) ? b : a));
     row = t[load_used]; throwBasis = t.throw;

@@ -114,6 +114,8 @@ export function computeSepticDrainfieldCapacity({
   const len = Number(available_trench_ft);
   const rate = Number(application_rate_gpd_per_ft2);
   const w = Number(trench_width_ft);
+  // A typed 0 was quietly read as the default until 2026-11-15.
+  if (gpd_per_bedroom != null && gpd_per_bedroom !== "" && !(Number(gpd_per_bedroom) > 0)) return { error: "Flow per bedroom must be above 0 gpd (150 typical)." };
   const perBed = Number(gpd_per_bedroom) || 150;
   if (!(len > 0)) return { error: "Available trench length must be positive (ft)." };
   if (!(rate > 0)) return { error: "Application rate must be positive." };

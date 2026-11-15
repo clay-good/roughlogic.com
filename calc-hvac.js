@@ -2718,6 +2718,8 @@ export function computeHoodExhaust({
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const L = Number(length_ft) || 0;
   const W = Number(width_ft) || 0;
+  // A typed 0 was quietly read as the default until 2026-11-15.
+  if (duct_velocity_fpm != null && duct_velocity_fpm !== "" && !(Number(duct_velocity_fpm) > 0)) return { error: "Duct velocity must be above 0 fpm (1,500 default)." };
   const Vd = Number(duct_velocity_fpm) || 1500;
   if (L <= 0) return { error: "Hood length must be positive (ft)." };
   if (hood_class !== "I" && hood_class !== "II") return { error: "Hood class must be 'I' (grease) or 'II' (vapor)." };

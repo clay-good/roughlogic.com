@@ -1778,6 +1778,9 @@ export function computeConcreteAnchorBreakout({ embedment_in = 0, fc_psi = 0, ed
   const _anchor = { "cast-in": [24, 0.70], "post-installed": [17, 0.65], "post-installed-cat2": [17, 0.55], "post-installed-cat3": [17, 0.45] }[anchor_type];
   if (!_anchor) return { error: "Anchor type must be cast-in or post-installed (Category 1, 2 or 3)." };
   if (cracking !== "cracked" && cracking !== "uncracked") return { error: "Cracking must be cracked or uncracked." };
+  // A typed 0 was quietly read as the default until 2026-11-15.
+  if (rows_toward_edge != null && rows_toward_edge !== "" && !(Number(rows_toward_edge) >= 1)) return { error: "Rows toward the edge must be 1 or more." };
+  if (anchors_along_edge != null && anchors_along_edge !== "" && !(Number(anchors_along_edge) >= 1)) return { error: "Anchors along the edge must be 1 or more." };
   const n1 = Number(rows_toward_edge) || 1, n2 = Number(anchors_along_edge) || 1;
   const s1 = Number(spacing_toward_edge_in) || 0, s2 = Number(spacing_along_edge_in) || 0;
   if (!(Number.isInteger(n1) && n1 >= 1 && Number.isInteger(n2) && n2 >= 1)) return { error: "Anchor counts must be whole numbers of 1 or more." };
