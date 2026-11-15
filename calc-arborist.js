@@ -788,6 +788,8 @@ export function computeCrownPruningDose({ live_foliage = 0, removed_foliage = 0,
   if (!Number.isFinite(live) || live <= 0) return { error: "Live foliage must be a positive finite number." };
   if (!Number.isFinite(removed) || removed < 0) return { error: "Removed foliage must be a non-negative finite number." };
   if (!Object.hasOwn(_CROWN_CAP_PCT, maturity_class)) return { error: "Maturity class must be young, mature, over-mature, or stressed." };
+  // Until 2026-11-15 a removal larger than the crown printed "1,500.0%" as a dose.
+  if (removed > live) return { error: "Removed foliage cannot exceed the live foliage it is cut from (same units)." };
   const removal_pct = removed / live * 100;
   const cap_pct = _CROWN_CAP_PCT[maturity_class];
   const within = removal_pct <= cap_pct + 1e-9 * Math.abs(cap_pct);

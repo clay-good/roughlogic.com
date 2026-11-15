@@ -1094,6 +1094,9 @@ export function computeFlueGasCombustionEff({ fuel = "natural_gas", flue_o2_pct 
   const co2_pct = f.co2max * (1 - o2 / 20.9);
   const dt_c = (ts - ta) * 5 / 9;
   const stack_loss_pct = dt_c * (f.a1 / co2_pct + f.b);
+  // A stack loss of 100% or more is outside the relation, not a negative
+  // efficiency ("-10.4%" at a 4,000 F stack until 2026-11-15).
+  if (!(stack_loss_pct < 100)) return { error: "The stack loss works out to " + fmt(stack_loss_pct, 0) + "% at this stack temperature and O2, which no burning appliance can have. Check the stack-temperature reading (°F) and the probe position." };
   const eff_net_pct = 100 - stack_loss_pct;
   const eff_gross_pct = eff_net_pct * f.lhv_hhv;
   return {
