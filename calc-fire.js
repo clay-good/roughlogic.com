@@ -1509,6 +1509,11 @@ export function computeStandpipePDP({
   if (height > 75) warnings.push("Building over 75 ft is a high-rise; NFPA 14 pressure limits (§7.8) and pressure regulation at hose connections (§7.2.3) and fire-pump requirements apply.");
   if (elev > 600) warnings.push("Lift above 600 ft is outside typical single-pumper capability; a relay or in-building fire pump is needed.");
   if (pdp_psi > 350) warnings.push("PDP above 350 psi exceeds typical apparatus pump and hose ratings; stage a relay or use the building fire pump.");
+  // The page's example fills Class I's 100 psi / 250 gpm, and switching the class
+  // left them in place without a word (2026-11-15). Say when the entered pair is
+  // not the selected class's NFPA 14 7.8 figure.
+  const classNP = classII ? 65 : 100, classQ = classII ? 100 : 250;
+  if (NP !== classNP || Q !== classQ) warnings.push("NFPA 14 7.8 sets Class " + standpipe_class + " at " + classNP + " psi and " + classQ + " gpm; this uses the " + fmt(NP, 0) + " psi and " + fmt(Q, 0) + " gpm entered" + (NP < classNP || Q < classQ ? ", which is BELOW that minimum" : "") + ". Clear both fields to use the class figures.");
 
   return {
     standpipe_class,
