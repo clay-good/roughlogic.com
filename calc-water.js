@@ -1026,6 +1026,8 @@ export function computePoolTurnover({
   const vol = Number(pool_volume_gal) || 0;
   const hr = Number(turnover_hr) || 0;
   const ppm = Number(chlorine_ppm);
+  // An unknown chlorine_type was quietly read as the default until 2026-11-15.
+  if (chlorine_type != null && chlorine_type !== "" && !Object.hasOwn(POOL_CHLORINE_TYPES, chlorine_type)) return { error: "Chlorine type must be one of: " + Object.keys(POOL_CHLORINE_TYPES).join(", ") + "." };
   const type = POOL_CHLORINE_TYPES[chlorine_type] ?? POOL_CHLORINE_TYPES.cal_hypo;
   if (!(vol > 0)) return { error: "Enter a positive pool volume (gal)." };
   if (!(hr > 0)) return { error: "Enter a positive turnover time (hr)." };

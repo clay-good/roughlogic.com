@@ -1588,6 +1588,8 @@ export function computeVesselHeadVolume({ inside_diameter_in = 48, head_type = "
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(inside_diameter_in > 0)) return { error: "Inside diameter must be positive (in)." };
   if (straight_flange_in < 0) return { error: "Straight flange cannot be negative (in)." };
+  // An unknown head_type was quietly read as the default until 2026-11-15.
+  if (head_type != null && head_type !== "" && !Object.hasOwn(_VESSEL_HEAD_COEF, head_type)) return { error: "Head type must be one of: " + Object.keys(_VESSEL_HEAD_COEF).join(", ") + "." };
   const coef = _VESSEL_HEAD_COEF[head_type] || _VESSEL_HEAD_COEF.elliptical;
   const D = inside_diameter_in;
   // Head bulge volume: 2:1 elliptical = pi D^3/24; hemispherical = pi D^3/12; ASME F&D ~ 0.0810 D^3 (standard).

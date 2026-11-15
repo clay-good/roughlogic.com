@@ -673,6 +673,8 @@ export function computeRecircPumpHead({
   const d = Number(internal_diameter_in) || 0;
   const L = Number(pipe_length_ft) || 0;
   const Q = Number(target_flow_gpm) || 0;
+  // An unknown material was quietly read as the default until 2026-11-15.
+  if (material != null && material !== "" && !Object.hasOwn(HAZEN_C, material)) return { error: "Pipe material must be one of: " + Object.keys(HAZEN_C).join(", ") + "." };
   const C = HAZEN_C[material] || 140;
   if (d <= 0 || L <= 0 || Q <= 0) return { error: "Provide positive length, diameter, and flow." };
   const equiv_ft = Number(fittings_count) * Number(equivalent_length_per_fitting_ft);
@@ -2891,6 +2893,8 @@ export function computeTrapPrimer({
   if (["floor_drain_count", "prime_volume_oz", "cycles_per_day"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Drain count, prime volume, and cycles cannot be negative." };
   const drains = Math.floor(Number(floor_drain_count) || 0);
   if (!(drains > 0)) return { error: "Enter the number of floor drains (1 or more)." };
+  // An unknown prime_method was quietly read as the default until 2026-11-15.
+  if (prime_method != null && prime_method !== "" && !Object.hasOwn(TRAP_PRIMER_DRAINS_PER_UNIT, prime_method)) return { error: "Prime method must be one of: " + Object.keys(TRAP_PRIMER_DRAINS_PER_UNIT).join(", ") + "." };
   const perUnit = TRAP_PRIMER_DRAINS_PER_UNIT[prime_method] ?? 1;
   const primers_needed = Math.ceil(drains / perUnit - 1e-9);
   const ozPerCycle = Number(prime_volume_oz) || 0;

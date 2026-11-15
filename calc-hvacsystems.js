@@ -165,6 +165,8 @@ export function computeChillerTons({
   const flow = Number(gpm) || 0;
   const Te = Number(ewt_F);
   const Tl = Number(lwt_F);
+  // An unknown fluid was quietly read as the default until 2026-11-15.
+  if (fluid != null && fluid !== "" && !Object.hasOwn(CHILLER_FLUID_FACTORS, fluid)) return { error: "Fluid must be one of: " + Object.keys(CHILLER_FLUID_FACTORS).join(", ") + "." };
   const factor = CHILLER_FLUID_FACTORS[fluid] ?? CHILLER_FLUID_FACTORS.water;
   if (!(flow > 0)) return { error: "Enter a positive chilled-water flow (GPM)." };
   if (!Number.isFinite(Te) || !Number.isFinite(Tl)) return { error: "Enter entering and leaving water temperatures." };
@@ -432,6 +434,8 @@ export function computeAirChangesPerHour({
   const net_ach = (net_cfm * 60) / vol;
   const pressurization_cfm = supply - ret;
 
+  // An unknown occupancy was quietly read as the default until 2026-11-15.
+  if (occupancy != null && occupancy !== "" && !Object.hasOwn(ACH_TARGET_BANDS, occupancy)) return { error: "Occupancy must be one of: " + Object.keys(ACH_TARGET_BANDS).join(", ") + "." };
   const band = ACH_TARGET_BANDS[occupancy] ?? ACH_TARGET_BANDS.classroom;
   let comparison;
   if (band.hi === Infinity) comparison = (ach < band.lo ? "below the " : "meets the ") + band.lo + " ACH minimum (" + band.label + ")";
@@ -570,6 +574,8 @@ export function computeBoilerPipeSizing({
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const Q = Number(boiler_btu_hr) || 0;
   const dT = Number(delta_T_F) || 0;
+  // An unknown material was quietly read as the default until 2026-11-15.
+  if (material != null && material !== "" && !Object.hasOwn(BOILER_PIPE_TABLE, material)) return { error: "Pipe material must be one of: " + Object.keys(BOILER_PIPE_TABLE).join(", ") + "." };
   const tbl = BOILER_PIPE_TABLE[material] ?? BOILER_PIPE_TABLE.copper;
   const vmax = max_velocity_fps != null && Number.isFinite(Number(max_velocity_fps)) && Number(max_velocity_fps) > 0
     ? Number(max_velocity_fps)
@@ -689,6 +695,8 @@ export function computeCompressorShortCycle({
   load_fraction_pct = 50,
   observed_cph = null,
 } = {}) {
+  // An unknown system_type was quietly read as the default until 2026-11-15.
+  if (system_type != null && system_type !== "" && !Object.hasOwn(COMPRESSOR_CYCLE_LIMITS, system_type)) return { error: "System type must be one of: " + Object.keys(COMPRESSOR_CYCLE_LIMITS).join(", ") + "." };
   const lim = COMPRESSOR_CYCLE_LIMITS[system_type] ?? COMPRESSOR_CYCLE_LIMITS.single;
   const lf = Number(load_fraction_pct);
   if (!Number.isFinite(lf) || lf <= 0 || lf >= 100) return { error: "Enter a load fraction between 0 and 100 percent (the part-load operating point)." };
@@ -938,6 +946,8 @@ export function computeFilterPressureDrop({
   energy_cost_per_kwh = null,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // An unknown filter_type was quietly read as the default until 2026-11-15.
+  if (filter_type != null && filter_type !== "" && !Object.hasOwn(FILTER_DP_TABLE, filter_type)) return { error: "Filter type must be one of: " + Object.keys(FILTER_DP_TABLE).join(", ") + "." };
   const t = FILTER_DP_TABLE[filter_type] ?? FILTER_DP_TABLE.merv13;
   const area = Number(face_area_ft2) || 0;
   const vel = Number(face_velocity_fpm) || 0;

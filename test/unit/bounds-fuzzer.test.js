@@ -29800,8 +29800,9 @@ test("bounds: spec-v912 computeVesselHeadVolume pins the head volumes by type, s
   // Straight flange adds a cylindrical skirt: pi/4*48^2*2 = 3619.1 in3 = 15.67 gal.
   const sf = _v912({ inside_diameter_in: 48, head_type: "elliptical", straight_flange_in: 2 });
   assert.ok(Math.abs(sf.total_volume_gal - (62.67 + 15.67)) < 0.05);
-  // Unknown head type falls back to elliptical (fuzzer-safe).
-  assert.ok(Math.abs(_v912({ inside_diameter_in: 48, head_type: "bogus" }).head_volume_gal - 62.67) < 0.02);
+  // An unknown head type is refused (it fell back to elliptical silently until 2026-11-15); omitted is elliptical.
+  assert.ok("error" in _v912({ inside_diameter_in: 48, head_type: "bogus" }));
+  assert.ok(Math.abs(_v912({ inside_diameter_in: 48 }).head_volume_gal - 62.67) < 0.02);
   // Error seams: non-positive diameter, negative flange, non-finite.
   assert.ok("error" in _v912({ inside_diameter_in: 0, head_type: "elliptical" }));
   assert.ok("error" in _v912({ inside_diameter_in: 48, head_type: "elliptical", straight_flange_in: -1 }));

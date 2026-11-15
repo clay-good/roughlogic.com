@@ -438,6 +438,8 @@ export function computePayrollWithholding({
   const periods = PAY_FREQ_PERIODS[pay_frequency];
   if (!periods) return { error: "Unknown pay frequency." };
   const annual_gross = gross_per_period * periods;
+  // An unbundled year (2027, say) quietly ran on the 2025 brackets until 2026-11-15.
+  if (!PUB_15T_BRACKETS[tax_year]) return { error: "Publication 15-T withholding tables for tax year " + tax_year + " are not bundled (bundled: " + Object.keys(PUB_15T_BRACKETS).sort().join(", ") + "). The IRS publishes each year's tables in December." };
   const brackets = (PUB_15T_BRACKETS[tax_year] || PUB_15T_BRACKETS[2025])[filing_status];
   if (!brackets) return { error: "Unsupported filing status (illustrative single only)." };
   let prev = 0, fed_annual = 0;
