@@ -17,3 +17,9 @@ test("fmt: a figure that rounds to zero prints without a minus sign", () => {
   assert.equal(fmt(-0.00051, 3), "-0.001");
   assert.equal(fmt(-12345.6, 1), "-12,345.6");
 });
+
+test("fmt: a figure past 1e21 prints three figures, not every digit of the double", () => {
+  assert.equal(fmt(3.6537540933272573e49, 1), "3.65e+49");
+  assert.equal(fmt(-1.5000000000000003e35, 0), "-1.50e+35");
+  assert.equal(fmt(9.99e20, 0), "999,000,000,000,000,000,000");
+});

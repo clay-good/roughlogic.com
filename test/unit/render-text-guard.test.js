@@ -106,5 +106,5 @@ test("render text: no figure takes the wrong article, and none prints as a negat
   const report = JSON.parse(execFileSync(process.execPath, [sweep], { encoding: "utf8", maxBuffer: 1 << 24, stdio: ["ignore", "pipe", "ignore"] }));
   assert.ok(report.withExample > 2200, `only ${report.withExample} tiles rendered an example`);
   const hits = report.hits.filter((h) => h.kind !== "plural").map((h) => `${h.id} (${h.state}) ${h.kind}: ...${h.text}`);
-  assert.deepEqual(hits, [], 'write `"... " + aFig(fmt(x, 0)) + " ft"` (not "a " + ...), and print signed figures with fmt()');
+  assert.deepEqual(hits, [], 'write `"... " + aFig(fmt(x, 0)) + " ft"` (not "a " + ...), and print signed or derived figures with fmt() or +x.toPrecision(12)');
 });

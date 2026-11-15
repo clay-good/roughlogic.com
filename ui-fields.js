@@ -20,6 +20,9 @@ export function debounce(fn, ms = DEBOUNCE_MS) {
 
 export function fmt(n, digits = 2) {
   if (n === null || n === undefined || !Number.isFinite(Number(n))) return "-";
+  // toFixed gives up at 1e21 and prints every digit it has ("3.6537540933272573e+49 %"
+  // on noise-dose with a typo'd level, 2026-11-15); three figures say the same thing.
+  if (Math.abs(Number(n)) >= 1e21) return Number(n).toExponential(2);
   let t = Number(n).toFixed(digits);
   // A small negative that rounds to zero printed "-0.000 ft" (traverse-closure's own example).
   if (/^-0(?:\.0+)?$/.test(t)) t = t.slice(1);

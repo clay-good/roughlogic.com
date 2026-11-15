@@ -504,7 +504,9 @@ export function computeKeyCutMacs({ depth_1 = 0, depth_2 = 0, depth_3 = 0, depth
   const differences = [];
   const failing = [];
   for (let i = 0; i < bitting.length - 1; i++) {
-    const d = Math.abs(bitting[i] - bitting[i + 1]);
+    // Rounded to the double's noise so a difference equal to MACS counts as at
+    // the limit and prints as "2", not "1.9800000000000004" (2026-11-15).
+    const d = +Math.abs(bitting[i] - bitting[i + 1]).toPrecision(12);
     differences.push(d);
     if (d > macs) failing.push(i + 1);
   }
@@ -527,7 +529,7 @@ export function computeKeyCutMacs({ depth_1 = 0, depth_2 = 0, depth_3 = 0, depth
     at_limit, longest_run, shallow_shoulder,
     pass: failing.length === 0,
     nearest_compliant: failing.length === 0 ? "the bitting is cuttable as entered"
-      : "raise the shallower cut or lower the deeper one at position " + worst_position + " to " + (max_difference - macs) + " step(s) less difference",
+      : "raise the shallower cut or lower the deeper one at position " + worst_position + " to " + +(max_difference - macs).toPrecision(12) + " step(s) less difference",
     verdict: failing.length === 0
       ? (at_limit > 0 ? "cuttable, with " + at_limit + " transition(s) sitting exactly at MACS" : "cuttable, with margin at every transition")
       : "NOT CUTTABLE -- " + failing.length + " adjacent pair(s) exceed MACS",

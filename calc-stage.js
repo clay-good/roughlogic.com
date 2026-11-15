@@ -1176,6 +1176,9 @@ export function computeLedVideoWall({ cab_w_px = 0, cab_h_px = 0, pixel_pitch_mm
   if (!(cab_w_px > 0) || !(cab_h_px > 0)) return { error: "Cabinet pixel counts must be positive." };
   if (!(pixel_pitch_mm > 0)) return { error: "Pixel pitch must be positive." };
   if (!(cols > 0) || !(rows > 0)) return { error: "Columns and rows must be positive." };
+  // A wall is built of whole cabinets of whole pixels: 0.1 columns printed
+  // "0.6000000000000001 cabinets" and "50.400000000000006 px" (2026-11-15).
+  if (![cab_w_px, cab_h_px, cols, rows].every(Number.isInteger)) return { error: "Cabinet pixel counts, columns and rows must be whole numbers." };
   if (!(avg_power_factor > 0 && avg_power_factor <= 1)) return { error: "Average-power factor must be greater than 0 and at most 1." };
   const MM_PER_FT = 304.8, FT_PER_M = 1 / 0.3048;
   const cab_w_mm = cab_w_px * pixel_pitch_mm;

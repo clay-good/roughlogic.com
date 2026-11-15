@@ -8954,7 +8954,7 @@ export function computeSlidingSnowLoad({ pf_upper_psf = 0, eave_ridge_ft = 0, lo
   const surcharge_psf = total_lb_ft / dist_width;
   return {
     total_lb_ft, dist_width, surcharge_psf, narrow: lower < 15,
-    note: "Sliding snow load on a lower roof (ASCE 7 §7.9): snow that slides off a slippery upper roof piles on the lower roof below. The total sliding load per foot of shared eave = 0.4 x the upper roof's flat snow load Pf x its horizontal eave-to-ridge length W. That load is distributed uniformly over the lower roof out to 15 ft from the upper roof's eave ; a lower roof narrower than 15 ft catches only its share, total x (width/15), because the snow that would land past its edge falls off, so the surcharge in psf stays the same while the total drops (O'Rourke's ASCE 7-05 Example 2: a 12 ft garage takes 0.80 x 166 = 133 plf at 11.1 psf). It adds to the lower roof's own balanced snow load, and applies where the upper roof is slippery and sloped enough to shed. A design aid, not a substitute for the engineer of record.",
+    note: "Sliding snow load on a lower roof (ASCE 7 §7.9): snow that slides off a slippery upper roof piles on the lower roof below. The total sliding load per foot of shared eave = 0.4 x the upper roof's flat snow load Pf x its horizontal eave-to-ridge length W. That load is distributed uniformly over the lower roof out to 15 ft from the upper roof's eave; a lower roof narrower than 15 ft catches only its share, total x (width/15), because the snow that would land past its edge falls off, so the surcharge in psf stays the same while the total drops (O'Rourke's ASCE 7-05 Example 2: a 12 ft garage takes 0.80 x 166 = 133 plf at 11.1 psf). It adds to the lower roof's own balanced snow load, and applies where the upper roof is slippery and sloped enough to shed. A design aid, not a substitute for the engineer of record.",
   };
 }
 export const slidingSnowLoadExample = { inputs: { pf_upper_psf: 20, eave_ridge_ft: 40, lower_width_ft: 15 } };
@@ -11664,8 +11664,9 @@ export function computeAdvanceWarningSignSpacing({ road_type = "rural", sign_cou
   const rural_placement = road_type === "rural" || road_type === "expressway";
   let speed_rule_min_ft = null, speed_rule_max_ft = null, speed_rule_ok = null;
   if (v > 0 && rural_placement) {
-    speed_rule_min_ft = 8 * v;
-    speed_rule_max_ft = 12 * v;
+    // Rounded to the double's noise: 12 x 0.55 printed "6.6000000000000005 ft" in the note.
+    speed_rule_min_ft = +(8 * v).toPrecision(12);
+    speed_rule_max_ft = +(12 * v).toPrecision(12);
     speed_rule_ok = first_sign_ft >= speed_rule_min_ft;
   }
   // spec-v1609 was cut here rather than built: its sign spacing and its
@@ -13217,8 +13218,9 @@ export function computeFlammableCabinetStorage({ cat123_gallons = 0, cat4_gallon
   const mixed = q123 > 0 && q4 > 0;
 
   // The area ceiling: three cabinets is a hard limit, not a starting point.
-  const area_cap_cat123_gal = maxCab * cap123;
-  const area_cap_cat4_gal = maxCab * cap4;
+  // The note prints these raw; 3 x 0.6 read "1.7999999999999998 gal" until 2026-11-15.
+  const area_cap_cat123_gal = +(maxCab * cap123).toPrecision(12);
+  const area_cap_cat4_gal = +(maxCab * cap4).toPrecision(12);
   const over_123 = Math.max(0, q123 - area_cap_cat123_gal);
   const over_4 = Math.max(0, q123 + q4 - area_cap_cat4_gal);
   const over_area_cap_gal = Math.max(over_123, over_4);

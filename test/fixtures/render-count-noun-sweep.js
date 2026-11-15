@@ -7,7 +7,8 @@
 // 2026-11-14. The same pass reports two more kinds, read by
 // render-text-guard.test.js: "a" before a figure said with a vowel sound
 // ("a 85 dB target", "a 11 ft landing"; aFig() in ui-fields.js picks the
-// article) and a negative zero ("-0.000 ft").
+// article) and a negative zero ("-0.000 ft"); since 2026-11-15 also a raw
+// float tail ("6.6000000000000005 ft") and a full-precision exponent.
 import { installDocument, installTimers, flushTimers } from "./fake-dom.js";
 import { RENDERER_MAP } from "./renderer-map.js";
 
@@ -19,6 +20,10 @@ const KINDS = [
   ["plural", /(?:^|[\s(=])1 ([a-z]{3,}s)\b/g],
   ["article", /\b([Aa]) ((?:8|1[18](?![\d]))[\d,.:%-]*)/g],
   ["negzero", /(?:^|[\s($=])(-0(?:\.0+)?)(?![\d.])/g],
+  // A raw float printed without fmt(): "6.6000000000000005 ft", "1.7999999999999998 gal".
+  ["floattail", /\d\.\d*(?:0{8,}[1-9]|9{8,}\d)/g],
+  // Every digit of a double in exponent form: "3.6537540933272573e+49 %".
+  ["rawexp", /\d\.\d{9,}e[+-]\d+/g],
 ];
 
 const report = { withExample: 0, hits: [] };
