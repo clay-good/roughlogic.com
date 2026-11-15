@@ -497,7 +497,7 @@ const renderPanConversion = _r({
   ],
   compute: (params) => computePanConversion({
     ...params,
-    pan_depth_in: Number(params.pan_depth_in) || 4,
+    pan_depth_in: params.pan_depth_in == null || params.pan_depth_in === "" ? 4 : Number(params.pan_depth_in),
   }),
 });
 

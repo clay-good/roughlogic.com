@@ -191,8 +191,10 @@ export function computeDMX({ fixtures = [] }) {
     const ch = Number(f.channels) || 0;
     if (!Number.isFinite(start) || start < 1 || start > 512) return { error: "Start address must be 1-512." };
     if (ch < 1) return { error: "Channel count must be at least 1." };
-    const universe = Number(f.universe) || 1;
-    if (universe < 1) return { error: "Universe must be at least 1." };
+    // A blank universe is 1; a typed 0 (Art-Net counts from 0) is refused rather than
+    // quietly read as 1 (until 2026-11-15 the check below could never fire).
+    const universe = f.universe == null || f.universe === "" ? 1 : Number(f.universe);
+    if (universe < 1) return { error: "Universe must be at least 1 (sACN numbering; add 1 to an Art-Net universe, which counts from 0)." };
     if (!Number.isInteger(start) || !Number.isInteger(ch) || !Number.isInteger(universe)) return { error: "Start address, channel count and universe must be whole numbers." };
     max_universe = Math.max(max_universe, universe);
     const end = start + ch - 1;
