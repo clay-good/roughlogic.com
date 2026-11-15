@@ -2142,8 +2142,9 @@ export function computeDuctFrictionStatic({
     if (fit.C_o !== undefined && fit.C_o !== null && Number.isFinite(Number(fit.C_o))) C_o = Number(fit.C_o);
     else if (fit.kind && DUCT_FITTINGS_C_O[fit.kind] !== undefined) C_o = DUCT_FITTINGS_C_O[fit.kind];
     else return { error: "Each fitting needs a C_o or a known kind." };
-    const count = Number(fit.count) || 1;
-    if (!Number.isInteger(count)) return { error: "Fitting counts must be whole numbers." };
+    // A blank count is one fitting; a typed 0 is none (it was read as 1 until 2026-11-15).
+    const count = fit.count == null || fit.count === "" ? 1 : Number(fit.count);
+    if (!(Number.isInteger(count) && count >= 0)) return { error: "Fitting counts must be whole numbers, 0 or more." };
     const loss = C_o * VP_in_wc * count;
     fitting_loss_in_wc += loss;
     fitting_breakdown.push({ kind: fit.kind || "user", C_o, count, loss_in_wc: loss });
@@ -2303,10 +2304,16 @@ function _v7h_renderDuctFrictionStatic(inputRegion, outputRegion, citationEl) {
   const mat = _v7h_makeSelect("Material", "df-mat", Object.keys(DUCT_ROUGHNESS_FT_v7).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
   const cfm = _v7h_makeNumber("Airflow (CFM)", "df-cfm", { step: "any", min: "0" });
   const len = _v7h_makeNumber("Run length (ft)", "df-len", { step: "any", min: "0" });
-  const fitN = _v7h_makeSelect("Fitting kind", "df-fit-k", [{ value: "", label: "(none / done)" }].concat(Object.keys(DUCT_FITTINGS_C_O).map((k) => ({ value: k, label: k.replace(/_/g, " ") + " (Co=" + DUCT_FITTINGS_C_O[k] + ")" }))));
-  const fitC = _v7h_makeNumber("Fitting count", "df-fit-c", { step: "1", min: "0" });
-  fitC.input.value = "1";
-  for (const f of [shape, D, W, H, mat, cfm, len, fitN, fitC]) inputRegion.appendChild(f.wrap);
+  // Three fitting slots: the worked example has three kinds (elbows, a filter, two
+  // diffusers), and one slot dropped two of them from the page's total until 2026-11-15.
+  const FIT_OPTS = [{ value: "", label: "(none / done)" }].concat(Object.keys(DUCT_FITTINGS_C_O).map((k) => ({ value: k, label: k.replace(/_/g, " ") + " (Co=" + DUCT_FITTINGS_C_O[k] + ")" })));
+  const fits = [["", ""], ["2", " 2"], ["3", " 3"]].map(([sfx, n]) => {
+    const k = _v7h_makeSelect("Fitting kind" + n, "df-fit-k" + sfx, FIT_OPTS);
+    const c = _v7h_makeNumber("Fitting count" + n, "df-fit-c" + sfx, { step: "1", min: "0" });
+    c.input.value = "1";
+    return [k, c];
+  });
+  for (const f of [shape, D, W, H, mat, cfm, len, ...fits.flat()]) inputRegion.appendChild(f.wrap);
   const oV = _v7h_makeOut(outputRegion, "Velocity", "df-out-v");
   const oVP = _v7h_makeOut(outputRegion, "Velocity pressure", "df-out-vp");
   const oF = _v7h_makeOut(outputRegion, "Friction factor", "df-out-f");
@@ -2317,12 +2324,12 @@ function _v7h_renderDuctFrictionStatic(inputRegion, outputRegion, citationEl) {
   function fillExample(x) {
     shape.select.value = x.shape; D.input.value = x.D_in || ""; W.input.value = x.W_in || ""; H.input.value = x.H_in || "";
     mat.select.value = x.material; cfm.input.value = x.cfm; len.input.value = x.length_ft;
-    if (x.fittings && x.fittings.length > 0) { fitN.select.value = x.fittings[0].kind; fitC.input.value = x.fittings[0].count; }
+    fits.forEach(([k, c], i) => { const f = (x.fittings || [])[i]; k.select.value = f ? f.kind : ""; c.input.value = f ? f.count : "1"; });
     update();
   }
   const update = _v7h_debounce(() => {
     const fittings = [];
-    if (fitN.select.value) fittings.push({ kind: fitN.select.value, count: Number(fitC.input.value) || 1 });
+    for (const [k, c] of fits) if (k.select.value) fittings.push({ kind: k.select.value, count: c.input.value === "" ? 1 : Number(c.input.value) });
     const r = computeDuctFrictionStatic({
       shape: shape.select.value,
       D_in: Number(D.input.value) || 0,
@@ -2341,7 +2348,7 @@ function _v7h_renderDuctFrictionStatic(inputRegion, outputRegion, citationEl) {
     oFi.textContent = _v7h_fmt(r.fitting_loss_in_wc, 4) + " in WC";
     oT.textContent = _v7h_fmt(r.total_static_in_wc, 4) + " in WC";
   }, _V7H_DEB);
-  for (const f of [shape.select, D.input, W.input, H.input, mat.select, cfm.input, len.input, fitN.select, fitC.input]) f.addEventListener("input", update);
+  for (const f of [shape.select, D.input, W.input, H.input, mat.select, cfm.input, len.input, ...fits.flatMap(([k, c]) => [k.select, c.input])]) f.addEventListener("input", update);
 }
 
 function _v7h_renderCoolingTower(inputRegion, outputRegion, citationEl) {
