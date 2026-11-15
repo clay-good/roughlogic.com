@@ -63,6 +63,11 @@ for (const { id } of TOOLS) {
       // checkValidity and ui-validity strikes through the answer (UTM's zone 0, 2026-11-15).
       const mn = el.attributes?.min, mx = el.attributes?.max;
       if (v0 !== "" && ((mn !== undefined && Number(v0) < Number(mn)) || (mx !== undefined && Number(v0) > Number(mx)))) report.outOfRange.push(id + " " + el.id + ": example " + v0 + " outside [" + (mn ?? "") + ", " + (mx ?? "") + "]");
+      const st = el.attributes?.step;
+      if (v0 !== "" && st !== undefined && st !== "any" && Number(st) > 0) {
+        const q = (Number(v0) - (mn !== undefined && Number.isFinite(Number(mn)) ? Number(mn) : 0)) / Number(st);
+        if (Math.abs(q - Math.round(q)) > 1e-7) report.outOfRange.push(id + " " + el.id + ": example " + v0 + " is off the box's step " + st);
+      }
       const mark = argsAfter(el, "7.31");
       if (!mark || typeof mark !== "object") { el.value = v0; fire(el); continue; }
       const key = Object.keys(mark).find((k) => Number(mark[k]) === 7.31 || mark[k] === "7.31");
