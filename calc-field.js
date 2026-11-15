@@ -1178,6 +1178,8 @@ export const FIELD_RENDERERS = {
 // residual = POA * (1 - cumulative_POD).
 // dims: in { pod_list: dimensionless, poa_pct: dimensionless } out: { cumulative_pod_pct: dimensionless, pos_pct: dimensionless, passes: dimensionless, residual_pct: dimensionless }
 export function computeSearchProbability({ pod_list = [], poa_pct = 100 } = {}) {
+  // A POD that is not a number was dropped without a word until 2026-11-15.
+  if (Array.isArray(pod_list) && pod_list.some((x) => x === null || x === "" || !Number.isFinite(Number(x)))) return { error: "Each per-pass POD must be a number (%)." };
   const pods = (Array.isArray(pod_list) ? pod_list : []).map(Number).filter((x) => Number.isFinite(x));
   const poa = Number(poa_pct);
   if (pods.length === 0) return { error: "Enter at least one per-pass POD (%)." };

@@ -274,6 +274,9 @@ export const drawbarPullExample = { inputs: { power_hp: 75, power_basis: "pto", 
 //  percents and the pass-flag booleans are dimensionless.)
 export function computeUniformity({ catch_volumes = [] }) {
   if (!Array.isArray(catch_volumes) || catch_volumes.length < 4) return { error: "Need at least 4 catch-can readings." };
+  // A negative or unreadable reading was dropped without a word until 2026-11-15.
+  const badCan = catch_volumes.findIndex((v) => v === null || v === "" || !(Number(v) >= 0));
+  if (badCan >= 0) return { error: "Catch-can reading " + (badCan + 1) + " is not a volume of zero or more." };
   const vals = catch_volumes.map(Number).filter((v) => Number.isFinite(v) && v >= 0);
   if (vals.length < 4) return { error: "Need at least 4 valid readings." };
   const mean = vals.reduce((a, b) => a + b, 0) / vals.length;

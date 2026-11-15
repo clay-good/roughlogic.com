@@ -314,6 +314,9 @@ export function computeFiberStrandCountPlanning({ living_units = 0, split_ratio 
   if (!(living_units > 0) || !(split_ratio > 0) || !(terminal_ports > 0)) return { error: "Living units, split ratio, and terminal port count must be positive." };
   if (!(spare_pct >= 0) || !(route_length_ft > 0)) return { error: "Spare percentage cannot be negative, and route length must be positive." };
   if (![lower_material_cost_per_ft, selected_material_cost_per_ft, placement_cost_per_ft].every((v) => v >= 0)) return { error: "Entered costs cannot be negative." };
+  // A count that is not a positive number was dropped from the list without a word until 2026-11-15.
+  { const raw = Array.isArray(standard_counts) ? standard_counts : String(standard_counts ?? "").split(/[\s,;]+/).filter((t) => t !== "");
+    const bad = raw.filter((t) => !(Number(t) > 0)); if (bad.length) return { error: "Standard strand counts must be positive numbers; not one: " + bad.slice(0, 3).join(", ") + "." }; }
   const standards = _parseStandardCounts(standard_counts);
   if (standards.length === 0) return { error: "Enter at least one positive standard cable count." };
   const roundUp = (required) => standards.find((count) => count >= required - 1e-9 * Math.abs(required)) ?? null;
