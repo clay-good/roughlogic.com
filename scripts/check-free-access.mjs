@@ -165,6 +165,10 @@ const SOFT_404 = /^\/(?:common\/)?(?:notfound|not-found|404|pagenotfound|page-no
 //                                        Versions of ASHRAE Standards" with
 //                                        its full preview list; the runner
 //                                        gets 403 on both
+//                            2026-11-15  the read-only-versions page now
+//                                        redirects to standards-and-guidelines
+//                                        #preview (free account, read-only);
+//                                        citations repointed there
 // Re-open any of these in a browser rather than trusting the list: a host that
 // has genuinely gone away looks exactly the same from here.
 const BOT_WALLED = new Set([

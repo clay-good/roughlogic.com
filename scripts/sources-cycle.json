@@ -110,7 +110,7 @@
       "next_expected": "2028-10",
       "last_verified": "2026-09-01",
       "verification_note": "Verified 2026-09-01: ANSI/ASHRAE 62.1-2025 IS PUBLISHED and supersedes 62.1-2022 (ANSI/ASHRAE store listings, ASHRAE announcements). Bundled ventilation-rate values still follow 62.1-2022, which is a value refresh tracked separately; the citation must name 2025 as the current edition. Release month recorded as the 2025 publication window, not a day-precise stamp.",
-      "free_access_url": "https://www.ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards",
+      "free_access_url": "https://www.ashrae.org/technical-resources/standards-and-guidelines",
       "match_terms": [
         "ASHRAE 62.1"
       ]
@@ -124,7 +124,7 @@
       "next_expected": "2028-10",
       "last_verified": "2026-09-01",
       "verification_note": "Verified 2026-09-01: ANSI/ASHRAE 62.2-2025 IS PUBLISHED (16 addenda to the 2022 edition, including MERV 6 -> MERV 11 filtration). Bundled values still follow 62.2-2022; the value refresh is tracked separately.",
-      "free_access_url": "https://www.ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards",
+      "free_access_url": "https://www.ashrae.org/technical-resources/standards-and-guidelines",
       "match_terms": [
         "ASHRAE 62.2"
       ]
@@ -138,7 +138,7 @@
       "next_expected": "2028-12",
       "last_verified": "2026-09-01",
       "verification_note": "Verified 2026-09-01: ANSI/ASHRAE 90.1-2025 IS PUBLISHED (105 addenda to the 2022 edition). Bundled values still follow 90.1-2022; the value refresh is tracked separately.",
-      "free_access_url": "https://www.ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards",
+      "free_access_url": "https://www.ashrae.org/technical-resources/standards-and-guidelines",
       "match_terms": [
         "ASHRAE 90.1"
       ]

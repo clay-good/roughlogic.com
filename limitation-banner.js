@@ -142,14 +142,14 @@ const CANONICAL = {
     replacement:
       "A code-compliant ventilation design requires ASHRAE 62.1 with the AHJ-adopted edition's Rp / Ra values for the project occupancy.",
     who_governs: "The AHJ and the design engineer govern.",
-    link: "ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards",
+    link: "ashrae.org/technical-resources/standards-and-guidelines",
   },
   "outdoor-air-ventilation": {
     headline: "Not an ASHRAE 62.1 design.",
     replacement:
       "Rp and Ra are user-supplied. ASHRAE 62.1 Table 6-1 governs the per-occupancy values for the AHJ-adopted edition. This tool does not bundle the table.",
     who_governs: "The AHJ and the design engineer govern.",
-    link: "ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards",
+    link: "ashrae.org/technical-resources/standards-and-guidelines",
   },
   "stair-stringer": {
     headline: "Not a code-compliance check.",

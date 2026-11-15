@@ -2861,7 +2861,7 @@ export const CITATIONS = {
   "outdoor-air-ventilation": {
     formula: "Vbz = Rp * Pz + Ra * Az. Voz = Vbz / E_z. Per-person and per-area ratios surface the design density.",
     edition: "ASHRAE 62.1-2022 §6.2.2.1 (single-zone breathing-zone procedure). AHJ-adopted edition governs.",
-    freeAccess: "ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards for TOC.",
+    freeAccess: "ashrae.org/technical-resources/standards-and-guidelines (a free read-only preview with a free ASHRAE account).",
     governance: GOVERNANCE.mechanical,
     editionNote: "ASHRAE 62.1 Table 6-1 occupancy categories are NOT bundled; user enters Rp and Ra from the AHJ-adopted edition.",
     assumptions: [

@@ -1466,7 +1466,7 @@ export function renderGFCIReference(inputRegion, outputRegion, citationEl, param
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderLightingDensity(inputRegion, outputRegion, citationEl, params) {
-  citationEl.textContent = "Citation: per IECC 2024 Table C405.3.2(1), Building Area Method (lower than IECC 2021 for office, retail, school and parking garage; the IECC 2021 values, the same as ASHRAE 90.1-2019 Table 9.5.1, are an edition option). AHJ governs adopted edition. Free at codes.iccsafe.org and ashrae.org/technical-resources/standards-and-guidelines/read-only-versions-of-ashrae-standards.";
+  citationEl.textContent = "Citation: per IECC 2024 Table C405.3.2(1), Building Area Method (lower than IECC 2021 for office, retail, school and parking garage; the IECC 2021 values, the same as ASHRAE 90.1-2019 Table 9.5.1, are an edition option). AHJ governs adopted edition. Free at codes.iccsafe.org and ashrae.org/technical-resources/standards-and-guidelines.";
 // The button loads the published worked example (render-example-result-sweep, 2026-11-15).
   attachExampleButton(inputRegion, () => fillExample({ ...lightingDensityExample.inputs, code_edition: "2021" }));
 
