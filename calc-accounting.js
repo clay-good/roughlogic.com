@@ -1209,6 +1209,10 @@ function renderMileageRollup(inputRegion, outputRegion, citationEl) {
   tableWrap.className = "tabular-tool";
   outputRegion.appendChild(tableWrap);
   const update = debounce(() => {
+    // A line whose miles are not a number was dropped without a word until 2026-11-15.
+    const tripLines = String(ta.input.value || "").split("\n").map((l) => l.trim()).filter(Boolean);
+    const badTrip = tripLines.findIndex((l) => { const m = (l.split(",")[1] || "").trim(); return m === "" || !Number.isFinite(Number(m)); });
+    if (badTrip >= 0) { while (tableWrap.firstChild) tableWrap.removeChild(tableWrap.firstChild); milesOut.textContent = "Line " + (badTrip + 1) + " needs date,miles,purpose: " + tripLines[badTrip].slice(0, 40); dedOut.textContent = rateOut.textContent = odoOut.textContent = ""; return; }
     const trips = String(ta.input.value || "").split("\n").map((line) => {
       const parts = line.split(",").map((s) => s.trim());
       const trip = { date: parts[0] || "", business_miles: Number(parts[1]) || 0, purpose: parts[2] || "" };

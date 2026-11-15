@@ -332,6 +332,13 @@ EDUCATIONASSESSMENT_RENDERERS["one-sample-t-test"] = renderOneSampleTTest;
 // dims: in { groups_text: dimensionless } out: { f_stat: dimensionless, df_between: dimensionless, df_within: dimensionless, p_value: dimensionless, ss_between: dimensionless, ss_within: dimensionless, ms_between: dimensionless, ms_within: dimensionless, eta_squared: dimensionless, groups: dimensionless, n_total: dimensionless }
 export function computeOneWayAnova({ groups_text = "" } = {}) {
   if (typeof groups_text !== "string") return { error: "Provide the group data as text, one group per line." };
+  // A token that is not a number ("9O" for 90) was dropped from its group without a word,
+  // and a line of nothing but such tokens vanished, until 2026-11-15.
+  const lines = groups_text.split("\n").map((l) => l.trim()).filter((l) => l.length > 0);
+  for (let i = 0; i < lines.length; i++) {
+    const bad = lines[i].split(/[\s,]+/).filter((tok) => tok !== "" && !Number.isFinite(Number(tok)));
+    if (bad.length) return { error: "Group " + (i + 1) + " has a value that is not a number: " + bad.slice(0, 3).join(", ") + "." };
+  }
   const groups = groups_text.split("\n").map((l) => l.trim()).filter((l) => l.length > 0)
     // Drop empty tokens before converting: Number("") is 0, so a trailing comma used to add a
     // zero observation to the group (F 32.2 became 0.9, "not significant").

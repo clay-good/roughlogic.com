@@ -32,7 +32,7 @@ for (const r of ROWS) if (!first.has(r.tile_id)) first.set(r.tile_id, r);
 // At the precision a reader can see, as check-example-parity compares inputs:
 // the button types 66.82 where the fixture carries 66.8235.
 const close = (a, b) => a === b || Math.abs(a - b) <= Math.max(Math.abs(b) * 0.001, 1e-12);
-const report = { compared: 0, mismatches: {}, outOfRange: [] };
+const report = { compared: 0, mismatches: {}, outOfRange: [], droppedLines: [] };
 for (const { id } of TOOLS) {
   const reg = RENDERER_MAP[id], creg = COMPUTE_MAP[id], row0 = first.get(id);
   if (!reg || !creg || !row0) continue;
@@ -56,6 +56,16 @@ for (const { id } of TOOLS) {
     const fire = (el) => { el.dispatchEvent(new Event("input", { bubbles: true })); el.dispatchEvent(new Event("change", { bubbles: true })); flushTimers(); };
     const labelOf = (el) => (view.querySelectorAll("label").find((l) => l.htmlFor === el.id)?.textContent || el.id);
     const argsAfter = (el, v) => { lastArgs.delete(creg.fn); el.value = v; fire(el); return lastArgs.get(creg.fn); };
+    // A list box must not drop a line it cannot read: the answer would look complete
+    // with a row the reader typed missing (mileage, PCR, ANOVA until 2026-11-15).
+    const outText = () => outputs.querySelectorAll("span").filter((x) => x.classList.contains("out-value")).map((x) => x.textContent).join(" | ");
+    for (const ta of inputs.querySelectorAll("textarea")) {
+      const t0 = ta.value; if (!t0.trim()) continue;
+      const before = outText();
+      ta.value = t0 + "\nzz,yy,qq"; fire(ta);
+      if (outText() === before) report.droppedLines.push(id + " " + ta.id);
+      ta.value = t0; fire(ta);
+    }
     for (const el of inputs.querySelectorAll("input")) {
       if (el.type !== "number") continue;
       const v0 = el.value;

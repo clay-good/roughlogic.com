@@ -1040,7 +1040,11 @@ function renderPcrMix(inputRegion, outputRegion, citationEl) {
   const tableWrap = document.createElement("div"); tableWrap.className = "tabular-tool"; outputRegion.appendChild(tableWrap);
   const totOut = makeOutputLine(outputRegion, "Total master mix volume (uL)", "pcr-out-t");
   const update = debounce(() => {
-    const components = String(ta.input.value || "").split("\n").map((s) => s.split(",").map((x) => x.trim())).filter((p) => p.length === 2 && p[0]).map((p) => ({ name: p[0], per_reaction: Number(p[1]) }));
+    // A line that is not "name,uL" was dropped without a word until 2026-11-15.
+    const lines = String(ta.input.value || "").split("\n").map((s) => s.trim()).filter(Boolean);
+    const badLine = lines.findIndex((l) => { const p = l.split(",").map((x) => x.trim()); return p.length !== 2 || !p[0] || !Number.isFinite(Number(p[1])) || p[1] === ""; });
+    if (badLine >= 0) { while (tableWrap.firstChild) tableWrap.removeChild(tableWrap.firstChild); totOut.textContent = "Line " + (badLine + 1) + " is not name,uL per reaction: " + lines[badLine].slice(0, 40); return; }
+    const components = lines.map((s) => s.split(",").map((x) => x.trim())).filter((p) => p.length === 2 && p[0]).map((p) => ({ name: p[0], per_reaction: Number(p[1]) }));
     const r = computePcrMix({ number_of_reactions: Number(n.input.value), fudge_factor_pct: Number(ff.input.value), components }); stepsFor(outputRegion, inputRegion, ["number_of_reactions", "fudge_factor_pct", "components"], r);
     while (tableWrap.firstChild) tableWrap.removeChild(tableWrap.firstChild);
     if (r.error) { totOut.textContent = r.error; return; }
