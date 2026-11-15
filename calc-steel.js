@@ -939,7 +939,9 @@ STEEL_RENDERERS["steel-b1-amplifier"] = _simpleRenderer({
       { value: "no", label: "No (Cm from the end-moment ratio)" },
       { value: "yes", label: "Yes (Cm = 1.0)" },
     ] },
-    { key: "m1_m2", label: "End-moment ratio, smaller/larger (- single curvature, + reverse; no transverse load)", kind: "number" },
+    // Signed by definition (AISC App. 8: negative in single curvature); the spec renderer's
+    // default min 0 struck through every single-curvature answer until 2026-11-15.
+    { key: "m1_m2", label: "End-moment ratio, smaller/larger (- single curvature, + reverse; no transverse load)", kind: "number", attrs: { step: "any", min: "-1", max: "1" } },
     { key: "method", label: "Design basis", kind: "select", default: "LRFD", options: [
       { value: "LRFD", label: "LRFD (alpha = 1.0)" },
       { value: "ASD", label: "ASD (alpha = 1.6)" },

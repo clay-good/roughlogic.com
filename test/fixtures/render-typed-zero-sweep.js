@@ -32,7 +32,7 @@ for (const r of ROWS) if (!first.has(r.tile_id)) first.set(r.tile_id, r);
 // At the precision a reader can see, as check-example-parity compares inputs:
 // the button types 66.82 where the fixture carries 66.8235.
 const close = (a, b) => a === b || Math.abs(a - b) <= Math.max(Math.abs(b) * 0.001, 1e-12);
-const report = { compared: 0, mismatches: {} };
+const report = { compared: 0, mismatches: {}, outOfRange: [] };
 for (const { id } of TOOLS) {
   const reg = RENDERER_MAP[id], creg = COMPUTE_MAP[id], row0 = first.get(id);
   if (!reg || !creg || !row0) continue;
@@ -59,6 +59,10 @@ for (const { id } of TOOLS) {
     for (const el of inputs.querySelectorAll("input")) {
       if (el.type !== "number") continue;
       const v0 = el.value;
+      // The example must sit inside the box's own min/max: a value outside them fails
+      // checkValidity and ui-validity strikes through the answer (UTM's zone 0, 2026-11-15).
+      const mn = el.attributes?.min, mx = el.attributes?.max;
+      if (v0 !== "" && ((mn !== undefined && Number(v0) < Number(mn)) || (mx !== undefined && Number(v0) > Number(mx)))) report.outOfRange.push(id + " " + el.id + ": example " + v0 + " outside [" + (mn ?? "") + ", " + (mx ?? "") + "]");
       const mark = argsAfter(el, "7.31");
       if (!mark || typeof mark !== "object") { el.value = v0; fire(el); continue; }
       const key = Object.keys(mark).find((k) => Number(mark[k]) === 7.31 || mark[k] === "7.31");

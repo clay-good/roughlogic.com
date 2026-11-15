@@ -563,7 +563,9 @@ function renderUTM(inputRegion, outputRegion, citationEl) {
   function fillExample(v) {
     dir.select.value = v.direction;
     lat.input.value = v.lat_deg; lon.input.value = v.lon_deg;
-    zone.input.value = v.zone; hemi.select.value = v.hemisphere;
+    // Zone 0 means "derive it" in the lat/lon direction; typed into a box whose min is 1 it
+    // tripped the validity check and struck through a correct answer (until 2026-11-15).
+    zone.input.value = v.zone || ""; hemi.select.value = v.hemisphere;
     east.input.value = v.easting; north.input.value = v.northing;
     update();
   }
