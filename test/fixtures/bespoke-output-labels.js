@@ -732,7 +732,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "readability": {"words":"Words","sentences":"Sentences","syllables":"Syllables","words_per_sentence":"Words per sentence","syllables_per_word":"Syllables per word","flesch_kincaid_grade_level":"Flesch-Kincaid Grade Level","flesch_reading_ease":"Flesch Reading Ease (0-100)"},
   "reaming-drill-allowance": {"drill_diameter_in":"Prebore drill diameter","allowance_used_in":"Allowance used"},
   "rebar": {"bars_along_length":"Bars (along length)","bars_along_width":"Bars (along width)","total_length_ft":"Total linear feet"},
-  "rebar-schedule": {"total_weight_lb":"Total weight (this row)"},
+  "rebar-schedule": {"total_weight_lb":"Total weight (all rows)","by_size_lb":"Weight by bar size"},
   "recipe-scale": {"factor":"Scale factor","rows":"Scaled rows"},
   "recirc-loop-sizing": {"q_per_ft_btu_hr":"Heat-loss rate per ft (Btu/hr/ft)","Q_total_btu_hr":"Total loop heat loss (Btu/hr)","gpm_required":"Required recirc flow (GPM)","head_ft":"Friction head (ft of water)","pressure_psi":"Pump pressure (psi)","recommended_hp":"Recommended pump size (HP, next standard)","warnings":"Notes"},
   "recirc-pump-head": {"head_ft":"Pump head","pressure_psi":"Pressure","equivalent_length_ft":"Equivalent length"},

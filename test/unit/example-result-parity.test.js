@@ -16,7 +16,6 @@ import { fileURLToPath } from "node:url";
 // Reviewed: the page cannot show the row's case, or shows it to a precision the
 // row did not use. Each entry says which.
 const REVIEWED = {
-  "rebar-schedule": "the form edits one bar row with one bend; the printed example is a three-row schedule",
   "grout-lift-pour-height": "the row rounds the limit to 5.33 ft; the page carries 16/3, and a 0.33 ft margin magnifies the 0.003 difference",
   "vibration-severity-zone": "the row rounds the zone boundaries to 0.044 / 0.11 / 0.28 in/s; the page converts the ISO mm/s values exactly, and the margin magnifies it",
 };

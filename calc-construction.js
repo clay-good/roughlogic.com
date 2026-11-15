@@ -2555,6 +2555,8 @@ export function computeRebarSchedule({ rows = [] } = {}) {
     const d_in = REBAR_BAR_DIAMETERS_IN[size];
     if (w_per_ft === undefined || d_in === undefined) return { error: "Unknown bar size " + size };
     const straight_ft = Math.max(0, Number(r.straight_ft) || 0);
+    // A row's piece count is whole; a typed 0 read as 1 until 2026-11-15.
+    if (r.pieces != null && r.pieces !== "" && !(Number.isInteger(Number(r.pieces)) && Number(r.pieces) >= 1)) return { error: "Pieces must be a whole number, 1 or more (" + size + " row)." };
     const pieces = Math.max(0, Number(r.pieces) || 1);
     let bend_allowance_in = 0;
     if (Array.isArray(r.bends)) {
@@ -2813,41 +2815,59 @@ function _v7c_renderHipValleyRafter(inputRegion, outputRegion, citationEl) {
   for (const f of [run.input, p.input, p2.input, oh.input, oc.input]) f.addEventListener("input", update);
 }
 
+// The tile is a schedule, but until 2026-11-15 its form held one bar with one
+// bend, so its own printed example (three rows, two 90s on the first) could not
+// be entered. Row 1 keeps its pickers and gains a second bend; further rows go
+// one per line in a box ("#4,16,stirrup,30"; bends joined with +).
 function _v7c_renderRebarSchedule(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Unit weights from data/construction/rebar-unit-weights.json (ACI/CRSI by name only). Bend allowance 90°/135° = 6 db, 180° = 4 db, stirrup = 14 db, hook = 6 db. Engineer of record governs the schedule.";
   _v7c_attachEx(inputRegion, () => fillExample(rebarScheduleExample.inputs));
-  const size = _v7c_makeSelect("Bar size", "rs-size", Object.keys(REBAR_UNIT_WEIGHTS).map((k) => ({ value: k, label: k + " (" + REBAR_UNIT_WEIGHTS[k] + " lb/ft)" })));
-  const sl = _v7c_makeNumber("Straight length (ft)", "rs-sl", { step: "any", min: "0" });
-  const bend = _v7c_makeSelect("Bend type", "rs-b", [
+  const BENDS = [
     { value: "", label: "(none)" },
     { value: "bend_90", label: "90° bend (6 db)" },
     { value: "bend_135", label: "135° bend (6 db)" },
     { value: "bend_180", label: "180° bend (4 db)" },
     { value: "stirrup", label: "Stirrup (14 db total)" },
     { value: "hook", label: "Hook (6 db)" },
-  ]);
+  ];
+  const size = _v7c_makeSelect("Bar size", "rs-size", Object.keys(REBAR_UNIT_WEIGHTS).map((k) => ({ value: k, label: k + " (" + REBAR_UNIT_WEIGHTS[k] + " lb/ft)" })));
+  const sl = _v7c_makeNumber("Straight length (ft)", "rs-sl", { step: "any", min: "0" });
+  const bend = _v7c_makeSelect("Bend type", "rs-b", BENDS);
+  const bend2 = _v7c_makeSelect("Second bend (optional)", "rs-b2", BENDS);
   const pcs = _v7c_makeNumber("Pieces", "rs-p", { step: "1", min: "1" });
   pcs.input.value = "1";
-  for (const f of [size, sl, bend, pcs]) inputRegion.appendChild(f.wrap);
+  const more = makeTextarea("More rows: size,straight ft,bends,pieces (bends joined with +; one row per line)", "rs-more", { rows: "4" });
+  more.input.placeholder = "#4,16,stirrup,30";
+  for (const f of [size, sl, bend, bend2, pcs, more]) inputRegion.appendChild(f.wrap);
   const oCl = _v7c_makeOut(outputRegion, "Cut length per bar", "rs-out-cl");
   const oW = _v7c_makeOut(outputRegion, "Row weight", "rs-out-w");
-  const oTotal = _v7c_makeOut(outputRegion, "Total weight (this row)", "rs-out-t");
+  const oTotal = _v7c_makeOut(outputRegion, "Total weight (all rows)", "rs-out-t");
+  const oBySize = _v7c_makeOut(outputRegion, "Weight by bar size", "rs-out-s");
   function fillExample(x) {
-    const r0 = (x.rows || [])[0]; if (!r0) return;
+    const [r0, ...rest] = x.rows || []; if (!r0) return;
     size.select.value = r0.size; sl.input.value = r0.straight_ft;
-    bend.select.value = (r0.bends && r0.bends[0]) || ""; pcs.input.value = r0.pieces;
+    bend.select.value = (r0.bends && r0.bends[0]) || ""; bend2.select.value = (r0.bends && r0.bends[1]) || ""; pcs.input.value = r0.pieces;
+    more.input.value = rest.map((r) => [r.size, r.straight_ft, (r.bends || []).join("+"), r.pieces].join(",")).join("\n");
     update();
   }
   const update = _v7c_debounce(() => {
-    const bends = bend.select.value ? [bend.select.value] : [];
-    const r = computeRebarSchedule({ rows: [{ size: size.select.value, straight_ft: Number(sl.input.value) || 0, bends, pieces: Number(pcs.input.value) || 1 }] }); stepsFor(outputRegion, inputRegion, ["rows"], r);
-    if (r.error) { oCl.textContent = r.error; oW.textContent = "-"; oTotal.textContent = "-"; return; }
+    const bends = [bend.select.value, bend2.select.value].filter(Boolean);
+    const rows = [{ size: size.select.value, straight_ft: Number(sl.input.value) || 0, bends, pieces: pcs.input.value === "" ? 1 : Number(pcs.input.value) }];
+    for (const line of String(more.input.value || "").split("\n")) {
+      if (!line.trim()) continue;
+      const [sz, len, bs, n] = line.split(",").map((p) => p.trim());
+      rows.push({ size: sz.startsWith("#") ? sz : "#" + sz, straight_ft: Number(len) || 0, bends: (bs || "").split("+").map((b) => b.trim()).filter(Boolean), pieces: n === undefined || n === "" ? 1 : Number(n) });
+    }
+    const r = computeRebarSchedule({ rows }); stepsFor(outputRegion, inputRegion, ["rows"], r);
+    if (r.error) { oCl.textContent = r.error; oW.textContent = "-"; oTotal.textContent = "-"; oBySize.textContent = "-"; return; }
     const d = r.detailed[0];
-    oCl.textContent = _v7c_fmt(d.cut_length_ft, 3) + " ft (+" + _v7c_fmt(d.bend_allowance_in, 2) + " in for bends)";
-    oW.textContent = _v7c_fmt(d.row_weight_lb, 1) + " lb";
+    oCl.textContent = _v7c_fmt(d.cut_length_ft, 3) + " ft (+" + _v7c_fmt(d.bend_allowance_in, 2) + " in for bends)" + (rows.length > 1 ? " -- row 1" : "");
+    oW.textContent = _v7c_fmt(d.row_weight_lb, 1) + " lb" + (rows.length > 1 ? " -- row 1" : "");
     oTotal.textContent = _v7c_fmt(r.total_weight_lb, 1) + " lb";
+    oTotal.textContent += " across " + rows.length + " " + (rows.length === 1 ? "row" : "rows");
+    oBySize.textContent = Object.entries(r.by_size_lb || {}).map(([k, w]) => k + " " + _v7c_fmt(w, 1) + " lb").join(", ") || "-";
   }, _V7C_DEB);
-  for (const f of [size.select, sl.input, bend.select, pcs.input]) f.addEventListener("input", update);
+  for (const f of [size.select, sl.input, bend.select, bend2.select, pcs.input, more.input]) f.addEventListener("input", update);
 }
 
 function _v7c_renderPlywoodSpan(inputRegion, outputRegion, citationEl) {
