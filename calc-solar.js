@@ -61,6 +61,9 @@ export function computePVStringSizing({
   // A negative voltage used to return a negative maximum string length (-14 modules) with no error.
   if (!(module_voc_V > 0) || !(module_vmp_V > 0)) return { error: "Module Voc and Vmp must be positive (V)." };
   if (!(Number(inverter_vdc_max_V) > 0) || !(Number(inverter_mppt_min_V) >= 0)) return { error: "Inverter maximum dc voltage must be positive and the MPPT minimum cannot be negative (V)." };
+  // Inverted pairs (record low above record high; MPPT minimum above maximum) were accepted until 2026-11-15.
+  if (Number(record_low_C) > Number(record_high_C)) return { error: "The record low temperature must not exceed the record high (C)." };
+  if (Number(inverter_mppt_max_V) > 0 && Number(inverter_mppt_min_V) > Number(inverter_mppt_max_V)) return { error: "The inverter MPPT minimum voltage must not exceed the MPPT maximum (V)." };
   const coeff = Math.abs(Number(voc_temp_coeff_pct_per_C) || 0);
   // 30 typed for 0.30 gave a negative hot-day Vmp and a "feasible" string of one module.
   if (coeff > 1.5) return { error: "The temperature coefficient is in % per C (about 0.30); " + coeff + " is not a real module." };

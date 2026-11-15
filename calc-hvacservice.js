@@ -499,6 +499,8 @@ export function computeFurnaceTempRise({ return_air_F = null, supply_air_F = 0, 
   if (!(efficiency_pct > 0)) return { error: "Efficiency must be positive (percent)." };
   if (efficiency_pct > 100) return { error: "Efficiency cannot exceed 100 percent." };
   if (rise_min_F < 0 || rise_max_F < 0) return { error: "Rating-plate rise limits must be non-negative." };
+  // An inverted pair (min 84, max 70) was accepted until 2026-11-15.
+  if (Number(rise_min_F) > Number(rise_max_F)) return { error: "The rating-plate minimum rise must not exceed the maximum (e.g. 40-70 F)." };
   const delta_T_F = supply_air_F - return_air_F;
   if (!(delta_T_F > 0)) return { error: "Supply air must be warmer than return air (positive temperature rise)." };
   const output_btuh = input_btuh * efficiency_pct / 100;
@@ -550,6 +552,8 @@ export function computeFurnaceAirflowToRise({ input_btuh = 0, efficiency_pct = 8
   if (efficiency_pct > 100) return { error: "Efficiency cannot exceed 100 percent." };
   if (!(cfm > 0)) return { error: "Blower airflow must be positive (CFM)." };
   if (rise_min_F < 0 || rise_max_F < 0) return { error: "Rating-plate rise limits must be non-negative." };
+  // An inverted pair (min 84, max 70) was accepted until 2026-11-15.
+  if (Number(rise_min_F) > Number(rise_max_F)) return { error: "The rating-plate minimum rise must not exceed the maximum (e.g. 40-70 F)." };
   const output_btuh = input_btuh * efficiency_pct / 100;
   const delta_T_F = output_btuh / (_SENSIBLE_HEAT_FACTOR * cfm);
   const supply_air_F = return_air_F + delta_T_F;

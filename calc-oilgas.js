@@ -698,6 +698,8 @@ export function computeCasingCementVolume({
   if (float_collar_ft < 0) return { error: "Depth to the float collar cannot be negative (ft)." };
   if (slurry_yield_ft3_per_sack < 0) return { error: "Slurry yield cannot be negative (cu ft per sack)." };
   if (low_excess_pct < 0 || high_excess_pct < 0) return { error: "Excess comparison values cannot be negative (%)." };
+  // An inverted pair silently dropped the spread line until 2026-11-15.
+  if (low_excess_pct > 0 && high_excess_pct > 0 && high_excess_pct < low_excess_pct) return { error: "The high excess must not be below the low excess (%)." };
   // The oilfield capacity constant, 1029.4, turns square inches over a foot
   // into barrels. Once it is in hand the whole job is arithmetic.
   const annular_capacity_bbl_ft = (hole_dia_in * hole_dia_in - casing_od_in * casing_od_in) / _OG_ANNULAR_BBL_CONST;

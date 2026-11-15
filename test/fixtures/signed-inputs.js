@@ -55,7 +55,6 @@ export const SIGNED_INPUTS = [
   "poe-budget::ambient_C",
   "insulation-heat-loss::surface_T_F",
   "insulation-heat-loss::ambient_T_F",
-  "pv-string-sizing::record_high_C",
   "insulation-thickness::ambient_F",
   "psychrometric::temperature_F",
   "static-pressure-piping::elevation_change_ft",
