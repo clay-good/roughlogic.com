@@ -884,6 +884,9 @@ export function computeWalkInCoolerLoad({ u_factor = 0, area_ft2 = 0, delta_t_f 
   const infil = Number(infiltration_btuh) || 0;
   const prod = Number(product_btuh) || 0;
   const internal = Number(internal_btuh) || 0;
+  // A typed 0 or negative was quietly read as the default until 2026-11-15.
+  if (safety != null && safety !== "" && !(Number(safety) > 0)) return { error: "Safety factor must be above 0 (1.10 default)." };
+  if (run_hours != null && run_hours !== "" && !(Number(run_hours) > 0)) return { error: "Run time must be above 0 hours a day (16 default)." };
   const sf = Number(safety) > 0 ? Number(safety) : 1.10;
   if (!(u > 0)) return { error: "Panel U-factor must be positive (Btu/hr-ft^2-F)." };
   if (!(area > 0)) return { error: "Envelope area must be positive (ft^2)." };

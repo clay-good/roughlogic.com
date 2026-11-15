@@ -10151,8 +10151,9 @@ test("bounds: spec-v703 computeRefrigerantLineSize pins ID = 12 sqrt(4 area/pi),
   }
   // A lower target velocity allows a larger line.
   assert.ok(computeRefrigerantLineSize({ mass_flow_lb_hr: 600, specific_volume_ft3_lb: 0.5, target_velocity_fpm: 700 }).line_id_in > r.line_id_in);
-  // A non-positive target velocity defaults to 1500 fpm (mirrors the riser minimum), not an error.
-  assert.ok(Math.abs(computeRefrigerantLineSize({ mass_flow_lb_hr: 600, specific_volume_ft3_lb: 0.5, target_velocity_fpm: 0 }).line_id_in - r.line_id_in) < 1e-9);
+  // A blank target velocity defaults to 1500 fpm; a typed 0 is refused (it was read as 1500 until 2026-11-15).
+  assert.ok(Math.abs(computeRefrigerantLineSize({ mass_flow_lb_hr: 600, specific_volume_ft3_lb: 0.5 }).line_id_in - r.line_id_in) < 1e-9);
+  assert.ok("error" in computeRefrigerantLineSize({ mass_flow_lb_hr: 600, specific_volume_ft3_lb: 0.5, target_velocity_fpm: 0 }));
   // Error seams: non-positive mass flow, non-positive specific volume, non-finite.
   assert.ok("error" in computeRefrigerantLineSize({ mass_flow_lb_hr: 0, specific_volume_ft3_lb: 0.5 }));
   assert.ok("error" in computeRefrigerantLineSize({ mass_flow_lb_hr: 600, specific_volume_ft3_lb: 0 }));

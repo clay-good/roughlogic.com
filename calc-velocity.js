@@ -145,6 +145,8 @@ VELOCITY_RENDERERS["refrigerant-velocity"] = renderRefrigerantVelocity;
 export function computeRefrigerantLineSize({ mass_flow_lb_hr = 0, specific_volume_ft3_lb = 0, target_velocity_fpm = 1500 } = {}) {
   const m = Number(mass_flow_lb_hr) || 0;
   const sv = Number(specific_volume_ft3_lb) || 0;
+  // A typed 0 or negative was quietly read as the default until 2026-11-15.
+  if (target_velocity_fpm != null && target_velocity_fpm !== "" && !(Number(target_velocity_fpm) > 0)) return { error: "Target velocity must be above 0 fpm (1,500 default)." };
   const v = Number(target_velocity_fpm) > 0 ? Number(target_velocity_fpm) : 1500;
   if (!(m > 0 && Number.isFinite(m))) return { error: "Mass flow must be positive (lb/hr)." };
   if (!(sv > 0 && Number.isFinite(sv))) return { error: "Specific volume must be positive (ft^3/lb)." };

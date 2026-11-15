@@ -49,6 +49,11 @@ test("compute zero default: no compute reads a passed 0 as its nonzero default",
 // read as the default. Ten more were found this way on 2026-11-15.
 const ZERO_MEANS_UNSET = new Map([
   ["calc-lowvoltage.js:derate_per_c", "a blank or zero coefficient means 'not entered' (the line says so); no cable has a zero de-rate"],
+  ["calc-lowvoltage.js:panel_min_output_v", "the field says 'enter 0 to use 85% of nominal'; negatives are refused above it"],
+  ["calc-openchannel.js:contraction_coeff", "declared default 0 = use the standard 0.61"],
+  ["calc-openchannel.js:discharge_coeff", "declared default 0 = use the standard 0.9"],
+  ["calc-plumbing.js:system_pressure_psi", "optional (declared default 0); blank or 0 assumes a 60 psi system"],
+  ["calc-openchannel.js:coeff", "a weir coefficient of 0 (the declared default) means 'use the standard coefficient for this weir type'"],
 ]);
 
 test("compute zero default: every `Number(param) || nonzero` is guarded or reviewed", async () => {
@@ -58,7 +63,8 @@ test("compute zero default: every `Number(param) || nonzero` is guarded or revie
   for (const f of readdirSync(root).filter((n) => /^calc-.*\.js$/.test(n))) {
     const lines = readFileSync(new URL(f, root), "utf8").split("\n");
     lines.forEach((line, i) => {
-      const m = /= Number\(([a-z_][a-z0-9_]*)\) \|\| [0-9.]*[1-9][0-9.]*;/.exec(line);
+      const m = /= Number\(([a-z_][a-z0-9_]*)\) \|\| [0-9.]*[1-9][0-9.]*;/.exec(line)
+        || /= (?:Number\()?([a-z_][a-z0-9_]*)\)? > 0 \? (?:Number\()?\1\)? : (?:[0-9.]*[1-9]|0\.\d+ \*)/.exec(line);
       if (!m) return;
       const p = m[1];
       let start = i;

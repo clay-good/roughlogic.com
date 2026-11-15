@@ -86,6 +86,9 @@ export function computeMulchTopsoilVolume({ area_ft2 = 0, depth_in = 0, bulk_den
   const area = Number(area_ft2) || 0;
   const depth = Number(depth_in) || 0;
   const dens = Number(bulk_density) || 0;
+  // A typed 0 or negative was quietly read as the default until 2026-11-15.
+  if (bag_ft3 != null && bag_ft3 !== "" && !(Number(bag_ft3) > 0)) return { error: "Bag volume must be above 0 cu ft (2 default)." };
+  if (load_yd3 != null && load_yd3 !== "" && !(Number(load_yd3) > 0)) return { error: "Bulk load must be above 0 cu yd (10 default)." };
   const bag = Number(bag_ft3) > 0 ? Number(bag_ft3) : 2;
   const load = Number(load_yd3) > 0 ? Number(load_yd3) : 10;
   const waste = Number(waste_pct) || 0;
