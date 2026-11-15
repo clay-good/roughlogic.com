@@ -73,7 +73,9 @@ const declared = (f, attr) => (f.attrs && f.attrs[attr] != null && f.attrs[attr]
 const negate = (f, v) => (declared(f, "min") != null && declared(f, "min") >= 0 ? null : -v);
 
 // Bounded by definition: efficiencies, ACI lambda, orifice Cd, fractions.
-const BOUNDED = /(^|_)eff(_|$)|efficiency|^lambda$|^cd$|fraction$|_fraction_|^runoff_c$/i;
+// Emissivity, absorptance, reflectance, albedo and porosity joined 2026-11-15: each
+// is a 0-1 share by definition, and jacket emissivity answered 90.
+const BOUNDED = /(^|_)eff(_|$)|efficiency|^lambda$|^cd$|fraction$|_fraction_|^runoff_c$|emissivity|absorptan|reflectan|albedo|porosity/i;
 const pastCeiling = (f, v) => {
   if (!BOUNDED.test(f.key) || declared(f, "max") != null) return null;
   const pct = /pct|percent/i.test(f.key) || /%|percent/i.test(f.label);
