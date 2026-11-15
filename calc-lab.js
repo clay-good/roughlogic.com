@@ -1085,7 +1085,7 @@ function renderBeerLambert(inputRegion, outputRegion, citationEl) {
     out.textContent = r.concentration.toExponential(4) + " M";
   }, DEBOUNCE_MS);
   for (const f of [a, l, e]) f.input.addEventListener("input", update);
-  attachExampleButton(inputRegion, () => { a.input.value = 0.5; l.input.value = 1; e.input.value = 50000; update(); });
+  attachExampleButton(inputRegion, () => { a.input.value = 1; l.input.value = 1; e.input.value = 10000; update(); });
 }
 
 function renderHendersonHasselbalch(inputRegion, outputRegion, citationEl) {
@@ -1114,7 +1114,7 @@ function renderHendersonHasselbalch(inputRegion, outputRegion, citationEl) {
   }, DEBOUNCE_MS);
   for (const f of [pKa, pH, cT, vT]) f.input.addEventListener("input", update);
   buf.select.addEventListener("change", update);
-  attachExampleButton(inputRegion, () => { buf.select.value = "phosphate"; pKa.input.value = 7.20; pH.input.value = 7.40; cT.input.value = 0.1; vT.input.value = 1.0; update(); });
+  attachExampleButton(inputRegion, () => { buf.select.value = "phosphate"; pKa.input.value = 7.20; pH.input.value = 7.40; cT.input.value = 0.25; vT.input.value = 0.05; update(); });
 }
 
 function renderHemocytometer(inputRegion, outputRegion, citationEl) {

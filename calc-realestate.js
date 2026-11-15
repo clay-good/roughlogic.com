@@ -757,7 +757,7 @@ export function renderCapRateDSCR(inputRegion, outputRegion, citationEl) {
   attachExampleButton(inputRegion, () => {
     N.input.value = String(capRateExample.inputs.noi_annual);
     V.input.value = String(capRateExample.inputs.property_value);
-    D.input.value = "0";
+    D.input.value = String(capRateExample.inputs.annual_debt_service);
     LA.input.value = "750000"; LR.input.value = "6.5"; LY.input.value = "30"; OE.input.value = "40000"; PG.input.value = "120000";
     update();
   });
@@ -1482,7 +1482,7 @@ export function renderRentalWorksheet(inputRegion, outputRegion, citationEl) {
     DEP.input.value = String(rentalWorksheetExample.inputs.depreciation_annual);
     PV.input.value = String(rentalWorksheetExample.inputs.property_value);
     CI.input.value = String(rentalWorksheetExample.inputs.cash_invested);
-    MG.input.value = "0";
+    MG.input.value = "10";
     update();
   });
   const oGross = makeOutputLine(outputRegion, "Gross rent (annual)", "rw-out-gross");

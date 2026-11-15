@@ -773,7 +773,7 @@ function _renderCoaxRgLoss(inputRegion, outputRegion, citationEl) {
   for (const f of [mode, type, lp, len, src, tgt]) inputRegion.appendChild(f.wrap);
   function fillLoss() { const d = _COAX_DEFAULT_LOSS[type.select.value]; if (d) lp.input.value = String(d); }
   fillLoss();
-  attachExampleButton(inputRegion, () => { mode.select.value = "loss"; type.select.value = "RG6"; fillLoss(); len.input.value = "100"; src.input.value = "0"; tgt.input.value = ""; update(); });
+  attachExampleButton(inputRegion, () => { mode.select.value = "loss"; type.select.value = "RG6"; fillLoss(); lp.input.value = "6"; len.input.value = "100"; src.input.value = "0"; tgt.input.value = ""; update(); });
   const oLoss = makeOutputLine(outputRegion, "Total attenuation / max run", "coax-out-loss");
   const oEnd = makeOutputLine(outputRegion, "End-of-run level", "coax-out-end");
   const oNote = makeOutputLine(outputRegion, "Notes", "coax-out-note");

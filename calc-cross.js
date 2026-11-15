@@ -1752,7 +1752,9 @@ const renderRampSlope = _simpleRendererG({
 
 function renderRainwaterYield(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Public engineering form gallons = area * rainfall * 0.6233 * efficiency. Default collection efficiency 0.85 (TWDB Rainwater Harvesting Manual: installers assume 75-90%; 0.62 is the gallons-per-inch-per-ft^2 constant, not an efficiency, and was the default here until 2026-10-02).";
-  _aeG(inputRegion, () => fillExample(rainwaterYieldExample.inputs));
+  // The published example is the annual form (30 in, the catchment-area sibling's inverse); the
+  // monthly const totals 38 in and printed a different answer until 2026-11-15.
+  _aeG(inputRegion, () => fillExample({ catchment_ft2: 1000, annual_in: 30, efficiency: 0.85 }));
   const a = _mnG("Catchment area (ft^2)", "rw-a", { step: "any", min: "0" });
   const e = _mnG("Collection efficiency (0-1)", "rw-e", { step: "any", min: "0", max: "1", value: "0.85" });
   e.input.value = "0.85";

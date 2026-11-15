@@ -1499,7 +1499,7 @@ export function renderAnchorEmbedment(inputRegion, outputRegion, citationEl) {
   const cracked = makeSelect("Concrete condition", "ae-cr", [{ value: "uncracked", label: "Uncracked" }, { value: "cracked", label: "Cracked" }]);
   const edge = makeNumber("Edge distance (in, optional)", "ae-ed", { step: "any", min: "0" });
   for (const f of [T, d, fc, cracked, edge]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { T.input.value = "5000"; d.input.value = "0.625"; fc.input.value = "3000"; cracked.select.value = "cracked"; edge.input.value = "3"; update(); });
+  attachExampleButton(inputRegion, () => { T.input.value = "5000"; d.input.value = "0.625"; fc.input.value = "3000"; cracked.select.value = "uncracked"; edge.input.value = "3"; update(); });
   const oI = makeOutputLine(outputRegion, "Required embedment", "ae-out-i");
   const oF = makeOutputLine(outputRegion, "Required embedment (ft)", "ae-out-f");
   const oE = makeOutputLine(outputRegion, "Cracked / edge check", "ae-out-e");

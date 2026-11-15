@@ -2115,7 +2115,7 @@
     },
     "/tools/debris-management-site-sizing/": {
       "sha": "30620922c0e2ddaa",
-      "date": "2026-10-17"
+      "date": "2026-11-15"
     },
     "/tools/debt-yield/": {
       "sha": "1202425a8f37286d",
@@ -2686,8 +2686,8 @@
       "date": "2026-10-17"
     },
     "/tools/emergency-earth-levee-section/": {
-      "sha": "555bff376944a47c",
-      "date": "2026-10-17"
+      "sha": "0506759961c953f3",
+      "date": "2026-11-15"
     },
     "/tools/emergency-water-bleach-dose/": {
       "sha": "fe0b199598a81d86",
@@ -3818,8 +3818,8 @@
       "date": "2026-10-17"
     },
     "/tools/henderson-hasselbalch/": {
-      "sha": "28e3685b9ac7f872",
-      "date": "2026-10-17"
+      "sha": "a99cdc14ee5e993e",
+      "date": "2026-11-15"
     },
     "/tools/hepa-filter-life/": {
       "sha": "c5514116ce411700",
@@ -4199,7 +4199,7 @@
     },
     "/tools/key-cut-macs-check/": {
       "sha": "4de15d1ae8b3170c",
-      "date": "2026-10-17"
+      "date": "2026-11-15"
     },
     "/tools/keyseat-key-size/": {
       "sha": "e1512498d5030b31",
@@ -4326,8 +4326,8 @@
       "date": "2026-10-17"
     },
     "/tools/lead-dust-clearance/": {
-      "sha": "f8a1db30a502fe7e",
-      "date": "2026-10-17"
+      "sha": "fae93cf3aa2373a2",
+      "date": "2026-11-15"
     },
     "/tools/led-tape-max-run/": {
       "sha": "e414a1c5d5ef5c8f",
@@ -7226,8 +7226,8 @@
       "date": "2026-10-17"
     },
     "/tools/smoke-alarm-placement/": {
-      "sha": "bd1221dd7defe06e",
-      "date": "2026-10-20"
+      "sha": "f7e64d7c7a167110",
+      "date": "2026-11-15"
     },
     "/tools/smoke-detector-spacing-count/": {
       "sha": "8aafb250583be28f",
@@ -7863,7 +7863,7 @@
     },
     "/tools/structure-debris-estimate/": {
       "sha": "6e50285ecf9cca21",
-      "date": "2026-10-17"
+      "date": "2026-11-15"
     },
     "/tools/structured-cabling-channel/": {
       "sha": "80b86a41527a86da",

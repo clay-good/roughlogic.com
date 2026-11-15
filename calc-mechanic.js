@@ -442,7 +442,7 @@ export function computeBrakePadLife({ vehicle_weight_lb = 0, speed_delta_mph = 0
   return { ke_J, ke_kJ, rotor_temp_rise_C, wear_per_stop_mm, stops_until_worn, miles_until_worn, pad_label: w.label, cost_per_100k_miles_usd, front_bias_pct: frontPct, wear_rate_used: wear_rate, front_miles_until_worn, rear_miles_until_worn };
 }
 
-export const brakePadLifeExample = { inputs: { vehicle_weight_lb: 4000, speed_delta_mph: 30, stops_per_mile: 1, pad_thickness_mm: 12, pad_material: "ceramic", rotor_mass_lb: 18 } };
+export const brakePadLifeExample = { inputs: { vehicle_weight_lb: 4000, speed_delta_mph: 30, stops_per_mile: 1, pad_thickness_mm: 12, pad_material: "ceramic", rotor_mass_lb: 18, pad_set_cost_usd: 80 } };
 
 // --- Renderers ---
 

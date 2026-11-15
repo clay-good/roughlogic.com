@@ -401,7 +401,7 @@ export function computeSolarTimes({ lat_deg = null, lon_deg = null, date_iso = "
   };
 }
 
-export const solarExample = { inputs: { lat_deg: 39.7392, lon_deg: -104.9903, date_iso: "2026-06-21", tz_offset_hours: -6 } };
+export const solarExample = { inputs: { lat_deg: 40, lon_deg: -105, date_iso: "2026-06-21", tz_offset_hours: -6 } };
 
 // --- Renderers ---
 

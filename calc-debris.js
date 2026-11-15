@@ -255,7 +255,7 @@ export function computeStructureDebrisEstimate({ structure_type = "single_family
   };
 }
 
-export const structureDebrisExample = { inputs: { structure_type: "single_family", structure_count: 1, length_ft: 30, width_ft: 40, stories: 2, height_ft: 0, vegetation: "medium", wood_type: "hardwood" } };
+export const structureDebrisExample = { inputs: { structure_type: "single_family", structure_count: 1, length_ft: 40, width_ft: 50, stories: 1, height_ft: 0, vegetation: "medium", wood_type: "hardwood" } };
 DEBRIS_RENDERERS["structure-debris-estimate"] = _simpleRenderer({
   citation: "Citation: FEMA 329, Debris Estimating Field Guide (2010), single-family formula L x W x S x 0.20 x VCM with the VCM applied to first-story debris only, mobile home volumes, flooded personal property volumes, and the general building formula L x W x H x 0.33 / 27; FEMA-325 (2007) Chapter 6; USACE cubic-yard-to-ton conversions. FEMA Public Assistance governs.",
   example: structureDebrisExample.inputs,
@@ -335,7 +335,7 @@ export function computeDebrisSiteSizing({ debris_volume_cy = 0, woody_volume_cy 
   };
 }
 
-export const debrisSiteExample = { inputs: { debris_volume_cy: 659100, woody_volume_cy: 197730, stack_height_ft: 10, land_use_fraction: 0.6, site_fill_count: 1, reduction_method: "grind", processing_rate_cyh: 125, machine_count: 4, operating_hours_per_day: 10 } };
+export const debrisSiteExample = { inputs: { debris_volume_cy: 7000000, woody_volume_cy: 2100000, stack_height_ft: 10, land_use_fraction: 0.6, site_fill_count: 1, reduction_method: "grind", processing_rate_cyh: 125, machine_count: 4, operating_hours_per_day: 10 } };
 DEBRIS_RENDERERS["debris-management-site-sizing"] = _simpleRenderer({
   citation: "Citation: FEMA-325, Public Assistance Debris Management Guide (2007), Appendix B, USACE model Step 2 (10 ft stack, 4,840 sq yd per acre, 60% land use, factor 1.66, site cycling) and reduction ratios (burning 95%, grinding 75%), Chapter 8 (about 100 acres per 1,000,000 cy), and grinder rates of 100 to 150 cy/h on contaminated debris; FEMA 329 (2010) 16,133 cy per acre at 10 ft. The state environmental agency and the applicant's plan govern.",
   example: debrisSiteExample.inputs,

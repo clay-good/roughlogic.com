@@ -154,7 +154,7 @@ export function computeTimberCruise({ small_end_dib_in = 0, log_length_ft = 16, 
   return { board_feet: bf, rule, note, value_usd };
 }
 
-export const timberCruiseExample = { inputs: { small_end_dib_in: 14, log_length_ft: 16, rule: "doyle" } };
+export const timberCruiseExample = { inputs: { small_end_dib_in: 14, log_length_ft: 16, rule: "doyle", price_per_bf: 0.4 } };
 
 // --- 205: Planting Density and Seed Rate ---
 
@@ -550,7 +550,10 @@ function renderUniformity(inputRegion, outputRegion, citationEl) {
     update();
   }
   function update() {
-    const vals = rows.map((r) => Number(r.value)).filter((v) => Number.isFinite(v) && v >= 0); // a dry can typed as 0 is a reading; only blanks are skipped
+    // A dry can typed as 0 is a reading; a blank row is not. Until 2026-11-15
+    // Number("") read every blank row as a dry can, so the worked example's 8
+    // cans in 12 rows printed DU 0.0% (2025's `v > 0` dropped real dry cans).
+    const vals = rows.filter((r) => r.value.trim() !== "").map((r) => Number(r.value)).filter((v) => Number.isFinite(v) && v >= 0);
     if (vals.length < 4) { oM.textContent = "Need at least 4 readings."; oC.textContent = "-"; oD.textContent = "-"; oF.textContent = "-"; return; }
     const r = computeUniformity({ catch_volumes: vals }); stepsFor(outputRegion, inputRegion, ["catch_volumes"], r);
     if (r.error) { oM.textContent = r.error; return; }
