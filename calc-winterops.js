@@ -299,6 +299,8 @@ export function computeSnowStackingArea({ lot_area_ft2 = 0, accumulation_in = 0,
   if (!(pile_height_ft > 0)) return { error: "Pile height must be positive (ft)." };
   if (!(side_slope_run_per_rise > 0)) return { error: "Side slope run per rise must be positive (1 is 45 degrees)." };
   if (!(area_per_space_ft2 > 0)) return { error: "Area per parking space must be positive (sq ft)." };
+  // 0 was read as 1 and 2.4 as 2 without a word until 2026-11-15.
+  if (!(Number.isInteger(Number(events)) && Number(events) >= 1)) return { error: "Events must be a whole number, 1 or more." };
   const n = Math.max(1, Math.round(events));
   if (!(allocated_pct >= 0 && allocated_pct <= 100)) return { error: "Allocated storage share must be in [0, 100] percent." };
   const fallen_volume_ft3 = lot_area_ft2 * (accumulation_in / 12);
@@ -448,6 +450,8 @@ export function computeWalkwayClearingProductivity({ total_area_ft2 = 0, hand_ar
   if (!(blower_depth_factor > 0 && blower_depth_factor <= 1)) return { error: "Blower depth factor must be in (0, 1] -- the share of the design-depth rate." };
   if (!(hand_depth_factor > 0 && hand_depth_factor <= 1)) return { error: "Hand depth factor must be in (0, 1] -- the share of the design-depth rate." };
   const shovellers = Math.max(1, Math.round(crew_size));
+  // 0 was read as 1 and 2.4 as 2 without a word until 2026-11-15.
+  if (!(Number.isInteger(Number(applications)) && Number(applications) >= 1)) return { error: "Applications must be a whole number, 1 or more." };
   const apps = Math.max(1, Math.round(applications));
   const open_area_ft2 = total_area_ft2 - hand_area_ft2;
   const blower_hr = open_area_ft2 > 1e-9 ? open_area_ft2 / (blower_rate_ft2_hr * blower_depth_factor) : 0;

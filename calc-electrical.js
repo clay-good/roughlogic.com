@@ -3101,6 +3101,8 @@ export function computeMotorBranchFromNameplate({
   const PH = Number(phase);
   const ETA = Number(eta);
   const PF = Number(power_factor);
+  // A typed 0 was read as 1.0 until 2026-11-15; a NEMA service factor is 1.0 or more.
+  if (service_factor != null && service_factor !== "" && !(Number(service_factor) >= 1)) return { error: "Service factor must be 1.0 or more (1.15 is common; 1.0 if the nameplate shows none)." };
   const SF = Number(service_factor) || 1.0;
   if (!(HP > 0)) return { error: "HP must be positive." };
   if (!(V > 0)) return { error: "Voltage must be positive." };
