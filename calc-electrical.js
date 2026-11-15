@@ -3262,6 +3262,8 @@ export function computeGroundingElectrodeResistance({
   plate_burial_depth_ft = 2.5,
   ufer_concrete_diameter_in = 6,
 } = {}) {
+  // A typed 0 was quietly read as the default until 2026-11-15.
+  if (ufer_concrete_diameter_in != null && ufer_concrete_diameter_in !== "" && !(Number(ufer_concrete_diameter_in) > 0)) return { error: "Ufer concrete diameter must be above 0 in (6 default)." };
   const rho = Number(soil_resistivity_ohm_cm) || 0;
   if (!(rho > 0)) return { error: "Soil resistivity must be positive (ohm-cm)." };
 

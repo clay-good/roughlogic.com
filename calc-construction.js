@@ -2477,6 +2477,8 @@ export function computeHipValleyRafter({
   overhang_in = 12, jack_oc_in = 16,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A typed 0 was quietly read as the default until 2026-11-15.
+  if (jack_oc_in != null && jack_oc_in !== "" && !(Number(jack_oc_in) > 0)) return { error: "Jack spacing must be above 0 in (16 default)." };
   if (Number(overhang_in) < 0) return { error: "Overhang cannot be negative (in)." };
   if (!(run_ft > 0) || !Number.isFinite(run_ft)) return { error: "Building run must be a finite positive length." };
   if (!(pitch >= 0)) return { error: "Pitch must be non-negative." };

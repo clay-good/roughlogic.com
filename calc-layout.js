@@ -517,6 +517,8 @@ const _V38_COS30 = Math.sqrt(3) / 2; // = 0.8660254037844386
 // dims: in { thread_standard: dimensionless, tpi: L^-1, pitch_mm: L, starts: dimensionless } out: { pitch_in: L, pitch_mm: L, tpi: L^-1, lead_in: L, lead_mm: L, sharp_v_height_in: L, sharp_v_height_mm: L, starts: dimensionless }
 export function computeThreadPitch({ thread_standard = "inch", tpi = 0, pitch_mm = 0, starts = 1 } = {}) {
   const _g = _finiteGuard({ tpi, pitch_mm, starts }); if (_g) return _g;
+  // A typed 0 was quietly read as the default until 2026-11-15.
+  if (starts != null && starts !== "" && !(Number.isInteger(Number(starts)) && Number(starts) >= 1)) return { error: "Number of thread starts must be a whole number, 1 or more." };
   if (!["inch", "metric"].includes(String(thread_standard))) return { error: "Unknown thread standard; use inch or metric." };
   const isMetric = String(thread_standard) === "metric";
   if (!Number.isInteger(Number(starts) || 1)) return { error: "Number of thread starts must be a whole number." };

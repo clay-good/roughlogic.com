@@ -64,7 +64,8 @@ test("compute zero default: every `Number(param) || nonzero` is guarded or revie
     const lines = readFileSync(new URL(f, root), "utf8").split("\n");
     lines.forEach((line, i) => {
       const m = /= Number\(([a-z_][a-z0-9_]*)\) \|\| [0-9.]*[1-9][0-9.]*;/.exec(line)
-        || /= (?:Number\()?([a-z_][a-z0-9_]*)\)? > 0 \? (?:Number\()?\1\)? : (?:[0-9.]*[1-9]|0\.\d+ \*)/.exec(line);
+        || /= (?:Number\()?([a-z_][a-z0-9_]*)\)? > 0 \? (?:Number\()?\1\)? : (?:[0-9.]*[1-9]|0\.\d+ \*)/.exec(line)
+        || (/\.value\b/.test(line) ? null : /\(Number\(([a-z_][a-z0-9_]*)\) \|\| [0-9.]*[1-9][0-9.]*\)/.exec(line));
       if (!m) return;
       const p = m[1];
       let start = i;
