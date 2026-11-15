@@ -489,6 +489,8 @@ export function computeAmortization({
   // 12,000 months = 1,000 years, far beyond any real amortization.
   if (!Number.isFinite(term_months) || term_months > 12000) return { error: "Term must be a realistic number of months." };
   const r = annual_rate_pct / 100 / 12;
+  // 360.5 months was floored to 360 payments without a word until 2026-11-15.
+  if (!Number.isInteger(Number(term_months))) return { error: "Term must be a whole number of months." };
   const n = Math.floor(term_months);
   // A term under one month floored to 0 payments and divided by zero.
   if (n < 1) return { error: "Term must be at least one month." };

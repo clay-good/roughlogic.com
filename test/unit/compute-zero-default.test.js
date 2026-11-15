@@ -99,3 +99,36 @@ test("compute zero default: no input is clamped from negative to 0 without a gua
   }
   assert.deepEqual(bad, [], 'refuse the negative above the clamp: `if (Number(p) < 0) return { error: "... cannot be negative." }`');
 });
+
+// And rounding: `Math.round(Number(param))` read 2.6 phases as 3 and year 3.5 as
+// year 3 (five inputs until 2026-11-15). Rounding a caller's own input needs a
+// guard on that input earlier in the function (an isInteger check or a refusal).
+const ROUNDING_REVIEWED = new Set([
+  "calc-edu.js:n", // the significant-figures helper's digit count, not a caller input
+  "calc-agriculture.js:small_end_dib_in", // Scribner scaling reads the small-end diameter to the nearest inch, as scalers do
+]);
+
+test("compute zero default: no input is rounded silently", async () => {
+  const { readdirSync } = await import("node:fs");
+  const root = new URL("../../", import.meta.url);
+  const bad = [];
+  for (const f of readdirSync(root).filter((n) => /^calc-.*\.js$/.test(n))) {
+    const lines = readFileSync(new URL(f, root), "utf8").split("\n");
+    lines.forEach((line, i) => {
+      const m = /= Math\.(?:round|floor|ceil|trunc)\((?:Number\()?([a-z_][a-z0-9_]*)\)?\)?;/.exec(line);
+      if (!m) return;
+      let start = i;
+      while (start > 0 && !/^export function /.test(lines[start])) start--;
+      if (start === 0 && !/^export function /.test(lines[0])) return;
+      const sig = lines.slice(start, start + 8).join("\n").split(") {")[0];
+      if (!new RegExp("\\b" + m[1] + "\\b").test(sig)) return; // a local, not a caller input
+      const body = lines.slice(start, i + 5).join("\n");
+      // Only a check on the RAW input counts: an isInteger on it, or an exact comparison
+      // of it with the rounded value. A range check on the rounded value does not.
+      if (new RegExp("isInteger\\((?:Number\\()?" + m[1] + "\\b|Math\\.abs\\(Number\\(" + m[1] + "\\) - ").test(body)) return;
+      if (ROUNDING_REVIEWED.has(f + ":" + m[1])) return;
+      bad.push(`${f}:${i + 1} ${m[1]}`);
+    });
+  }
+  assert.deepEqual(bad, [], "refuse a non-integer input (`Number.isInteger(Number(p))`) instead of rounding it");
+});

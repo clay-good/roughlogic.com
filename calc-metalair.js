@@ -532,6 +532,8 @@ export function computeSquareToRoundDevelopment({ square_side_in = 0, round_diam
   if (!(elements_per_quadrant >= 2)) return { error: "Use at least two elements per quadrant; a curve cannot be triangulated with fewer." };
   // The sheet comes from unfolding the pattern, so the division is bounded; past 100 per quadrant the chord
   // error is under 0.003% and a finer division only costs layout time.
+  // 2.5 was rounded to 3 without a word until 2026-11-15.
+  if (!Number.isInteger(Number(elements_per_quadrant))) return { error: "Elements per quadrant must be a whole number." };
   if (elements_per_quadrant > 100) return { error: "Use at most 100 elements per quadrant; shop practice is 3 to 12, and finer gains nothing measurable." };
   if (seam_allowance_in < 0) return { error: "The seam allowance cannot be negative (in)." };
   const half_side = square_side_in / 2;
