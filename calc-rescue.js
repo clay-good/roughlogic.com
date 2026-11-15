@@ -138,8 +138,8 @@ export function computeSlingAngle({ load_lb = 0, sling_config = "vertical", incl
   // what those legs carry if they really spread at that angle (two legs at 120
   // degrees: twice the vertical figure). 0 degrees, the one angle a vertical
   // hitch has, is accepted (it was rejected until 2026-10-10).
-  if (sling_config !== "vertical" && !(included_angle_deg > 0 && included_angle_deg < 180)) return { error: "Included angle must be 0-180 deg." };
-  if (!(included_angle_deg >= 0 && included_angle_deg < 180)) return { error: "Included angle must be 0-180 deg." };
+  if (sling_config !== "vertical" && !(included_angle_deg > 0 && included_angle_deg < 180)) return { error: "Included angle must be above 0 and below 180 deg." };
+  if (!(included_angle_deg >= 0 && included_angle_deg < 180)) return { error: "Included angle must be 0 or more and below 180 deg." };
   // Included (apex) angle: each leg sits included_angle/2 off the vertical, so
   // vertical equilibrium is n * T * cos(theta/2) = W and T = W / (n cos(theta/2)).
   // Tension is W/n when the legs are vertical (theta -> 0) and diverges as the

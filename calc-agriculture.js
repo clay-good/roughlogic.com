@@ -2374,7 +2374,7 @@ export function computeHayDryMatter({ bale_weight_lb = 0, moisture_pct = 0, targ
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(bale_weight_lb > 0)) return { error: "Bale weight must be positive (lb)." };
   if (moisture_pct < 0 || moisture_pct >= 100) return { error: "Moisture must be between 0 and 100 percent." };
-  if (target_moisture_pct < 0 || target_moisture_pct >= 100) return { error: "Target moisture must be between 0 and 100 percent." };
+  if (target_moisture_pct < 0 || target_moisture_pct >= 100) return { error: "Target moisture must be 0 or more and below 100 percent." };
   if (!(safe_threshold_pct > 0)) return { error: "Safe-storage threshold must be positive (percent)." };
   if (safe_threshold_pct > 100) return { error: "Safe-storage threshold cannot exceed 100 percent." };
   const dry_matter_lb = bale_weight_lb * (1 - moisture_pct / 100);
@@ -2662,8 +2662,8 @@ export function computeGrainShrinkMoisture({ W_lb = 0, M_wet_pct = 0, M_dry_pct 
   const h = Number(handling) || 0;
   const tw = Number(tw_lbbu) || 0;
   if (!(W > 0)) return { error: "Enter a positive gross (wet) weight." };
-  if (!(Mw > 0 && Mw < 100)) return { error: "Wet moisture must be between 0 and 100 percent." };
-  if (!(Md >= 0 && Md < 100)) return { error: "Market moisture must be between 0 and 100 percent." };
+  if (!(Mw > 0 && Mw < 100)) return { error: "Wet moisture must be above 0 and below 100 percent." };
+  if (!(Md >= 0 && Md < 100)) return { error: "Market moisture must be 0 or more and below 100 percent." };
   if (!(Mw > Md)) return { error: "Wet moisture must be above the market moisture (you cannot dry up)." };
   if (!(tw > 0)) return { error: "Enter a positive test weight (lb/bu)." };
   const moist_shrink = (Mw - Md) / (100 - Md);

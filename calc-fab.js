@@ -130,7 +130,7 @@ export function computePipeMiterCut({ total_angle_deg = 90, pieces = 2, outside_
   const n = Number(pieces);
   const OD = Number(outside_diameter_in);
   if (!Number.isInteger(n) || n < 2) return { error: "Pieces must be an integer of 2 or more." };
-  if (!(A > 0) || !(A < 180)) return { error: "Total turn angle must be between 0 and 180 degrees." };
+  if (!(A > 0) || !(A < 180)) return { error: "Total turn angle must be above 0 and below 180 degrees." };
   if (!(OD > 0)) return { error: "Outside diameter must be positive (in)." };
   const cuts = n - 1;
   const miter_angle_deg = A / (2 * cuts);

@@ -336,14 +336,14 @@ export function computeRiggingCheck({ hardware = "sling_5_8_steel", configuratio
   let tension_per_leg;
   if (configuration === "vertical") tension_per_leg = load_lb / n_legs;
   else if (configuration === "basket" || configuration === "bridle") {
-    if (!(included_angle_deg > 0 && included_angle_deg < 180)) return { error: "Included angle must be 0-180 deg." };
+    if (!(included_angle_deg > 0 && included_angle_deg < 180)) return { error: "Included angle must be above 0 and below 180 deg." };
     // A bridle of three or more legs cannot be assumed to share the load
     // evenly -- legs of unequal length or a rigid load leave two carrying it
     // (the multi-leg-sling tile's rule). Until 2026-09-19 all n legs shared.
     const bearing_legs = configuration === "bridle" ? Math.min(n_legs, 2) : n_legs;
     tension_per_leg = load_lb / (bearing_legs * Math.cos((included_angle_deg / 2) * Math.PI / 180));
   } else if (configuration === "choker") {
-    if (!(included_angle_deg > 0 && included_angle_deg < 180)) return { error: "Included angle must be 0-180 deg." };
+    if (!(included_angle_deg > 0 && included_angle_deg < 180)) return { error: "Included angle must be above 0 and below 180 deg." };
     // The 0.75 choke derate reduces the RATED load once (below); it does not
     // also raise the leg tension (until 2026-09-19 it was applied twice).
     derate_factor = 0.75;
@@ -1090,7 +1090,7 @@ export function computeLightingBeam({ beam_angle_deg = 0, throw_distance = 0, di
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const ang = Number(beam_angle_deg) || 0;
   const thr = Number(throw_distance) || 0;
-  if (!(ang > 0) || !(ang < 180)) return { error: "Beam angle must be between 0 and 180 degrees." };
+  if (!(ang > 0) || !(ang < 180)) return { error: "Beam angle must be above 0 and below 180 degrees." };
   if (!(thr > 0)) return { error: "Throw distance must be positive." };
   if (distance_unit !== "ft" && distance_unit !== "m") return { error: "Distance unit must be ft or m." };
   const FT_PER_M = 3.280839895013123, M_PER_FT = 0.3048, LUX_PER_FC = 1 / (0.3048 * 0.3048);
@@ -1741,7 +1741,7 @@ export function computeLightingThrowForPool({ target_pool_diameter = 0, beam_ang
   const ang = Number(beam_angle_deg) || 0;
   if (!(D > 0)) return { error: "Target pool diameter must be positive." };
   if (distance_unit !== "ft" && distance_unit !== "m") return { error: "Distance unit must be ft or m." };
-  if (!(ang > 0) || !(ang < 180)) return { error: "Beam angle must be between 0 and 180 degrees." };
+  if (!(ang > 0) || !(ang < 180)) return { error: "Beam angle must be above 0 and below 180 degrees." };
   const isFt = String(distance_unit) !== "m";
   const half = (ang / 2) * Math.PI / 180;
   // Inverse of D = 2 x throw x tan(angle/2): throw = D / (2 x tan(angle/2)).

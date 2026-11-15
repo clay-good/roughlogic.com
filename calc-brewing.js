@@ -106,7 +106,7 @@ export function computeMashStrikeWater({ grain_weight_lb = 0, mash_thickness_qt_
   if (!(grain_weight_lb > 0)) return { error: "Grain weight must be positive." };
   if (!(mash_thickness_qt_per_lb > 0)) return { error: "Mash thickness must be positive." };
   if (!(target_mash_temp_f > grain_temp_f)) return { error: "The target mash temperature must be above the grain temperature." };
-  if (!(grain_specific_heat > 0 && grain_specific_heat < 1)) return { error: "Grain specific heat must be between 0 and 1 Btu/lb-degF (about 0.4 for malt)." };
+  if (!(grain_specific_heat > 0 && grain_specific_heat < 1)) return { error: "Grain specific heat must be above 0 and below 1 Btu/lb-degF (about 0.4 for malt)." };
   if (!(tun_weight_lb >= 0) || !(tun_specific_heat >= 0)) return { error: "Tun weight and specific heat cannot be negative (enter 0 to leave the tun out)." };
   if (!(tun_temp_f >= -20) || !(grain_temp_f >= -20)) return { error: "Grain and tun temperatures below -20 deg F are outside a brewhouse; check the units (deg F)." };
   if (!(tun_temp_f <= target_mash_temp_f)) return { error: "The tun temperature should be at or below the mash temperature; a hotter tun is a preheated one." };
