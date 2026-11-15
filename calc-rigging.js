@@ -1500,6 +1500,9 @@ export function computeLiftingLugDesign({ applied_load_kip, plate_thick_in, hole
   if (!Number.isFinite(w) || w <= 0) return { error: "Plate width must be positive (in)." };
   if (!Number.isFinite(Fy) || Fy <= 0) return { error: "Yield strength must be positive (ksi)." };
   if (!Number.isFinite(Fu) || Fu <= 0) return { error: "Ultimate strength must be positive (ksi)." };
+  // A yield above the tensile strength is no steel; with it, BTH-1's effective width
+  // (proportional to Fu/Fy) shrank and a stronger plate read as inadequate (until 2026-11-15).
+  if (Fy >= Fu) return { error: "Yield strength must be below the ultimate (tensile) strength (36 / 58 ksi for A36)." };
   if (!Number.isFinite(Nd) || Nd < 1) return { error: "Design factor Nd must be at least 1." };
   if (w <= Dh) return { error: "Plate width must exceed the hole diameter (no net tension section)." };
   if (!(a > Dh / 2)) return { error: "The hole-center-to-edge distance a must exceed half the hole diameter; otherwise the plate edge falls inside the hole." };
