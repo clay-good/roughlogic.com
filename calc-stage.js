@@ -413,7 +413,7 @@ function _r(spec) {
         else if (f.kind === "checkbox") params[f.key] = fields[f.key].input.checked;
         // A cleared field that has a declared default means the default, not zero
         // (a cleared 68 F air temperature used to compute at 0 F).
-        else params[f.key] = fields[f.key].input.value === "" && f.default !== undefined ? f.default : Number(fields[f.key].input.value) || 0;
+        else params[f.key] = fields[f.key].input.value === "" && f.default !== undefined ? f.default : fields[f.key].input.value === "" ? undefined : Number(fields[f.key].input.value);
       }
       const r = spec.compute(params); stepsFor(outputRegion, inputRegion, spec.fields, r, params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }

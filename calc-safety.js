@@ -50,7 +50,7 @@ function _simpleRendererG(spec) {
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
         else if (f.kind === "checkbox") params[f.key] = fields[f.key].input.checked;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        else params[f.key] = fields[f.key].input.value === "" ? undefined : Number(fields[f.key].input.value);
       }
       const result = spec.compute(params); _steps.update(spec.fields, params, result);
       if (result.error) {

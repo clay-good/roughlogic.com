@@ -499,7 +499,7 @@ function _simpleRenderer(spec) {
         // A field marked `required` passes null when blank, so the compute can
         // tell a cleared temperature from a typed 0. `blankAs` overrides that
         // value where null already means something to the compute.
-        else params[f.key] = f.required && fields[f.key].input.value === "" ? (f.blankAs ?? null) : Number(fields[f.key].input.value) || 0;
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? (f.blankAs ?? null) : fields[f.key].input.value === "" ? undefined : Number(fields[f.key].input.value);
       }
       const r = spec.compute(params); _steps.update(spec.fields, params, r);
       if (r.error) {

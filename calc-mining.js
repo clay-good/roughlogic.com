@@ -66,7 +66,7 @@ function _simpleRenderer(spec) {
     }
     const update = debounce(() => {
       const params = {};
-      for (const f of spec.fields) params[f.key] = Number(fields[f.key].input.value) || 0;
+      for (const f of spec.fields) params[f.key] = fields[f.key].input.value === "" ? undefined : Number(fields[f.key].input.value);
       const r = spec.compute(params); _steps.update(spec.fields, params, r);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);

@@ -13,11 +13,11 @@ if (nodeModule.registerHooks) nodeModule.registerHooks({ load: (await import("./
 else nodeModule.register("./compute-spy-loader.js", import.meta.url);
 
 let last = new Map(); const lastArgs = new Map();
-globalThis.__computeSpy = (fn, name) => function (...a) {
+globalThis.__computeSpy = (fn, name) => { const w = function (...a) {
   const r = fn.apply(this, a);
   last.set(name, r); lastArgs.set(name, a[0]);
   return r;
-};
+}; w.__orig = fn; return w; };
 
 const { installDocument, installTimers, flushTimers } = await import("./fake-dom.js");
 const { RENDERER_MAP } = await import("./renderer-map.js");
@@ -32,7 +32,7 @@ for (const r of ROWS) if (!first.has(r.tile_id)) first.set(r.tile_id, r);
 // At the precision a reader can see, as check-example-parity compares inputs:
 // the button types 66.82 where the fixture carries 66.8235.
 const close = (a, b) => a === b || Math.abs(a - b) <= Math.max(Math.abs(b) * 0.001, 1e-12);
-const report = { compared: 0, mismatches: {}, outOfRange: [], droppedLines: [] };
+const report = { compared: 0, mismatches: {}, outOfRange: [], droppedLines: [], blankDefault: [] };
 for (const { id } of TOOLS) {
   const reg = RENDERER_MAP[id], creg = COMPUTE_MAP[id], row0 = first.get(id);
   if (!reg || !creg || !row0) continue;
@@ -83,6 +83,24 @@ for (const { id } of TOOLS) {
       const key = Object.keys(mark).find((k) => Number(mark[k]) === 7.31 || mark[k] === "7.31");
       if (!key) { el.value = v0; fire(el); continue; }
       report.compared++;
+      // A label that promises a default ("default 500", "blank = 3 mph") must keep the
+      // promise: blank runs with that default, or with 0 where the label documents 0 as
+      // the "use the default" sentinel. 23 boxes errored or ran something else on a
+      // blank until 2026-11-15 (the spec factories sent a blank as 0).
+      const lab0 = labelOf(el);
+      const dm = /(?:default|blank\s*=|blank uses|if blank)\s*:?\s*(-?[\d,]*\.?\d+)/i.exec(lab0);
+      if (dm) {
+        const stated = Number(dm[1].replace(/,/g, ""));
+        const blankArgs = argsAfter(el, "");
+        const rr = last.get(creg.fn);
+        const src = (mod[creg.fn].__orig || mod[creg.fn]).toString(); const sig = src.slice(0, src.indexOf(") {"));
+        const sm = new RegExp("\\b" + key + "\\s*=\\s*(-?[\\d.]+)").exec(sig);
+        const ba = blankArgs?.[key];
+        const used = ba === null || ba === undefined || ba === "" ? (sm ? Number(sm[1]) : undefined) : Number(ba);
+        const sentinel = /\b0\s*=\s*default|blank\s*=/i.test(lab0) && used === 0;
+        if (rr && rr.error) report.blankDefault.push(id + " " + key + ": blank errors (" + rr.error.slice(0, 60) + ")");
+        else if (!sentinel && used !== undefined && Math.abs(used - stated) > 1e-9 * Math.max(1, Math.abs(stated))) report.blankDefault.push(id + " " + key + ": label says " + stated + ", blank runs with " + used);
+      }
       const z = argsAfter(el, "0");
       const got = z && typeof z === "object" ? z[key] : undefined;
       if (z && got !== undefined && got !== null && got !== "" && Number(got) !== 0) report.mismatches[id + " " + key] = labelOf(el) + " | typed 0, compute got " + JSON.stringify(got);

@@ -99,7 +99,7 @@ function _simpleRenderer(spec) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
         // A field marked `required` passes null when blank, so the compute can
         // ask for it. Blank must not become 0 where 0 is a real value (0 F).
-        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : fields[f.key].input.value === "" ? undefined : Number(fields[f.key].input.value);
       }
       const r = spec.compute(params); _steps.update(spec.fields, params, r);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -1302,7 +1302,7 @@ function _v409renderCoilFaceVelocity(inputRegion, outputRegion, citationEl) {
   const oA = makeOutputLine(outputRegion, "Face area", "cfv-out-a");
   const oNote = makeOutputLine(outputRegion, "Note", "cfv-out-note");
   const update = debounce(() => {
-    const r = computeCoilFaceVelocity({ cfm: Number(cfm.input.value) || 0, face_width_in: Number(w.input.value) || 0, face_height_in: Number(h.input.value) || 0, threshold_fpm: Number(thr.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["cfm", "face_width_in", "face_height_in", "threshold_fpm"], r);
+    const r = computeCoilFaceVelocity({ cfm: Number(cfm.input.value) || 0, face_width_in: Number(w.input.value) || 0, face_height_in: Number(h.input.value) || 0, threshold_fpm: thr.input.value === "" ? undefined : Number(thr.input.value) }); stepsFor(outputRegion, inputRegion, ["cfm", "face_width_in", "face_height_in", "threshold_fpm"], r);
     if (r.error) { oV.textContent = r.error; oA.textContent = ""; oNote.textContent = ""; return; }
     oV.textContent = fmt(r.face_velocity_fpm, 0) + " fpm" + (r.carryover ? " (OVER " + fmt(r.threshold_fpm, 0) + " -- carryover risk)" : " (below threshold)");
     oA.textContent = fmt(r.face_area_ft2, 2) + " ft^2";
@@ -1343,7 +1343,7 @@ function _v701renderCoilFaceArea(inputRegion, outputRegion, citationEl) {
   const oS = makeOutputLine(outputRegion, "Square face (approx)", "cfa-out-s");
   const oNote = makeOutputLine(outputRegion, "Note", "cfa-out-note");
   const update = debounce(() => {
-    const r = computeCoilFaceArea({ cfm: Number(cfm.input.value) || 0, target_fpm: Number(v.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["cfm", "target_fpm"], r);
+    const r = computeCoilFaceArea({ cfm: Number(cfm.input.value) || 0, target_fpm: v.input.value === "" ? undefined : Number(v.input.value) }); stepsFor(outputRegion, inputRegion, ["cfm", "target_fpm"], r);
     if (r.error) { oA.textContent = r.error; oS.textContent = ""; oNote.textContent = ""; return; }
     oA.textContent = fmt(r.face_area_ft2, 2) + " ft^2 (" + fmt(r.face_area_in2, 0) + " in^2)";
     oS.textContent = "~" + fmt(r.square_side_in, 1) + " in x " + fmt(r.square_side_in, 1) + " in at " + fmt(r.target_fpm, 0) + " fpm";

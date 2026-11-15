@@ -1171,7 +1171,7 @@ function renderPvCellTemperaturePower(inputRegion, outputRegion, citationEl) {
   const oLoss = makeOutputLine(outputRegion, "Temperature loss", "pctp-out-loss");
   const oNote = makeOutputLine(outputRegion, "Note", "pctp-out-note");
   const update = debounce(() => {
-    const r = computePvCellTemperaturePower({ T_amb_C: Ta.input.value === "" ? "" : Number(Ta.input.value), G_wm2: Number(G.input.value) || 0, NOCT_C: Number(noct.input.value) || 0, P_stc_W: Number(Pstc.input.value) || 0, gamma: Number(g.input.value) }); stepsFor(outputRegion, inputRegion, ["T_amb_C", "G_wm2", "NOCT_C", "P_stc_W", "gamma"], r);
+    const r = computePvCellTemperaturePower({ T_amb_C: Ta.input.value === "" ? "" : Number(Ta.input.value), G_wm2: Number(G.input.value) || 0, NOCT_C: noct.input.value === "" ? undefined : Number(noct.input.value), P_stc_W: Number(Pstc.input.value) || 0, gamma: Number(g.input.value) }); stepsFor(outputRegion, inputRegion, ["T_amb_C", "G_wm2", "NOCT_C", "P_stc_W", "gamma"], r);
     if (r.error) { oTc.textContent = r.error; oP.textContent = "-"; oLoss.textContent = "-"; oNote.textContent = ""; return; }
     oTc.textContent = fmt(r.T_cell_C, 1) + " C";
     oP.textContent = fmt(r.P_W, 0) + " W";
@@ -1226,7 +1226,7 @@ function renderPvMaxAmbientForPower(inputRegion, outputRegion, citationEl) {
   const oTc = makeOutputLine(outputRegion, "Cell temperature at that point", "pma-out-tc");
   const oNote = makeOutputLine(outputRegion, "Note", "pma-out-note");
   const update = debounce(() => {
-    const r = computePvMaxAmbientForPower({ target_power_W: Number(Ptgt.input.value) || 0, P_stc_W: Number(Pstc.input.value) || 0, G_wm2: Number(G.input.value) || 0, NOCT_C: Number(noct.input.value) || 0, gamma: Number(g.input.value) }); stepsFor(outputRegion, inputRegion, ["target_power_W", "P_stc_W", "G_wm2", "NOCT_C", "gamma"], r);
+    const r = computePvMaxAmbientForPower({ target_power_W: Number(Ptgt.input.value) || 0, P_stc_W: Number(Pstc.input.value) || 0, G_wm2: Number(G.input.value) || 0, NOCT_C: noct.input.value === "" ? undefined : Number(noct.input.value), gamma: Number(g.input.value) }); stepsFor(outputRegion, inputRegion, ["target_power_W", "P_stc_W", "G_wm2", "NOCT_C", "gamma"], r);
     if (r.error) { oTa.textContent = r.error; oTc.textContent = "-"; oNote.textContent = ""; return; }
     oTa.textContent = fmt(r.max_ambient_C, 1) + " C (" + fmt(r.max_ambient_C * 9 / 5 + 32, 0) + " F)";
     oTc.textContent = fmt(r.max_cell_C, 1) + " C";

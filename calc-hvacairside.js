@@ -35,7 +35,7 @@ function _rEnv(spec) {
       const params = {};
       // A field marked `required` passes null when blank, so the compute can
       // tell a cleared temperature from a typed 0.
-      for (const f of spec.fields) params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
+      for (const f of spec.fields) params[f.key] = f.required && fields[f.key].input.value === "" ? null : fields[f.key].input.value === "" ? undefined : Number(fields[f.key].input.value);
       const r = spec.compute(params); stepsFor(outputRegion, inputRegion, spec.fields, r, params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
@@ -149,7 +149,7 @@ function _renderGrilleFaceVelocity(inputRegion, outputRegion, citationEl) {
     agr.wrap.style.display = isSize ? "none" : "";
   }
   const update = debounce(() => {
-    const r = computeGrilleFaceVelocity({ mode: mode.select.value, cfm: readNum(cfm.input), ratio: readNum(ratio.input), A_gross_ft2: readNum(agr.input), V_target: readNum(vtar.input) }); stepsFor(outputRegion, inputRegion, ["mode", "cfm", "ratio", "A_gross_ft2", "V_target"], r);
+    const r = computeGrilleFaceVelocity({ mode: mode.select.value, cfm: readNum(cfm.input), ratio: ratio.input.value === "" ? undefined : Number(ratio.input.value), A_gross_ft2: readNum(agr.input), V_target: readNum(vtar.input) }); stepsFor(outputRegion, inputRegion, ["mode", "cfm", "ratio", "A_gross_ft2", "V_target"], r);
     if (r.error) { oOut.textContent = r.error; oBand.textContent = "-"; return; }
     if (r.mode === "size") { oOut.textContent = fmt(r.A_gross_req_ft2, 2) + " ft^2 gross (" + fmt(r.A_gross_req_in2, 0) + " in^2)"; oBand.textContent = "-"; return; }
     oOut.textContent = fmt(r.V_face, 0) + " fpm face velocity";

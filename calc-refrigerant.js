@@ -925,7 +925,7 @@ function _v432renderWalkInCoolerLoad(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "wic-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeWalkInCoolerLoad({ u_factor: readNum(u.input), area_ft2: readNum(area.input), delta_t_f: readNum(dt.input), infiltration_btuh: readNum(infil.input), product_btuh: readNum(prod.input), internal_btuh: readNum(internal.input), safety: readNum(sf.input), run_hours: readNum(rh.input) }); stepsFor(outputRegion, inputRegion, ["u_factor", "area_ft2", "delta_t_f", "infiltration_btuh", "product_btuh", "internal_btuh", "safety", "run_hours"], r);
+    const r = computeWalkInCoolerLoad({ u_factor: readNum(u.input), area_ft2: readNum(area.input), delta_t_f: readNum(dt.input), infiltration_btuh: readNum(infil.input), product_btuh: readNum(prod.input), internal_btuh: readNum(internal.input), safety: sf.input.value === "" ? undefined : Number(sf.input.value), run_hours: readNum(rh.input) }); stepsFor(outputRegion, inputRegion, ["u_factor", "area_ft2", "delta_t_f", "infiltration_btuh", "product_btuh", "internal_btuh", "safety", "run_hours"], r);
     if (r.error) { oT.textContent = r.error; oTot.textContent = "-"; oEq.textContent = "-"; oNote.textContent = ""; return; }
     oT.textContent = fmt(r.transmission_btuh, 0) + " Btu/hr";
     oTot.textContent = fmt(r.total_btuh, 0) + " Btu/hr (" + fmt(r.tons, 2) + " tons)";
@@ -1365,7 +1365,7 @@ function _simpleRenderer(spec) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
         // A field marked `required` passes null when blank, so the compute can
         // tell a cleared temperature from a typed 0.
-        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : fields[f.key].input.value === "" ? undefined : Number(fields[f.key].input.value);
       }
       const r = spec.compute(params); _steps.update(spec.fields, params, r);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }

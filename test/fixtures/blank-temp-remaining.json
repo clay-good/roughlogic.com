@@ -22,7 +22,6 @@
   "concrete-maturity::target_ttf_c": "reviewed: a time-temperature factor (C-hr), and the label says 0 = none",
   "coulomb-earth-pressure::theta": "reviewed: a wall batter angle labelled 0 vertical",
   "seismic-earth-pressure::theta": "reviewed: a wall batter angle labelled 0 vertical",
-  "cwr-neutral-temperature::sun_adder_f": "reviewed: a rail-above-air adder (a difference); 0 is real for shade or night",
   "nesc-district-loading::custom_temp_f": "reviewed: read only in custom district 0; the example is district 1 and the box opens at its 0 default",
   "ammonia-charge-inventory::recirculator_volume_gal": "reviewed: a volume; the label mentions a low-temp vessel",
   "condenser-td-head-pressure::alternate_ambient_f": "reviewed: the label says 0 reuses the design ambient, and the compute does",

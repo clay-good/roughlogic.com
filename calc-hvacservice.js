@@ -74,7 +74,7 @@ function _simpleRenderer(spec) {
       for (const f of spec.fields) {
         // A field marked `required` passes null when blank, so the compute can
         // tell a cleared temperature from a typed 0.
-        params[f.key] = f.kind === "select" ? fields[f.key].select.value : f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
+        params[f.key] = f.kind === "select" ? fields[f.key].select.value : f.required && fields[f.key].input.value === "" ? null : fields[f.key].input.value === "" ? undefined : Number(fields[f.key].input.value);
       }
       const r = spec.compute(params); _steps.update(spec.fields, params, r);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }

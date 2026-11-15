@@ -66,7 +66,7 @@ function _simpleRenderer(spec) {
       const params = {};
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        else params[f.key] = fields[f.key].input.value === "" ? undefined : Number(fields[f.key].input.value);
       }
       const r = spec.compute(params); _steps.update(spec.fields, params, r);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
@@ -322,7 +322,7 @@ function _r(spec) {
         else if (f.kind === "text") params[f.key] = fields[f.key].input.value;
         // A field marked `required` passes null when blank, so the compute can
         // tell a cleared temperature from a typed 0.
-        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : fields[f.key].input.value === "" ? undefined : Number(fields[f.key].input.value);
       }
       const r = spec.compute(params); stepsFor(outputRegion, inputRegion, spec.fields, r, params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }

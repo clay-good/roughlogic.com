@@ -434,7 +434,7 @@ function _v184renderMotorCapacitorMax(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "mcm-out-note");
 
   const update = debounce(() => {
-    const r = computeMotorCapacitorMax({ v_ll: Number(v.input.value) || 0, i_noload_a: Number(i.input.value) || 0, safety_factor: Number(sf.input.value) }); stepsFor(outputRegion, inputRegion, ["v_ll", "i_noload_a", "safety_factor"], r);
+    const r = computeMotorCapacitorMax({ v_ll: Number(v.input.value) || 0, i_noload_a: Number(i.input.value) || 0, safety_factor: sf.input.value === "" ? undefined : Number(sf.input.value) }); stepsFor(outputRegion, inputRegion, ["v_ll", "i_noload_a", "safety_factor"], r);
     if (r.error) { oMag.textContent = r.error; oMax.textContent = "-"; oNote.textContent = ""; return; }
     oMag.textContent = fmt(r.magnetizing_kvar, 2) + " kVAR";
     oMax.textContent = fmt(r.max_capacitor_kvar, 2) + " kVAR";

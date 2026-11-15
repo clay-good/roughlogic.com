@@ -53,7 +53,7 @@ function _r(spec) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
         // A field marked `required` passes null when blank, so the compute can
         // tell a cleared temperature from a typed 0.
-        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : fields[f.key].input.value === "" ? undefined : Number(fields[f.key].input.value);
       }
       const r = spec.compute(params); stepsFor(outputRegion, inputRegion, spec.fields, r, params);
       if (r.error) {
@@ -121,7 +121,7 @@ function renderMulchTopsoilVolume(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "mtv-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeMulchTopsoilVolume({ area_ft2: readNum(area.input), depth_in: readNum(depth.input), bulk_density: readNum(dens.input), bag_ft3: readNum(bag.input), load_yd3: readNum(load.input), waste_pct: readNum(waste.input) }); stepsFor(outputRegion, inputRegion, ["area_ft2", "depth_in", "bulk_density", "bag_ft3", "load_yd3", "waste_pct"], r);
+    const r = computeMulchTopsoilVolume({ area_ft2: readNum(area.input), depth_in: readNum(depth.input), bulk_density: readNum(dens.input), bag_ft3: bag.input.value === "" ? undefined : Number(bag.input.value), load_yd3: load.input.value === "" ? undefined : Number(load.input.value), waste_pct: readNum(waste.input) }); stepsFor(outputRegion, inputRegion, ["area_ft2", "depth_in", "bulk_density", "bag_ft3", "load_yd3", "waste_pct"], r);
     if (r.error) { oYd.textContent = r.error; oBags.textContent = ""; oNote.textContent = ""; return; }
     oYd.textContent = fmt(r.yd3, 2) + " yd^3";
     oBags.textContent = r.bags + " " + (r.bags === 1 ? "bag" : "bags") + " / " + fmt(r.tons, 1) + " tons / " + r.loads + " load(s)";
@@ -174,7 +174,7 @@ function renderGrainDryingEnergy(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "gde-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeGrainDryingEnergy({ bushels: readNum(bu.input), lb_per_bushel: readNum(lbbu.input), mi_percent: readNum(mi.input), mf_percent: readNum(mf.input), btu_per_lb: readNum(btu.input), price_per_gal: readNum(price.input) }); stepsFor(outputRegion, inputRegion, ["bushels", "lb_per_bushel", "mi_percent", "mf_percent", "btu_per_lb", "price_per_gal"], r);
+    const r = computeGrainDryingEnergy({ bushels: readNum(bu.input), lb_per_bushel: readNum(lbbu.input), mi_percent: readNum(mi.input), mf_percent: readNum(mf.input), btu_per_lb: btu.input.value === "" ? undefined : Number(btu.input.value), price_per_gal: readNum(price.input) }); stepsFor(outputRegion, inputRegion, ["bushels", "lb_per_bushel", "mi_percent", "mf_percent", "btu_per_lb", "price_per_gal"], r);
     if (r.error) { oWater.textContent = r.error; oEnergy.textContent = ""; oCost.textContent = ""; oNote.textContent = ""; return; }
     oWater.textContent = fmt(r.water_lb, 0) + " lb (of " + fmt(r.weight_lb, 0) + " lb)";
     oEnergy.textContent = fmt(r.energy_btu / 1e6, 2) + " million Btu, " + fmt(r.propane_gal, 0) + " gal propane";

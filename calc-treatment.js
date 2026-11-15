@@ -177,7 +177,7 @@ function _rPool(spec) {
     }
     const update = debounce(() => {
       const params = {};
-      for (const f of spec.fields) params[f.key] = Number(fields[f.key].input.value) || 0;
+      for (const f of spec.fields) params[f.key] = fields[f.key].input.value === "" ? undefined : Number(fields[f.key].input.value);
       const r = spec.compute(params); stepsFor(outputRegion, inputRegion, spec.fields, r, params);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }
       for (const o of spec.outputs) outs[o.key].textContent = o.value(r);
@@ -738,7 +738,7 @@ function renderTdsFromConductivity(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "tfc-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeTdsFromConductivity({ conductivity_us_cm: readNum(ec.input), k_factor: readNum(k.input) }); stepsFor(outputRegion, inputRegion, ["conductivity_us_cm", "k_factor"], r);
+    const r = computeTdsFromConductivity({ conductivity_us_cm: readNum(ec.input), k_factor: k.input.value === "" ? undefined : Number(k.input.value) }); stepsFor(outputRegion, inputRegion, ["conductivity_us_cm", "k_factor"], r);
     if (r.error) { oTds.textContent = r.error; oBand.textContent = "-"; oNote.textContent = ""; return; }
     oTds.textContent = fmt(r.tds_mgl, 0) + " mg/L";
     oBand.textContent = fmt(r.tds_low, 0) + " to " + fmt(r.tds_high, 0) + " mg/L";
@@ -773,7 +773,7 @@ function renderConductivityFromTds(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "cft-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeConductivityFromTds({ tds_mgl: readNum(tds.input), k_factor: readNum(k.input) }); stepsFor(outputRegion, inputRegion, ["tds_mgl", "k_factor"], r);
+    const r = computeConductivityFromTds({ tds_mgl: readNum(tds.input), k_factor: k.input.value === "" ? undefined : Number(k.input.value) }); stepsFor(outputRegion, inputRegion, ["tds_mgl", "k_factor"], r);
     if (r.error) { oEc.textContent = r.error; oBand.textContent = "-"; oNote.textContent = ""; return; }
     oEc.textContent = fmt(r.conductivity_us_cm, 0) + " uS/cm";
     oBand.textContent = fmt(r.ec_low, 0) + " to " + fmt(r.ec_high, 0) + " uS/cm";

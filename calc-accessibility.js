@@ -56,7 +56,7 @@ function _simpleRenderer(spec) {
         else if (f.blankUndefined && fields[f.key].input.value === "") params[f.key] = undefined;
         // A field marked `required` passes null when blank, so the compute can
         // tell a cleared temperature from a typed 0.
-        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : fields[f.key].input.value === "" ? undefined : Number(fields[f.key].input.value);
       }
       const r = spec.compute(params); _steps.update(spec.fields, params, r);
       if (r.error) {

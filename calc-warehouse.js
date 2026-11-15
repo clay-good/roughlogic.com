@@ -50,7 +50,7 @@ function _simpleRenderer(spec) {
     const _steps = makeStepsPanel(outputRegion);
     function update() {
       const params = {};
-      for (const f of spec.fields) params[f.key] = Number(fields[f.key].input.value) || 0;
+      for (const f of spec.fields) params[f.key] = fields[f.key].input.value === "" ? undefined : Number(fields[f.key].input.value);
       const result = spec.compute(params); _steps.update(spec.fields, params, result);
       if (result.error) {
         for (const out of Object.values(outs)) out.textContent = "-";

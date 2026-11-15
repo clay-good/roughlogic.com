@@ -1418,7 +1418,7 @@ function _v357renderWeldPassesArcTime(inputRegion, outputRegion, citationEl) {
   const oTotal = makeOutputLine(outputRegion, "Total shop time", "wpa-out-t");
   const oNote = makeOutputLine(outputRegion, "Note", "wpa-out-note");
   const update = debounce(() => {
-    const r = computeWeldPassesArcTime({ A_groove: Number(ag.input.value) || 0, length_in: Number(len.input.value) || 0, a_pass: Number(ap.input.value) || 0, dep_rate: Number(dr.input.value) || 0, density: Number(dens.input.value) || 0, op_factor: Number(of.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["A_groove", "length_in", "a_pass", "dep_rate", "density", "op_factor"], r);
+    const r = computeWeldPassesArcTime({ A_groove: Number(ag.input.value) || 0, length_in: Number(len.input.value) || 0, a_pass: Number(ap.input.value) || 0, dep_rate: Number(dr.input.value) || 0, density: dens.input.value === "" ? undefined : Number(dens.input.value), op_factor: Number(of.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["A_groove", "length_in", "a_pass", "dep_rate", "density", "op_factor"], r);
     if (r.error) { oPasses.textContent = r.error; oWeight.textContent = "-"; oArc.textContent = "-"; oTotal.textContent = "-"; oNote.textContent = ""; return; }
     oPasses.textContent = String(r.passes);
     oWeight.textContent = fmt(r.weight_lb, 3) + " lb";
@@ -1917,7 +1917,7 @@ function _simpleRenderer(spec) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
         // A field marked `required` passes null when blank, so the compute can
         // tell a cleared temperature from a typed 0.
-        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : Number(fields[f.key].input.value) || 0;
+        else params[f.key] = f.required && fields[f.key].input.value === "" ? null : fields[f.key].input.value === "" ? undefined : Number(fields[f.key].input.value);
       }
       const r = spec.compute(params); _steps.update(spec.fields, params, r);
       if (r.error) { for (const k of Object.keys(outs)) outs[k].textContent = "-"; outs[spec.outputs[0].key].textContent = r.error; return; }

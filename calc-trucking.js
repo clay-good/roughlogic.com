@@ -616,7 +616,7 @@ function _simpleRenderer(spec) {
       for (const f of spec.fields) {
         if (f.kind === "select") params[f.key] = fields[f.key].select.value;
         else if (f.kind === "checkbox") params[f.key] = fields[f.key].input.checked;
-        else params[f.key] = Number(fields[f.key].input.value) || 0;
+        else params[f.key] = fields[f.key].input.value === "" ? undefined : Number(fields[f.key].input.value);
       }
       const r = spec.compute(params); _steps.update(spec.fields, params, r);
       if (r.error) {
@@ -1052,7 +1052,7 @@ export function renderStoppingSightDistance(inputRegion, outputRegion, citationE
   const update = debounce(() => {
     const r = computeStoppingSightDistance({
       speed_mph: readNum(v.input),
-      reaction_time_s: readNum(tpr.input),
+      reaction_time_s: tpr.input.value === "" ? undefined : Number(tpr.input.value),
       friction: readNum(f.input),
       grade: readNum(g.input),
       available_distance_ft: readNum(avail.input) ?? 0,
@@ -1090,7 +1090,7 @@ export function renderSsdDesignSpeed(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "sds-out-note");
   function readNum(input) { if (input.value === "") return null; const n = Number(input.value); return Number.isFinite(n) ? n : null; }
   const update = debounce(() => {
-    const r = computeSsdDesignSpeed({ sight_distance_ft: readNum(d.input), reaction_time_s: readNum(tpr.input), friction: readNum(f.input), grade: readNum(g.input) }); stepsFor(outputRegion, inputRegion, ["sight_distance_ft", "reaction_time_s", "friction", "grade"], r);
+    const r = computeSsdDesignSpeed({ sight_distance_ft: readNum(d.input), reaction_time_s: tpr.input.value === "" ? undefined : Number(tpr.input.value), friction: readNum(f.input), grade: readNum(g.input) }); stepsFor(outputRegion, inputRegion, ["sight_distance_ft", "reaction_time_s", "friction", "grade"], r);
     if (r.error) { oSpeed.textContent = r.error; oNote.textContent = ""; return; }
     oSpeed.textContent = fmt(r.design_speed_mph, 1) + " mph";
     oNote.textContent = (r.warnings.length ? r.warnings.join(" ") + " " : "") + r.note;
