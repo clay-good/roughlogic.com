@@ -767,6 +767,8 @@ export function computeBaseConvert({ value, from_base, to_base }) {
   // Until 2026-10-14 a numeric 0 read as blank ("Enter a value to convert.").
   const v = String(value == null ? "" : value).trim();
   if (v.length === 0) return { error: "Enter a value to convert." };
+  // Base 2.5 was floored to 2 without a word until 2026-11-15.
+  if (!Number.isInteger(Number(from_base)) || !Number.isInteger(Number(to_base))) return { error: "Bases must be whole numbers from 2 to 36." };
   const fromB = Math.floor(Number(from_base));
   const toB = Math.floor(Number(to_base));
   if (!Number.isFinite(fromB) || fromB < 2 || fromB > 36) return { error: "Source base must be 2-36." };
@@ -2055,7 +2057,8 @@ export function renderChiSquareGof(inputRegion, outputRegion, citationEl) {
 // margin is <= the target. p = 0.5 is the conservative (largest-n) planning value.
 export function computeSampleSizeForMargin({ proportion, target_moe, confidence_pct }) {
   const conf = Math.round(Number(confidence_pct));
-  if (!(conf in Z_CRITICAL)) return { error: "Confidence must be one of 80, 90, 95, 98, 99." };
+  // 95.4 was rounded to 95 without a word until 2026-11-15 (the sibling tile already refused it).
+  if (!(conf in Z_CRITICAL) || Math.abs(Number(confidence_pct) - conf) > 1e-9) return { error: "Confidence must be one of 80, 90, 95, 98, 99." };
   const z = Z_CRITICAL[conf];
   const p = Number(proportion);
   if (!Number.isFinite(p) || p < 0 || p > 1) return { error: "Planning proportion must be between 0 and 1." };

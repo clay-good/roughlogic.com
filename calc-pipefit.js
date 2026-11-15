@@ -801,7 +801,7 @@ export function computeBranchSaddleCutback({ branch_od_in = 0, run_od_in = 0, st
   if (bod > rod) return { error: "Branch OD must be <= run OD (no saddle geometry for an equal-or-larger branch by this method)." };
   let n = Math.round(Number(stations));
   // A typed 0 was quietly replaced by the default until 2026-11-15.
-  if (stations != null && stations !== "" && !(n >= 1 && n <= 24)) return { error: "Marks per quarter must be a whole number from 1 to 24." };
+  if (stations != null && stations !== "" && !(Number.isInteger(Number(stations)) && n >= 1 && n <= 24)) return { error: "Marks per quarter must be a whole number from 1 to 24." };
   if (!(n >= 1 && n <= 24)) n = 6;
   const r = bod / 2;
   const R = rod / 2;

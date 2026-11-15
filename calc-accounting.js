@@ -231,6 +231,8 @@ export function computeMacrs({ cost = 0, class_life = 5, convention = "half_year
   for (const r of schedule) { accumulated += r.depreciation; r.accumulated = accumulated; r.book_value = cost - accumulated; }
   const yoi = Math.floor(Number(year_of_interest));
   if (!Number.isFinite(yoi)) return { error: "Year of interest must be a finite year." };
+  // 3.5 was floored and year 50 of an 8-row schedule shown as its last row until 2026-11-15.
+  if (!(Number.isInteger(Number(year_of_interest)) && yoi >= 1 && yoi <= schedule.length)) return { error: "Year of interest must be a whole year from 1 to " + schedule.length + " (the schedule for this class life and convention)." };
   const idx = Math.max(1, Math.min(schedule.length, yoi)) - 1;
   const snapshot = schedule[idx];
   return { schedule, year_of_interest: snapshot.year, year_depreciation: snapshot.depreciation, accumulated_depreciation: snapshot.accumulated, book_value: snapshot.book_value };

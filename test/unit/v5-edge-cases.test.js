@@ -28,7 +28,8 @@ test("SL: year zero accumulated is zero", () => { const r = computeStraightLine(
 test("MACRS: 3-year class first year is 33.33%", () => { const r = computeMacrs({ cost: 1000, class_life: 3, year_of_interest: 1 }); assert.ok(close(r.year_depreciation, 333.30, 0.05)); });
 test("MACRS: 15-year totals to 100%", () => { const r = computeMacrs({ cost: 100, class_life: 15, year_of_interest: 16 }); const sum = r.schedule.reduce((a, b) => a + b.depreciation, 0); assert.ok(close(sum, 100, 0.05)); });
 test("MACRS: 20-year totals to 100%", () => { const r = computeMacrs({ cost: 100, class_life: 20, year_of_interest: 21 }); const sum = r.schedule.reduce((a, b) => a + b.depreciation, 0); assert.ok(close(sum, 100, 0.05)); });
-test("MACRS: year_of_interest beyond schedule clamps", () => { const r = computeMacrs({ cost: 1000, class_life: 5, year_of_interest: 99 }); assert.equal(r.year_of_interest, 6); });
+// Until 2026-11-15 year 99 was quietly shown as the schedule's last year (6); now it is refused and year 6 itself is answered.
+test("MACRS: year_of_interest beyond schedule is refused", () => { assert.match(computeMacrs({ cost: 1000, class_life: 5, year_of_interest: 99 }).error, /from 1 to 6/); assert.equal(computeMacrs({ cost: 1000, class_life: 5, year_of_interest: 6 }).year_of_interest, 6); });
 
 // Until 2026-10-11 this expected a $0 deduction; IRC 179(d)(1) needs more than 50% business use, so 0% is an error that says so.
 test("S179: 0% business use is not eligible", () => { const r = computeSection179({ cost: 50000, business_use_pct: 0, taxable_income: 100000, tax_year: 2025 }); assert.match(r.error, /more than 50%/); });

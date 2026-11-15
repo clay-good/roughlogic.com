@@ -388,7 +388,8 @@ export function computePvAcOutputCircuit({ ac_power_w = 9600, ac_voltage_v = 240
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(ac_power_w > 0)) return { error: "Inverter AC power must be positive (W)." };
   if (!(ac_voltage_v > 0)) return { error: "AC voltage must be positive (V)." };
-  const ph = Math.round(phases);
+  const ph = Number(phases);
+  // 2.6 was rounded to 3 phases until 2026-11-15.
   if (ph !== 1 && ph !== 3) return { error: "Phases must be 1 (single-phase) or 3 (three-phase)." };
   // I_cont = P / (V x line-to-line factor): 1 for single-phase, sqrt(3) for three-phase.
   const phase_factor = ph === 3 ? Math.sqrt(3) : 1;
