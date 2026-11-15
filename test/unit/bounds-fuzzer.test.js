@@ -22856,8 +22856,9 @@ test("bounds: spec-v701 computeCoilFaceArea pins area = CFM / target_fpm, round-
   }
   // A lower target velocity demands a larger face.
   assert.ok(_v701({ cfm: 2000, target_fpm: 400 }).face_area_ft2 > r.face_area_ft2);
-  // A non-positive target velocity defaults to 500 fpm (mirrors the forward threshold default), not an error.
-  assert.ok(Math.abs(_v701({ cfm: 2000, target_fpm: 0 }).face_area_ft2 - 4.0) < 1e-9);
+  // A blank target velocity defaults to 500 fpm; a typed 0 is refused (it was read as 500 until 2026-11-15).
+  assert.ok(Math.abs(_v701({ cfm: 2000 }).face_area_ft2 - 4.0) < 1e-9);
+  assert.ok("error" in _v701({ cfm: 2000, target_fpm: 0 }));
   // Error seams: non-positive airflow, non-finite.
   assert.ok("error" in _v701({ cfm: 0, target_fpm: 500 }));
   assert.ok("error" in _v701({ cfm: Infinity, target_fpm: 500 }));

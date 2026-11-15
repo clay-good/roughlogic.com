@@ -136,6 +136,8 @@ export function computeGrainDryingEnergy({ bushels = 0, lb_per_bushel = 56, mi_p
   const lbbu = Number(lb_per_bushel) || 0;
   const mi = Number(mi_percent) || 0;
   const mf = Number(mf_percent) || 0;
+  // A typed 0 or negative was quietly read as the default until 2026-11-15.
+  if (btu_per_lb != null && btu_per_lb !== "" && !(Number(btu_per_lb) > 0)) return { error: "Heat per pound of water must be above 0 Btu/lb (1,500 default)." };
   const btu = Number(btu_per_lb) > 0 ? Number(btu_per_lb) : 1500;
   const price = Number(price_per_gal) || 0;
   if (!(bu > 0)) return { error: "Bushels must be positive." };

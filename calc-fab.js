@@ -1383,6 +1383,8 @@ export function computeWeldPassesArcTime({ A_groove = 0, length_in = 0, a_pass =
   // Until 2026-09-26 a negative density was silently replaced and an operating factor typed as a percent (40) passed.
   if (Number(density) < 0) return { error: "Metal density cannot be negative (lb/in^3)." };
   if (Number(op_factor) < 0 || Number(op_factor) > 1) return { error: "Operating factor is a fraction from 0 to 1 (enter 0.4, not 40)." };
+  // A typed 0 or negative was quietly read as the default until 2026-11-15.
+  if (density != null && density !== "" && !(Number(density) > 0)) return { error: "Density must be above 0 lb/in^3 (0.283 for steel)." };
   const dens = Number(density) > 0 ? Number(density) : 0.283;
   const of = Number(op_factor) || 0;
   if (!(ag > 0)) return { error: "Groove cross-sectional area must be positive (in^2)." };

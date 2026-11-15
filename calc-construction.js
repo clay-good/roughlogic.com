@@ -8726,6 +8726,8 @@ export function computeTrimLinearFootage({ perimeter_ft = 0, openings_ft = 0, wa
   const perim = Number(perimeter_ft) || 0;
   const openings = Number(openings_ft) || 0;
   const waste = Number(waste_pct) || 0;
+  // A typed 0 or negative was quietly read as the default until 2026-11-15.
+  if (stock_len_ft != null && stock_len_ft !== "" && !(Number(stock_len_ft) > 0)) return { error: "Stock length must be above 0 ft (16 default)." };
   const stock = Number(stock_len_ft) > 0 ? Number(stock_len_ft) : 16;
   const spring = Number(spring_deg) || 0;
   if (!(perim > 0)) return { error: "Perimeter must be positive (ft)." };

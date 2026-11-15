@@ -301,8 +301,12 @@ export function computeBrickVeneerAnchorSpacing({ area_ft2 = 0, area_per = 2.67,
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const area = Number(area_ft2) || 0;
   const per = Number(area_per) || 0;
+  // A typed 0 or negative was quietly read as the default until 2026-11-15.
+  if (max_horiz_in != null && max_horiz_in !== "" && !(Number(max_horiz_in) > 0)) return { error: "Maximum horizontal spacing must be above 0 in (32 default)." };
   const mh = Number(max_horiz_in) > 0 ? Number(max_horiz_in) : 32;
   if (Number(max_horiz_in) < 0 || Number(max_vert_in) < 0) return { error: "Maximum spacings cannot be negative (in)." };
+  // A typed 0 or negative was quietly read as the default until 2026-11-15.
+  if (max_vert_in != null && max_vert_in !== "" && !(Number(max_vert_in) > 0)) return { error: "Maximum vertical spacing must be above 0 in (25 default)." };
   const mv = Number(max_vert_in) > 0 ? Number(max_vert_in) : 25;
   if (!(area > 0)) return { error: "Veneer wall area must be positive (ft^2)." };
   if (!(per > 0)) return { error: "Maximum area per anchor must be positive (ft^2)." };

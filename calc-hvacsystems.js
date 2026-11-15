@@ -1266,6 +1266,8 @@ export function computeCoilFaceVelocity({ cfm = 0, face_width_in = 0, face_heigh
   const q = Number(cfm) || 0;
   const w = Number(face_width_in) || 0;
   const h = Number(face_height_in) || 0;
+  // A typed 0 or negative was quietly read as the default until 2026-11-15.
+  if (threshold_fpm != null && threshold_fpm !== "" && !(Number(threshold_fpm) > 0)) return { error: "Carryover threshold must be above 0 fpm (500 default)." };
   const thr = Number(threshold_fpm) > 0 ? Number(threshold_fpm) : 500;
   if (!(q > 0)) return { error: "Airflow must be positive (cfm)." };
   if (!(w > 0)) return { error: "Coil face width must be positive (in)." };
@@ -1307,6 +1309,8 @@ HVACSYSTEMS_RENDERERS["coil-face-velocity"] = _v409renderCoilFaceVelocity;
 export function computeCoilFaceArea({ cfm = 0, target_fpm = 500 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const q = Number(cfm) || 0;
+  // A typed 0 or negative was quietly read as the default until 2026-11-15.
+  if (target_fpm != null && target_fpm !== "" && !(Number(target_fpm) > 0)) return { error: "Target face velocity must be above 0 fpm (500 default)." };
   const v = Number(target_fpm) > 0 ? Number(target_fpm) : 500;
   if (!(q > 0)) return { error: "Airflow must be positive (cfm)." };
   if (!(v > 0)) return { error: "Target face velocity must be positive (fpm)." };

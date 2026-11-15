@@ -195,6 +195,8 @@ export function computePipeSpacingRack({ pipe_od_in = 0, insulation_thickness_in
   if (!(od > 0)) return { error: "Pipe outside diameter must be positive (in)." };
   const ins = Math.max(0, Number(insulation_thickness_in) || 0);
   const gap = Math.max(0, Number(clearance_in) || 0);
+  // A typed 0 or negative was quietly read as the default until 2026-11-15.
+  if (pipe_count != null && pipe_count !== "" && !(Number.isInteger(Number(pipe_count)) && Number(pipe_count) >= 1)) return { error: "Pipe count must be a whole number, 1 or more." };
   const n = Math.max(1, Math.floor(Number(pipe_count) || 1));
   const insulated_od_in = od + 2 * ins;
   const center_to_center_in = insulated_od_in + gap;
