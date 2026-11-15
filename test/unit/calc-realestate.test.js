@@ -857,3 +857,33 @@ test("DTI: Fannie Mae B3-6-02 has no front-end ratio -- total DTI governs (45% m
   assert.equal(r.conventional_pass, true);
   assert.equal(computeDTI({ gross_monthly_income: 10000, housing_payment: 3800, other_monthly_debts: 800 }).conventional_pass, false);
 });
+
+// The loan-limits worked example carries its own copy of the shard, and until
+// 2026-11-15 that copy held the 2025 figures ($806,500 / $1,209,750) under a
+// 2026 label: the agent door, which runs the example when called with no
+// inputs, handed them out as 2026's. Every number an embedded example shard
+// states must match the bundled shard it stands in for.
+test("loan-limits / hud-fmr: the worked example's embedded shard matches the bundled shard", async () => {
+  const { readFileSync } = await import("node:fs");
+  const rows = JSON.parse(readFileSync(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8")).rows;
+  const ll = JSON.parse(readFileSync(new URL("../../data/realestate/loan-limits.json", import.meta.url), "utf8"));
+  const fmr = JSON.parse(readFileSync(new URL("../../data/realestate/hud-fmr.json", import.meta.url), "utf8"));
+  for (const r of rows.filter((x) => x.tile_id === "loan-limits" && x.inputs.shard)) {
+    const s = r.inputs.shard;
+    assert.equal(s.year, ll.year);
+    for (const [k, v] of Object.entries(s.baseline)) assert.equal(v, ll.baseline[k], "baseline." + k);
+    for (const c of s.high_cost_counties_one_unit) {
+      const b = ll.high_cost_counties_one_unit.find((x) => x.county_fips === c.county_fips);
+      assert.ok(b, c.county_name + " is bundled");
+      assert.equal(c.conforming_usd, b.conforming_usd, c.county_name + " conforming");
+      assert.equal(c.fha_usd, b.fha_usd, c.county_name + " FHA");
+    }
+  }
+  for (const r of rows.filter((x) => x.tile_id === "hud-fmr" && x.inputs.shard)) {
+    for (const a of r.inputs.shard.areas) {
+      const b = fmr.areas.find((x) => x.name === a.name);
+      assert.ok(b, a.name + " is bundled");
+      for (const k of Object.keys(a).filter((k) => k.startsWith("fmr_"))) assert.equal(a[k], b[k], a.name + " " + k);
+    }
+  }
+});

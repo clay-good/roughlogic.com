@@ -15282,17 +15282,17 @@
    "source_publisher": "FHFA / HUD / VA (federal-published, 2026 cycle)",
    "source_title": "FHFA conforming + HUD FHA + VA loan limits, per county (2026)",
    "source_edition_or_year": "2026 annual cycle",
-   "source_section_or_page": "Worked example: San Francisco, CA (FIPS 06075) returns the FHFA high-cost ceiling $1,209,750",
+   "source_section_or_page": "Worked example: San Francisco, CA (FIPS 06075) returns the 2026 FHFA high-cost ceiling $1,249,125 (the embedded shard carried the 2025 figures, $806,500 / $1,209,750, under a 2026 label until 2026-11-15)",
    "verified_by": "rl",
-   "verified_on": "2026-05-16",
+   "verified_on": "2026-11-15",
    "inputs": {
     "state": "CA",
     "county_name": "San Francisco",
     "shard": {
      "year": 2026,
      "baseline": {
-      "conforming_one_unit_usd": 806500,
-      "fha_floor_one_unit_usd": 524225
+      "conforming_one_unit_usd": 832750,
+      "fha_floor_one_unit_usd": 541287
      },
      "va": {
       "full_entitlement_cap_removed_since": "2020-01-01"
@@ -15302,8 +15302,8 @@
        "state": "CA",
        "county_name": "San Francisco",
        "county_fips": "06075",
-       "conforming_usd": 1209750,
-       "fha_usd": 1209750
+       "conforming_usd": 1249125,
+       "fha_usd": 1249125
       }
      ]
     }
