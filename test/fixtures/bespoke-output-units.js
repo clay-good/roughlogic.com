@@ -433,7 +433,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "pipe-flotation": {"uplift_plf":{"prefix":"","suffix":" lb/ft","digits":0}},
   "pipe-heat-loss-radial": {"q_per_ft_btuh":{"prefix":"","suffix":" BTU/hr-ft","digits":1},"q_total_btuh":{"prefix":"","suffix":" BTU/hr","digits":1}},
   "pipe-insulation-for-condensation": {"dew_point_F":{"prefix":"","suffix":" F"}},
-  "pipe-insulation-takeoff": {"jacket_sf":{"prefix":"","suffix":" sf","digits":0}},
+  "pipe-insulation-takeoff": {"jacket_sf":{"prefix":"","suffix":" sf","digits":0},"jacket_with_lap_sf":{"prefix":"","suffix":" sf","digits":0}},
   "pipe-miter-cut": {"miter_angle_deg":{"prefix":"","suffix":" deg","digits":3}},
   "pipe-partial-flow-depth": {"v_fps":{"prefix":"","suffix":" ft/s","digits":2},"shear_psf":{"prefix":"","suffix":" lb/ft^2","digits":4}},
   "pipe-pressure-rating": {"t_min":{"prefix":"","suffix":" in","digits":4},"p_allow":{"prefix":"","suffix":" psi","digits":0},"t_avail":{"prefix":"","suffix":" in","digits":4}},

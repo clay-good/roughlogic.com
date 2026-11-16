@@ -117,6 +117,7 @@ export function computePipeInsulationTakeoff({ pipe_ft = 250, waste_pct = 5, num
   if (!(pipe_od_in >= 0 && insul_thickness_in >= 0)) return { error: "Pipe OD and insulation thickness cannot be negative (0 to skip the jacket OD check)." };
   if (!(jacket_overlap_pct >= 0)) return { error: "Jacket lap allowance cannot be negative." };
   if (!(elbow_count >= 0 && tee_count >= 0 && valve_count >= 0)) return { error: "Fitting counts cannot be negative." };
+  if (![elbow_count, tee_count, valve_count].every((n) => Number.isInteger(Number(n)))) return { error: "Elbow, tee and valve counts must be whole numbers." };
   const jacket_circumference_ft = Math.PI * (insul_od_in / 12);
   const jacket_with_lap_sf = jacket_sf * (1 + jacket_overlap_pct / 100);
   // The trap: estimating the jacket on the PIPE's circumference instead of the
@@ -169,21 +170,39 @@ function _v857renderPipeInsulationTakeoff(inputRegion, outputRegion, citationEl)
   const fa = makeNumber("Insulation allowance per fitting (ft)", "pit-fa", { step: "any", min: "0" });
   const sl = makeNumber("Insulation section length (ft)", "pit-sl", { step: "any", min: "0" });
   const od = makeNumber("Insulation outside diameter (in)", "pit-od", { step: "any", min: "0" });
-  for (const f of [p, w, nf, fa, sl, od]) inputRegion.appendChild(f.wrap);
+  // spec-v1676 was cut into this compute (jacket OD check, lap allowance, fitting and
+  // valve covers as pieces), but the page never asked for its inputs until 2026-11-15.
+  const pod = makeNumber("Pipe outside diameter (in, optional; jacket OD check)", "pit-pod", { step: "any", min: "0" });
+  const thk = makeNumber("Insulation thickness (in, optional; jacket OD check)", "pit-thk", { step: "any", min: "0" });
+  const lap = makeNumber("Jacket lap allowance (percent, optional)", "pit-lap", { step: "any", min: "0" });
+  const ne = makeNumber("Elbows to cover (count, optional)", "pit-ne", { step: "1", min: "0" });
+  const nt = makeNumber("Tees to cover (count, optional)", "pit-nt", { step: "1", min: "0" });
+  const nv = makeNumber("Valves to cover (count, optional)", "pit-nv", { step: "1", min: "0" });
+  for (const f of [p, w, nf, fa, sl, od, pod, thk, lap, ne, nt, nv]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { p.input.value = "250"; w.input.value = "5"; nf.input.value = "12"; fa.input.value = "1"; sl.input.value = "3"; od.input.value = "4.5"; update(); });
   const oSections = makeOutputLine(outputRegion, "Insulation sections", "pit-out-sections");
   const oJacket = makeOutputLine(outputRegion, "Jacket area", "pit-out-jacket");
+  const oLap = makeOutputLine(outputRegion, "Jacket area with lap", "pit-out-lap");
+  const oOd = makeOutputLine(outputRegion, "Jacket OD check", "pit-out-od");
+  const oCov = makeOutputLine(outputRegion, "Fitting and valve covers", "pit-out-cov");
   const update = debounce(() => {
     const r = computePipeInsulationTakeoff({
       pipe_ft: p.input.value === "" ? 250 : Number(p.input.value), waste_pct: w.input.value === "" ? 5 : Number(w.input.value),
       num_fittings: nf.input.value === "" ? 12 : Number(nf.input.value), fitting_allow_ft: fa.input.value === "" ? 1 : Number(fa.input.value),
       section_len_ft: sl.input.value === "" ? 3 : Number(sl.input.value), insul_od_in: od.input.value === "" ? 4.5 : Number(od.input.value),
-    }); stepsFor(outputRegion, inputRegion, ["pipe_ft", "waste_pct", "num_fittings", "fitting_allow_ft", "section_len_ft", "insul_od_in"], r);
-    if (r.error) { oSections.textContent = r.error; oJacket.textContent = "-"; return; }
+      pipe_od_in: pod.input.value === "" ? undefined : Number(pod.input.value), insul_thickness_in: thk.input.value === "" ? undefined : Number(thk.input.value),
+      jacket_overlap_pct: lap.input.value === "" ? undefined : Number(lap.input.value),
+      elbow_count: ne.input.value === "" ? undefined : Number(ne.input.value), tee_count: nt.input.value === "" ? undefined : Number(nt.input.value),
+      valve_count: nv.input.value === "" ? undefined : Number(nv.input.value),
+    }); stepsFor(outputRegion, inputRegion, ["pipe_ft", "waste_pct", "num_fittings", "fitting_allow_ft", "section_len_ft", "insul_od_in", "pipe_od_in", "insul_thickness_in", "jacket_overlap_pct", "elbow_count", "tee_count", "valve_count"], r);
+    if (r.error) { oSections.textContent = r.error; oJacket.textContent = "-"; oLap.textContent = "-"; oOd.textContent = "-"; oCov.textContent = "-"; return; }
     oSections.textContent = fmt(r.sections, 0) + " " + (fmt(r.sections, 0) === "1" ? "section" : "sections") + " (" + fmt(r.cut_ft, 1) + " ft cut)";
     oJacket.textContent = fmt(r.jacket_sf, 0) + " sf";
+    oLap.textContent = fmt(r.jacket_with_lap_sf, 0) + " sf";
+    oOd.textContent = r.jacket_od_verdict;
+    oCov.textContent = r.covers_verdict;
   }, DEBOUNCE_MS);
-  for (const f of [p, w, nf, fa, sl, od]) f.input.addEventListener("input", update);
+  for (const f of [p, w, nf, fa, sl, od, pod, thk, lap, ne, nt, nv]) f.input.addEventListener("input", update);
 }
 PLUMBINGTAKEOFF_RENDERERS["pipe-insulation-takeoff"] = _v857renderPipeInsulationTakeoff;
 

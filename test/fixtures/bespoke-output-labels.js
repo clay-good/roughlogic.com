@@ -648,7 +648,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "pipe-flotation": {"fs":"Factor of safety","uplift_plf":"Buoyant uplift","required_backfill_plf":"Backfill to meet the target (FS on the whole uplift; FS on the backfill only, as WSSC C-4)"},
   "pipe-heat-loss-radial": {"q_per_ft_btuh":"Heat loss per linear foot","q_total_btuh":"Total heat loss","has_film":"Jacket surface temperature","note":"Note"},
   "pipe-insulation-for-condensation": {"dew_point_F":"Ambient dew point","no_risk":"Minimum thickness (round UP to stock)","note":"Note"},
-  "pipe-insulation-takeoff": {"sections":"Insulation sections","jacket_sf":"Jacket area"},
+  "pipe-insulation-takeoff": {"sections":"Insulation sections","jacket_sf":"Jacket area","jacket_with_lap_sf":"Jacket area with lap","jacket_od_verdict":"Jacket OD check","covers_verdict":"Fitting and valve covers"},
   "pipe-miter-cut": {"miter_angle_deg":"Miter angle per cut (deg)","n_welds":"Welds (cuts)","cutback_in":"Cutback, long side minus short side (in)","gore_centerline_in":"Gore centerline (in)","notes":"Notes"},
   "pipe-partial-flow-depth": {"depth_in":"Flow depth","v_fps":"Velocity at that depth","self_cleansing":"Self-cleansing (2 ft/s)","shear_psf":"Boundary shear","note":"Note"},
   "pipe-purge-volume": {"pipe_volume_ft3":"Pipe volume","purge_volume_ft3":"Purge volume","purge_min":"Purge time"},
