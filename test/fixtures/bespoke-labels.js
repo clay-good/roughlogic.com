@@ -285,7 +285,7 @@ export const BESPOKE_LABELS = {
   "dti": {"gross_monthly_income":"Gross monthly income ($)","housing_payment":"Housing payment (PITI + HOA, $)","other_monthly_debts":"Other monthly debts ($, car / cards / student / etc.)"},
   "duct-friction-static": {"shape":"Duct shape","D_in":"Round D (in)","W_in":"Rect W (in)","H_in":"Rect H (in)","material":"Material","cfm":"Airflow (CFM)","length_ft":"Run length (ft)"},
   "duct-leakage": {"design_cfm":"Design CFM","measured_cfm":"Measured CFM at registers","duct_surface_ft2":"Duct surface area (ft²)","test_pressure_inwc":"Test pressure (in WC)","design_class":"Design class"},
-  "duct-sizing": {"cfm":"CFM","friction_in_wc_per_100ft":"Friction rate (in w.c. / 100 ft)"},
+  "duct-sizing": {"cfm":"CFM","friction_in_wc_per_100ft":"Friction rate (in w.c. / 100 ft)","material":"Duct material"},
   "duct-static-pressure-total": {"components":"Components: label,drop(in. w.c.) per line","rated_esp_in_wc":"Blower rated ESP (in. w.c.)"},
   "duct-static-regain": {"upstream_velocity_fpm":"Upstream velocity (fpm)","downstream_velocity_fpm":"Downstream velocity (fpm)","recovery_factor":"Recovery factor (0-1, ~0.75)"},
   "duct-transition-length": {"large_dim_in":"Large end dimension (in)","small_dim_in":"Small end dimension (in)","slope_deg":"Transition slope (deg per side)"},

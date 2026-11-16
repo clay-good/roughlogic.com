@@ -194,9 +194,16 @@ export const manualJHeatingExample = {
 const AIR_DENSITY_LB_FT3 = 0.075;
 const DUCT_ROUGHNESS_FT = 0.0003; // galvanized steel default
 
-// dims: in { cfm: L^3 T^-1, friction_in_wc_per_100ft: dimensionless, roughness_ft: L } out: { velocity_fpm: L T^-1, round_diameter_in: L, equivalent_square_in: L }
-export function computeDuctSize({ cfm, friction_in_wc_per_100ft = 0.08, roughness_ft = DUCT_ROUGHNESS_FT }) {
+// dims: in { cfm: L^3 T^-1, friction_in_wc_per_100ft: dimensionless, roughness_ft: L, material: dimensionless } out: { velocity_fpm: L T^-1, round_diameter_in: L, equivalent_square_in: L }
+export function computeDuctSize({ cfm, friction_in_wc_per_100ft = 0.08, roughness_ft = DUCT_ROUGHNESS_FT, material = null }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page could only size galvanized duct until 2026-11-15; flex is about ten times
+  // rougher and needs a larger diameter at the same friction rate. An explicit
+  // roughness_ft still overrides the material.
+  if (material != null && material !== "") {
+    if (!Object.hasOwn(DUCT_ROUGHNESS_FT_v7, material)) return { error: "Duct material must be one of: " + Object.keys(DUCT_ROUGHNESS_FT_v7).join(", ") + "." };
+    if (!(arguments[0] && Object.hasOwn(arguments[0], "roughness_ft") && arguments[0].roughness_ft != null && arguments[0].roughness_ft !== "")) roughness_ft = DUCT_ROUGHNESS_FT_v7[material];
+  }
   // `!(x > 0)` rather than `x <= 0`: a CFM left out is undefined, and NaN <= 0 is false, so a call with no
   // airflow used to return a 2 in duct.
   if (!(cfm > 0) || !(friction_in_wc_per_100ft > 0)) return { error: "Provide positive CFM and friction rate." };
@@ -1289,10 +1296,19 @@ export function renderDuctSizing(inputRegion, outputRegion, citationEl) {
     btn.addEventListener("click", () => { fr.input.value = String(p.friction); update(); });
     chipRow.appendChild(btn);
   }
+  const mat = makeSelect("Duct material", "ds-mat", [
+    { value: "galv_smooth", label: "Galvanized steel, smooth", selected: true },
+    { value: "galv_general", label: "Galvanized steel, typical joints" },
+    { value: "fiberboard", label: "Duct board (fibrous glass)" },
+    { value: "flex_extended", label: "Flex duct, fully extended" },
+    { value: "flex_compressed", label: "Flex duct, partly compressed" },
+    { value: "flex_metal", label: "Flexible metal" },
+  ]);
   inputRegion.appendChild(cfm.wrap);
   inputRegion.appendChild(fr.wrap);
   inputRegion.appendChild(chipRow);
-  attachExampleButton(inputRegion, () => { cfm.input.value = "400"; fr.input.value = "0.08"; update(); });
+  inputRegion.appendChild(mat.wrap);
+  attachExampleButton(inputRegion, () => { cfm.input.value = "400"; fr.input.value = "0.08"; mat.select.value = "galv_smooth"; update(); });
 
   const oR = makeOutputLine(outputRegion, "Round diameter", "ds-out-r");
   const oS = makeOutputLine(outputRegion, "Equivalent square", "ds-out-s");
@@ -1303,7 +1319,7 @@ export function renderDuctSizing(inputRegion, outputRegion, citationEl) {
   const oVc = makeOutputLine(outputRegion, "Velocity ceiling", "ds-out-vc");
 
   const update = debounce(async () => {
-    const inputs = { cfm: Number(cfm.input.value) || 0, friction_in_wc_per_100ft: Number(fr.input.value) || 0 };
+    const inputs = { cfm: Number(cfm.input.value) || 0, friction_in_wc_per_100ft: Number(fr.input.value) || 0, material: mat.select.value };
     const r = await runInWorker({ kind: "duct", inputs }, computeDuctSize);
     if (r.error) { oR.textContent = r.error; oS.textContent = "-"; oV.textContent = "-"; oF.textContent = "-"; oVc.textContent = "-"; return; }
     oR.textContent = fmt(r.round_diameter_in, 2) + " in";
@@ -1313,6 +1329,7 @@ export function renderDuctSizing(inputRegion, outputRegion, citationEl) {
     oVc.textContent = r.velocity_label;
   }, DEBOUNCE_MS);
   for (const el of [cfm.input, fr.input]) el.addEventListener("input", update);
+  mat.select.addEventListener("change", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
