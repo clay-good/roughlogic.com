@@ -1766,6 +1766,7 @@
     {"term":"will my pipes freeze","target":"pipe-freeze-time","kind":"industry"},
     {"term":"pipe insulation freeze protection time","target":"pipe-freeze-time","kind":"industry"},
     {"term":"pipe size for gpm","target":"pipe-velocity","kind":"question"},
-    {"term":"water heater size","target":"water-heater-storage-sizing","kind":"question"}
+    {"term":"water heater size","target":"water-heater-storage-sizing","kind":"question"},
+    {"term":"pipe size for","target":"pipe-velocity","kind":"question"}
   ]
 }

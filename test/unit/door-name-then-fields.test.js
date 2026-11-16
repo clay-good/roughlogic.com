@@ -43,3 +43,16 @@ test("answer_query never says OK while the calculator refused", async () => {
   assert.match(r.error, /O2/);
   assert.ok(r.missing.length > 0);
 });
+
+// 2026-11-16: a mode the question chose is tried before naming "required" fields
+// that only the default mode reads.
+test("a question that picks a mode is answered in that mode", async () => {
+  const r = await answerQuery({ query: "pipe size for 10 gpm" });
+  assert.equal(r.id, "pipe-velocity");
+  assert.equal(r.status, "OK");
+  assert.equal(r.inputs.mode, "size-for-flow");
+  assert.equal(r.result.nominal_size_in, 1);
+  const hp = await answerQuery({ query: "horsepower from torque 400 ft-lb at 5000 rpm" });
+  assert.equal(hp.status, "OK");
+  assert.ok(Math.abs(hp.result.hp - 380.8) < 0.1);
+});

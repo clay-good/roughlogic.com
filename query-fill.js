@@ -942,6 +942,21 @@ export function queryFill(query, rows, opts) {
     filled[key] = choice;
   }
 
+  // --- A mode dropdown named by what the question asks for -----------------
+  // Options written "size-for-flow", "velocity-from-flow" lead with what the
+  // mode computes. When exactly one option's leading word (4+ letters) is a
+  // word of the question, that is the mode: "pipe size for 10 gpm" asks for
+  // the size (2026-11-16).
+  for (const r of selectRows) {
+    if (r.d in filled || !/\bmode\b/i.test(r.l + " " + r.d)) continue;
+    const words = new Set(text.split(/[^a-z]+/));
+    const hits = r.o.filter((o) => {
+      const lead = String(o).toLowerCase().split(/[-_ ]+/)[0];
+      return lead.length >= 4 && /[-_]/.test(String(o)) && words.has(lead);
+    });
+    if (hits.length === 1) filled[r.d] = String(hits[0]);
+  }
+
   // --- A "solve for" dropdown names the unknown ----------------------------
   // When its options name the tile's quantities and the question gives values
   // for all of them but one, that one is the unknown, whatever word the

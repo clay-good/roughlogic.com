@@ -1758,6 +1758,20 @@ export async function answerQuery({ query } = {}) {
 
   // Name what it still needs, in one round trip instead of three.
   const missingRequired = rows.filter((r) => r.r && !(r.d in filled)).map((r) => ({ key: r.d, label: r.l, unit: r.u || null }));
+  // "Required" was measured in the tile's default mode. When the question
+  // itself chose a mode or a solve-for ("pipe size for 10 gpm" -> size for a
+  // flow), a field that mode does not read may be flagged anyway: the
+  // diameter, in the mode that finds the diameter (2026-11-16). Try it, and
+  // answer only if the calculator accepts the values without refusing.
+  const choseMode = rows.some((r) => r.k === "select" && r.d in filled && /\b(mode|solve|find)\b/i.test(r.l + " " + r.d));
+  if (missingRequired.length && choseMode) {
+    try {
+      const trial = await run({ id: top.id, inputs: coerceForCompute(filled, rows) });
+      if (trial && trial.result && !trial.result.error && !(trial.warnings || []).some((w) => w && (w.rule === "min" || w.rule === "max") && w.key in filled)) {
+        return { ...trial, status: "OK", query: q, name: top.name, via: "registry" };
+      }
+    } catch { /* fall through to naming what is missing */ }
+  }
   if (missingRequired.length) {
     return {
       status: "MISSING_INPUTS", query: q, id: top.id, name: top.name,
