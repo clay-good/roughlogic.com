@@ -1419,7 +1419,10 @@ function _v9f_renderConfinedSpaceVent(inputRegion, outputRegion, citationEl) {
     Object.keys(CONFINED_SPACE_CONTAMINANTS).map((k) => ({ value: k, label: CONFINED_SPACE_CONTAMINANTS[k].label }))
   );
   const N = makeNumber("Target air-changes (blank = contaminant default)", "csv-n", { step: "any", min: "0" });
-  for (const f of [L, W, H, cfm, ct, N]) inputRegion.appendChild(f.wrap);
+  // The compute took a direct volume; the page only offered L x W x H until 2026-11-15,
+  // which fits no tank, manhole or vault.
+  const Vd = makeNumber("Volume (ft³, optional; overrides L x W x H for a tank or vault)", "csv-vol", { step: "any", min: "0" });
+  for (const f of [L, W, H, Vd, cfm, ct, N]) inputRegion.appendChild(f.wrap);
 
   attachExampleButton(inputRegion, () => {
     L.input.value = "10"; W.input.value = "10"; H.input.value = "10";
@@ -1444,10 +1447,11 @@ function _v9f_renderConfinedSpaceVent(inputRegion, outputRegion, citationEl) {
       length_ft: readNum(L.input),
       width_ft: readNum(W.input),
       height_ft: readNum(H.input),
+      volume_ft3: readNum(Vd.input),
       blower_cfm: readNum(cfm.input),
       contaminant: ct.select.value,
       target_purges: N.input.value === "" ? null : readNum(N.input),
-    }); stepsFor(outputRegion, inputRegion, ["length_ft", "width_ft", "height_ft", "blower_cfm", "contaminant", "target_purges"], r);
+    }); stepsFor(outputRegion, inputRegion, ["length_ft", "width_ft", "height_ft", "volume_ft3", "blower_cfm", "contaminant", "target_purges"], r);
     if (r.error) {
       oV.textContent = r.error; oM.textContent = ""; oA.textContent = ""; oT.textContent = ""; oC.textContent = ""; oW.textContent = "";
       return;
@@ -1459,7 +1463,7 @@ function _v9f_renderConfinedSpaceVent(inputRegion, outputRegion, citationEl) {
     oC.textContent = r.contaminant_label;
     oW.textContent = r.warnings.join(" ");
   }, DEBOUNCE_MS);
-  for (const el of [L.input, W.input, H.input, cfm.input, N.input]) el.addEventListener("input", update);
+  for (const el of [L.input, W.input, H.input, Vd.input, cfm.input, N.input]) el.addEventListener("input", update);
   ct.select.addEventListener("change", update);
 }
 
@@ -1680,7 +1684,9 @@ function _v15f_renderSmokeEjector(inputRegion, outputRegion, citationEl) {
   const fan = _v15f_makeNumber("Ejector fan CFM rating", "se-fan", { step: "any", min: "0"});
   const ex = _v15f_makeNumber("Exhaust opening (ft^2)", "se-ex", { step: "any", min: "0"});
   const en = _v15f_makeNumber("Entry opening (ft^2)", "se-en", { step: "any", min: "0"});
-  for (const f of [L, W, H, ach, fan, ex, en]) inputRegion.appendChild(f.wrap);
+  // The compute took a direct room volume; the page only offered L x W x H until 2026-11-15.
+  const Vr = _v15f_makeNumber("Room volume (ft^3, optional; overrides L x W x H)", "se-vol", { step: "any", min: "0" });
+  for (const f of [L, W, H, Vr, ach, fan, ex, en]) inputRegion.appendChild(f.wrap);
   _v15f_attachEx(inputRegion, () => {
     L.input.value = "30"; W.input.value = "40"; H.input.value = "10"; ach.input.value = "5"; fan.input.value = "4000"; ex.input.value = "12"; en.input.value = "10"; update();
   });
@@ -1697,11 +1703,12 @@ function _v15f_renderSmokeEjector(inputRegion, outputRegion, citationEl) {
       length_ft: readNum(L.input),
       width_ft: readNum(W.input),
       height_ft: readNum(H.input),
+      room_volume_ft3: readNum(Vr.input),
       target_ach: readNum(ach.input),
       fan_cfm: readNum(fan.input),
       exhaust_opening_ft2: readNum(ex.input),
       entry_opening_ft2: readNum(en.input),
-    }); stepsFor(outputRegion, inputRegion, ["length_ft", "width_ft", "height_ft", "target_ach", "fan_cfm", "exhaust_opening_ft2", "entry_opening_ft2"], r);
+    }); stepsFor(outputRegion, inputRegion, ["length_ft", "width_ft", "height_ft", "room_volume_ft3", "target_ach", "fan_cfm", "exhaust_opening_ft2", "entry_opening_ft2"], r);
     if (r.error) { oReq.textContent = r.error; oFans.textContent = "-"; oTime.textContent = "-"; oRatio.textContent = "-"; oW.textContent = ""; return; }
     oReq.textContent = _v15f_fmt(r.cfm_required, 0) + " CFM (" + _v15f_fmt(r.volume_ft3, 0) + " ft^3)";
     oFans.textContent = String(r.fans) + " (" + _v15f_fmt(r.cfm_actual, 0) + " CFM actual)";
@@ -1709,7 +1716,7 @@ function _v15f_renderSmokeEjector(inputRegion, outputRegion, citationEl) {
     oRatio.textContent = r.opening_ratio != null ? _v15f_fmt(r.opening_ratio, 2) + " : 1" : "-";
     oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Within efficient PPV range; SOP and incident command govern.";
   }, _V15F_DEB);
-  for (const el of [L.input, W.input, H.input, ach.input, fan.input, ex.input, en.input]) el.addEventListener("input", update);
+  for (const el of [L.input, W.input, H.input, Vr.input, ach.input, fan.input, ex.input, en.input]) el.addEventListener("input", update);
 }
 
 FIRE_RENDERERS["smoke-ejector-cfm"] = _v15f_renderSmokeEjector;
