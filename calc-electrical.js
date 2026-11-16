@@ -2859,60 +2859,56 @@ export const panelRebalanceExample = {
 function _v8e_renderPanelRebalance(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: per NEC 2023 §220 (load calculations) and §408.36 (panel rating). AHJ governs final panel sizing. Free at nfpa.org/freeaccess.";
   _v8e_attachEx(inputRegion, () => fillExample(panelRebalanceExample.inputs));
-  // For the simple renderer we expose a single circuit row with phase,
-  // amps, and description. The user iterates by editing the example.
-  const desc = _v8e_makeNumber("Circuit count", "pr-cnt", { step: "1", min: "1" });
-  desc.input.value = "6";
-  const totalA = _v8e_makeNumber("Sum amps on phase A (sample input)", "pr-a", { step: "any", min: "0" });
-  const totalB = _v8e_makeNumber("Sum amps on phase B", "pr-b", { step: "any", min: "0" });
-  const totalC = _v8e_makeNumber("Sum amps on phase C", "pr-c", { step: "any", min: "0" });
-  for (const f of [desc, totalA, totalB, totalC]) inputRegion.appendChild(f.wrap);
+  // One row per circuit, through computePanelRebalance. Until 2026-11-15 the page took three
+  // phase totals and a "Circuit count" that nothing read, and suggested moving "~X A" -- an
+  // amount no single circuit may carry -- instead of naming the circuit the compute picks.
+  const list = document.createElement("div"); inputRegion.appendChild(list);
+  const rows = [];
+  for (let i = 0; i < 8; i++) {
+    const n = i + 1;
+    const wrap = document.createElement("div"); wrap.className = "field";
+    const ph = document.createElement("select");
+    ph.setAttribute("aria-label", "Phase for circuit " + n); ph.id = "pr-c" + n + "-ph";
+    for (const v of ["A", "B", "C"]) { const o = document.createElement("option"); o.value = v; o.textContent = "Phase " + v; ph.appendChild(o); }
+    const ampsF = makeRowField("Circuit " + n + " load (A)", "pr-c" + n + "-a", { step: "any", min: "0" });
+    wrap.appendChild(ph); wrap.appendChild(ampsF.wrap); list.appendChild(wrap);
+    ph.addEventListener("input", () => update()); ph.addEventListener("change", () => update()); ampsF.input.addEventListener("input", () => update());
+    rows.push({ ph, amps: ampsF.input, desc: "" });
+  }
   const oA = _v8e_makeOut(outputRegion, "Phase A total", "pr-out-a");
   const oB = _v8e_makeOut(outputRegion, "Phase B total", "pr-out-b");
   const oC = _v8e_makeOut(outputRegion, "Phase C total", "pr-out-c");
   const oI = _v8e_makeOut(outputRegion, "Imbalance %", "pr-out-i");
   const oS = _v8e_makeOut(outputRegion, "Suggested swap", "pr-out-s");
   function fillExample(x) {
-    let a = 0, b = 0, c = 0;
-    for (const cr of x.circuits) {
-      if (cr.phase === "A") a += cr.amps;
-      else if (cr.phase === "B") b += cr.amps;
-      else if (cr.phase === "C") c += cr.amps;
+    for (let i = 0; i < rows.length; i++) {
+      const c = x.circuits[i];
+      rows[i].ph.value = c ? c.phase : "A"; rows[i].amps.value = c ? String(c.amps) : ""; rows[i].desc = c && c.description ? c.description : "";
     }
-    desc.input.value = String(x.circuits.length);
-    totalA.input.value = String(a);
-    totalB.input.value = String(b);
-    totalC.input.value = String(c);
     update();
   }
   const update = _v8e_debounce(() => {
-    const a = Number(totalA.input.value) || 0;
-    const b = Number(totalB.input.value) || 0;
-    const c = Number(totalC.input.value) || 0;
-    if (a + b + c === 0) {
-      oA.textContent = "0 A"; oB.textContent = "0 A"; oC.textContent = "0 A";
-      oI.textContent = "0 %"; oS.textContent = "(enter loads)"; return;
+    const circuits = [];
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i];
+      if (r.amps.value.trim() === "") continue;
+      circuits.push({ description: r.desc || "Circuit " + (i + 1), amps: Number(r.amps.value), phase: r.ph.value });
     }
-    const mean = (a + b + c) / 3;
-    const mx = Math.max(a, b, c);
-    const mn = Math.min(a, b, c);
-    const imb = mean > 0 ? ((mx - mn) / mean) * 100 : 0;
-    oA.textContent = _v8e_fmt(a, 1) + " A";
-    oB.textContent = _v8e_fmt(b, 1) + " A";
-    oC.textContent = _v8e_fmt(c, 1) + " A";
-    oI.textContent = _v8e_fmt(imb, 2) + " % (max-min spread of load current; a spread above 5% triggers a rebalance suggestion)";
-    if (imb <= 5) {
-      oS.textContent = "balanced (≤ 5 %); no swap suggested";
-    } else {
-      const heavy = a >= b && a >= c ? "A" : (b >= c ? "B" : "C");
-      const light = a <= b && a <= c ? "A" : (b <= c ? "B" : "C");
-      const move = (mx - mn) / 2;
-      oS.textContent = "move ~" + _v8e_fmt(move, 1) + " A from phase " + heavy + " to phase " + light;
-    }
+    if (!circuits.length) { oA.textContent = oB.textContent = oC.textContent = oI.textContent = "-"; oS.textContent = "(enter circuit loads)"; return; }
+    const r = computePanelRebalance({ circuits }); stepsFor(outputRegion, inputRegion, ["circuits"], r);
+    if (r.error) { oA.textContent = r.error; oB.textContent = oC.textContent = oI.textContent = oS.textContent = ""; return; }
+    oA.textContent = _v8e_fmt(r.totals_A_amps, 1) + " A";
+    oB.textContent = _v8e_fmt(r.totals_B_amps, 1) + " A";
+    oC.textContent = _v8e_fmt(r.totals_C_amps, 1) + " A";
+    oI.textContent = _v8e_fmt(r.imbalance_pct, 1) + " % (max-min spread over the mean; above 5% a swap is looked for)";
+    const sg = r.suggestion;
+    oS.textContent = r.imbalance_pct <= 5 ? "balanced (5 % or less); no swap suggested"
+      : sg ? "move " + sg.description + " (" + _v8e_fmt(sg.amps, 1) + " A) from phase " + sg.from_phase + " to phase " + sg.to_phase + ": imbalance becomes " + _v8e_fmt(sg.projected_imbalance_pct, 1) + " %"
+      : "no single circuit move lowers the imbalance";
   }, _V8E_DEB);
-  for (const f of [desc.input, totalA.input, totalB.input, totalC.input]) f.addEventListener("input", update);
+  // A circuit's description is the example's label; a typed row is named by its number.
+  for (const r of rows) r.amps.addEventListener("input", () => { r.desc = ""; });
 }
-
 ELECTRICAL_RENDERERS["panel-rebalance"] = _v8e_renderPanelRebalance;
 
 // =====================================================================

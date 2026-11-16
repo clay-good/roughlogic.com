@@ -417,6 +417,7 @@ export const BESPOKE_OUTPUT_UNITS = {
   "overtime": {"gross_pay":{"prefix":"$","suffix":"","digits":2}},
   "oxyfuel-cutting-gas": {"cut_time_min":{"prefix":"","suffix":" min","digits":1},"oxygen_used_ft3":{"prefix":"","suffix":" ft3","digits":1},"fuel_used_ft3":{"prefix":"","suffix":" ft3","digits":1},"oxygen_runtime_hr":{"prefix":"","suffix":" hr","digits":1},"fuel_runtime_hr":{"prefix":"","suffix":" hr","digits":1}},
   "paint-coverage": {"total_paint_gallons":{"prefix":"","suffix":" gal","digits":2},"primer_gallons":{"prefix":"","suffix":" gal","digits":2}},
+  "panel-rebalance": {"totals_A_amps":{"prefix":"","suffix":" A","digits":1},"totals_B_amps":{"prefix":"","suffix":" A","digits":1},"totals_C_amps":{"prefix":"","suffix":" A","digits":1}},
   "paraboloid-volume": {"radius_at_level":{"prefix":"","suffix":" ft","digits":3}},
   "particle-settling-velocity": {"settling_velocity_mm_s":{"prefix":"","suffix":" mm/s","digits":3},"settling_velocity_ft_min":{"prefix":"","suffix":" ft/min","digits":3}},
   "payroll-withholding": {"fed_income_tax_period":{"prefix":"$","suffix":"","digits":2},"ss_tax_period":{"prefix":"$","suffix":"","digits":2},"medicare_period":{"prefix":"$","suffix":"","digits":2},"total_employee_period":{"prefix":"$","suffix":"","digits":2}},
