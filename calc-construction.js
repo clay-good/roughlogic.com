@@ -3523,9 +3523,16 @@ function _v15c_renderHeaderSizing(inputRegion, outputRegion, citationEl) {
   snow.input.value = "30";
   const sp = _v15c_makeSelect("Species and grade", "hdr-sp", Object.keys(LUMBER_SPECIES_GRADES).map((k) => ({ value: k, label: k.replace("_", " ") })));
   sp.select.value = "SPF_No2";
-  for (const f of [span, trib, floors, snow, sp]) inputRegion.appendChild(f.wrap);
+  // The compute always took a deflection limit; the page fixed L/360 until 2026-11-15.
+  // IRC Table R301.7: L/360 under plaster or a floor, L/240 for other members.
+  const dl = _v15c_makeSelect("Deflection limit (IRC Table R301.7)", "hdr-dl", [
+    { value: "360", label: "L/360 (plaster or gypsum below, or a floor)" },
+    { value: "240", label: "L/240 (no brittle finish below)" },
+  ]);
+  dl.select.value = "360";
+  for (const f of [span, trib, floors, snow, sp, dl]) inputRegion.appendChild(f.wrap);
   _v15c_attachEx(inputRegion, () => {
-    span.input.value = "6"; trib.input.value = "14"; floors.select.value = "0"; snow.input.value = "30"; sp.select.value = "SPF_No2"; update();
+    span.input.value = "6"; trib.input.value = "14"; floors.select.value = "0"; snow.input.value = "30"; sp.select.value = "SPF_No2"; dl.select.value = "360"; update();
   });
 
   const oMember = _v15c_makeOut(outputRegion, "Recommended header", "hdr-out-member");
@@ -3542,7 +3549,8 @@ function _v15c_renderHeaderSizing(inputRegion, outputRegion, citationEl) {
       floors_above: Number(floors.select.value),
       ground_snow_psf: readNum(snow.input),
       species_grade: sp.select.value,
-    }); stepsFor(outputRegion, inputRegion, ["header_span_ft", "tributary_width_ft", "floors_above", "ground_snow_psf", "species_grade"], r);
+      deflection_limit: Number(dl.select.value),
+    }); stepsFor(outputRegion, inputRegion, ["header_span_ft", "tributary_width_ft", "floors_above", "ground_snow_psf", "species_grade", "deflection_limit"], r);
     if (r.error) { oMember.textContent = r.error; oLoad.textContent = "-"; oVerify.textContent = "-"; oJack.textContent = "-"; oW.textContent = ""; return; }
     oMember.textContent = r.member_label + " (allowable span " + _v15c_fmt(r.allowable_span_ft, 2) + " ft, governed by " + r.governing + ")";
     oLoad.textContent = _v15c_fmt(r.w_plf, 0) + " plf (" + _v15c_fmt(r.total_load_psf, 0) + " psf on tributary)";
@@ -3551,7 +3559,7 @@ function _v15c_renderHeaderSizing(inputRegion, outputRegion, citationEl) {
     oW.textContent = r.warnings.length ? r.warnings.join(" ") : "Within the IRC R602.7 table range; the AHJ governs the final inspection.";
   }, _V15C_DEB);
   for (const el of [span.input, trib.input, snow.input]) el.addEventListener("input", update);
-  for (const el of [floors.select, sp.select]) el.addEventListener("change", update);
+  for (const el of [floors.select, sp.select, dl.select]) el.addEventListener("change", update);
 }
 
 CONSTRUCTION_RENDERERS["header-sizing"] = _v15c_renderHeaderSizing;
