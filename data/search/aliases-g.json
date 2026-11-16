@@ -1327,6 +1327,8 @@
     {"term":"salvage lift air volume","target":"lift-bag-sizing","kind":"industry"},
     {"term":"how big a lift bag do i need","target":"lift-bag-sizing","kind":"question"},
     {"term":"markup on","target":"markup","kind":"question"},
-    {"term":"markup percent on dollars of cost","target":"markup","kind":"question"}
+    {"term":"markup percent on dollars of cost","target":"markup","kind":"question"},
+    {"term":"heat index","target":"heat-stress","kind":"industry"},
+    {"term":"wind chill","target":"wind-chill","kind":"industry"}
   ]
 }

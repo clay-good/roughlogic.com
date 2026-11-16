@@ -117857,6 +117857,16 @@
   "term": "pipe size for",
   "target": "pipe-velocity",
   "kind": "question"
+ },
+ {
+  "term": "heat index",
+  "target": "heat-stress",
+  "kind": "industry"
+ },
+ {
+  "term": "wind chill",
+  "target": "wind-chill",
+  "kind": "industry"
  }
  ]
 }

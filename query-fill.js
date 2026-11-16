@@ -135,7 +135,7 @@ const AMBIGUOUS_PAIR = /\b\d+\s*\/\s*\d+\b/;
 // rewrite below.
 // Refrigeration service words joined these 2026-11-16: "subcooling 300 psig liquid
 // 95 f" read the 95 as a vertical lift in feet.
-const TEMP_CONTEXT = /\b(temp|temperature|ambient|outdoor|indoor|db|wb|dry\s*bulb|wet\s*bulb|setpoint|supply\s*air|return\s*air|degrees?|superheat|subcool(?:ing)?|suction|liquid\s*line|condensing|evaporator|saturation)\b/;
+const TEMP_CONTEXT = /\b(temp|temperature|ambient|outdoor|indoor|db|wb|dry\s*bulb|wet\s*bulb|setpoint|supply\s*air|return\s*air|degrees?|superheat|subcool(?:ing)?|suction|liquid\s*line|condensing|evaporator|saturation|heat\s*index|wind\s*chill|dew\s*point|humidity|rh)\b/;
 
 // `protect` is a set of literal strings a rewrite must not touch -- in
 // practice, the option values of the tile's own selects. `lumber-spans` has a
@@ -372,7 +372,13 @@ export function queryFill(query, rows, opts) {
   if (numberRows.some((r) => rowUnit(r) === "ft") && numberRows.some((r) => rowUnit(r) === "in")) {
     skip.add("spelled-feet-inches");
   }
-  const text = rewriteQuery(query, protect, skip);
+  let text = rewriteQuery(query, protect, skip);
+  // "heat index 95 degrees 50 percent": on a tile with a temperature field
+  // and no angle field, bare "degrees" are degrees F (2026-11-16: read as an
+  // angle and refused).
+  if (text && !numberRows.some((r) => rowUnit(r) === "deg") && numberRows.some((r) => rowUnit(r) === "degf")) {
+    text = text.replace(/(-?\d+(?:\.\d+)?)\s*degrees?\b(?!\s*(?:f|c|fahrenheit|celsius)\b)/g, "$1 degf");
+  }
   if (!text) return { filled: {}, missing: rows.map((r) => r.d), unmatched: [] };
   const termsByRow = new Map(rows.map((r) => [r.d, labelTerms(r.l)]));
   // Every word that names a field on THIS tile. valueFor uses it to tell a

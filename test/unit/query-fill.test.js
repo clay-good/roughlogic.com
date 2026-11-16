@@ -617,3 +617,14 @@ test("field-units: whole-label units are an allowlist", async () => {
   assert.equal(unitFromLabel("Horsepower"), "hp");
   for (const l of ["G", "Km", "a", "Tons", "Area"]) assert.equal(unitFromLabel(l), null, l);
 });
+
+// 2026-11-16: "95 degrees" on a tile with a degF field and no angle field is
+// degrees F; weather words mark a temperature context for a bare "f".
+test("query-fill: weather degrees are temperatures", () => {
+  const hs = [num("T_F", "Air temperature", "degf"), num("RH_percent", "Relative humidity", "pct")];
+  assert.deepEqual(queryFill("heat index 95 degrees 50 percent humidity", hs).filled, { T_F: "95", RH_percent: "50" });
+  assert.equal(queryFill("heat index 100 f 40% rh", hs).filled.T_F, "100");
+  // An angle field keeps "degrees" as an angle.
+  const bend = [num("angle_deg", "Bend angle", "deg"), num("t_f", "Temperature", "degf")];
+  assert.equal(queryFill("bend angle 30 degrees", bend).filled.angle_deg, "30");
+});

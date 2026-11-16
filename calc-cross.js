@@ -1719,7 +1719,7 @@ const renderWindChillWindSpeed = _simpleRendererG({
   citation: "Citation: NWS 2001 wind chill formula solved for the wind speed: w = [ (WC - 35.74 - 0.6215 T) / (0.4275 T - 35.75) ]^(1/0.16). Valid for T <= 50 F and w >= 3 mph. A reference estimate; the NWS advisory governs.",
   example: windChillWindSpeedExample.inputs,
   fields: [
-    { key: "T_F", required: true, label: "Ambient temp (F, <= 50)", kind: "number" },
+    { key: "T_F", required: true, label: "Ambient temp (°F, 50 or below)", kind: "number" },
     { key: "target_wc_F", required: true, label: "Target / reported wind chill (°F)", kind: "number" },
   ],
   outputs: [

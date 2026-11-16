@@ -6,6 +6,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Heat index and wind chill questions answer outright.** "Heat index 95 degrees 50 percent humidity" now gives 105.2 F. "Degrees" on a calculator with a temperature field and no angle field is now degrees F, and heat index, wind chill, dew point and humidity now mark a temperature context, so a bare "f" counts. "Wind chill 20 f 15 mph" now gives 6.2 F (the NWS chart reads 6). It used to rank the inverse tile first and put the 20 F into its target wind chill. A curated "wind chill" phrase now sends it to the forward calculator, and the inverse tile's temperature label now carries its unit (°F).
 - **Lumber sizes and rise-over-run are read as written.** A fourth batch of everyday questions found four more wrong values, now pinned in `test/fixtures/free-text-queries.json`:
   - "A 4x4 slab" was read as a 4x4 post, so the slab came out 0.33 ft wide. The lumber rewrite no longer fires before a surface word (slab, patio, pad, deck, floor, room...), and the slab is 4 by 4 ft.
   - "2 ft rise over 50 ft" became a 2 ft run and a 600 in fall. Rise, run, fall and drop after a length now describe it, like tall and deep, and the run is 50 ft.
