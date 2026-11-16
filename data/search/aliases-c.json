@@ -2452,6 +2452,7 @@
     {"term":"btu to heat a room","target":"manual-j-heating","kind":"question"},
     {"term":"how many btu to heat a house","target":"manual-j-heating","kind":"question"},
     {"term":"btu to heat","target":"manual-j-heating","kind":"question"},
-    {"term":"btu to heat a room by square feet","target":"manual-j-heating","kind":"question"}
+    {"term":"btu to heat a room by square feet","target":"manual-j-heating","kind":"question"},
+    {"term":"ac tonnage for","target":"manual-j-cooling","kind":"question"}
   ]
 }

@@ -117777,6 +117777,41 @@
   "term": "studs for a wall with corners and openings",
   "target": "wood-stud-wall-takeoff",
   "kind": "question"
+ },
+ {
+  "term": "mortgage payment",
+  "target": "piti",
+  "kind": "question"
+ },
+ {
+  "term": "markup on",
+  "target": "markup",
+  "kind": "question"
+ },
+ {
+  "term": "fertilizer for",
+  "target": "npk-blend",
+  "kind": "question"
+ },
+ {
+  "term": "water heater size",
+  "target": "water-heater-storage-sizing",
+  "kind": "question"
+ },
+ {
+  "term": "gallons of paint for",
+  "target": "paint-coverage",
+  "kind": "question"
+ },
+ {
+  "term": "drywall screws for",
+  "target": "drywall-fastener-takeoff",
+  "kind": "question"
+ },
+ {
+  "term": "ac tonnage for",
+  "target": "manual-j-cooling",
+  "kind": "question"
  }
  ]
 }

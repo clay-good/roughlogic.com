@@ -1037,6 +1037,7 @@
     {"term":"stump conversion table","target":"hazard-tree-stump-screen","kind":"industry"},
     {"term":"how much mulch do i need","target":"mulch-topsoil-volume","kind":"question"},
     {"term":"mulch for","target":"mulch-topsoil-volume","kind":"question"},
-    {"term":"mulch inches deep","target":"mulch-topsoil-volume","kind":"industry"}
+    {"term":"mulch inches deep","target":"mulch-topsoil-volume","kind":"industry"},
+    {"term":"fertilizer for","target":"npk-blend","kind":"question"}
   ]
 }

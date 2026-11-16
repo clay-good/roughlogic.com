@@ -6,6 +6,9 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Six more everyday questions reach the right calculator.**
+  - A label that is itself a unit word ("CFM", "AWG", "RPM", "Horsepower") now declares that unit, so "duct size for 400 cfm" fills the duct sizer. This is an allowlist: a bare "G" is a gust factor, "Km" a Michaelis constant and "Tons" on cfm-per-ton are refrigeration tons, so none of them is read as a unit.
+  - New curated phrases send these to the right calculator: mortgage payment (PITI), water heater size, gallons of paint (which now answers outright), drywall screws and AC tonnage. Phrases for markup and fertilizer were added too, but "markup 30% on 100 dollars" and "fertilizer for 5000 sq ft lawn" still get no match.
 - **Four more wrong values from everyday questions are gone.** A second batch of 25 typed questions found these:
   - "Concrete block count 40 ft wall 8 ft tall" put the wall, as 480 in, into the mortar joint.
   - "How much weight can a 2x10 span 12 ft" made the span a 144 in tributary width.

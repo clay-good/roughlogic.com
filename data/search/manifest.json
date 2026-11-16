@@ -9,7 +9,7 @@
     {
       "file": "aliases.json",
       "name": "Search aliases master (authoring source; runtime loads the per-group aliases-<letter>.json shards)",
-      "gzip_size_bytes": 338253
+      "gzip_size_bytes": 338379
     },
     {
       "file": "aliases-a.json",
@@ -19,12 +19,12 @@
     {
       "file": "aliases-b.json",
       "name": "Search aliases, group B runtime shard (generated from aliases.json)",
-      "gzip_size_bytes": 24813
+      "gzip_size_bytes": 24829
     },
     {
       "file": "aliases-c.json",
       "name": "Search aliases, group C runtime shard (generated from aliases.json)",
-      "gzip_size_bytes": 35157
+      "gzip_size_bytes": 35172
     },
     {
       "file": "aliases-d.json",
@@ -34,7 +34,7 @@
     {
       "file": "aliases-e.json",
       "name": "Search aliases, group E runtime shard (generated from aliases.json)",
-      "gzip_size_bytes": 88383
+      "gzip_size_bytes": 88422
     },
     {
       "file": "aliases-f.json",
@@ -44,7 +44,7 @@
     {
       "file": "aliases-g.json",
       "name": "Search aliases, group G runtime shard (generated from aliases.json)",
-      "gzip_size_bytes": 19126
+      "gzip_size_bytes": 19138
     },
     {
       "file": "aliases-h.json",
@@ -64,7 +64,7 @@
     {
       "file": "aliases-l.json",
       "name": "Search aliases, group L runtime shard (generated from aliases.json)",
-      "gzip_size_bytes": 14826
+      "gzip_size_bytes": 14844
     },
     {
       "file": "aliases-m.json",
@@ -104,7 +104,7 @@
     {
       "file": "aliases-x.json",
       "name": "Search aliases, group X runtime shard (generated from aliases.json)",
-      "gzip_size_bytes": 7376
+      "gzip_size_bytes": 7379
     },
     {
       "file": "aliases-y.json",
@@ -128,18 +128,18 @@
     }
   ],
   "hashes": {
-    "aliases.json": "cbde39c4745117c972533039fe6bd0d77efa6f7d40d429082c4ce0c38a5d3a49",
+    "aliases.json": "0c5fc8fadbb690b985c4e3aba27dd379dffb139689ed893c397487c5fb9f3d61",
     "aliases-a.json": "f3d88594eaeaf9b9f2556e188a64ee1dcde64aac3accfe9ac545d92737e36a1a",
-    "aliases-b.json": "0f0c07511c50b32beda7184a67a6d70a51f194726c45272a3c27a2c1463af3dc",
-    "aliases-c.json": "7633009c51ec59bf1366eda26f511ddc55edefdaa37af063d004a614c0c0fb64",
+    "aliases-b.json": "34b9f154ad71c719d5db3f341b1a97aa65a8f682353beadd7a179be23a8ddaef",
+    "aliases-c.json": "9ab423d6216ab0025a5fa798216a52a2c1b203a83a8802b64c1aa9d37c033aaf",
     "aliases-d.json": "1d34f4d7356d4b6a722695dfc0b6bb9b4e114de57ca4b2af73e9072ef4a92dff",
-    "aliases-e.json": "0b403d76e3f27cef3c92bff62cac91992d6b3052ca0be214a72c427bb14ff41f",
+    "aliases-e.json": "884b52d88f93f21202cf7fe6a3dbb6e2348952747dbce1b857faf96f8b9af6d3",
     "aliases-f.json": "7005e335a42f1eda305d202405fa5d62125c44dd666bfc2138291393bf5cf984",
-    "aliases-g.json": "fa86bcc6f818a602e63e5beabbcaca537c235ce20a08f2e804fe4f9e4a839c27",
+    "aliases-g.json": "a061c96c9aacdabff569672d832313581a64c5f37776db58aa010d8d09bb836d",
     "aliases-h.json": "524289408a182bcf2c84dc9c2a279946a114495d11410e363cfd891e6844d812",
     "aliases-j.json": "672218f8c645284968b17e1772e24f8769063c069db77dc54a945425f2a1a541",
     "aliases-k.json": "d81594ca423a1851604c6476cc535c54e777c7ef4e8d21b01084743f5be07901",
-    "aliases-l.json": "11423b184e54e0089cfc0276cd40e5393e1660d69288dffc574792275d828003",
+    "aliases-l.json": "067da9d2858d9650ec6d31109e692327e5824b22bf4056f806c2e360ddcb0357",
     "aliases-m.json": "c04051b480100b412e16cee901a44b3bba50301c5137641bd18c82505093df19",
     "aliases-n.json": "f2cb6900bfd85806cd5ad61e150845e0a6850e283e905648b1bccc50f453adab",
     "aliases-o.json": "85fc5cb8b55d531922391400c05b730ca160950d48329bd8d494e5d17761bdf8",
@@ -147,7 +147,7 @@
     "aliases-q.json": "678e2f05311d688c4c399d9c2c87ecdbd2b527516ff1651d96caa8c803c2a7c5",
     "aliases-r.json": "f143d81ce3ecc1cc70e34c90db9b1560a4f0d4091e69823d428e907c90d4c030",
     "aliases-t.json": "256d14d5634b480a398fc845ba626f7dd655f45acd2e9319bb8ad7a72354e869",
-    "aliases-x.json": "a20a2164e2f42ad825179b3699b9bfdea19ddf37d95c927020553816eec44370",
+    "aliases-x.json": "d68ec16441fbb776a5d742fd283acb07f20c2399e09c5348f18c4eacb3b222db",
     "aliases-y.json": "6bf2eea986b00c891486a6f942a3decc3a1e643e684a5b54bf051ecc81d392e5",
     "aliases-z.json": "e4eba5833259df2d7588857f7f346577b26cd8fe057fcc8d2e0a7f3dfbbb8c54",
     "slots.json": "b5135e22912b8822a076389e6c888c10094fe97a3815c4e8919f78f228b3c73e",

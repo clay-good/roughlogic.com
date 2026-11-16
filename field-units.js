@@ -169,9 +169,18 @@ function trailingParen(label) {
 }
 
 // The unit a label declares, canonicalized, or null.
+// A label that IS a unit word, with no parenthesis ("CFM", "AWG", "RPM").
+// An allowlist, because a bare letter or symbol label is usually a variable:
+// "G" is a gust factor, "Km" a Michaelis constant, "a" a coefficient, and
+// "Tons" on cfm-per-ton are refrigeration tons, not 2,000 lb (2026-11-16).
+const WHOLE_LABEL_UNITS = new Set(["awg", "hp", "horsepower", "cfm", "gpm", "rpm", "mph", "hours", "years", "count"]);
+
 export function unitFromLabel(label) {
   const inner = trailingParen(label);
-  if (inner === null) return null;
+  if (inner === null) {
+    const whole = tidy(label);
+    return WHOLE_LABEL_UNITS.has(whole) ? canonicalUnit(whole) : null;
+  }
   // Keep the first delimited segment: "ft, optional" -> "ft".
   const head = inner.split(/[,;]/)[0];
   return canonicalUnit(head);

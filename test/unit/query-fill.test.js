@@ -607,3 +607,13 @@ test("query-fill: hp and volts fill their dropdowns, pitch and counts read as wr
   const r = queryFill("200 ft", [num("dbh_in", "Trunk diameter", "in")]);
   assert.deepEqual(r.converted, ["dbh_in"]);
 });
+
+// 2026-11-16: a label that IS a unit word declares it -- an allowlist, since
+// bare letters are usually variables (G gust factor, Km, a coefficient).
+test("field-units: whole-label units are an allowlist", async () => {
+  const { unitFromLabel } = await import("../../field-units.js");
+  assert.equal(unitFromLabel("CFM"), "cfm");
+  assert.equal(unitFromLabel("AWG"), "awg");
+  assert.equal(unitFromLabel("Horsepower"), "hp");
+  for (const l of ["G", "Km", "a", "Tons", "Area"]) assert.equal(unitFromLabel(l), null, l);
+});
