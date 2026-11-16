@@ -120,7 +120,7 @@
     "realestate/hud-fmr.json": "4fc4a6400f5d3028bd16d3e8c8f63fd6cf14a1a1110e8e962fee83f9b9deef7f",
     "realestate/manifest.json": "3093bfd51988e85fb98e46efd9e5fbe20776e8873a53f9c35fe23e72f348c4cd",
     "fields/manifest.json": "c7dc6a1e65a932444e0d90b9775bbda2885afa5f15f0ea9002959950d6b2add6",
-    "search/manifest.json": "64f3552b3521e60e7e80e172c85e806ea4eadf1e315c40c193a889fb1c913d24",
+    "search/manifest.json": "27f483d9085e7fe2a171036776f595172fb13fb70d3b4337a6eb75d639a8bcae",
     "desc/manifest.json": "b0d6fa46e303bb2d43220e66e81c8657c5164c7a525416deb5d75794c959b2a7",
     "citations/manifest.json": "dcee0651c99ed97beaf74227d1f4aecf83cf4e2aa6924a2f54eafee92532d406"
   }
