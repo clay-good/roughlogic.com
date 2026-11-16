@@ -2888,7 +2888,10 @@ function _v7c_renderRebarSchedule(inputRegion, outputRegion, citationEl) {
     const rows = [{ size: size.select.value, straight_ft: Number(sl.input.value) || 0, bends, pieces: pcs.input.value === "" ? 1 : Number(pcs.input.value) }];
     for (const line of String(more.input.value || "").split("\n")) {
       if (!line.trim()) continue;
-      const [sz, len, bs, n] = line.split(",").map((p) => p.trim());
+      const fields = line.split(",").map((p) => p.trim());
+      // A fifth field is a thousands comma ("1,200" pieces); it was dropped until 2026-11-15.
+      if (fields.length > 4) { oCl.textContent = "Each extra row is size,length_ft,bends,pieces -- write 1200, not 1,200: " + line.trim().slice(0, 40); oW.textContent = "-"; oTotal.textContent = "-"; oBySize.textContent = "-"; return; }
+      const [sz, len, bs, n] = fields;
       rows.push({ size: sz.startsWith("#") ? sz : "#" + sz, straight_ft: Number(len) || 0, bends: (bs || "").split("+").map((b) => b.trim()).filter(Boolean), pieces: n === undefined || n === "" ? 1 : Number(n) });
     }
     const r = computeRebarSchedule({ rows }); stepsFor(outputRegion, inputRegion, ["rows"], r);

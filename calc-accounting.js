@@ -1224,6 +1224,10 @@ function renderMileageRollup(inputRegion, outputRegion, citationEl) {
     // A line whose miles are not a number was dropped without a word until 2026-11-15.
     const tripLines = String(ta.input.value || "").split("\n").map((l) => l.trim()).filter(Boolean);
     const badTrip = tripLines.findIndex((l) => { const m = (l.split(",")[1] || "").trim(); return m === "" || !Number.isFinite(Number(m)); });
+    // A thousands comma ("1,250" miles, "12,345" odometer) split into two fields and read as 1 mile.
+    // Refused since 2026-11-15: a 1-3 digit field followed by an exactly 3-digit one, from the miles on.
+    const grouped = tripLines.findIndex((l) => { const p = l.split(",").map((s) => s.trim()); return p.some((x, i) => i >= 1 && i + 1 < p.length && /^\d{1,3}$/.test(x) && /^\d{3}$/.test(p[i + 1])); });
+    if (grouped >= 0) { while (tableWrap.firstChild) tableWrap.removeChild(tableWrap.firstChild); milesOut.textContent = "Line " + (grouped + 1) + ": write 1250, not 1,250 -- commas separate the fields: " + tripLines[grouped].slice(0, 40); dedOut.textContent = rateOut.textContent = odoOut.textContent = ""; return; }
     if (badTrip >= 0) { while (tableWrap.firstChild) tableWrap.removeChild(tableWrap.firstChild); milesOut.textContent = "Line " + (badTrip + 1) + " needs date,miles,purpose: " + tripLines[badTrip].slice(0, 40); dedOut.textContent = rateOut.textContent = odoOut.textContent = ""; return; }
     const trips = String(ta.input.value || "").split("\n").map((line) => {
       const parts = line.split(",").map((s) => s.trim());
