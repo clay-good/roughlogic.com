@@ -57,6 +57,18 @@
       "tile": "shower-pan-mortar-bed",
       "mustNotBind": { "drain_thickness_in": "12" },
       "why": "A floor-tile count ranked the shower pan first, and the 12 inch TILE filled the mortar bed's thickness at the drain. It now reaches tile-count."
+    },
+    {
+      "query": "how many studs for a 40 ft wall with 2 corners and 2 openings",
+      "tile": "siding-takeoff",
+      "mustNotBind": { "exposure_in": "480" },
+      "why": "The 40 ft wall, converted to 480 in, was the only evidence for the siding tile and became its siding exposure."
+    },
+    {
+      "query": "fence 200 ft with 2 gates",
+      "tile": "tree-protection-zone",
+      "mustNotBind": { "dbh_in": "2400" },
+      "why": "200 ft of fence, converted to 2,400 in, became a tree's trunk diameter on a calculator the question never asked for."
     }
   ]
 }

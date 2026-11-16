@@ -591,3 +591,19 @@ test("query-fill: plan dimensions fill length and width, or a plan area, never a
   assert.equal(queryFill("paint for a 12 by 12 room 8 ft walls", [num("area_ft2", "Area", "ft2")]).filled.area_ft2, undefined);
   assert.equal(queryFill("2 by 4 studs", slab).filled.length_ft, undefined);
 });
+
+// 2026-11-16: a unit names a unitless dropdown's quantity; roof pitch; counts with their noun.
+test("query-fill: hp and volts fill their dropdowns, pitch and counts read as written", () => {
+  const motor = [sel("hp", "Horsepower", ["0.5", "1", "2", "5", "10"]), sel("voltage", "Voltage", ["115", "230", "208", "460"]), sel("phase", "Phase", ["single", "three"])];
+  assert.deepEqual(queryFill("amps for a 5 hp motor 230v single phase", motor).filled, { hp: "5", voltage: "230", phase: "single" });
+  const rafter = [num("horizontal_span_ft", "Horizontal run", "ft"), num("pitch_rise_per_12", "Pitch")];
+  assert.equal(queryFill("rafter 12 ft run 6/12 pitch", rafter).filled.pitch_rise_per_12, "6");
+  const rp = [num("rise", "Rise", "in"), num("run", "Run", "in")];
+  assert.deepEqual(queryFill("roof pitch 4 in 12", rp).filled, { rise: "4", run: "12" });
+  const wall = [num("corners", "Corners", "count"), num("studs_per_corner", "Extra studs per corner"), num("openings", "Door and window openings", "count"), num("studs_per_opening", "Extra studs per opening")];
+  const w = queryFill("2 corners 3 openings", wall).filled;
+  assert.deepEqual([w.corners, w.openings, w.studs_per_corner], ["2", "3", undefined]);
+  // A conversion nobody named is flagged for the door.
+  const r = queryFill("200 ft", [num("dbh_in", "Trunk diameter", "in")]);
+  assert.deepEqual(r.converted, ["dbh_in"]);
+});

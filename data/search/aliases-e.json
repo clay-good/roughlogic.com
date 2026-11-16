@@ -6510,6 +6510,8 @@
     {"term":"tile for a floor","target":"tile-count","kind":"industry"},
     {"term":"bundles of shingles","target":"roofing-squares","kind":"industry"},
     {"term":"tiles for a","target":"tile-count","kind":"question"},
-    {"term":"inch tiles for a floor","target":"tile-count","kind":"question"}
+    {"term":"inch tiles for a floor","target":"tile-count","kind":"question"},
+    {"term":"how many studs","target":"wood-stud-wall-takeoff","kind":"question"},
+    {"term":"studs for a wall with corners and openings","target":"wood-stud-wall-takeoff","kind":"question"}
   ]
 }

@@ -117767,6 +117767,16 @@
   "term": "mulch inches deep",
   "target": "mulch-topsoil-volume",
   "kind": "industry"
+ },
+ {
+  "term": "how many studs",
+  "target": "wood-stud-wall-takeoff",
+  "kind": "question"
+ },
+ {
+  "term": "studs for a wall with corners and openings",
+  "target": "wood-stud-wall-takeoff",
+  "kind": "question"
  }
  ]
 }

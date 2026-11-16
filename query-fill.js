@@ -176,6 +176,13 @@ const TERM_STOPWORDS = new Set([
 // Query shorthand -> the word a label is likely to use. Kept small and
 // trade-specific on purpose; a large synonym table is how a matcher starts
 // guessing.
+// The label words that name what a unit measures, for a dropdown that lists
+// values with no unit of its own ("Horsepower": 0.5, 1, 2, 5 ...).
+const UNIT_QUANTITY_WORDS = {
+  hp: ["horsepower", "hp"], v: ["voltage", "volts", "volt"], a: ["current", "amps", "amperage", "ampacity"],
+  kw: ["kilowatts", "kw"], kva: ["kva"], w: ["watts", "wattage"], awg: ["awg", "gauge"],
+};
+
 // A dimension word written after a length, and the label word it means.
 // "4 inches deep" on a slab is its thickness, so deep and thick name both.
 const POST_WORDS = new Map([["tall", ["height"]], ["high", ["height"]], ["deep", ["depth", "thickness"]], ["wide", ["width"]], ["long", ["length"]], ["thick", ["thickness", "depth"]], ["apart", ["spacing"]]]);
@@ -415,6 +422,31 @@ export function queryFill(query, rows, opts) {
   const filled = {};
   const claimed = new Set();       // quantity indexes already spent
   const unmatched = [];
+  // Fields filled ONLY by unit agreement after a conversion ("40 ft" into an
+  // inch field nobody named). Real fills, but too weak to say on their own
+  // that this is the calculator being asked about; the door reads them so.
+  const converted = new Set();
+
+  // --- Roof pitch: "6/12 pitch", "4 in 12" ----------------------------------
+  // Rise per 12 of run, in the two ways roofers write it. It fills a unitless
+  // Pitch field with the rise, or a Rise and a Run measured in inches with
+  // the rise and 12, and nothing else: read as a fraction it is 0.5, and read
+  // as "4 in" it is a length (2026-11-16: neither rafter nor roof-pitch filled).
+  if (/\b(pitch|roof|rafter|slope)\b/.test(text)) {
+    const pm = text.match(/(^|[^\d.])(\d+(?:\.\d+)?)\s*(?:\/|in|:|-in-)\s*12(?![\d.])/);
+    if (pm) {
+      const rise = Number(pm[2]);
+      const start = pm.index + pm[1].length, end = pm.index + pm[0].length;
+      const inSpan = quantities.map((q, i) => (q.index >= start && q.index < end ? i : -1)).filter((i) => i >= 0);
+      const pitchRow = numberRows.filter((r) => !rowUnit(r) && termsByRow.get(r.d).has("pitch"));
+      const riseRow = numberRows.filter((r) => rowUnit(r) === "in" && termsByRow.get(r.d).has("rise"));
+      const runRow = numberRows.filter((r) => rowUnit(r) === "in" && termsByRow.get(r.d).has("run"));
+      let done = false;
+      if (rise > 0 && rise <= 24 && pitchRow.length === 1) { filled[pitchRow[0].d] = String(rise); done = true; }
+      else if (rise > 0 && rise <= 24 && riseRow.length === 1 && runRow.length === 1) { filled[riseRow[0].d] = String(rise); filled[runRow[0].d] = "12"; done = true; }
+      if (done) for (const i of inSpan) { suppressed.add(i); claimed.add(i); }
+    }
+  }
 
   // --- Plan dimensions: "a 10 by 12 floor", "20x30 slab" --------------------
   // Two bare numbers joined by "by" or "x" are a plan, written in feet, when a
@@ -478,7 +510,24 @@ export function queryFill(query, rows, opts) {
   quantities.forEach((qty, qi) => {
     if (suppressed.has(qi)) return;
     const unit = canonicalUnit(rawUnitOf(qty, text));
-    if (!unit) return;
+    if (!unit) {
+      // A count written with its noun -- "500 bricks", "10 post holes", "4
+      // corners" -- fills the one count field (no unit, or "count") whose
+      // label has that noun (2026-11-16).
+      const raw = rawUnitOf(qty, text);
+      if (!raw || !/^[a-z]{3,}$/.test(raw) || NON_UNIT_WORDS.has(raw)) return;
+      const noun = raw.replace(/(?<=[a-z]{3})s$/, "");
+      let keys = numberRows.filter((r) => (!rowUnit(r) || rowUnit(r) === "count") &&
+        (termsByRow.get(r.d).has(noun) || termsByRow.get(r.d).has(raw))).map((r) => r.d);
+      // "Corners" beside "Extra studs per corner": the label using the word
+      // exactly as typed is the count.
+      if (keys.length > 1) {
+        const literal = keys.filter((k) => String(rows.find((r) => r.d === k).l).toLowerCase().split(/[^a-z]+/).includes(raw));
+        if (literal.length === 1) keys = literal;
+      }
+      if (keys.length === 1 && Number.isInteger(Number(qty.value)) && Number(qty.value) >= 0) backOf.set(qi, { cut: 0, keys, count: true, dimension: false });
+      return;
+    }
     const next = quantities[qi + 1];
     const after = text.slice(qty.end, next ? next.index : text.length);
     let m = after.match(/^\s+of\s+([a-z][a-z -]*)/i);
@@ -513,7 +562,14 @@ export function queryFill(query, rows, opts) {
     prevEnd = qty.end;
     if (suppressed.has(qi)) return;
     if (backOf.has(qi)) {
-      const { keys, square } = backOf.get(qi);
+      const { keys, square, count } = backOf.get(qi);
+      if (count) {
+        if (keys[0] in filled) return;
+        rowsFor.set(qi, keys);
+        if (!proposals.has(keys[0])) proposals.set(keys[0], []);
+        proposals.get(keys[0]).push(qi);
+        return;
+      }
       if (square) {
         if (keys.some((k) => k in filled)) return;
         const vals = keys.map((k) => valueFor(qty, numberRows.find((r) => r.d === k), text, labelWords));
@@ -678,7 +734,7 @@ export function queryFill(query, rows, opts) {
     if ((proposals.get(key) || []).length !== 1) continue; // field wanted twice
     const row = numberRows.find((r) => r.d === key);
     if (!row) continue;                                   // a select won the name
-    const value = valueFor(quantities[qi], row, text, labelWords);
+    const value = backOf.has(qi) && backOf.get(qi).count ? String(quantities[qi].value) : valueFor(quantities[qi], row, text, labelWords);
     if (value === null) continue;
     filled[key] = value;
     claimed.add(qi);
@@ -728,6 +784,20 @@ export function queryFill(query, rows, opts) {
       // size in inches is a length among lengths and the case this phase was
       // written for still fills. wire-ampacity measures amps, degrees and
       // counts, and a distance in feet belongs to none of them.
+      // A dropdown whose own label names the unit's quantity -- "Horsepower"
+      // for 5 hp, "Voltage" for 230 v -- is corroborated by the unit itself,
+      // though no field on the tile declares one: motor-fla read "a 5 hp motor
+      // 230v single phase" as phase only until 2026-11-16.
+      const unitWords = UNIT_QUANTITY_WORDS[qtyUnit];
+      if (unitWords) {
+        const named = numericSelects.filter((r) => !(r.d in filled) && [...termsByRow.get(r.d)].some((t) => unitWords.includes(t)) &&
+          r.o.filter((o) => Number(o) === Number(qty.value)).length === 1);
+        if (named.length === 1) {
+          filled[named[0].d] = String(named[0].o.find((o) => Number(o) === Number(qty.value)));
+          claimed.add(qi);
+          return;
+        }
+      }
       if (!rows.some((r) => rowUnit(r) && unitsCompatible(qtyUnit, rowUnit(r)))) return;
       const takers = [];
       for (const row of numericSelects) {
@@ -763,6 +833,7 @@ export function queryFill(query, rows, opts) {
     const value = valueFor(qty, candidates[0], text, labelWords);
     if (value === null) return;
     filled[candidates[0].d] = value;
+    if (rowUnit(candidates[0]) !== qtyUnit) converted.add(candidates[0].d);
     claimed.add(qi);
   });
 
@@ -891,6 +962,7 @@ export function queryFill(query, rows, opts) {
 
   return {
     filled,
+    converted: [...converted].filter((k) => k in filled),
     // Declaration order, so spec-v1342 can ask for the first one. NOTE this is
     // "unfilled", not "required" -- the registry carries no required flag and
     // spec-v1342 derives the real thing.

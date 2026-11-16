@@ -1697,8 +1697,13 @@ export async function answerQuery({ query } = {}) {
   const { queryFill } = await import(new URL("../query-fill.js", import.meta.url).href);
   // The tile's own name goes in so the words the agent used to NAME the
   // calculator are not mistaken for the names of its fields.
-  const { filled } = rows.length ? queryFill(q, rows, { name: top.name }) : { filled: {} };
+  const { filled, converted = [] } = rows.length ? queryFill(q, rows, { name: top.name }) : { filled: {} };
   const recovered = Object.keys(filled);
+  // A fill that is only a unit conversion nobody named does not corroborate
+  // the route: "how many studs for a 40 ft wall..." reached siding-takeoff on
+  // its 40 ft turned into a 480 in exposure, and "fence 200 ft with 2 gates"
+  // reached tree-protection-zone with a 2,400 in trunk (2026-11-16).
+  const corroborating = recovered.filter((k) => !converted.includes(k));
 
   // Corroboration, in any of three forms: the question carried values, it names
   // the calculator, or the catalog's own alias corpus maps it to this one.
@@ -1710,7 +1715,7 @@ export async function answerQuery({ query } = {}) {
   // not tokenise into "Backflow Assembly Sizing Screen", and is nobody's
   // curated phrase, so a correctly identified tile came back NO_MATCH.
   if (!literalId && !soleAliasTarget
-      && !recovered.length && !queryNamesTile(q, top.name) && !queryIsCuratedAliasFor(q, top.id, aliases)) {
+      && !corroborating.length && !queryNamesTile(q, top.name) && !queryIsCuratedAliasFor(q, top.id, aliases)) {
     return { status: "NO_MATCH", query: q, message: "No calculator matched." };
   }
   // 20 tiles have no inputs at all: OSHA Top-10, the knot and hand-signal
