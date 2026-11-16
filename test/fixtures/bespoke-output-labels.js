@@ -1040,7 +1040,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "weld-travel-speed": {"travel_speed_ipm":"Travel speed (at or above)","note":"Note"},
   "welder-arc-circuit-conductor": {"effective_current_a":"Effective current (size conductor to)","ocpd_max_a":"Max overcurrent device"},
   "welder-resistance-circuit-conductor": {"conductor_current_a":"Conductor current (size to)","ocpd_max_a":"Max overcurrent device"},
-  "well-drawdown": {"drawdown_ft":"Drawdown","specific_capacity_gpm_ft":"Specific capacity","pump_setting_ft":"Recommended pump setting","transmissivity_gpd_ft":"Transmissivity (Cooper-Jacob)","warnings":"Notes"},
+  "well-drawdown": {"drawdown_ft":"Drawdown","specific_capacity_gpm_ft":"Specific capacity","pump_setting_ft":"Recommended pump setting","transmissivity_gpd_ft":"Transmissivity (Cooper-Jacob)","storativity":"Aquifer test (storativity / hydraulic conductivity)","warnings":"Notes"},
   "well-max-yield": {"max_yield_gpm":"Max sustainable yield","note":"Note"},
   "wet-bulb-psychrometer": {"RH_percent":"Relative humidity","dew_point_F":"Dew point","GPP":"GPP"},
   "wh-expansion-tank": {"v_expansion_gal":"Expansion volume","v_tank_gal":"Required tank volume","recommended_gal":"Recommended standard tank","pre_charge_psi":"Pre-charge pressure","warnings":"Notes"},

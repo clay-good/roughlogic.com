@@ -1215,7 +1215,12 @@ function _v16w_renderWellDrawdown(inputRegion, outputRegion, citationEl) {
   // v23 EN.17: Cooper-Jacob transmissivity (ds per log cycle) + recovery level.
   const ds = makeNumber("Drawdown per log cycle (ft, optional)", "wd-ds", { step: "any", min: "0" });
   const rec = makeNumber("Recovery water level (ft, optional)", "wd-rec", { step: "any" });
-  for (const f of [stat, pump, q, offset, ds, rec]) inputRegion.appendChild(f.wrap);
+  // spec-v1737 folded storativity and hydraulic conductivity into this compute, but the
+  // page never asked for their inputs or showed them (until 2026-11-15).
+  const robs = makeNumber("Observation well distance (ft, optional; storativity)", "wd-robs", { step: "any", min: "0" });
+  const t0 = makeNumber("Zero-drawdown intercept time t0 (min, optional; storativity)", "wd-t0", { step: "any", min: "0" });
+  const bth = makeNumber("Aquifer thickness (ft, optional; hydraulic conductivity)", "wd-b", { step: "any", min: "0" });
+  for (const f of [stat, pump, q, offset, ds, rec, robs, t0, bth]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => {
     stat.input.value = "50"; pump.input.value = "80"; q.input.value = "30"; offset.input.value = "20"; ds.input.value = "5"; rec.input.value = "55"; update();
   });
@@ -1224,6 +1229,7 @@ function _v16w_renderWellDrawdown(inputRegion, outputRegion, citationEl) {
   const oSc = makeOutputLine(outputRegion, "Specific capacity", "wd-out-sc");
   const oSet = makeOutputLine(outputRegion, "Recommended pump setting", "wd-out-set");
   const oT = makeOutputLine(outputRegion, "Transmissivity (Cooper-Jacob)", "wd-out-t");
+  const oAq = makeOutputLine(outputRegion, "Aquifer test (storativity / hydraulic conductivity)", "wd-out-aq");
   const oNote = makeOutputLine(outputRegion, "Notes", "wd-out-note");
 
   const update = debounce(() => {
@@ -1234,15 +1240,20 @@ function _v16w_renderWellDrawdown(inputRegion, outputRegion, citationEl) {
       pump_offset_ft: _v16w_readNum(offset.input),
       delta_s_per_log_ft: _v16w_readNum(ds.input),
       recovery_level_ft: _v16w_readNum(rec.input),
-    }); stepsFor(outputRegion, inputRegion, ["static_level_ft", "pumping_level_ft", "discharge_gpm", "pump_offset_ft", "delta_s_per_log_ft", "recovery_level_ft"], r);
-    if (r.error) { oDraw.textContent = r.error; oSc.textContent = "-"; oSet.textContent = "-"; oT.textContent = "-"; oNote.textContent = ""; return; }
+      observation_distance_ft: _v16w_readNum(robs.input),
+      intercept_time_min: _v16w_readNum(t0.input),
+      aquifer_thickness_ft: _v16w_readNum(bth.input),
+    }); stepsFor(outputRegion, inputRegion, ["static_level_ft", "pumping_level_ft", "discharge_gpm", "pump_offset_ft", "delta_s_per_log_ft", "recovery_level_ft", "observation_distance_ft", "intercept_time_min", "aquifer_thickness_ft"], r);
+    if (r.error) { oDraw.textContent = r.error; oSc.textContent = "-"; oSet.textContent = "-"; oT.textContent = "-"; oAq.textContent = "-"; oNote.textContent = ""; return; }
     oDraw.textContent = fmt(r.drawdown_ft, 1) + " ft" + (r.residual_drawdown_ft == null ? "" : " (residual " + fmt(r.residual_drawdown_ft, 1) + " ft)");
     oSc.textContent = fmt(r.specific_capacity_gpm_ft, 2) + " GPM per ft of drawdown";
     oSet.textContent = fmt(r.pump_setting_ft, 0) + " ft below ground";
     oT.textContent = r.transmissivity_gpd_ft == null ? "(enter drawdown per log cycle)" : fmt(r.transmissivity_gpd_ft, 0) + " gpd/ft (T = 264 Q / ds)";
+    oAq.textContent = (r.storativity == null ? "S: enter an observation well distance and t0 (not meaningful from the pumping well)" : "S = " + r.storativity.toExponential(2) + " (S = 0.3 T t0 / r^2)")
+      + "; " + (r.hydraulic_conductivity_gpd_ft2 == null ? "K: enter the aquifer thickness" : "K = " + fmt(r.hydraulic_conductivity_gpd_ft2, 1) + " gpd/ft^2 (T / b)");
     oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Specific capacity within the typical range; re-test periodically for trend.";
   }, DEBOUNCE_MS);
-  for (const el of [stat.input, pump.input, q.input, offset.input, ds.input, rec.input]) el.addEventListener("input", update);
+  for (const el of [stat.input, pump.input, q.input, offset.input, ds.input, rec.input, robs.input, t0.input, bth.input]) el.addEventListener("input", update);
 }
 WATER_RENDERERS["well-drawdown"] = _v16w_renderWellDrawdown;
 
