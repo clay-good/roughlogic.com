@@ -551,16 +551,21 @@ export function renderStaticPressurePiping(inputRegion, outputRegion, citationEl
   const elev = makeNumber("Elevation change (ft)", "sp-e", { step: "any" });
   const fric = makeNumber("Friction loss (psi)", "sp-f", { step: "any", min: "0", value: "0" });
   fric.input.value = "0";
-  for (const f of [elev, fric]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { elev.input.value = "30"; fric.input.value = "5"; update(); });
+  // The compute took a fluid density; the page assumed water until 2026-11-15. A 50%
+  // glycol loop is about 5-7% denser, and so is its static head.
+  const rho = makeNumber("Fluid density (lb/ft³; 62.4 water, about 65-67 for 50% glycol)", "sp-rho", { step: "any", min: "0", value: "62.4" });
+  rho.input.value = "62.4";
+  for (const f of [elev, fric, rho]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { elev.input.value = "30"; fric.input.value = "5"; rho.input.value = "62.4"; update(); });
   const oE = makeOutputLine(outputRegion, "Elevation loss", "sp-out-e");
   const oT = makeOutputLine(outputRegion, "Total", "sp-out-t");
   const update = debounce(() => {
-    const r = computeStaticPressureLossPiping({ elevation_change_ft: Number(elev.input.value) || 0, friction_loss_psi: Number(fric.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["elevation_change_ft", "friction_loss_psi"], r);
+    const r = computeStaticPressureLossPiping({ elevation_change_ft: Number(elev.input.value) || 0, friction_loss_psi: Number(fric.input.value) || 0, fluid_density_lb_ft3: rho.input.value === "" ? undefined : Number(rho.input.value) }); stepsFor(outputRegion, inputRegion, ["elevation_change_ft", "friction_loss_psi", "fluid_density_lb_ft3"], r);
+    if (r.error) { oE.textContent = r.error; oT.textContent = "-"; return; }
     oE.textContent = fmt(r.elevation_loss_psi, 2) + " psi";
     oT.textContent = fmt(r.total_psi, 2) + " psi";
   }, DEBOUNCE_MS);
-  for (const el of [elev.input, fric.input]) el.addEventListener("input", update);
+  for (const el of [elev.input, fric.input, rho.input]) el.addEventListener("input", update);
 }
 
 // renderGasPipeSizing -> relocated to calc-gas.js (spec-v42 split)

@@ -887,7 +887,7 @@ export const BESPOKE_LABELS = {
   "standing-water": {"area_ft2":"Affected area (ft²)","depth_in":"Standing depth (in)"},
   "standpipe-friction": {"riser_height_ft":"Riser height (ft)","outlet_count":"Outlet count","gpm_per_outlet":"GPM per outlet","outlet_length_ft":"Outlet hose length (ft)","hose_diameter":"Outlet hose diameter"},
   "standpipe-pdp": {"standpipe_class":"Standpipe class","highest_outlet_elevation_ft":"Highest outlet above pumper (ft)","nozzle_pressure_psi":"Required nozzle pressure (psi; blank = 100 Class I/III, 65 Class II)","design_gpm":"Design flow (GPM)","appliance_loss_psi":"Appliance loss (psi)","supply_hose_length_ft":"Supply hose length (ft)","supply_hose_diameter":"Supply hose diameter","building_height_ft":"Building height (ft)"},
-  "static-pressure-piping": {"elevation_change_ft":"Elevation change (ft)","friction_loss_psi":"Friction loss (psi)"},
+  "static-pressure-piping": {"elevation_change_ft":"Elevation change (ft)","friction_loss_psi":"Friction loss (psi)","fluid_density_lb_ft3":"Fluid density (lb/ft³; 62.4 water, about 65-67 for 50% glycol)"},
   "statistics-quickread": {"values":"Numbers (comma or whitespace separated)"},
   "steam-boiler-blowdown": {"steam_rate_lb_hr":"Steam rate (lb/hr)","feedwater_tds_ppm":"Feedwater TDS (ppm)","max_boiler_tds_ppm":"Max boiler-water TDS (ppm)"},
   "steam-pipe-capacity": {"nps":"Existing Sch 40 size (in)","spec_vol_ft3lb":"Steam specific volume at pressure (ft3/lb)","vel_ceiling_fpm":"Allowable velocity (ft/min)","steam_basis":"Steam specific volume","steam_pressure_psig":"Steam pressure (psig, when computing the volume)"},
