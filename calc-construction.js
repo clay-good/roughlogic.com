@@ -1050,9 +1050,14 @@ export const MASONRY_UNIT_FACE_IN = {
   cmu_8x16x16: { w: 15.625, h: 15.625 },
 };
 
-// dims: in { wall_area_ft2: L^2, unit_type: dimensionless, mortar_joint_in: L, waste_factor: dimensionless } out: { unit_count: dimensionless, base_count: dimensionless, face_ft2: L^2 }
-export function computeMasonryCount({ wall_area_ft2, unit_type, mortar_joint_in = 0.375, waste_factor = 0.05 }) {
+// dims: in { wall_area_ft2: L^2, unit_type: dimensionless, mortar_joint_in: L, waste_factor: dimensionless, waste_pct: dimensionless } out: { unit_count: dimensionless, base_count: dimensionless, face_ft2: L^2 }
+export function computeMasonryCount({ wall_area_ft2, unit_type, mortar_joint_in = 0.375, waste_factor = 0.05, waste_pct = null }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page's waste box is a percent (2026-11-15), the same split as tile count.
+  if (waste_pct !== null && waste_pct !== undefined && waste_pct !== "") {
+    if (!(Number(waste_pct) >= 0)) return { error: "Waste allowance must be a percent, zero or more." };
+    waste_factor = Number(waste_pct) / 100;
+  }
   if (!(Number(mortar_joint_in) >= 0) || !(Number(waste_factor) >= 0)) return { error: "Mortar joint and waste factor must be numbers, zero or more." };
   if ([waste_factor].some((x) => Number(x) < 0)) return { error: "Waste factor cannot be negative." };
   const a = Number(wall_area_ft2) || 0;
@@ -1426,21 +1431,26 @@ export function renderMasonryCount(inputRegion, outputRegion, citationEl) {
   const u = makeSelect("Unit type", "mc-u", Object.keys(MASONRY_UNIT_FACE_IN).map((k) => ({ value: k, label: k.replace(/_/g, " ") })));
   const m = makeNumber("Mortar joint (in)", "mc-m", { step: "any", min: "0", value: "0.375" });
   m.input.value = "0.375";
-  for (const f of [a, u, m]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { a.input.value = "100"; u.select.value = "cmu_8x8x16"; m.input.value = "0.375"; update(); });
-  const oC = makeOutputLine(outputRegion, "Unit count (with 5% waste)", "mc-out-c");
+  // The compute took a waste factor; the page fixed 5% until 2026-11-15.
+  const wf = makeNumber("Waste allowance (%; 5 typical, more for cut-heavy walls)", "mc-wf", { step: "any", min: "0", value: "5" });
+  wf.input.value = "5";
+  for (const f of [a, u, m, wf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { a.input.value = "100"; u.select.value = "cmu_8x8x16"; m.input.value = "0.375"; wf.input.value = "5"; update(); });
+  const oC = makeOutputLine(outputRegion, "Unit count (with waste)", "mc-out-c");
   const oF = makeOutputLine(outputRegion, "Face area per unit", "mc-out-f");
   const update = debounce(() => {
     const r = computeMasonryCount({
       wall_area_ft2: Number(a.input.value) || 0,
       unit_type: u.select.value,
       mortar_joint_in: Number(m.input.value) || 0,
-    }); stepsFor(outputRegion, inputRegion, ["wall_area_ft2", "unit_type", "mortar_joint_in"], r);
+      waste_pct: wf.input.value === "" ? undefined : Number(wf.input.value),
+    }); stepsFor(outputRegion, inputRegion, ["wall_area_ft2", "unit_type", "mortar_joint_in", "waste_pct"], r);
     if (r.error) { oC.textContent = r.error; oF.textContent = "-"; return; }
     oC.textContent = String(r.unit_count);
+    oC.textContent += " (" + fmt((wf.input.value === "" ? 5 : Number(wf.input.value)), 0) + "% waste)";
     oF.textContent = fmt(r.face_ft2, 3) + " ft^2";
   }, DEBOUNCE_MS);
-  for (const el of [a.input, u.select, m.input]) el.addEventListener("input", update);
+  for (const el of [a.input, u.select, m.input, wf.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }

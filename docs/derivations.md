@@ -1725,7 +1725,7 @@ cross-check.
 | calc-construction.js | `computeLayoutSquaring` | `{ mode, side_a, side_b, diag1, diag2, tolerance = 0, sym_left = 0, sym_right ...` | _ | _ | _ |
 | calc-construction.js | `computeLumberSpan` | `{ species_grade, nominal_size, total_load_psf, tributary_width_in = 16, defle...` | _ | _ | _ |
 | calc-construction.js | `computeMasonryControlJointLayout` | `{ wall_length_ft = 80, wall_height_ft = 16, max_spacing_cap_ft = 25 } = {}` | _ | _ | _ |
-| calc-construction.js | `computeMasonryCount` | `{ wall_area_ft2, unit_type, mortar_joint_in = 0.375, waste_factor = 0.05 }` | _ | _ | _ |
+| calc-construction.js | `computeMasonryCount` | `{ wall_area_ft2, unit_type, mortar_joint_in = 0.375, waste_factor = 0.05, was...` | _ | _ | _ |
 | calc-construction.js | `computeMasonryCoursing` | `{ target_in = 0, unit_in = 7.625, joint_in = 0.375 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeMassConcreteTempRise` | `{ cementitious_lb_per_cy = 600, rise_f_per_100lb = 12, placing_temp_f = 70, d...` | _ | _ | _ |
 | calc-construction.js | `computeMaterialQuantity` | `{ assembly, area_ft2 }` | _ | _ | _ |

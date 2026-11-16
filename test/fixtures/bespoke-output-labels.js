@@ -535,7 +535,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "manure-storage-volume": {"manure_volume_ft3":"Manure + wastewater + bedding volume","precip_storm_ft3":"Precipitation + 25-yr storm volume","freeboard_ft3":"Freeboard volume","total_ft3":"Total required storage","note":"Note"},
   "markup": {"selling_price":"Selling price","markup_percent":"Markup","margin_percent":"Margin","profit":"Profit"},
   "markup-vs-margin": {"profit_per_unit":"Gross profit"},
-  "masonry-count": {"unit_count":"Unit count (with 5% waste)","face_ft2":"Face area per unit"},
+  "masonry-count": {"unit_count":"Unit count (with waste)","face_ft2":"Face area per unit"},
   "mass-moles": {"mass_g":"Result"},
   "master-stream": {"typical_reach_ft":"Typical reach","reaction_lb":"Nozzle reaction (smooth bore)"},
   "material-cost": {"subtotal":"Subtotal","tax":"Tax","total":"Total"},

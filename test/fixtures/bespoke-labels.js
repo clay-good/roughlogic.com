@@ -531,7 +531,7 @@ export const BESPOKE_LABELS = {
   "manure-storage-volume": {"daily_manure_ft3":"Daily manure (ft3/day = head x rate)","wastewater_ft3":"Added wastewater (ft3/day, 0 if none)","bedding_ft3":"Added bedding (ft3/day, 0 if none)","storage_days":"Storage period (days; under 120 flagged short)","surface_area_ft2":"Surface area (ft2; for a roofed store keep it and zero the rain)","net_precip_in":"Net precipitation over period (in)","storm_in":"25-yr 24-hr storm depth (in)","freeboard_in":"Freeboard (in: 6 vertical wall / 12 other)"},
   "markup": {"cost":"Cost ($)","mode":"Mode","value":"Value"},
   "markup-vs-margin": {"cost":"Cost ($)","price":"Selling price ($)","markup_pct":"Markup %","margin_pct":"Gross margin %","units":"Unit count (optional)"},
-  "masonry-count": {"wall_area_ft2":"Wall area (ft²)","unit_type":"Unit type","mortar_joint_in":"Mortar joint (in)"},
+  "masonry-count": {"wall_area_ft2":"Wall area (ft²)","unit_type":"Unit type","mortar_joint_in":"Mortar joint (in)","waste_pct":"Waste allowance (%; 5 typical, more for cut-heavy walls)"},
   "mass-moles": {"mass_g":"Mass (g, leave 0 to solve)","moles":"Moles (leave 0 to solve)","molecular_weight":"Molecular weight (g/mol)"},
   "master-stream": {"nozzle_type":"Nozzle type","nozzle_pressure_psi":"Nozzle pressure (psi)"},
   "material-cost": {"unit_price":"Unit price ($)","quantity":"Quantity","tax_rate_percent":"Tax rate (percent)","delivery_fee":"Delivery fee ($)"},
