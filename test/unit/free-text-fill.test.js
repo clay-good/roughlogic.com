@@ -41,7 +41,10 @@ import { measureFreeTextFill } from "../../scripts/measure-free-text-fill.mjs";
 //        invented inch beats a real one, so the 20 took Slab thickness and the
 //        four inches went unused. Bounded to 12, the largest nominal
 //        dimension lumber is sold in.
-const CEILING = 2;
+//   1 -- 2026-11-15, after a calculator-name word beside a value stopped being
+//        struck from the question (it now discounts only the name's own
+//        occurrences, in the window where the name is written).
+const CEILING = 1;
 
 test("free-text extraction does not get worse", async () => {
   const { rows, violations } = await measureFreeTextFill();
