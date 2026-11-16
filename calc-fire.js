@@ -392,6 +392,7 @@ export function renderPDP(inputRegion, outputRegion, citationEl) {
       elevation_ft: Number(E.input.value) || 0,
       appliance_loss_psi: Number(A.input.value) || 0,
     }); stepsFor(outputRegion, inputRegion, ["nozzle_pressure_psi", "friction_loss_psi", "elevation_ft", "appliance_loss_psi"], r);
+    if (r.error) { oP.textContent = r.error; oE.textContent = "-"; return; }
     oP.textContent = fmt(r.pdp_psi, 1) + " psi";
     oE.textContent = fmt(r.elevation_psi, 1) + " psi";
   }, DEBOUNCE_MS);
@@ -414,6 +415,7 @@ export function renderHydrantFlow(inputRegion, outputRegion, citationEl) {
   const oNR = makeOutputLine(outputRegion, "Nozzle reaction (smooth bore)", "hf-out-nr");
   const update = debounce(() => {
     const r = computeHydrantFlow({ pitot_psi: Number(P.input.value) || 0, outlet_diameter_in: Number(d.input.value) || 0, c: c.input.value === "" ? 0.9 : Number(c.input.value) }); stepsFor(outputRegion, inputRegion, ["pitot_psi", "outlet_diameter_in", "c"], r);
+    if (r.error) { oQ.textContent = r.error; oNR.textContent = "-"; return; }
     oQ.textContent = fmt(r.flow_gpm, 0) + " gpm";
     oNR.textContent = r.reaction_lb === null ? "-" : fmt(r.reaction_lb, 1) + " lb (NR = 1.57 d^2 NP)";
   }, DEBOUNCE_MS);
@@ -490,6 +492,7 @@ export function renderAerialLadder(inputRegion, outputRegion, citationEl) {
   const oV = makeOutputLine(outputRegion, "Vertical reach", "al-out-v");
   const update = debounce(() => {
     const r = computeAerialLadderReach({ angle_deg: Number(a.input.value) || 0, extension_ft: Number(L.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["angle_deg", "extension_ft"], r);
+    if (r.error) { oH.textContent = r.error; oV.textContent = "-"; return; }
     oH.textContent = fmt(r.horizontal_reach_ft, 1) + " ft";
     oV.textContent = fmt(r.vertical_reach_ft, 1) + " ft";
   }, DEBOUNCE_MS);
@@ -520,6 +523,7 @@ export function renderFoam(inputRegion, outputRegion, citationEl) {
       foam_percentage: Number(pct.input.value) || 0,
       duration_min: Number(dur.input.value) || 0,
     }); stepsFor(outputRegion, inputRegion, ["fire_area_ft2", "application_rate_gpm_per_ft2", "foam_percentage", "duration_min"], x);
+    if (x.error) { oS.textContent = x.error; oC.textContent = "-"; oT.textContent = "-"; return; }
     oS.textContent = fmt(x.total_solution_gpm, 1) + " gpm";
     oC.textContent = fmt(x.concentrate_gpm, 2) + " gpm concentrate";
     oT.textContent = fmt(x.total_concentrate_gallons, 1) + " gal";

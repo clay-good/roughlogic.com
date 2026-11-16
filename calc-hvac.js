@@ -1357,6 +1357,7 @@ export function renderStaticPressureHvac(inputRegion, outputRegion, citationEl) 
   const update = debounce(() => {
     const list = elements.map((e) => ({ name: e.label, dp_in_wc: Number(inputs[e.id].value) || 0 }));
     const r = computeStaticPressureHvac({ elements: list }); stepsFor(outputRegion, inputRegion, ["elements"], r);
+    if (r.error) { oT.textContent = r.error;  return; }
     oT.textContent = fmt(r.total_in_wc, 3) + " in w.c.";
   }, DEBOUNCE_MS);
   for (const el of Object.values(inputs)) el.addEventListener("input", update);
@@ -1463,6 +1464,7 @@ export function renderCombustionAir(inputRegion, outputRegion, citationEl) {
   const oIn = makeOutputLine(outputRegion, "Indoor opening", "ca-out-in");
   const update = debounce(() => {
     const r = computeCombustionAir({ btu_input: Number(btu.input.value) || 0, room_volume_ft3: Number(vol.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["btu_input", "room_volume_ft3"], r);
+    if (r.error) { oReq.textContent = r.error; oAd.textContent = "-"; oOut.textContent = "-"; oIn.textContent = "-"; return; }
     oReq.textContent = fmt(r.required_volume_ft3, 0) + " ft^3";
     oAd.textContent = r.adequate_by_volume ? "Yes" : "No (combustion air opening required)";
     oOut.textContent = fmt(r.opening_outdoor_in2, 1) + " in^2";

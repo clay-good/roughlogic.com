@@ -539,6 +539,7 @@ export function renderPumpSizing(inputRegion, outputRegion, citationEl) {
   const oS = makeOutputLine(outputRegion, "Shaft hp", "pm-out-s");
   const update = debounce(() => {
     const r = computePumpSize({ flow_gpm: Number(flow.input.value) || 0, total_dynamic_head_ft: Number(tdh.input.value) || 0, efficiency: eff.input.value === "" ? 0.65 : Number(eff.input.value) }); stepsFor(outputRegion, inputRegion, ["flow_gpm", "total_dynamic_head_ft", "efficiency"], r);
+    if (r.error) { oH.textContent = r.error; oS.textContent = "-"; return; }
     oH.textContent = fmt(r.hydraulic_hp, 2);
     oS.textContent = r.shaft_hp === null ? "-" : fmt(r.shaft_hp, 2);
   }, DEBOUNCE_MS);

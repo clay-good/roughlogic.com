@@ -504,6 +504,7 @@ export function renderTimeAndMaterials(inputRegion, outputRegion, citationEl) {
       overhead_percent: Number(o.input.value) || 0,
       profit_percent: Number(pr.input.value) || 0,
     }); stepsFor(outputRegion, inputRegion, ["hours", "labor_rate_per_hour", "material_cost", "overhead_percent", "profit_percent"], x);
+    if (x.error) { oL.textContent = x.error; oM.textContent = "-"; oOv.textContent = "-"; oP.textContent = "-"; oT.textContent = "-"; return; }
     oL.textContent = "$" + fmt(x.labor, 2);
     oM.textContent = "$" + fmt(x.material_cost, 2);
     oOv.textContent = "$" + fmt(x.overhead, 2);

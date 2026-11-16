@@ -399,6 +399,7 @@ export function renderDehumidifier(inputRegion, outputRegion, citationEl) {
   const oG = makeOutputLine(outputRegion, "Operational guidance", "dh-out-g");
   const update = debounce(() => {
     const r = computeDehumidifierSize({ room_cubic_feet: Number(v.input.value) || 0, water_class: c.select.value }); stepsFor(outputRegion, inputRegion, ["room_cubic_feet", "water_class"], r);
+    if (r.error) { oA.textContent = r.error; oF.textContent = "-"; oG.textContent = "-"; return; }
     oA.textContent = fmt(r.aham_pints_per_day, 1);
     oF.textContent = fmt(r.field_pints_per_day, 1);
     oG.textContent = r.operational_guidance ?? "-";
@@ -491,6 +492,7 @@ export function renderMold(inputRegion, outputRegion, citationEl) {
   const oR = makeOutputLine(outputRegion, "Risk", "mr-out");
   const update = debounce(() => {
     const r = computeMoldRisk({ rh_percent: Number(rh.input.value) || 0, temperature_F: Number(T.input.value) || 0, hours_elevated: Number(h.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["rh_percent", "temperature_F", "hours_elevated"], r);
+    if (r.error) { oR.textContent = r.error;  return; }
     oR.textContent = r.risk;
   }, DEBOUNCE_MS);
   for (const el of [rh.input, T.input, h.input]) el.addEventListener("input", update);

@@ -546,6 +546,7 @@ export function renderRafter(inputRegion, outputRegion, citationEl) {
       pitch_rise_per_12: Number(pitch.input.value) || 0,
       overhang_ft: Number(overhang.input.value) || 0,
     }); stepsFor(outputRegion, inputRegion, ["horizontal_span_ft", "pitch_rise_per_12", "overhang_ft"], r);
+    if (r.error) { oR.textContent = r.error; oM.textContent = "-"; return; }
     oR.textContent = fmt(r.rafter_length_ft, 3) + " ft";
     oM.textContent = fmt(r.multiplier, 4);
   }, DEBOUNCE_MS);
@@ -602,6 +603,7 @@ export function renderBoardFootage(inputRegion, outputRegion, citationEl) {
   const oT = makeOutputLine(outputRegion, "Total", "bf-out-t");
   const update = debounce(() => {
     const r = computeBoardFootage({ thickness_in: Number(t.input.value) || 0, width_in: Number(w.input.value) || 0, length_ft: Number(l.input.value) || 0, count: c.input.value === "" ? 1 : Number(c.input.value) }); stepsFor(outputRegion, inputRegion, ["thickness_in", "width_in", "length_ft", "count"], r);
+    if (r.error) { oE.textContent = r.error; oT.textContent = "-"; return; }
     oE.textContent = fmt(r.board_feet_each, 2) + " bf";
     oT.textContent = fmt(r.total_board_feet, 2) + " bf";
   }, DEBOUNCE_MS);

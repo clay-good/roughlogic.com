@@ -32,7 +32,7 @@ for (const r of ROWS) if (!first.has(r.tile_id)) first.set(r.tile_id, r);
 // At the precision a reader can see, as check-example-parity compares inputs:
 // the button types 66.82 where the fixture carries 66.8235.
 const close = (a, b) => a === b || Math.abs(a - b) <= Math.max(Math.abs(b) * 0.001, 1e-12);
-const report = { compared: 0, mismatches: {}, outOfRange: [], droppedLines: [], blankDefault: [] };
+const report = { compared: 0, mismatches: {}, outOfRange: [], droppedLines: [], blankDefault: [], silentErrors: [] };
 for (const { id } of TOOLS) {
   const reg = RENDERER_MAP[id], creg = COMPUTE_MAP[id], row0 = first.get(id);
   if (!reg || !creg || !row0) continue;
@@ -58,6 +58,27 @@ for (const { id } of TOOLS) {
     const argsAfter = (el, v) => { lastArgs.delete(creg.fn); el.value = v; fire(el); return lastArgs.get(creg.fn); };
     // A list box must not drop a line it cannot read: the answer would look complete
     // with a row the reader typed missing (mileage, PCR, ANOVA until 2026-11-15).
+    // A compute error must reach the page: 15 renderers had no r.error branch and printed
+    // dashes (one printed "undefined") with no reason until 2026-11-15.
+    {
+      let found = false;
+      for (const el of inputs.querySelectorAll("input")) {
+        if (el.type !== "number" || found) continue;
+        const v0e = el.value;
+        for (const bad of ["-1", "-1000", "0"]) {
+          last.delete(creg.fn); el.value = bad; fire(el);
+          const r = last.get(creg.fn);
+          if (r && r.error) {
+            found = true;
+            const t = outputs.textContent;
+            const words = r.error.replace(/[^A-Za-z ]/g, " ").split(/\s+/).filter((w) => w.length > 4).slice(0, 4);
+            if (!words.length || !words.some((w) => t.includes(w))) report.silentErrors.push(id + " (" + el.id + "=" + bad + "): " + r.error.slice(0, 70));
+            break;
+          }
+        }
+        el.value = v0e; fire(el);
+      }
+    }
     const outText = () => outputs.querySelectorAll("span").filter((x) => x.classList.contains("out-value")).map((x) => x.textContent).join(" | ");
     for (const ta of inputs.querySelectorAll("textarea")) {
       const t0 = ta.value; if (!t0.trim()) continue;

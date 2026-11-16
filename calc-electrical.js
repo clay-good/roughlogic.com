@@ -709,6 +709,7 @@ export function renderVoltageDrop(inputRegion, outputRegion, citationEl, params)
       current_A: Number(cur.input.value) || 0,
       source_voltage_V: Number(src.input.value) || 0,
     }); stepsFor(outputRegion, inputRegion, ["phase", "material", "awg", "length_ft", "current_A", "source_voltage_V"], r);
+    if (r.error) { outV.textContent = r.error; outP.textContent = "-"; outAtLoad.textContent = "-"; outFlag.textContent = "-"; return; }
     outV.textContent = fmt(r.drop_V, 2) + " V";
     outP.textContent = r.percent === null ? "-" : fmt(r.percent, 2) + " %";
     outAtLoad.textContent = r.voltage_at_load_V === null ? "-" : fmt(r.voltage_at_load_V, 2) + " V";
@@ -967,6 +968,7 @@ export function renderThreePhase(inputRegion, outputRegion, citationEl, params) 
       I_L: Number(I.input.value) || 0,
       pf: Number(pf.input.value) || 0,
     }); stepsFor(outputRegion, inputRegion, ["V_LL", "I_L", "pf"], r);
+    if (r.error) { oP.textContent = r.error; oS.textContent = "-"; oQ.textContent = "-"; return; }
     oP.textContent = fmt(r.kW, 2);
     oS.textContent = fmt(r.kVA, 2);
     oQ.textContent = fmt(r.kVAR, 2);
@@ -1365,6 +1367,7 @@ export function renderServiceLoad(inputRegion, outputRegion, citationEl, params)
       hvac_cooling_W: Number(cool.input.value) || 0,
       hvac_heating_W: Number(heat.input.value) || 0,
     }); stepsFor(outputRegion, inputRegion, ["area_ft2", "small_appliance_circuits", "laundry_circuits", "fixed_appliances_W", "range_W", "dryer_W", "hvac_cooling_W", "hvac_heating_W"], r);
+    if (r.error) { outTotal.textContent = r.error; outAmps.textContent = "-"; outNext.textContent = "-"; return; }
     outTotal.textContent = fmt(r.total_demand_W, 0) + " W";
     outAmps.textContent = fmt(r.required_A, 1) + " A";
     outNext.textContent = r.next_standard_A === null ? "none listed (over 400 A: an engineered service)" : r.next_standard_A + " A";
