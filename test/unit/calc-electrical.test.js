@@ -379,3 +379,17 @@ test("cross-tile: three-phase power and breaker sizing round-trip the sqrt(3) V 
       `breaker-derived current ${bs.derived_load_A} != original ${I} at ${V} V / pf ${pf} -- three-phase relation diverges between tiles`);
   }
 });
+
+// 2026-11-16: a standard box is picked by trade size (NEC Table 314.16(A)).
+test("box-fill: a standard box carries its Table 314.16(A) volume", async () => {
+  const { computeBoxFill, NEC_314_16A_BOX_IN3 } = await import("../../calc-electrical.js");
+  const sq = computeBoxFill({ standard_box: "square_4x1.5", conductors_by_size: { "12": 6 }, devices: 1, internal_clamps: true });
+  assert.equal(sq.box_volume_in3, 21.0);
+  assert.equal(sq.fill_in3, 20.25);
+  // Four #12 and a device (13.5 in^3) overfill a 3 x 2 x 2-1/2 device box (12.5).
+  assert.equal(computeBoxFill({ standard_box: "device_3x2x2.5", conductors_by_size: { "12": 4 }, devices: 1 }).pass, false);
+  assert.ok(computeBoxFill({ standard_box: "square_4x1.5", box_volume_in3: 30, conductors_by_size: { "12": 1 } }).error);
+  assert.ok(computeBoxFill({ standard_box: "toString", conductors_by_size: { "12": 1 } }).error);
+  assert.equal(computeBoxFill({ standard_box: "custom", box_volume_in3: 22.5, conductors_by_size: { "12": 2 } }).box_volume_in3, 22.5);
+  assert.equal(Object.keys(NEC_314_16A_BOX_IN3).length, 14);
+});

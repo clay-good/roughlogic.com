@@ -2131,7 +2131,7 @@ cross-check.
 | calc-electrical.js | `computeBendRadius` | `{ cable_type, cable_od_in }` | _ | _ | _ |
 | calc-electrical.js | `computeBendsBetweenPulls` | `{ bend1_deg = 0, bend2_deg = 0, bend3_deg = 0, bend4_deg = 0, bend5_deg = 0, ...` | _ | _ | _ |
 | calc-electrical.js | `computeBondingJumper` | `{ mode = "supply-side", material = "copper", service_kcmil = 0, ocpd_A = 0, p...` | _ | _ | _ |
-| calc-electrical.js | `computeBoxFill` | `{ box_volume_in3, conductors_by_size, devices = 0, internal_clamps = false, l...` | _ | _ | _ |
+| calc-electrical.js | `computeBoxFill` | `{ box_volume_in3, standard_box = null, conductors_by_size, devices = 0, inter...` | _ | _ | _ |
 | calc-electrical.js | `computeBreakerSize` | `{ load_A, continuous, load_W = 0, voltage_V = 0, power_factor = 1, phase = "s...` | _ | _ | _ |
 | calc-electrical.js | `computeBuckBoostSizing` | `{ supply_v = 0, desired_v = 0, load_a = 0 } = {}` | _ | _ | _ |
 | calc-electrical.js | `computeConductorResistance` | `{ material, awg, length_ft, temperature_C }` | _ | _ | _ |

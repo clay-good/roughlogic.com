@@ -283,9 +283,29 @@ export const BOX_FILL_PER_CONDUCTOR_IN3 = {
   "18": 1.5, "16": 1.75, "14": 2.0, "12": 2.25, "10": 2.5, "8": 3.0, "6": 5.0,
 };
 
-// dims: in { box_volume_in3: L^3, conductors_by_size: dimensionless, devices: dimensionless, internal_clamps: dimensionless, largest_awg_for_clamp_and_device: dimensionless } out: { fill_in3: L^3, free_in3: L^3, pass: dimensionless, box_volume_in3: L^3, grounding_in3: L^3 }
-export function computeBoxFill({ box_volume_in3, conductors_by_size, devices = 0, internal_clamps = false, largest_awg_for_clamp_and_device = null, grounding_conductors = 0 }) {
+// NEC Table 314.16(A), metal boxes: the volume a standard box is credited with
+// (cu in). Since 2026-11-16 a box can be picked by its trade size instead of
+// typing its volume. Only the sizes cross-checked against two published
+// reproductions of the table are listed; anything else is entered as a volume.
+export const NEC_314_16A_BOX_IN3 = {
+  "round_4x1.25": 12.5, "round_4x1.5": 15.5, "round_4x2.125": 21.5,
+  "square_4x1.25": 18.0, "square_4x1.5": 21.0, "square_4x2.125": 30.3,
+  "square_4.6875x1.5": 29.5, "square_4.6875x2.125": 42.0,
+  "device_3x2x2": 10.0, "device_3x2x2.5": 12.5, "device_3x2x2.75": 14.0, "device_3x2x3.5": 18.0,
+  "handy_4x2.125x1.875": 13.0, "handy_4x2.125x2.125": 14.0,
+};
+
+// dims: in { box_volume_in3: L^3, standard_box: dimensionless, conductors_by_size: dimensionless, devices: dimensionless, internal_clamps: dimensionless, largest_awg_for_clamp_and_device: dimensionless } out: { fill_in3: L^3, free_in3: L^3, pass: dimensionless, box_volume_in3: L^3, grounding_in3: L^3 }
+export function computeBoxFill({ box_volume_in3, standard_box = null, conductors_by_size, devices = 0, internal_clamps = false, largest_awg_for_clamp_and_device = null, grounding_conductors = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (standard_box !== null && standard_box !== undefined && standard_box !== "" && standard_box !== "custom") {
+    if (!Object.hasOwn(NEC_314_16A_BOX_IN3, String(standard_box))) return { error: "Standard box must be one of: " + Object.keys(NEC_314_16A_BOX_IN3).join(", ") + "." };
+    const tableVol = NEC_314_16A_BOX_IN3[String(standard_box)];
+    if (box_volume_in3 !== null && box_volume_in3 !== undefined && box_volume_in3 !== "" && Math.abs(Number(box_volume_in3) - tableVol) > 1e-9) {
+      return { error: "Pick a standard box or enter a volume, not both: the " + standard_box + " box is " + tableVol + " in^3, not " + box_volume_in3 + "." };
+    }
+    box_volume_in3 = tableVol;
+  }
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
   if (["box_volume_in3", "devices"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Box volume and device count cannot be negative." };
   box_volume_in3 = Number(box_volume_in3);
@@ -770,7 +790,19 @@ export function renderBoxFill(inputRegion, outputRegion, citationEl, params) {
   citationEl.textContent = "Citation: per NEC 2023 §314.16 (volume allowances by conductor size; devices count twice the largest conductor; internal clamps count once; one allowance for up to four equipment grounding conductors and a quarter more for each beyond four). AHJ governs. Free at nfpa.org/freeaccess.";
   attachExampleButton(inputRegion, () => fillExample({ vol: 22.5, awg: "12", count: 6, devices: 1, clamps: true }));
 
+  const std = makeSelect("Standard box (NEC Table 314.16(A))", "bf-std", [
+    { value: "custom", label: "Other: enter the volume", selected: true },
+    { value: "round_4x1.25", label: "4 x 1-1/4 round/octagon (12.5)" }, { value: "round_4x1.5", label: "4 x 1-1/2 round/octagon (15.5)" },
+    { value: "round_4x2.125", label: "4 x 2-1/8 round/octagon (21.5)" }, { value: "square_4x1.25", label: "4 x 1-1/4 square (18.0)" },
+    { value: "square_4x1.5", label: "4 x 1-1/2 square (21.0)" }, { value: "square_4x2.125", label: "4 x 2-1/8 square (30.3)" },
+    { value: "square_4.6875x1.5", label: "4-11/16 x 1-1/2 square (29.5)" }, { value: "square_4.6875x2.125", label: "4-11/16 x 2-1/8 square (42.0)" },
+    { value: "device_3x2x2", label: "3 x 2 x 2 device (10.0)" }, { value: "device_3x2x2.5", label: "3 x 2 x 2-1/2 device (12.5)" },
+    { value: "device_3x2x2.75", label: "3 x 2 x 2-3/4 device (14.0)" }, { value: "device_3x2x3.5", label: "3 x 2 x 3-1/2 device (18.0)" },
+    { value: "handy_4x2.125x1.875", label: "4 x 2-1/8 x 1-7/8 handy (13.0)" }, { value: "handy_4x2.125x2.125", label: "4 x 2-1/8 x 2-1/8 handy (14.0)" },
+  ]);
   const vol = makeNumber("Box volume (in³)", "bf-vol", { step: "any", min: "0" });
+  // A standard box writes its table volume into the box above, so the reader sees the number used.
+  std.select.addEventListener("change", () => { const v = NEC_314_16A_BOX_IN3[std.select.value]; if (v) vol.input.value = String(v); });
   const awg = makeSelect("Conductor AWG", "bf-awg", [
     { value: "18", label: "18" }, { value: "16", label: "16" }, { value: "14", label: "14" },
     { value: "12", label: "12" }, { value: "10", label: "10" }, { value: "8", label: "8" }, { value: "6", label: "6" },
@@ -779,31 +811,33 @@ export function renderBoxFill(inputRegion, outputRegion, citationEl, params) {
   const devices = makeNumber("Device count", "bf-dev", { step: "1", min: "0" });
   const clamps = makeCheckbox("Internal clamps present", "bf-clamps");
   const egc = makeNumber("Equipment grounding conductors (not in the count above)", "bf-egc", { step: "1", min: "0" });
-  for (const f of [vol, awg, count, devices, clamps, egc]) inputRegion.appendChild(f.wrap);
+  for (const f of [std, vol, awg, count, devices, clamps, egc]) inputRegion.appendChild(f.wrap);
 
   const outFill = makeOutputLine(outputRegion, "Fill", "bf-out-fill");
   const outPass = makeOutputLine(outputRegion, "Result", "bf-out-pass");
 
   function fillExample(v) {
-    vol.input.value = v.vol; awg.select.value = v.awg; count.input.value = v.count;
+    std.select.value = "custom"; vol.input.value = v.vol; awg.select.value = v.awg; count.input.value = v.count;
     devices.input.value = v.devices; clamps.input.checked = v.clamps; update();
   }
   const update = debounce(() => {
     const a = awg.select.value;
     const r = computeBoxFill({
       box_volume_in3: Number(vol.input.value) || 0,
+      standard_box: std.select.value,
       conductors_by_size: { [a]: Number(count.input.value) || 0 },
       devices: Number(devices.input.value) || 0,
       internal_clamps: clamps.input.checked,
       largest_awg_for_clamp_and_device: a,
       grounding_conductors: Number(egc.input.value) || 0,
-    }); stepsFor(outputRegion, inputRegion, ["box_volume_in3", "conductors_by_size", "devices", "internal_clamps", "largest_awg_for_clamp_and_device", "grounding_conductors"], r);
+    }); stepsFor(outputRegion, inputRegion, ["standard_box", "box_volume_in3", "conductors_by_size", "devices", "internal_clamps", "largest_awg_for_clamp_and_device", "grounding_conductors"], r);
     if (r.error) { outFill.textContent = r.error; outPass.textContent = "-"; return; }
-    outFill.textContent = fmt(r.fill_in3, 2) + " in^3 (free " + fmt(r.free_in3, 2) + " in^3)";
+    outFill.textContent = fmt(r.fill_in3, 2) + " in^3 of " + fmt(r.box_volume_in3, 2) + " in^3 (free " + fmt(r.free_in3, 2) + " in^3)";
     outPass.textContent = r.pass ? "Pass" : "Fail";
   }, DEBOUNCE_MS);
 
-  for (const el of [vol.input, awg.select, count.input, devices.input, clamps.input, egc.input]) el.addEventListener("input", update);
+  for (const el of [std.select, vol.input, awg.select, count.input, devices.input, clamps.input, egc.input]) el.addEventListener("input", update);
+  std.select.addEventListener("change", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
