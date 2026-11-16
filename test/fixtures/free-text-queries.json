@@ -111,6 +111,30 @@
       "tile": "hp-from-torque",
       "mustNotBind": { "solve_for": "torque" },
       "why": "The question hands over the torque and asks for horsepower; the word torque chose Solve for torque, and the tile refused for want of a horsepower."
+    },
+    {
+      "query": "how many bags of quikrete for a 4x4 slab 4 inches",
+      "tile": "concrete-premix-bags",
+      "mustNotBind": { "width_ft": "0.333333333333" },
+      "why": "A 4x4 slab is four feet by four; the lumber rewrite made it a 4 in wide stick and the slab 0.33 ft wide."
+    },
+    {
+      "query": "slope percent 2 ft rise over 50 ft",
+      "tile": "foundation-grade-slope-check",
+      "mustNotBind": { "run_ft": "2", "fall_in": "600" },
+      "why": "The 2 ft is the rise and the 50 ft the run; they came back as a 2 ft run and a 600 in fall."
+    },
+    {
+      "query": "2x4 studs 16 on center",
+      "tile": "wood-stud-wall-takeoff",
+      "mustNotBind": { "stud_oc_in": "2" },
+      "why": "The 2 is the stick's nominal size, written by the lumber rewrite as 2 in, and its unit alone put it in the stud spacing."
+    },
+    {
+      "query": "joist span 2x10 16 inch",
+      "tile": "deck-ledger-fasteners",
+      "mustNotBind": { "joist_span_ft": "0.166666666667" },
+      "why": "The 2 of 2x10, as 2 in, became a 0.17 ft joist span because \"span\" sat in front of it."
     }
   ]
 }

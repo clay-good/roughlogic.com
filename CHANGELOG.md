@@ -6,6 +6,12 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Lumber sizes and rise-over-run are read as written.** A fourth batch of everyday questions found four more wrong values, now pinned in `test/fixtures/free-text-queries.json`:
+  - "A 4x4 slab" was read as a 4x4 post, so the slab came out 0.33 ft wide. The lumber rewrite no longer fires before a surface word (slab, patio, pad, deck, floor, room...), and the slab is 4 by 4 ft.
+  - "2 ft rise over 50 ft" became a 2 ft run and a 600 in fall. Rise, run, fall and drop after a length now describe it, like tall and deep, and the run is 50 ft.
+  - The inches the lumber rewrite invents ("2x4" -> 2 in and 4 in) no longer fill a field by unit alone, or by a nearby word that is not about the stick's size. "2x4 studs" made the stud spacing 2 in, and "joist span 2x10" made a 0.17 ft span.
+
+  Every worked-example phrasing still has 0 wrong values.
 - **"Pipe size for 10 gpm" answers on the agent door: 1 in.** A Mode dropdown whose options lead with what they compute ("size-for-flow", "velocity-from-flow") is now set from the question when exactly one option's leading word is in it. The door's "required" list was measured in each tile's default mode, so when the question itself chose a mode or solve-for, the door now tries the calculation first. It answers only if the calculator accepts the values without refusing; otherwise it still names what is missing. "Horsepower from torque 400 ft-lb at 5000 rpm" also answers outright (380.8 hp). Measured over every worked example, the wrong-value count stays 0.
 - **The agent door no longer says OK when the calculator refused.** `answer_query` returned `status: OK` whenever the calculator ran, even when the result was a refusal. That was 10 of the 93 curated phrases with numbers that answered OK, for example "ansi z21 400 ppm", whose result was "Enter the flue O2 reading". These now return `MISSING_INPUTS` with the calculator's own message in `error` and every unfilled field listed, so an agent reading the status cannot mistake a refusal for an answer. Measured again, 0 of 83 OK answers carry an error.
 - **Three more service-call questions read right.**

@@ -104,7 +104,8 @@ const REWRITES = [
   // wrote -- and an invented inch then beats a real one, so the 20 took the
   // Slab thickness field and the reader's four inches went unused. A slab, a
   // room and a floor are written in feet; only the lumber is in inches.
-  [/\b(\d+)\s*x\s*(\d+)\b/g, (m, w, d) =>
+  // ...and not when a surface follows: "a 4x4 slab" is four feet by four.
+  [/\b(\d+)\s*x\s*(\d+)\b(?!\s+(?:slab|patio|pad|deck|floor|room|area|shed|porch|landing)s?\b)/g, (m, w, d) =>
     (Number(w) <= NOMINAL_LUMBER_MAX_IN && Number(d) <= NOMINAL_LUMBER_MAX_IN
       ? `nominal width ${w} in nominal depth ${d} in`
       : m)],
@@ -187,8 +188,10 @@ const UNIT_QUANTITY_WORDS = {
 
 // A dimension word written after a length, and the label word it means.
 // "4 inches deep" on a slab is its thickness, so deep and thick name both.
-const POST_WORDS = new Map([["tall", ["height"]], ["high", ["height"]], ["deep", ["depth", "thickness"]], ["wide", ["width"]], ["long", ["length"]], ["thick", ["thickness", "depth"]], ["apart", ["spacing"]]]);
-const DIMENSION_WORDS = new Set(["height", "depth", "thickness", "width", "length", "spacing"]);
+const POST_WORDS = new Map([["tall", ["height"]], ["high", ["height"]], ["deep", ["depth", "thickness"]], ["wide", ["width"]], ["long", ["length"]], ["thick", ["thickness", "depth"]], ["apart", ["spacing"]],
+  // "2 ft rise over 50 ft" (2026-11-16): the rise is not the run.
+  ["rise", ["rise", "height"]], ["drop", ["drop", "fall"]], ["fall", ["fall", "drop"]], ["run", ["run"]]]);
+const DIMENSION_WORDS = new Set(["height", "depth", "thickness", "width", "length", "spacing", "rise", "run", "fall", "drop"]);
 
 const SHORTHAND = new Map([
   ["amps", "current"], ["amperage", "current"], ["amp", "current"],
@@ -420,6 +423,13 @@ export function queryFill(query, rows, opts) {
   const quantities = extractQuantities(text, { withIndex: true });
   // "900 kwh per month" is a rate, not 900 kwh: it never fills a field
   // measured in the bare unit (a battery's nameplate kWh, 2026-11-16).
+  // The inches the nominal-lumber rewrite writes ("2x4" -> "nominal width 2 in
+  // nominal depth 4 in") are its own, not the reader's: they may fill a field
+  // that the word "nominal"/"width"/"depth" names, never one their unit alone
+  // fits. "2x4 studs 16 on center" put 2 in into the stud spacing (2026-11-16).
+  for (const q of quantities) {
+    if (/nominal (?:width|depth)\s*$/.test(text.slice(0, q.index))) q.lumber = true;
+  }
   for (const q of quantities) {
     if (/^\s*(?:per|\/|a)\s*(?:month|mo|year|yr|day|week|wk|hour|hr|h|minute|min|second|sec)\b/.test(text.slice(q.end))) q.rate = true;
   }
@@ -542,7 +552,7 @@ export function queryFill(query, rows, opts) {
     let m = after.match(/^\s+of\s+([a-z][a-z -]*)/i);
     let terms = null;
     if (m) terms = windowTerms(m[1]);
-    else if (unitFamily(unit) === "length" && (m = after.match(/^\s+(tall|high|deep|wide|long|thick|apart)\b/i))) {
+    else if (unitFamily(unit) === "length" && (m = after.match(/^\s+(tall|high|deep|wide|long|thick|apart|rise|drop|fall|run)\b/i))) {
       terms = new Set([m[1].toLowerCase(), ...POST_WORDS.get(m[1].toLowerCase())]);
     }
     if (!terms) {
@@ -662,6 +672,8 @@ export function queryFill(query, rows, opts) {
         break;
       }
       if (!matched) continue;
+      // A number the lumber rewrite wrote only fills a field about the stick's size.
+      if (qty.lumber && ![...termsByRow.get(row.d)].some((t) => ["nominal", "width", "depth", "thickness", "lumber"].includes(t))) continue;
       if (valueFor(qty, row, text, labelWords) === null) continue;   // unit disagreement
       // The same in the other direction: "a 40 ft wall 16 on center" names the
       // wall AFTER its 40 ft, and reading "wall" forward handed the bare 16 to
@@ -825,7 +837,7 @@ export function queryFill(query, rows, opts) {
   // field when EXACTLY ONE unfilled field can accept its unit. A unitless
   // number never reaches here -- it would match everything.
   quantities.forEach((qty, qi) => {
-    if (claimed.has(qi) || burned.has(qi)) return;
+    if (claimed.has(qi) || burned.has(qi) || qty.lumber) return;
     const qtyUnit = canonicalUnit(rawUnitOf(qty, text));
     if (!qtyUnit) return;
     const compatible = numberRows.filter(
