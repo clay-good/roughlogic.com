@@ -423,6 +423,9 @@ export function queryFill(query, rows, opts) {
     const tok = String(o).toLowerCase();
     if (tok.length > 2 && /[a-z]/.test(tok) && text.includes(tok)) for (const w of tok.split(/[^a-z]+/)) if (w) optionWordsInText.add(w);
   }
+  const nameTokCount = new Map();
+  for (const t of String((opts && opts.name) || "").toLowerCase().split(/[^a-z]+/)) if (t) nameTokCount.set(t, (nameTokCount.get(t) || 0) + 1);
+  const firstQi = quantities.findIndex((q, i) => !suppressed.has(i));
   let prevEnd = 0;
   quantities.forEach((qty, qi) => {
     const window = text.slice(prevEnd, qty.index);
@@ -437,7 +440,16 @@ export function queryFill(query, rows, opts) {
     for (const raw of String(window).toLowerCase().split(/[^a-z]+/)) {
       if (raw.length >= 2 && raw.length < 4 && labelWords.has(raw)) wanted.add(raw);
     }
-    for (const w of nameWords) wanted.delete(w);
+    // A name word is the calculator's name only as many times as the name spells it, and
+    // only in the first window, where the name is written. "ceiling speaker coverage,
+    // ceiling height 9 ft" says "ceiling" twice: the second is the field (2026-11-15).
+    const firstWindow = qi === firstQi;
+    const toks = String(window).toLowerCase().split(/[^a-z]+/).filter(Boolean);
+    for (const w of nameWords) {
+      const inWindow = toks.filter((t) => t === w || t === w + "s").length;
+      const inName = firstWindow ? (nameTokCount.get(w) || 0) : 0;
+      if (inWindow <= inName) wanted.delete(w);
+    }
     if (!wanted.size) return;
     const hits = [];
     // Selects compete here even though only number rows get filled in this

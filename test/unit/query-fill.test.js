@@ -478,3 +478,15 @@ test("query-fill: an exact label wins a two-field tie, and only an exact one", (
   const c = queryFill("power-ratio, 1 w, 2 w", db, { name: "Decibel Converter" }).filled;
   assert.notEqual(c.p2, "1");
 });
+
+// 2026-11-15: a calculator-name word beside a number is a field name when the
+// question says it more often than the name does.
+test("query-fill: a name word repeated beside a value names the field", () => {
+  const rows = [
+    { d: "ceiling_ft", l: "Ceiling height", k: "number", u: "ft", r: 1 },
+    { d: "ear_ft", l: "Listener ear height", k: "number", u: "ft", r: 1 },
+  ];
+  const f = queryFill("ceiling speaker coverage, ceiling height 9 ft, listener ear height 4 ft", rows, { name: "Ceiling Speaker Coverage" }).filled;
+  assert.equal(Number(f.ceiling_ft), 9);
+  assert.equal(Number(f.ear_ft), 4);
+});
