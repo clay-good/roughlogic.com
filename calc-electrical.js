@@ -1409,8 +1409,11 @@ export function renderGeneratorSize(inputRegion, outputRegion, citationEl, param
     const tr = Number(totalRun.input.value) || 0;
     const lr = Number(largeRun.input.value) || 0;
     const ls = Number(largeStart.input.value) || 0;
-    const surge_excess = Math.max(0, ls - lr);
-    const r = { running_W: tr, surge_W: tr + surge_excess };
+    // Through the compute, so the page refuses what the agent door refuses: until 2026-11-15 this
+    // did the arithmetic inline, and a negative wattage printed a negative generator size.
+    if (lr > tr) { outRun.textContent = "The largest motor's running watts cannot exceed the total running watts."; outSurge.textContent = ""; return; }
+    const r = computeGeneratorSize({ items: [{ running_watts: tr - lr, starting_watts: tr - lr }, { running_watts: lr, starting_watts: ls }] }); stepsFor(outputRegion, inputRegion, ["items"], r);
+    if (r.error) { outRun.textContent = r.error; outSurge.textContent = ""; return; }
     outRun.textContent = fmt(r.running_W / 1000, 2) + " kW (" + fmt(r.running_W, 0) + " W)";
     outSurge.textContent = fmt(r.surge_W / 1000, 2) + " kW (" + fmt(r.surge_W, 0) + " W)";
   }, DEBOUNCE_MS);

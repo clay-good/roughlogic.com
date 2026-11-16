@@ -10,9 +10,11 @@ test("typed zero: no number box turns a typed 0 into a default", () => {
   const sweep = fileURLToPath(new URL("../fixtures/render-typed-zero-sweep.js", import.meta.url));
   const report = JSON.parse(execFileSync(process.execPath, [sweep], { encoding: "utf8", maxBuffer: 1 << 24, stdio: ["ignore", "pipe", "ignore"] }));
   assert.ok(report.compared > 5000, `only ${report.compared} number boxes were traced to a compute argument`);
-  // duct-sizing computes in a Web Worker (async); the fake DOM does not await it, and the
-  // renderer's own r.error branch is read by eye.
-  assert.deepEqual(report.silentErrors.filter((x) => !x.startsWith("duct-sizing ")), [], "add `if (r.error) { first.textContent = r.error; ...; return; }` after the compute call");
+  // duct-sizing and Manual J compute in a Web Worker (async); the fake DOM does not await it,
+  // and each renderer's own r.error branch is read by eye. (Manual J became visible to this
+  // sweep 2026-11-15, when the compute spy began wrapping non-`compute*` mapped functions.)
+  const ASYNC = /^(duct-sizing|manual-j-cooling|manual-j-heating) /;
+  assert.deepEqual(report.silentErrors.filter((x) => !ASYNC.test(x)), [], "add `if (r.error) { first.textContent = r.error; ...; return; }` after the compute call");
   assert.deepEqual(report.unshownInputs, [], "add the argument's key to the stepsFor key list so Show the steps lists it");
   assert.deepEqual(report.staleTables, [], "clear the table/plot/list container in the r.error branch");
   assert.deepEqual(report.blankDefault, [], "a box whose label states a default must run with it when left blank");

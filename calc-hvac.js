@@ -1200,7 +1200,8 @@ export function renderManualJCooling(inputRegion, outputRegion, citationEl) {
       occupants: Number(occ.input.value) || 0,
       outdoor_design_F: od.input.value === "" ? null : Number(od.input.value),
       indoor_design_F: id.input.value === "" ? undefined : Number(id.input.value),
-      outdoor_RH_percent: Number(orh.input.value) || 50,
+      // A typed 0% (desert design air) ran as 50% until 2026-11-15.
+      outdoor_RH_percent: orh.input.value === "" ? 50 : Number(orh.input.value),
     };
     const r = await runInWorker({ kind: "cooling", inputs }, manualJCooling);
     if (r.error) { oTotal.textContent = r.error; oTons.textContent = "-"; oSens.textContent = "-"; oLat.textContent = "-"; oBand.textContent = "-"; return; }

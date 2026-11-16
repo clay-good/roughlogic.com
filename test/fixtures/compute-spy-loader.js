@@ -6,6 +6,8 @@
 // module body runs, both get the wrapper. Test-only; nothing
 // here touches the shipped modules.
 const ROOT = new URL("../../", import.meta.url).href;
+import { readFileSync } from "node:fs";
+const MAPPED = new Set([...readFileSync(new URL("./compute-map.js", import.meta.url), "utf8").matchAll(/fn: "(\w+)"/g)].map((m) => m[1]));
 // Synchronous for registerHooks; register() (Node 20) awaits whatever it returns,
 // and there `next` returns a promise, so both shapes are handled.
 export function load(url, context, next) {
@@ -16,7 +18,10 @@ export function load(url, context, next) {
 function spy(url, out) {
   if (!url.startsWith(ROOT) || !/^calc-[^/]+\.js$/.test(url.slice(ROOT.length))) return out;
   const src = typeof out.source === "string" ? out.source : new TextDecoder().decode(out.source);
-  const names = [...src.matchAll(/^export function (compute\w+)\s*\(/gm)].map((m) => m[1]);
+  // Every `computeX`, plus the few computes compute-map.js names otherwise
+  // (pressureConvert, convertUnit, manualJCooling...): until 2026-11-15 those
+  // tiles were invisible to every sweep that reads results through this spy.
+  const names = [...src.matchAll(/^export function (\w+)\s*\(/gm)].map((m) => m[1]).filter((n) => n.startsWith("compute") || MAPPED.has(n));
   if (!names.length) return out;
   const tail = names.map((n) => `${n} = globalThis.__computeSpy(${n}, ${JSON.stringify(n)});`).join("\n");
   return { ...out, source: tail + "\n" + src, shortCircuit: true };
