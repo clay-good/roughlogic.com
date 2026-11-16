@@ -6,6 +6,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **The agent door no longer says OK when the calculator refused.** `answer_query` returned `status: OK` whenever the calculator ran, even when the result was a refusal. That was 10 of the 93 curated phrases with numbers that answered OK, for example "ansi z21 400 ppm", whose result was "Enter the flue O2 reading". These now return `MISSING_INPUTS` with the calculator's own message in `error` and every unfilled field listed, so an agent reading the status cannot mistake a refusal for an answer. Measured again, 0 of 83 OK answers carry an error.
 - **Three more service-call questions read right.**
   - "Horsepower from torque 400 ft-lb at 5000 rpm" chose "Solve for: torque" from the word torque, then refused because no horsepower was given. A solve-for dropdown now takes the one quantity the question gives no value for, so it answers 380.8 hp.
   - "Gas meter clock 1 cubic foot dial 30 seconds" made the dial 30 cu ft. Its labels now carry their units (s, ft³), so each number lands in its own box.

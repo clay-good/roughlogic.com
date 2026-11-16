@@ -34,3 +34,12 @@ test("a word that is not the named calculator's still narrows to a sibling", asy
   // "hose" is not a Friction Loss field: the reader is asking for the fire-hose tile.
   assert.equal((await answerQuery({ query: "friction loss 200 ft of hose at 150 gpm" })).id, "fire-friction");
 });
+
+// 2026-11-16: a calculator that runs and refuses is not an answer.
+test("answer_query never says OK while the calculator refused", async () => {
+  const r = await answerQuery({ query: "ansi z21 400 ppm" });
+  assert.notEqual(r.status, "OK");
+  assert.equal(r.status, "MISSING_INPUTS");
+  assert.match(r.error, /O2/);
+  assert.ok(r.missing.length > 0);
+});

@@ -129,7 +129,7 @@ const TOOLS = [
     name: "answer_query",
     annotations: { title: "Answer a question", readOnlyHint: true, idempotentHint: true, destructiveHint: false, openWorldHint: false },
     description:
-      "Answer a plain-language question in ONE call: picks the calculator, extracts the values out of the question, and computes. Use this when the question already contains its numbers ('voltage drop 120v 150 ft 12 awg 20a') instead of chaining search_calculators + describe_calculator + run_calculator. Returns status OK with the computed outputs, MISSING_INPUTS naming what it still needs, NO_VALUES when the question named a calculator but carried no numbers, or NO_MATCH.",
+      "Answer a plain-language question in ONE call: picks the calculator, extracts the values out of the question, and computes. Use this when the question already contains its numbers ('voltage drop 120v 150 ft 12 awg 20a') instead of chaining search_calculators + describe_calculator + run_calculator. Returns status OK with the computed outputs, MISSING_INPUTS naming what it still needs (with the calculator's own message in `error` when it refused the values read), NO_VALUES when the question named a calculator but carried no numbers, or NO_MATCH.",
     inputSchema: {
       type: "object",
       properties: {

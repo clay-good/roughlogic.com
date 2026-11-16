@@ -1799,6 +1799,21 @@ export async function answerQuery({ query } = {}) {
           " Send it to run_calculator directly if that value is intended.",
       };
     }
+    // The calculator ran and refused: that is not an answer. Until 2026-11-16
+    // this came back `status: OK` with the refusal tucked inside `result` (10
+    // of the 93 curated digit phrases that answered OK, e.g. "ansi z21 400
+    // ppm" -> "Enter the flue O2 reading"), so an agent reading the status
+    // took it as answered. It now says what the calculator still needs, in its
+    // own words, naming every field the question did not fill.
+    if (out && out.result && out.result.error) {
+      return {
+        status: "MISSING_INPUTS", query: q, id: top.id, name: top.name,
+        inputs: filled,
+        missing: rows.filter((r) => !(r.d in filled)).map((r) => ({ key: r.d, label: r.l, unit: r.u || null })),
+        error: out.result.error,
+        message: `"${top.name}" did not answer from the values read from the question: ${out.result.error}`,
+      };
+    }
     return { ...out, status: "OK", query: q, name: top.name, via: "registry" };
   } catch (e) {
     return {
