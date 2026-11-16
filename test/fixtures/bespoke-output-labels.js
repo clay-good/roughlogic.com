@@ -950,7 +950,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "three-phase": {"kW":"kW","kVA":"kVA","kVAR":"kVAR"},
   "thrust-block-max-pressure": {"max_thrust_lb":"Max thrust the soil takes","note":"Note"},
   "thrust-block-sizing": {"thrust_lb":"Resultant thrust","bearing_area_ft2":"Required bearing area","note":"Note"},
-  "tile-count": {"tile_count":"Tile count (with 10% waste)","grout_volume_in3":"Grout volume"},
+  "tile-count": {"tile_count":"Tile count (with waste)","grout_volume_in3":"Grout volume"},
   "time-and-materials": {"labor":"Labor","material_cost":"Material","overhead":"Overhead","profit":"Profit","total":"Total"},
   "time-of-concentration": {"tc_min":"Time of concentration","note":"Note"},
   "timesheet": {"total_hours":"Total hours","gross_pay":"Gross pay","total_miles":"Reimbursable miles"},

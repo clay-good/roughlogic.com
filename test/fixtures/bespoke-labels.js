@@ -950,7 +950,7 @@ export const BESPOKE_LABELS = {
   "three-point-bridle": {"apex_load_lb":"Apex load (lb)","e1_ft":"Leg 1 east offset (ft, - west)","n1_ft":"Leg 1 north offset (ft, - south)","r1_ft":"Leg 1 rise (ft)","e2_ft":"Leg 2 east offset (ft)","n2_ft":"Leg 2 north offset (ft)","r2_ft":"Leg 2 rise (ft)","e3_ft":"Leg 3 east offset (ft)","n3_ft":"Leg 3 north offset (ft)","r3_ft":"Leg 3 rise (ft)"},
   "thrust-block-max-pressure": {"bearing_area_ft2":"Bearing-face area (ft²)","od_in":"Pipe outside diameter (in)","bend_deg":"Bend angle (deg)","soil_bearing_psf":"Allowable soil bearing (psf)","safety_factor":"Safety factor (1.5 customary)"},
   "thrust-block-sizing": {"pressure_psi":"Internal pressure (psi, test/surge)","od_in":"Pipe outside diameter (in)","bend_deg":"Bend angle (deg)","soil_bearing_psf":"Allowable soil bearing (psf)","safety_factor":"Safety factor (1.5 customary)"},
-  "tile-count": {"area_ft2":"Area (ft²)","tile_width_in":"Tile width (in)","tile_height_in":"Tile height (in)","grout_joint_width_in":"Grout joint width (in)","tile_thickness_in":"Tile thickness (in)"},
+  "tile-count": {"area_ft2":"Area (ft²)","tile_width_in":"Tile width (in)","tile_height_in":"Tile height (in)","grout_joint_width_in":"Grout joint width (in)","tile_thickness_in":"Tile thickness (in)","waste_pct":"Waste allowance (%; 10 straight lay, 15 diagonal)"},
   "time-and-materials": {"hours":"Hours","labor_rate_per_hour":"Labor rate ($/hr)","material_cost":"Material cost ($)","overhead_percent":"Overhead (percent)","profit_percent":"Profit (percent)"},
   "time-of-concentration": {"l_ft":"Flow-path length L (ft)","s_slope":"Average slope S (ft/ft)"},
   "timesheet": {"regular_rate":"Hourly rate ($)"},

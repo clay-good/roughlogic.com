@@ -932,9 +932,15 @@ export const footingAreaExample = {
 
 // --- Utility 93: Tile Count and Grout Volume ---
 
-// dims: in { area_ft2: L^2, tile_width_in: L, tile_height_in: L, grout_joint_width_in: L, tile_thickness_in: L, waste_factor: dimensionless } out: { grout_volume_in3: L^3, tile_count: dimensionless, base_count: dimensionless, tile_face_in2: L^2 }
-export function computeTileCount({ area_ft2, tile_width_in, tile_height_in, grout_joint_width_in = 0.125, tile_thickness_in = 0.25, waste_factor = 0.10 }) {
+// dims: in { area_ft2: L^2, tile_width_in: L, tile_height_in: L, grout_joint_width_in: L, tile_thickness_in: L, waste_factor: dimensionless, waste_pct: dimensionless } out: { grout_volume_in3: L^3, tile_count: dimensionless, base_count: dimensionless, tile_face_in2: L^2 }
+export function computeTileCount({ area_ft2, tile_width_in, tile_height_in, grout_joint_width_in = 0.125, tile_thickness_in = 0.25, waste_factor = 0.10, waste_pct = null }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page's waste box is a percent (2026-11-15); waste_pct takes it so an agent reading
+  // that label is not handed a fraction key (10 there meant 1,000% waste).
+  if (waste_pct !== null && waste_pct !== undefined && waste_pct !== "") {
+    if (!(Number(waste_pct) >= 0)) return { error: "Waste allowance must be a percent, zero or more." };
+    waste_factor = Number(waste_pct) / 100;
+  }
   if (!(Number(waste_factor) >= 0) || !(Number(grout_joint_width_in) >= 0)) return { error: "Waste factor and grout joint must be numbers, zero or more." };
   const a = Number(area_ft2) || 0;
   const tw = Number(tile_width_in) || 0;
@@ -1328,9 +1334,13 @@ export function renderTileCount(inputRegion, outputRegion, citationEl) {
   j.input.value = "0.125";
   const t = makeNumber("Tile thickness (in)", "tc-t", { step: "any", min: "0", value: "0.25" });
   t.input.value = "0.25";
-  for (const f of [a, w, h, j, t]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { a.input.value = "100"; w.input.value = "12"; h.input.value = "12"; j.input.value = "0.125"; t.input.value = "0.25"; update(); });
-  const oC = makeOutputLine(outputRegion, "Tile count (with 10% waste)", "tc-out-c");
+  // The compute always took a waste factor; the page fixed it at 10% until 2026-11-15
+  // (a diagonal or herringbone layout commonly needs 15% or more).
+  const wf = makeNumber("Waste allowance (%; 10 straight lay, 15 diagonal)", "tc-wf", { step: "any", min: "0", value: "10" });
+  wf.input.value = "10";
+  for (const f of [a, w, h, j, t, wf]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { a.input.value = "100"; w.input.value = "12"; h.input.value = "12"; j.input.value = "0.125"; t.input.value = "0.25"; wf.input.value = "10"; update(); });
+  const oC = makeOutputLine(outputRegion, "Tile count (with waste)", "tc-out-c");
   const oG = makeOutputLine(outputRegion, "Grout volume", "tc-out-g");
   const update = debounce(() => {
     const r = computeTileCount({
@@ -1339,12 +1349,14 @@ export function renderTileCount(inputRegion, outputRegion, citationEl) {
       tile_height_in: Number(h.input.value) || 0,
       grout_joint_width_in: Number(j.input.value) || 0,
       tile_thickness_in: Number(t.input.value) || 0,
-    }); stepsFor(outputRegion, inputRegion, ["area_ft2", "tile_width_in", "tile_height_in", "grout_joint_width_in", "tile_thickness_in"], r);
+      waste_pct: wf.input.value === "" ? undefined : Number(wf.input.value),
+    }); stepsFor(outputRegion, inputRegion, ["area_ft2", "tile_width_in", "tile_height_in", "grout_joint_width_in", "tile_thickness_in", "waste_pct"], r);
     if (r.error) { oC.textContent = r.error; oG.textContent = "-"; return; }
     oC.textContent = String(r.tile_count);
+    oC.textContent += " (" + fmt((wf.input.value === "" ? 10 : Number(wf.input.value)), 0) + "% waste)";
     oG.textContent = fmt(r.grout_volume_in3, 1) + " in^3";
   }, DEBOUNCE_MS);
-  for (const el of [a.input, w.input, h.input, j.input, t.input]) el.addEventListener("input", update);
+  for (const el of [a.input, w.input, h.input, j.input, t.input, wf.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
