@@ -1992,6 +1992,8 @@ AGRICULTURE_RENDERERS["growing-degree-days"] = renderGrowingDegreeDays;
 export function computePearsonSquareRation({ feed_a_pct = 0, feed_b_pct = 0, target_pct = 0, batch_lb = 0 } = {}) {
   const A = Number(feed_a_pct), B = Number(feed_b_pct), T = Number(target_pct);
   let batch = Number(batch_lb) || 0;
+  // A supplied out-of-range value was quietly replaced until 2026-11-15; blank still defaults.
+  if (Number(batch_lb) < 0) return { error: "Batch size cannot be negative (lb)." };
   if (!Number.isFinite(batch) || batch < 0) batch = 0;
   if (!Number.isFinite(A) || !Number.isFinite(B) || !Number.isFinite(T)) return { error: "Nutrient percentages must be finite." };
   if (A < 0 || B < 0 || T < 0) return { error: "Nutrient percentages cannot be negative." };

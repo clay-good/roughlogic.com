@@ -423,6 +423,8 @@ export function computeBrakePadLife({ vehicle_weight_lb = 0, speed_delta_mph = 0
   // (an even split, which reproduces the single-axle estimate exactly).
   const wear_rate = (Number(wear_rate_mm_per_kj) > 0 && Number.isFinite(Number(wear_rate_mm_per_kj))) ? Number(wear_rate_mm_per_kj) : w.mm_per_kJ;
   let frontPct = Number(front_bias_pct);
+  // A supplied out-of-range value was quietly replaced until 2026-11-15; blank still defaults.
+  if (front_bias_pct != null && front_bias_pct !== "" && Number.isFinite(frontPct) && !(frontPct > 0 && frontPct < 100)) return { error: "Front brake bias must be above 0 and below 100 percent (50 if unknown)." };
   if (!Number.isFinite(frontPct) || frontPct <= 0 || frontPct >= 100) frontPct = 50;
   // Kinetic energy: KE = 0.5 * m * v^2. Convert lb -> kg, mph -> m/s.
   const m_kg = vehicle_weight_lb * 0.45359237;

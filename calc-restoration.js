@@ -2141,6 +2141,8 @@ export function computeDryingBalance({ evap_load_ppd = 0, installed_ppd = 0, tar
   if (!Number.isFinite(evap) || !Number.isFinite(installed) || !Number.isFinite(margin)) return { error: "Inputs must be finite numbers." };
   if (!(evap > 0)) return { error: "Evaporation load must be positive (pints/day)." };
   if (!(installed > 0)) return { error: "Installed dehumidification capacity must be positive (pints/day)." };
+  // A supplied out-of-range value was quietly replaced until 2026-11-15; blank still defaults.
+  if (target_margin != null && target_margin !== "" && !(margin > 0)) return { error: "The capacity margin must be above 0 (1.2 default)." };
   if (!(margin > 0)) margin = 1.2;
   // A margin is a multiplier of at least 1 (1.2 = 20% over); below 1 is a deficit called balanced,
   // and 120 is a percent typed as a multiplier. Both were accepted until 2026-10-03.

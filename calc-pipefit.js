@@ -153,6 +153,8 @@ export function computeRacewayExpansion({ run_length_ft = 0, temp_range_f = 0, a
   if (!(L > 0)) return { error: "Run length must be positive (ft)." };
   if (!(dT >= 0)) return { error: "Temperature range must be non-negative (F)." };
   let alpha = Number(alpha_per_f);
+  // A supplied out-of-range value was quietly replaced until 2026-11-15; blank still defaults.
+  if (alpha_per_f != null && alpha_per_f !== "" && Number.isFinite(alpha) && !(alpha > 0)) return { error: "The expansion coefficient must be above 0 (in/in/F; 0.0000338 for PVC)." };
   if (!Number.isFinite(alpha) || !(alpha > 0)) alpha = 0.0000338;
   const travel = Number(fitting_travel_in);
   const threshold = Number.isFinite(Number(threshold_in)) ? Number(threshold_in) : 0.25;

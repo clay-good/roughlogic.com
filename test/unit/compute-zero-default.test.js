@@ -155,3 +155,38 @@ test("compute zero default: no absolute temperature input answers below absolute
   }
   assert.deepEqual(bad, [], "call the module's _finiteGuard(arguments[0]) first; it refuses a temperature below -459.67 F");
 });
+
+// And the reassignment shape: `if (!Number.isFinite(x) || x < 0) x = 5;` read a
+// supplied -1 as the default (superheat tolerance, brake bias, pipe alpha,
+// drying margin, ration batch until 2026-11-15). A blank test alone
+// (`x === null || x === ""`) is a default and is fine.
+const REASSIGN_REVIEWED = new Set([
+  "calc-concrete.js:lambda", // ACI 25.4.3.2 / 18.8.5.1: hooked bars use 0.75 for ANY lightweight concrete
+]);
+
+test("compute zero default: no supplied value is reassigned to a default without a refusal guard", async () => {
+  const { readdirSync } = await import("node:fs");
+  const root = new URL("../../", import.meta.url);
+  const bad = [];
+  for (const f of readdirSync(root).filter((n) => /^calc-.*\.js$/.test(n))) {
+    const lines = readFileSync(new URL(f, root), "utf8").split("\n");
+    lines.forEach((line, i) => {
+      const m = /^\s*if \((.*)\) ([a-zA-Z_]\w*) = (-?[\d.]+);/.exec(line);
+      if (!m || !m[1].includes(m[2])) return;
+      if (!/[<>]/.test(m[1])) return; // a blank / not-a-number test with no range comparison is a default
+      let start = i;
+      while (start > 0 && !/^export function /.test(lines[start])) start--;
+      if (start === 0 && !/^export function /.test(lines[0])) return;
+      const head = lines.slice(start, start + 8).join(" ").split(") {")[0];
+      const params = [...head.matchAll(/[{,]\s*([a-z_]\w*)/g)].map((x) => x[1]);
+      let p = params.includes(m[2]) ? m[2] : null;
+      if (!p) for (let k = start; k < i; k++) { const d = new RegExp("(?:let|const)\\s+" + m[2] + "\\s*=\\s*(?:Number\\()?([a-z_]\\w*)\\)?\\s*(?:;|\\|\\|)").exec(lines[k]); if (d && params.includes(d[1])) p = d[1]; }
+      if (!p) return; // a computed local, not a caller input
+      if (REASSIGN_REVIEWED.has(f + ":" + m[2])) return;
+      const body = lines.slice(start, i).join("\n");
+      if (new RegExp("if \\([^\\n]*\\b(?:" + p + "|" + m[2] + ")\\b[^\\n]*\\) return \\{ error").test(body)) return;
+      bad.push(`${f}:${i + 1} ${p}`);
+    });
+  }
+  assert.deepEqual(bad, [], "refuse a supplied out-of-range value above the reassignment; only a blank may fall back to the default");
+});
