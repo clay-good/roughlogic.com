@@ -12,8 +12,10 @@
 // it a script so the next change to query-fill.js can be measured against the
 // same lens rather than argued about: 62.4% recovered, 0 tiles wrong.
 //
-// Not a lint gate (it is a measurement, and the honest baseline moves with the
-// catalog). Run it before and after any query-fill change:
+// Not a lint gate for RECOVERY (it is a measurement, and the honest baseline
+// moves with the catalog). The WRONG count is gated: it reached 0 in every mode
+// on 2026-11-16 and test/unit/query-fill-wrong-zero.test.js holds it there.
+// Run it before and after any query-fill change:
 //
 //   node scripts/measure-query-fill.mjs            summary
 //   node scripts/measure-query-fill.mjs --wrong    every wrong value, named
