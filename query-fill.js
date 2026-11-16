@@ -311,6 +311,7 @@ function isLabelWord(raw, labelWords) {
 
 function valueFor(qty, row, text, labelWords) {
   const fieldUnit = rowUnit(row);
+  if (qty.rate && fieldUnit) return null;
   const raw = rawUnitOf(qty, String(text || ""));
   const prose =
     raw !== null &&
@@ -415,6 +416,11 @@ export function queryFill(query, rows, opts) {
   // inside `R_410A` cost `head-pressure-control` its evaporator pressure. The
   // quantity stays where it is and is simply spent before any phase can use it.
   const quantities = extractQuantities(text, { withIndex: true });
+  // "900 kwh per month" is a rate, not 900 kwh: it never fills a field
+  // measured in the bare unit (a battery's nameplate kWh, 2026-11-16).
+  for (const q of quantities) {
+    if (/^\s*(?:per|\/|a)\s*(?:month|mo|year|yr|day|week|wk|hour|hr|h|minute|min|second|sec)\b/.test(text.slice(q.end))) q.rate = true;
+  }
   const suppressed = new Set();
   quantities.forEach((qty, qi) => {
     if (optionSpans.some(([s, e]) => qty.index >= s && qty.end <= e)) suppressed.add(qi);
@@ -471,8 +477,9 @@ export function queryFill(query, rows, opts) {
         let done = false;
         if (len.length === 1 && wid.length === 1 && len[0].d !== wid[0].d) {
           filled[len[0].d] = String(a); filled[wid[0].d] = String(b); done = true;
-        } else if (!len.length && !wid.length && areas.length === 1 &&
-                   m[4] && /^\s+(floor|slab|patio|deck|yard|driveway|lawn|garden|pad|area|lot|walkway|sidewalk)s?$/.test(m[4]) &&
+        } else if (!len.length && !wid.length && areas.length === 1 && m[4] &&
+                   (/^\s+(floor|slab|patio|deck|yard|driveway|lawn|garden|pad|area|lot|walkway|sidewalk)s?$/.test(m[4]) ||
+                    termsByRow.get(areas[0].d).has(m[4].trim().replace(/s$/, ""))) &&
                    !/\b(walls?|ceilings?|paint|primer)\b/.test(text)) {
           // A room's plan is its floor, but a question about a room may be about
           // its walls ("paint for a 12 by 12 room"): only a work surface fills
@@ -830,6 +837,18 @@ export function queryFill(query, rows, opts) {
     const exact = compatible.filter((r) => rowUnit(r) === qtyUnit);
     const candidates = exact.length ? exact : compatible;
     if (candidates.length !== 1) return;
+    // A conversion is the weakest fill there is, so the words right beside the
+    // number may veto it: "40 ft wall" is not a mortar joint and "span 12 ft"
+    // is not a tributary width (2026-11-16). A neighbouring content word that
+    // is not a term of the target field means the number is something else.
+    if (rowUnit(candidates[0]) !== qtyUnit) {
+      const before = text.slice(0, qty.index).toLowerCase().match(/([a-z]{3,})[^a-z0-9]*$/);
+      const after = text.slice(qty.end).toLowerCase().match(/^[^a-z0-9]*([a-z]{3,})/);
+      const t = termsByRow.get(candidates[0].d);
+      const foreign = (w) => w && !TERM_STOPWORDS.has(w) && !NON_UNIT_WORDS.has(w) && canonicalUnit(w) === null &&
+        !t.has(w) && !t.has(w.replace(/s$/, ""));
+      if (foreign(before && before[1]) || foreign(after && after[1])) return;
+    }
     const value = valueFor(qty, candidates[0], text, labelWords);
     if (value === null) return;
     filled[candidates[0].d] = value;

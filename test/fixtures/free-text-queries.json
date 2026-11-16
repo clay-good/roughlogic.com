@@ -69,6 +69,30 @@
       "tile": "tree-protection-zone",
       "mustNotBind": { "dbh_in": "2400" },
       "why": "200 ft of fence, converted to 2,400 in, became a tree's trunk diameter on a calculator the question never asked for."
+    },
+    {
+      "query": "concrete block count 40 ft wall 8 ft tall",
+      "tile": "masonry-count",
+      "mustNotBind": { "mortar_joint_in": "480" },
+      "why": "The 40 ft wall, converted to inches, filled the mortar joint thickness."
+    },
+    {
+      "query": "how much weight can a 2x10 span 12 ft",
+      "tile": "lumber-spans",
+      "mustNotBind": { "tributary_width_in": "144" },
+      "why": "The 12 ft span, converted to 144 in, filled the joist's tributary width."
+    },
+    {
+      "query": "how many lumens for a 12 by 12 room",
+      "tile": "lumen-method",
+      "mustNotBind": { "lumens_per_lum": "12" },
+      "why": "One side of the room became the lumens each luminaire puts out."
+    },
+    {
+      "query": "solar panels for 900 kwh per month",
+      "tile": "battery-peak-shaving",
+      "mustNotBind": { "nameplate_kwh": "900" },
+      "why": "900 kWh per month is a usage rate, not a 900 kWh battery."
     }
   ]
 }

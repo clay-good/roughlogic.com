@@ -6,6 +6,13 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Four more wrong values from everyday questions are gone.** A second batch of 25 typed questions found these:
+  - "Concrete block count 40 ft wall 8 ft tall" put the wall, as 480 in, into the mortar joint.
+  - "How much weight can a 2x10 span 12 ft" made the span a 144 in tributary width.
+  - "How many lumens for a 12 by 12 room" gave each luminaire 12 lumens.
+  - "Solar panels for 900 kwh per month" sized a 900 kWh battery.
+
+  Three fixes. A feet-to-inches conversion, the weakest kind of fill, is refused when a word right beside the number names something other than the target field. A rate ("per month") never fills a field in its bare unit. A room's plan area fills an area field whose own label says room. Now the lumens question fills its 144 sq ft room area, and the other three fill nothing wrong. All four are pinned in `test/fixtures/free-text-queries.json`, and every measured phrasing still has 0 wrong values.
 - **More everyday questions answer, and two wrong routes now refuse.**
   - "Amps for a 5 hp motor 230v single phase" filled only the phase. The Horsepower and Voltage dropdowns list values with no unit, so a unit that names their quantity now selects them. The answer is 28 A, and "10 hp 460v three phase" gives 14 A (NEC Tables 430.248 and 430.250).
   - Roof pitch is read as roofers write it, "6/12" or "4 in 12". It fills a unitless Pitch field with the rise, or a Rise and Run in inches with the rise and 12: 4 in 12 is 18.43 deg, and a 12 ft run at 6/12 is a 13.42 ft rafter. It is never read as the fraction 0.5.
