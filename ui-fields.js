@@ -266,7 +266,16 @@ export function attachExampleButton(host, fillFn) {
   // non-bubbling events is still seen.
   let seeded = false;
   const mark = () => { seeded = true; };
-  btn.addEventListener("click", () => { mark(); fillFn(); });
+  // The example sets only the inputs it names. Until 2026-11-15 a box the reader
+  // had already filled (an extra payment, other motors, a second select) stayed
+  // in, so 103 tiles showed an "example" answer that was not the example's. The
+  // click now puts every field back as rendered before the example fills its own.
+  let initial = null;
+  btn.addEventListener("click", () => {
+    mark();
+    if (initial) for (const f of initial) if (f.el.value !== f.value || f.el.checked !== f.checked) { f.el.value = f.value; f.el.checked = f.checked; }
+    fillFn();
+  });
   host.addEventListener("input", mark, true);
   host.addEventListener("change", mark, true);
   // Deferred: many tiles attach the button before they build their fields,
@@ -275,6 +284,7 @@ export function attachExampleButton(host, fillFn) {
   queueMicrotask(() => {
     host.removeEventListener("input", mark, true);
     host.removeEventListener("change", mark, true);
+    initial = Array.from(host.querySelectorAll("input, select, textarea")).map((el) => ({ el, value: el.value, checked: el.checked }));
     primeExamplePlaceholders(host, fillFn, seeded);
   });
   return btn;

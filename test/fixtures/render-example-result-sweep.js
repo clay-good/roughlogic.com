@@ -36,7 +36,7 @@ for (const r of ROWS) if (!first.has(r.tile_id)) first.set(r.tile_id, r);
 // At the precision a reader can see, as check-example-parity compares inputs:
 // the button types 66.82 where the fixture carries 66.8235.
 const close = (a, b) => a === b || Math.abs(a - b) <= Math.max(Math.abs(b) * 0.001, 1e-12);
-const report = { compared: 0, mismatches: {} };
+const report = { compared: 0, mismatches: {}, dirty: [] };
 for (const { id } of TOOLS) {
   const reg = RENDERER_MAP[id], creg = COMPUTE_MAP[id], row0 = first.get(id);
   if (!reg || !creg || !row0) continue;
@@ -59,6 +59,16 @@ for (const { id } of TOOLS) {
     flushTimers();
     const page = last.get(creg.fn);
     if (!page || typeof page !== "object" || page.error) continue;
+    // Fill every box and pick the last option of every select, then press the button
+    // again: the answer must be the same, because the example resets what it does not
+    // name (103 tiles kept the reader's optional boxes until 2026-11-15).
+    { const fire = (el) => { el.dispatchEvent(new Event("input", { bubbles: true })); el.dispatchEvent(new Event("change", { bubbles: true })); };
+      for (const el of inputs.querySelectorAll("input")) if (el.type === "number" || el.type === "text") { el.value = el.type === "number" ? "3" : el.value; fire(el); }
+      for (const el of inputs.querySelectorAll("select")) { const o = el.querySelectorAll ? el.querySelectorAll("option") : []; if (o.length > 1) { el.value = o[o.length - 1].value; fire(el); } }
+      flushTimers(); last = new Map(); btn.click(); flushTimers();
+      const again = last.get(creg.fn);
+      if (again && typeof again === "object") { const d = Object.entries(page).filter(([k, v]) => typeof v === "number" && Number.isFinite(v) && !(typeof again[k] === "number" && close(v, again[k])));
+        if (d.length || again.error) report.dirty.push(id + ": " + (again.error ? "ERROR " + again.error.slice(0, 60) : d.slice(0, 2).map(([k, v]) => k + " " + v + " -> " + again[k]).join("; "))); } }
     const want = mod[creg.fn](structuredClone(inputs0));
     if (!want || typeof want !== "object" || want.error) continue;
     report.compared++;

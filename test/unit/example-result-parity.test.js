@@ -28,4 +28,5 @@ test("example result parity: the example button computes the worked example the 
   assert.deepEqual(fresh, [], "the button loads a different case than the printed example: make the button load the first fixture row, or move a matching verified row first");
   const gone = Object.keys(REVIEWED).filter((id) => !(id in report.mismatches));
   assert.deepEqual(gone, [], "fixed or gone: remove these from REVIEWED");
+  assert.deepEqual(report.dirty, [], "the example button kept a value the reader had typed: attachExampleButton resets every field as rendered before filling; a tile with its own button must do the same");
 });
