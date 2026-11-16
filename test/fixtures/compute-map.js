@@ -2391,6 +2391,7 @@ export const COMPUTE_MAP = {
   "mver-calcium-chloride": { module: "../../calc-finish.js", fn: "computeMverCalciumChloride" },
   "work-zone-buffer-space": { module: "../../calc-construction.js", fn: "computeWorkZoneBufferSpace" },
   "wood-stud-wall-takeoff": { module: "../../calc-construction.js", fn: "computeWoodStudWallTakeoff" },
+  "lawn-fertilizer-rate": { module: "../../calc-farmproduction.js", fn: "computeLawnFertilizerRate" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

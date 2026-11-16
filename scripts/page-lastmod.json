@@ -2,11 +2,11 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "357fe50f720fb3e8",
+      "sha": "ccba9c2bacb602da",
       "date": "2026-11-16"
     },
     "/tools/": {
-      "sha": "6ed6191585a683a4",
+      "sha": "8aec64a74c29bf2d",
       "date": "2026-11-16"
     },
     "/errata/": {
@@ -14,91 +14,91 @@
       "date": "2026-11-14"
     },
     "/collections/disaster-response/": {
-      "sha": "7822e287682c7427",
+      "sha": "ccf37e2896642960",
       "date": "2026-11-16"
     },
     "/groups/accounting/": {
-      "sha": "76b66b5c908e7115",
+      "sha": "43bee43636e81f9d",
       "date": "2026-11-16"
     },
     "/groups/agriculture/": {
-      "sha": "8811d0af3bc9cc13",
+      "sha": "fef907337b8ed6e6",
       "date": "2026-11-16"
     },
     "/groups/construction/": {
-      "sha": "8cd2014e764fb794",
+      "sha": "a0ac080b6cc567b4",
       "date": "2026-11-16"
     },
     "/groups/cross-trade/": {
-      "sha": "21c6d562b900f3db",
+      "sha": "62746290c9ce0756",
       "date": "2026-11-16"
     },
     "/groups/educators/": {
-      "sha": "1f5fa8318b36c9f2",
+      "sha": "babc12f5c51fed3f",
       "date": "2026-11-16"
     },
     "/groups/electrical/": {
-      "sha": "e4c16223662feade",
+      "sha": "c6012c2d6b82148b",
       "date": "2026-11-16"
     },
     "/groups/field/": {
-      "sha": "67f805072f0198b7",
+      "sha": "c9a15cffebcb9f83",
       "date": "2026-11-16"
     },
     "/groups/fire-ground/": {
-      "sha": "b262688719d9ffae",
+      "sha": "ecfcf8a95e410252",
       "date": "2026-11-16"
     },
     "/groups/historical/": {
-      "sha": "3bec6a1f11e929ca",
+      "sha": "e1356259f3aebd2e",
       "date": "2026-11-16"
     },
     "/groups/hvac/": {
-      "sha": "8fbaf8ed551b3585",
+      "sha": "7832ad36b3febb18",
       "date": "2026-11-16"
     },
     "/groups/kitchen/": {
-      "sha": "d3ba591f8a6b92d7",
+      "sha": "ff5ab54c92b62020",
       "date": "2026-11-16"
     },
     "/groups/lab/": {
-      "sha": "33ea8bd1c78004ca",
+      "sha": "ece77d3ac57e60b3",
       "date": "2026-11-16"
     },
     "/groups/mechanic/": {
-      "sha": "1e1d3701c5ef561d",
+      "sha": "6f186b7de60de866",
       "date": "2026-11-16"
     },
     "/groups/plumbing/": {
-      "sha": "76cd67010eda846a",
+      "sha": "bd0117734a12ed20",
       "date": "2026-11-16"
     },
     "/groups/real-estate/": {
-      "sha": "c8539744f5eb95dd",
+      "sha": "384845cda9c85928",
       "date": "2026-11-16"
     },
     "/groups/references/": {
-      "sha": "f07831d760a2053e",
+      "sha": "ac6221541508a391",
       "date": "2026-11-16"
     },
     "/groups/restoration/": {
-      "sha": "9ded3954fb790c55",
+      "sha": "261fb8260fa21939",
       "date": "2026-11-16"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "64f7cdc5c2d988ec",
+      "sha": "cef90bacc79ac9f3",
       "date": "2026-11-16"
     },
     "/groups/stage/": {
-      "sha": "da4ded0000b061d6",
+      "sha": "5df73dbe6fc4bc44",
       "date": "2026-11-16"
     },
     "/groups/trucking/": {
-      "sha": "83136f21c16e3ab0",
+      "sha": "3baa0ab150c71474",
       "date": "2026-11-16"
     },
     "/groups/water/": {
-      "sha": "2a9f8eff94efbdce",
+      "sha": "937a68e91c0bf229",
       "date": "2026-11-16"
     },
     "/tools/aav-install-check/": {
@@ -2966,8 +2966,8 @@
       "date": "2026-10-17"
     },
     "/tools/fertigation-injection-rate/": {
-      "sha": "daa4d64f12179c22",
-      "date": "2026-10-17"
+      "sha": "68b7dc84663feff8",
+      "date": "2026-11-16"
     },
     "/tools/fiber-loss-budget/": {
       "sha": "36e8c6ae23348b95",
@@ -4309,6 +4309,10 @@
       "sha": "8d2c38169e69321b",
       "date": "2026-10-17"
     },
+    "/tools/lawn-fertilizer-rate/": {
+      "sha": "0204a33c5542b52c",
+      "date": "2026-11-16"
+    },
     "/tools/layout-squaring/": {
       "sha": "d0a0f3aeb25e69f7",
       "date": "2026-10-17"
@@ -5375,7 +5379,7 @@
     },
     "/tools/pearson-square-ration/": {
       "sha": "7baa53df789f8e84",
-      "date": "2026-10-17"
+      "date": "2026-11-16"
     },
     "/tools/per-diem/": {
       "sha": "af7ce773931042c8",

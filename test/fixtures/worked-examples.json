@@ -173115,6 +173115,79 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "lawn-fertilizer-rate",
+  "source_publisher": "Penn State Extension",
+  "source_title": "Calculations Used to Determine the Amount of Fertilizer Needed to Treat Turf (Landschoot)",
+  "source_edition_or_year": "updated 2025-10-01 (extension.psu.edu, read 2026-11-16)",
+  "source_section_or_page": "26-5-10, 1.0 lb N/1,000 sq ft: 3.8 lb product, 0.19 lb P2O5, 0.38 lb K2O per 1,000 sq ft; 30,000 sq ft about 2.3 bags of 50 lb (printed values rounded)",
+  "verified_by": "rl",
+  "verified_on": "2026-11-16",
+  "inputs": {
+   "area_ft2": 30000,
+   "n_lb_per_1000": 1,
+   "n_pct": 26,
+   "p_pct": 5,
+   "k_pct": 10,
+   "bag_weight_lb": 50
+  },
+  "outputs": {
+   "product_lb_per_1000": {
+    "value": 3.8,
+    "tolerance": {
+     "abs": 0.05
+    }
+   },
+   "p2o5_lb_per_1000": {
+    "value": 0.19,
+    "tolerance": {
+     "abs": 0.005
+    }
+   },
+   "k2o_lb_per_1000": {
+    "value": 0.38,
+    "tolerance": {
+     "abs": 0.01
+    }
+   },
+   "bags_exact": {
+    "value": 2.3,
+    "tolerance": {
+     "abs": 0.05
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "lawn-fertilizer-rate",
+  "source_publisher": "UF/IFAS Florida-Friendly Landscaping",
+  "source_title": "GI-BMP Fertilizer Calculation Worksheet",
+  "source_edition_or_year": "2024 (ffl.ifas.ufl.edu, read 2026-11-16)",
+  "source_section_or_page": "16-0-8 at 1 lb N per 1,000 sq ft on 5,000 sq ft: 1 / 0.16 = 6.25 lb per 1,000 sq ft, 31.25 lb",
+  "verified_by": "rl",
+  "verified_on": "2026-11-16",
+  "inputs": {
+   "area_ft2": 5000,
+   "n_lb_per_1000": 1,
+   "n_pct": 16,
+   "p_pct": 0,
+   "k_pct": 8
+  },
+  "outputs": {
+   "product_lb_per_1000": {
+    "value": 6.25,
+    "tolerance": {
+     "abs": 1e-09
+    }
+   },
+   "product_lb": {
+    "value": 31.25,
+    "tolerance": {
+     "abs": 1e-09
+    }
+   }
+  }
  }
  ]
 }

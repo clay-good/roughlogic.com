@@ -117789,11 +117789,6 @@
   "kind": "question"
  },
  {
-  "term": "fertilizer for",
-  "target": "npk-blend",
-  "kind": "question"
- },
- {
   "term": "water heater size",
   "target": "water-heater-storage-sizing",
   "kind": "question"
@@ -117817,6 +117812,31 @@
   "term": "markup percent on dollars of cost",
   "target": "markup",
   "kind": "question"
+ },
+ {
+  "term": "fertilizer for",
+  "target": "lawn-fertilizer-rate",
+  "kind": "question"
+ },
+ {
+  "term": "how much fertilizer for my lawn",
+  "target": "lawn-fertilizer-rate",
+  "kind": "question"
+ },
+ {
+  "term": "lawn fertilizer",
+  "target": "lawn-fertilizer-rate",
+  "kind": "industry"
+ },
+ {
+  "term": "pounds of fertilizer per 1000 sq ft",
+  "target": "lawn-fertilizer-rate",
+  "kind": "industry"
+ },
+ {
+  "term": "lb of nitrogen per 1000 square feet",
+  "target": "lawn-fertilizer-rate",
+  "kind": "industry"
  }
  ]
 }

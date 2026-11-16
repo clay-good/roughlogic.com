@@ -62509,3 +62509,17 @@ test("bounds: spec-v1994 computeWoodStudWallTakeoff pins the counts, plates and 
     assert.ok("error" in _wsw({ ...ex, ...bad }), JSON.stringify(bad));
   }
 });
+
+import { computeLawnFertilizerRate as _lfr } from "../../calc-farmproduction.js";
+test("bounds: spec-v1995 computeLawnFertilizerRate pins the Penn State example and the error seams", () => {
+  const ex = { area_ft2: 30000, n_lb_per_1000: 1, n_pct: 26, p_pct: 5, k_pct: 10, bag_weight_lb: 50 };
+  const r = _lfr(ex);
+  assert.ok(Math.abs(r.product_lb_per_1000 - 1 / 0.26) < 1e-12);
+  assert.ok(Math.abs(r.bag_coverage_ft2 - 13000) < 1e-6);
+  assert.strictEqual(r.bags, 3);
+  for (const bad of [{ area_ft2: 0 }, { n_lb_per_1000: 0 }, { n_lb_per_1000: 3 }, { n_pct: 0 }, { n_pct: 50 }, { p_pct: -1 }, { n_pct: 46, p_pct: 46, k_pct: 10 }, { bag_weight_lb: 0 }, { bag_weight_lb: 200 }, { area_ft2: 1e8 }]) {
+    assert.ok("error" in _lfr({ ...ex, ...bad }), JSON.stringify(bad));
+  }
+  // A null from the agent door takes the default, not 0.
+  assert.strictEqual(_lfr({ ...ex, n_lb_per_1000: null, bag_weight_lb: null, p_pct: null }).bags, 3);
+});

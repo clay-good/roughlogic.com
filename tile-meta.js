@@ -1541,6 +1541,8 @@ const _TILES = [
   ["work-zone-buffer-space", "E"],
   // spec-v1994: wood stud wall takeoff (calc-construction.js).
   ["wood-stud-wall-takeoff", "E"],
+  // spec-v1995: lawn fertilizer product rate (calc-farmproduction.js).
+  ["lawn-fertilizer-rate", "L"],
 ];
 
 

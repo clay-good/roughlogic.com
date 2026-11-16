@@ -2292,4 +2292,5 @@ export const RENDERER_MAP = {
   "mver-calcium-chloride": { module: "../../calc-finish.js", exportName: "FINISH_RENDERERS" },
   "work-zone-buffer-space": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "wood-stud-wall-takeoff": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
+  "lawn-fertilizer-rate": { module: "../../calc-farmproduction.js", exportName: "FARMPRODUCTION_RENDERERS" },
 };

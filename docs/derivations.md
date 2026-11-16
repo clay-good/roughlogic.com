@@ -2288,6 +2288,7 @@ cross-check.
 | calc-farmproduction.js | `computeFertigationInjectionRate` | `{ product_rate_gal_per_acre = 5, area_acres = 40, set_time_hours = 6 } = {}` | _ | _ | _ |
 | calc-farmproduction.js | `computeGrainAerationAirflow` | `{ bin_capacity_bu = 0, airflow_rate = 0 } = {}` | _ | _ | _ |
 | calc-farmproduction.js | `computeGrainDryingEnergy` | `{ bushels = 0, lb_per_bushel = 56, mi_percent = 0, mf_percent = 0, btu_per_lb...` | _ | _ | _ |
+| calc-farmproduction.js | `computeLawnFertilizerRate` | `{ area_ft2 = 0, n_lb_per_1000 = 1, n_pct = 0, p_pct = 0, k_pct = 0, bag_weigh...` | _ | _ | _ |
 | calc-farmproduction.js | `computeMadIrrigationTrigger` | `{ field_capacity = 0.30, wilting_point = 0.12, root_depth_in = 24, mad_fracti...` | _ | _ | _ |
 | calc-farmproduction.js | `computeManureCoverSavings` | `{ daily_manure_ft3 = 0, wastewater_ft3 = 0, bedding_ft3 = 0, storage_days = 0...` | _ | _ | _ |
 | calc-farmproduction.js | `computeManureNutrientApplication` | `{ crop_n_need_lb_acre = 0, total_n_lb_ton = 0, availability_pct = 0, p2o5_lb_...` | _ | _ | _ |
@@ -3954,7 +3955,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2538.
+Row count: 2539.
 
 <!-- END function-corpus-v14 -->
 
@@ -5888,7 +5889,7 @@ per spec-v14 §13.1 second paragraph.
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `worm-gear-geometry` | Worm and Worm-Wheel Geometry | Machinery's Handbook (worm gearing); lead = 0.5 x 1 = 0.5 in; lead angle = atan(0.5/(pi x 2)) ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group L Agriculture (96 tiles)
+### Group L Agriculture (97 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5932,6 +5933,7 @@ per spec-v14 §13.1 second paragraph.
 | `irrigation-zone-runtime` | Irrigation Zone Runtime and Cycle-and-Soak | Irrigation Association scheduling ref...; spec-v208 section 2.1 pinned example (clay lawn zone) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `kiln-charge-water` | Kiln Charge Water Weight, Energy, and Vent Load | Project (first-principles); the FPL dry-kiln schedules and the mill's own kiln sample... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `kiln-drying-time` | Lumber Kiln Drying Time and Schedule Duration | Project (first-principles); the FPL dry-kiln schedules and the kiln manufacturer govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `lawn-fertilizer-rate` | Lawn Fertilizer Product Rate | Penn State Extension; 26-5-10, 1.0 lb N/1,000 sq ft: 3.8 lb product, 0.19 lb P2... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `leaching-fraction-runoff-ec` | Leaching Fraction and Runoff Conductivity | Project (first-principles); a consistent pour-through and the crop range govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `livestock-dry-matter-intake` | Livestock Dry-Matter Intake and As-Fed Ration | NRC Nutrient Requirements; spec-v339 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `livestock-water-requirement` | Livestock Water Requirement | NRC / USDA NRCS water-intake guidance...; 50 head, 80 F between (40 F,8 gal) and (90 F,20 gal) -> 1... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -6411,6 +6413,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2284. Fixture-covered or reference-cadence: 2284 / 2284.
+Tile count: 2285. Fixture-covered or reference-cadence: 2285 / 2285.
 
 <!-- END tile-index-v14 -->

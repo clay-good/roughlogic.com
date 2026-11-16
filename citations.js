@@ -26847,6 +26847,17 @@ export const CITATIONS = {
       { name: "Waste", value: "10% on studs and plates", source: "estimating practice" },
     ],
   },
+  "lawn-fertilizer-rate": {
+    formula: "lb product per 1,000 sq ft = lb N per 1,000 sq ft / (N% / 100); lb P2O5 or K2O per 1,000 sq ft = product rate x P% or K% / 100; lb product = rate x area / 1,000; per acre = rate x 43.56; bags = lb product / bag weight.",
+    edition: "Penn State Extension, \"Calculations Used to Determine the Amount of Fertilizer Needed to Treat Turf\" (Peter Landschoot; updated 2025-10-01), read 2026-11-16: 26-5-10 at 1.0 lb N per 1,000 sq ft is 3.8 lb product, 0.19 lb P2O5 and 0.38 lb K2O; a 50 lb bag covers about 13,200 sq ft; 30,000 sq ft takes about 2.3 bags. Purdue Turfgrass Science and the UF/IFAS GI-BMP fertilizer worksheet (16-0-8, 1 lb N, 5,000 sq ft: 31.25 lb) state the same division.",
+    freeAccess: "Free at extension.psu.edu, turf.purdue.edu and ffl.ifas.ufl.edu.",
+    governance: GOVERNANCE.general,
+    editionNote: "The arithmetic is the extension services' own. Penn State rounds the product rate to 3.8 before dividing the bag, which prints 13,200 sq ft per bag; carried unrounded it is 13,000. The per-application nitrogen ceiling is guidance (about 1 lb N per 1,000 sq ft or less), not a single national rule; state and local fertilizer ordinances (phosphorus, blackout seasons) govern.",
+    assumptions: [
+      { name: "Granular product by weight", value: "the analysis is percent by weight; liquids by volume are not converted", source: "fertilizer labeling" },
+      { name: "Bag weight", value: "50 lb unless entered", source: "common bag size" },
+    ],
+  },
 };
 
 // --- Reference block and copy text ---

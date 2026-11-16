@@ -907,3 +907,58 @@ FARMPRODUCTION_RENDERERS["reference-et0"] = _r({
   ],
   compute: computeReferenceEt0,
 });
+
+// ===================== spec-v1995: lawn fertilizer product rate =====================
+// Pounds of product = pounds of nitrogen wanted / the product's N fraction, per
+// 1,000 sq ft (Penn State Extension, Purdue Turfgrass, UF/IFAS GI-BMP). The
+// same product rate carries P2O5 and K2O at the bag's other two percentages.
+// dims: in { area_ft2: L^2, n_lb_per_1000: dimensionless, n_pct: dimensionless, p_pct: dimensionless, k_pct: dimensionless, bag_weight_lb: M } out: { product_lb_per_1000: M, product_lb: M, product_lb_per_acre: M, p2o5_lb_per_1000: M, k2o_lb_per_1000: M, bag_coverage_ft2: L^2, bags_exact: dimensionless, bags: dimensionless }
+export function computeLawnFertilizerRate({ area_ft2 = 0, n_lb_per_1000 = 1, n_pct = 0, p_pct = 0, k_pct = 0, bag_weight_lb = 50 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The agent door sends an unfilled box as null: a blank means the default.
+  const d = (v, D) => (v === null || v === undefined || v === "" ? D : v);
+  const A = Number(area_ft2), N = Number(d(n_lb_per_1000, 1)), n = Number(n_pct), p = Number(d(p_pct, 0)), k = Number(d(k_pct, 0)), bag = Number(d(bag_weight_lb, 50));
+  if (!(A > 0)) return { error: "Lawn area must be positive (sq ft)." };
+  if (A > 10000000) return { error: "An area over 10,000,000 sq ft is outside this calculator." };
+  if (!(N > 0)) return { error: "Nitrogen rate must be positive (lb N per 1,000 sq ft)." };
+  if (N > 2) return { error: "More than 2 lb of nitrogen per 1,000 sq ft in one application is outside lawn practice (extension guidance is 1 lb or less)." };
+  if (!(n > 0)) return { error: "The bag's nitrogen percentage (the first number of the analysis) must be positive." };
+  if (n > 46) return { error: "No dry lawn fertilizer is above 46% nitrogen (urea, 46-0-0)." };
+  if (!(p >= 0) || !(k >= 0)) return { error: "Phosphate and potash percentages cannot be negative." };
+  if (n + p + k > 100) return { error: "The three analysis numbers cannot add up to more than 100%." };
+  if (!(bag > 0) || bag > 100) return { error: "Bag weight must be above 0 and at most 100 lb." };
+  const product_lb_per_1000 = N / (n / 100);
+  const product_lb = product_lb_per_1000 * A / 1000;
+  const product_lb_per_acre = product_lb_per_1000 * 43.56;
+  const p2o5_lb_per_1000 = product_lb_per_1000 * p / 100;
+  const k2o_lb_per_1000 = product_lb_per_1000 * k / 100;
+  const bag_coverage_ft2 = bag / product_lb_per_1000 * 1000;
+  const bags_exact = product_lb / bag;
+  const bags = Math.ceil(bags_exact - 1e-9);
+  if (![product_lb_per_1000, product_lb, product_lb_per_acre, p2o5_lb_per_1000, k2o_lb_per_1000, bag_coverage_ft2, bags_exact].every(Number.isFinite)) return { error: "Fertilizer math is not a finite value." };
+  return {
+    product_lb_per_1000, product_lb, product_lb_per_acre, p2o5_lb_per_1000, k2o_lb_per_1000, bag_coverage_ft2, bags_exact, bags,
+    high_rate: N > 1 + 1e-9,
+    note: "Pounds of product per 1,000 sq ft are the pounds of nitrogen wanted divided by the bag's nitrogen fraction (the first number of the analysis, so 26-5-10 is 26% N): 1 lb N from 26-5-10 is 1 / 0.26 = 3.85 lb of product. The same product rate puts down the bag's phosphate (P2O5) and potash (K2O) at its other two percentages. Extension services generally advise no more than about 1 lb of nitrogen per 1,000 sq ft in one application (less from quick-release sources), and some states and counties limit phosphorus on lawns without a soil test; follow the label and local rules. Set the spreader from the label for the product rate.",
+  };
+}
+export const lawnFertilizerRateExample = { inputs: { area_ft2: 30000, n_lb_per_1000: 1, n_pct: 26, p_pct: 5, k_pct: 10, bag_weight_lb: 50 } };
+FARMPRODUCTION_RENDERERS["lawn-fertilizer-rate"] = _r({
+  citation: "Citation: Penn State Extension, \"Calculations Used to Determine the Amount of Fertilizer Needed to Treat Turf\" (Landschoot), Purdue Turfgrass Science, and the UF/IFAS GI-BMP fertilizer worksheet, by name; free online. lb product per 1,000 sq ft = lb N per 1,000 sq ft / (N% / 100); P2O5 and K2O = product rate x their percentages; bags = area x rate / bag weight. The product label and local fertilizer rules govern.",
+  example: lawnFertilizerRateExample.inputs,
+  fields: [
+    { key: "area_ft2", label: "Lawn area (sq ft)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "n_lb_per_1000", label: "Nitrogen rate (lb N per 1,000 sq ft)", kind: "number", default: 1, attrs: { step: "any", min: "0", max: "2" } },
+    { key: "n_pct", label: "Nitrogen % (first number of the analysis)", kind: "number", attrs: { step: "any", min: "0", max: "46" } },
+    { key: "p_pct", label: "Phosphate % (second number)", kind: "number", default: 0, attrs: { step: "any", min: "0", max: "100" } },
+    { key: "k_pct", label: "Potash % (third number)", kind: "number", default: 0, attrs: { step: "any", min: "0", max: "100" } },
+    { key: "bag_weight_lb", label: "Bag weight (lb)", kind: "number", default: 50, attrs: { step: "any", min: "0", max: "100" } },
+  ],
+  outputs: [
+    { key: "r", id: "lfr-out-r", label: "Product rate", value: (r) => fmt(r.product_lb_per_1000, 2) + " lb per 1,000 sq ft (" + fmt(r.product_lb_per_acre, 0) + " lb per acre)" + (r.high_rate ? " -- above 1 lb N per 1,000 sq ft in one application" : "") },
+    { key: "t", id: "lfr-out-t", label: "Product for the lawn", value: (r) => fmt(r.product_lb, 1) + " lb, " + fmt(r.bags_exact, 2) + " bags (buy " + r.bags + "); one bag covers " + fmt(r.bag_coverage_ft2, 0) + " sq ft" },
+    { key: "pk", id: "lfr-out-pk", label: "Phosphate and potash applied", value: (r) => fmt(r.p2o5_lb_per_1000, 2) + " lb P2O5 and " + fmt(r.k2o_lb_per_1000, 2) + " lb K2O per 1,000 sq ft" },
+    { key: "n", id: "lfr-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeLawnFertilizerRate,
+});

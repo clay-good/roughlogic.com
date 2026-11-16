@@ -2445,6 +2445,8 @@ const RELATED = {
   "work-zone-buffer-space": ["traffic-taper-length","advance-warning-sign-spacing"],
   // spec-v1994: wood stud wall takeoff (calc-construction.js).
   "wood-stud-wall-takeoff": ["residential-framing","metal-stud-takeoff","header-sizing","sheathing-takeoff"],
+  // spec-v1995: lawn fertilizer product rate (calc-farmproduction.js).
+  "lawn-fertilizer-rate": ["npk-blend","sod-takeoff","mulch-topsoil-volume","sprinkler-precip-rate"],
 };
 
 export { RELATED };

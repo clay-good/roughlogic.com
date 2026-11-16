@@ -1038,6 +1038,10 @@
     {"term":"how much mulch do i need","target":"mulch-topsoil-volume","kind":"question"},
     {"term":"mulch for","target":"mulch-topsoil-volume","kind":"question"},
     {"term":"mulch inches deep","target":"mulch-topsoil-volume","kind":"industry"},
-    {"term":"fertilizer for","target":"npk-blend","kind":"question"}
+    {"term":"fertilizer for","target":"lawn-fertilizer-rate","kind":"question"},
+    {"term":"how much fertilizer for my lawn","target":"lawn-fertilizer-rate","kind":"question"},
+    {"term":"lawn fertilizer","target":"lawn-fertilizer-rate","kind":"industry"},
+    {"term":"pounds of fertilizer per 1000 sq ft","target":"lawn-fertilizer-rate","kind":"industry"},
+    {"term":"lb of nitrogen per 1000 square feet","target":"lawn-fertilizer-rate","kind":"industry"}
   ]
 }

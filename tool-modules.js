@@ -1351,6 +1351,7 @@ export const TOOL_MODULES = (() => {
     "tractor-ballast", "anhydrous-ammonia-rate", "mad-irrigation-trigger",
     "fertigation-injection-rate", "cattle-heart-girth-weight", "corn-yield-estimate",
     "dressing-percentage", "reference-et0",
+    "lawn-fertilizer-rate",
   ]);
   // spec-v1717..v1726: the air quality and emissions bench (Group G). Two
   // threads: the REGULATORY number is rarely the one a plant tracks (potential
