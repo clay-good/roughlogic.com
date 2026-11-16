@@ -563,7 +563,8 @@ function renderUniformity(inputRegion, outputRegion, citationEl) {
     // A dry can typed as 0 is a reading; a blank row is not. Until 2026-11-15
     // Number("") read every blank row as a dry can, so the worked example's 8
     // cans in 12 rows printed DU 0.0% (2025's `v > 0` dropped real dry cans).
-    const vals = rows.filter((r) => r.value.trim() !== "").map((r) => Number(r.value)).filter((v) => Number.isFinite(v) && v >= 0);
+    // A negative reading is passed on so the compute names it; until 2026-11-15 it was dropped here.
+    const vals = rows.filter((r) => r.value.trim() !== "").map((r) => Number(r.value));
     if (vals.length < 4) { oM.textContent = "Need at least 4 readings."; oC.textContent = "-"; oD.textContent = "-"; oF.textContent = "-"; return; }
     const r = computeUniformity({ catch_volumes: vals }); stepsFor(outputRegion, inputRegion, ["catch_volumes"], r);
     if (r.error) { oM.textContent = r.error; return; }
@@ -1097,6 +1098,8 @@ export function computeStockingRate({
   herd_size = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["herd_size"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Herd size cannot be negative." };
   const au = ANIMAL_UNIT_EQUIV[animal_class];
   if (au === undefined) return { error: "Unknown animal class '" + animal_class + "'." };
   const area = Number(area_acres);

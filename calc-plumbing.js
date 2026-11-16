@@ -242,6 +242,8 @@ function _v8frictionVelocityFlag(v_ft_s) {
 // dims: in { method: dimensionless, material: dimensionless, nominal_size: L, length_ft: L, flow_gpm: L^3 T^-1, internal_diameter_in: L } out: { headLoss_ft: L, pressureLoss_psi: M L^-1 T^-2, internal_diameter_in: L, velocity_ft_s: L T^-1 }
 export function computeFrictionLoss({ method, material, nominal_size, length_ft, flow_gpm, internal_diameter_in }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["flow_gpm"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Flow cannot be negative (gpm)." };
   const d = internal_diameter_in || (FRICTION_ID_BY_MATERIAL[material] || SCH40_ID_IN)[String(nominal_size)];
   if (!d) return { error: "No bundled bore for " + nominal_size + " in " + material + "; provide the internal diameter directly." };
   // Compute velocity once (independent of method): V (ft/s) = (Q gpm × 0.4085) / d² (in²).
@@ -331,6 +333,8 @@ export const pumpSizingExample = {
 // dims: in { elevation_change_ft: L, friction_loss_psi: M L^-1 T^-2, fluid_density_lb_ft3: M L^-3 } out: { elevation_loss_psi: M L^-1 T^-2, total_psi: M L^-1 T^-2, friction_loss_psi: M L^-1 T^-2 }
 export function computeStaticPressureLossPiping({ elevation_change_ft, friction_loss_psi = 0, fluid_density_lb_ft3 = 62.4 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["friction_loss_psi"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Friction loss cannot be negative (psi)." };
   friction_loss_psi = Number(friction_loss_psi);
   // DR-09: a non-positive density is non-physical (yields zero/negative head).
   if (!(fluid_density_lb_ft3 > 0)) return { error: "Fluid density must be positive." };
@@ -350,6 +354,8 @@ export const staticPressurePipingExample = {
 // dims: in { rise: L, run: L, units: dimensionless } out: { percent: dimensionless, degrees: dimensionless, fraction: dimensionless, in_per_ft: dimensionless }
 export function computeSlope({ rise, run, units = "in_per_ft" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["run"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Run cannot be negative." };
   // A missing rise (or, in rise/run mode, a missing run) used to come back as empty
   // numbers rather than an error, and in inches-per-foot mode a run of 0 was refused
   // though that mode never reads it (2026-10-18).
@@ -2118,6 +2124,8 @@ export function computeRecircLoopSizing({
   fuel_price = null,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["fuel_price"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Fuel price cannot be negative." };
   // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
   { const x = arguments[0]?.heater_efficiency; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 1)) return { error: "Heater efficiency must be from 0 to 1 (0.80 = 80%)." }; }
   // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
@@ -2562,6 +2570,8 @@ export function computeWhExpansionTank({
   acceptance_factor = 0.46,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["incoming_psi", "relief_psi"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Pressures cannot be negative (psi)." };
   // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
   if ([incoming_F].some((x) => x === null || x === "")) return { error: "Enter the incoming water temperature (F)." };
   const vol = Number(water_heater_vol_gal) || 0;
@@ -3036,6 +3046,8 @@ export function computeBackflowSizing({
   min_residual_psi = 20,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["min_residual_psi"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Minimum residual pressure cannot be negative (psi)." };
   if (arguments[0]?.hazard !== undefined && arguments[0].hazard !== "high" && arguments[0].hazard !== "low") return { error: "Hazard must be high or low." };
   const flow = Number(service_flow_gpm);
   const up = Number(upstream_pressure_psi);

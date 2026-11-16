@@ -1629,6 +1629,8 @@ export function computeSmokeEjector({
   entry_opening_ft2 = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["exhaust_opening_ft2", "entry_opening_ft2"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Opening areas cannot be negative (ft^2)." };
   if (Number(length_ft) < 0 || Number(width_ft) < 0 || Number(height_ft) < 0) return { error: "Dimensions cannot be negative (ft)." };
   const L = Number(length_ft) || 0;
   const W = Number(width_ft) || 0;

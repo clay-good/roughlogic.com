@@ -47,6 +47,8 @@ export const LOWVOLTAGE_RENDERERS = {};
 // dims: in { length_m: L, attenuation_db_km: dimensionless, connector_count: dimensionless, splice_count: dimensionless, max_channel_loss_db: dimensionless } out: { total_loss_db: dimensionless, margin_db: dimensionless, connector_loss_db: dimensionless, fiber_loss_db: dimensionless, max_channel_loss_db: dimensionless, splice_loss_db: dimensionless }
 export function computeFiberLossBudget({ length_m = 0, attenuation_db_km = 0, connector_count = 0, loss_per_connector_db = 0.75, splice_count = 0, loss_per_splice_db = 0.3, max_channel_loss_db = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["max_channel_loss_db"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "The maximum channel loss cannot be negative (dB)." };
   const len = Number(length_m);
   const att = Number(attenuation_db_km);
   if (!(len > 0)) return { error: "Link length must be positive (m)." };

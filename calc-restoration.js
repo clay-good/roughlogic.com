@@ -2200,6 +2200,8 @@ RESTORATION_RENDERERS["drying-balance"] = renderDryingBalance;
 // water_gal = water_lb / 8.34 (lb/gal).
 // dims: in { material_volume_ft3: L^3, dry_density_lb_ft3: M L^-3, mc_current_pct: dimensionless, mc_goal_pct: dimensionless } out: { dry_mass_lb: M, water_lb: M, water_gal: L^3 }
 export function computeBoundWater({ material_volume_ft3 = 0, dry_density_lb_ft3 = 0, mc_current_pct = 0, mc_goal_pct = 0 } = {}) {
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["mc_goal_pct"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "The goal moisture content cannot be negative (percent)." };
   const vol = Number(material_volume_ft3);
   const density = Number(dry_density_lb_ft3);
   const cur = Number(mc_current_pct);
@@ -2506,6 +2508,8 @@ RESTORATION_RENDERERS["cavity-drying-system"] = renderCavityDryingSystem;
 // optimistic near goal). A non-positive daily drop reports "not progressing".
 // dims: in { current_mc_pct: dimensionless, goal_mc_pct: dimensionless, daily_drop_pct: dimensionless } out: { remaining_pts: dimensionless, days_to_goal: T }
 export function computeDryTimeProjection({ current_mc_pct = 0, goal_mc_pct = 0, daily_drop_pct = 0 } = {}) {
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["goal_mc_pct"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "The goal moisture content cannot be negative (percent)." };
   const cur = Number(current_mc_pct);
   const goal = Number(goal_mc_pct);
   const drop = Number(daily_drop_pct);

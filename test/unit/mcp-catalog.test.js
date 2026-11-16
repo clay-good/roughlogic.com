@@ -388,12 +388,14 @@ test("the door does not answer on a value the tile's own bounds reject", async (
 
   // And a caller who means it is still served: `run_calculator` answers and
   // keeps the warning ADVISORY, exactly as its contract says. Demonstrated on
-  // a tile whose compute does not itself refuse -- a negative insurance
-  // premium is out of range but arithmetically meaningful, and the door hands
-  // back the number with the bound reported beside it.
+  // a tile whose compute does not itself refuse -- a negative discount rate is
+  // out of the box's range but arithmetically meaningful, and the door hands
+  // back the number with the bound reported beside it. (rent-vs-buy's negative
+  // insurance premium served here until 2026-11-15, when its compute began to
+  // refuse it.)
   const forced = await run({
-    id: "rent-vs-buy",
-    inputs: { ...(await describe({ id: "rent-vs-buy" })).example.inputs, insurance_annual: -1800 },
+    id: "upgrade-roi",
+    inputs: { ...(await describe({ id: "upgrade-roi" })).example.inputs, discount_rate_percent: -2 },
   });
   assert.ok(forced.result && !forced.result.error, JSON.stringify(forced.result).slice(0, 120));
   assert.equal(forced.warnings.filter((w) => w.rule === "min").length, 1);

@@ -45,6 +45,8 @@ export const MACHINING_RENDERERS = {};
 // dims: in { surface_speed_sfm: L*T^-1, diameter_in: L, num_flutes: dimensionless, chip_load_in: L } out: { rpm: T^-1, feed_ipm: L*T^-1, chip_load_in: L, diameter_in: L, surface_speed_sfm: L*T^-1, num_flutes: dimensionless }
 export function computeCuttingSpeed({ surface_speed_sfm = 0, diameter_in = 0, num_flutes = 0, chip_load_in = 0 } = {}) {
   const _g = _finiteGuard({ surface_speed_sfm, diameter_in, num_flutes, chip_load_in }); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["chip_load_in"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Chip load cannot be negative (in)." };
   const sfm = Number(surface_speed_sfm) || 0;
   const dia = Number(diameter_in) || 0;
   if (!(sfm > 0)) return { error: "Surface speed must be positive (SFM)." };
@@ -92,6 +94,8 @@ MACHINING_RENDERERS["cutting-speed-rpm"] = renderCuttingSpeed;
 // dims: in { diameter_in: L, point_angle_deg: dimensionless, full_depth_in: L } out: { point_length_in: L, drill_to_depth_in: L, diameter_in: L, full_depth_in: L, point_angle_deg: dimensionless }
 export function computeDrillPointDepth({ diameter_in = 0, point_angle_deg = 118, full_depth_in = 0 } = {}) {
   const _g = _finiteGuard({ diameter_in, point_angle_deg, full_depth_in }); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["full_depth_in"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Depth cannot be negative (in)." };
   const d = Number(diameter_in);
   const ang = Number(point_angle_deg);
   if (!(d > 0)) return { error: "Drill diameter must be positive (in)." };

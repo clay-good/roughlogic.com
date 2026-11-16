@@ -286,6 +286,9 @@ export const ductSizingExample = {
 // dims: in { elements: dimensionless } out: { total_in_wc: M L^-1 T^-2 }
 export function computeStaticPressureHvac({ elements }) {
   // elements: array of { name, dp_in_wc }.
+  // A negative pressure drop was added in and lowered the total until 2026-11-15.
+  const neg = (elements || []).find((e) => Number(e.dp_in_wc) < 0);
+  if (neg) return { error: (neg.name || "A component") + " pressure drop cannot be negative (in. w.c.)." };
   let total = 0;
   for (const e of elements || []) total += Number(e.dp_in_wc) || 0;
   return { total_in_wc: total, items: elements || [] };
@@ -559,7 +562,7 @@ export function computeEquivalentLength({ items = [] }) {
     const ft = t[String(it.diameter)];
     if (ft === undefined) return { error: "Unknown diameter for " + it.type + ": " + it.diameter };
     const c = Number(it.count) || 0;
-    if (!Number.isInteger(c)) return { error: "Fitting counts must be whole numbers." };
+    if (!Number.isInteger(c) || c < 0) return { error: "Fitting counts must be whole numbers of zero or more." };
     total += ft * c;
     detail.push({ type: it.type, diameter: it.diameter, count: c, equivalent_ft_each: ft });
   }
@@ -1521,6 +1524,8 @@ export function computeAffinityLaws({
   target_kind = "RPM", target_RPM = 0, target_CFM = 0, target_SP_in_wc = 0, target_kW = 0,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["baseline_CFM", "baseline_SP_in_wc", "baseline_kW", "baseline_RPM"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Baseline values cannot be negative." };
   const targets = { RPM: target_RPM, CFM: target_CFM, SP: target_SP_in_wc, kW: target_kW };
   if (!Object.hasOwn(targets, target_kind)) return { error: "Unknown target kind." };
   const target_value = targets[target_kind];
@@ -1588,6 +1593,8 @@ export function computeAirReceiver({
   drawdown_minutes = 1, p_atm_psi = 14.7,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["pump_scfm", "p_low_psi"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Pump SCFM and pressures cannot be negative." };
   if (!Array.isArray(tools)) return { error: "Tools must be a list." };
   if (!(p_high_psi > p_low_psi)) return { error: "P1 must exceed P2." };
   if (!(drawdown_minutes > 0)) return { error: "Drawdown minutes must be positive." };

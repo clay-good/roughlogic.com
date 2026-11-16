@@ -591,6 +591,8 @@ export function computeSalesTaxCompound({
   pre_tax = 0, post_tax = 0, rate1_pct = 0, rate2_pct = 0,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["rate1_pct", "rate2_pct"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Tax rates cannot be negative (percent)." };
   const r = (Number(rate1_pct) + Number(rate2_pct)) / 100;
   if (!(r >= 0)) return { error: "Combined rate cannot be negative." };
   if (pre_tax > 0 && post_tax > 0) return { error: "Provide either pre-tax or post-tax, not both." };

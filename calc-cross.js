@@ -329,6 +329,8 @@ export const salesTaxExample = {
 // dims: in { total_amount: dimensionless, members: dimensionless } out: { total_hours: T, total_amount: dimensionless }
 export function computeTipOut({ total_amount, members }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["total_amount"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "The tip pool cannot be negative ($)." };
   total_amount = Number(total_amount);
   if (!Array.isArray(members) || members.length === 0) return { error: "Provide at least one crew member." };
   if (members.some((m) => Number(m.hours) < 0)) return { error: "Hours cannot be negative." };
@@ -672,6 +674,8 @@ export const IRS_STANDARD_MILEAGE_RATE = 0.76;
 // dims: in { round_trip_miles: L, mpg: L^-2, fuel_price_per_gallon: dimensionless, irs_rate_per_mile: dimensionless } out: { fuel_cost: dimensionless, gallons: L^3, irs_rate_per_mile: dimensionless, reimbursement: dimensionless }
 export function computeMileageCost({ round_trip_miles, mpg, fuel_price_per_gallon, irs_rate_per_mile = IRS_STANDARD_MILEAGE_RATE }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["irs_rate_per_mile"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "The mileage rate cannot be negative ($/mi)." };
   const miles = Number(round_trip_miles) || 0;
   const mpg_val = Number(mpg) || 0;
   const price = Number(fuel_price_per_gallon) || 0;
@@ -692,6 +696,8 @@ export const mileageCostExample = {
 // dims: in { total_hours: T, regular_rate: dimensionless, overtime_multiplier: dimensionless, double_time_multiplier: dimensionless, double_time_threshold_hr: T } out: { gross_pay: dimensionless, overtime_pay: dimensionless, overtime_hours: T, double_time_hours: T, double_time_pay: dimensionless, regular_hours: T, regular_pay: dimensionless }
 export function computeOvertime({ total_hours, regular_rate, overtime_multiplier = 1.5, double_time_multiplier = 2.0, double_time_threshold_hr = 60 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["overtime_multiplier", "double_time_multiplier"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Overtime multipliers cannot be negative." };
   const h = Number(total_hours) || 0;
   const rate = Number(regular_rate) || 0;
   if (h < 0 || rate < 0) return { error: "Hours and rate must be non-negative." };
@@ -1508,6 +1514,8 @@ export function computeTimesheet({ jobs = [], regular_rate = 0, weekly_overtime_
     const lunch = Number(j.lunch_min) || 0;
     const miles = Number(j.miles) || 0;
     if (end < start) return { error: "Job end must be >= start." };
+    // A negative lunch added hours and negative miles cut the reimbursement until 2026-11-15.
+    if (lunch < 0 || miles < 0) return { error: "Lunch minutes and miles cannot be negative." };
     const hours = Math.max(0, (end - start) - lunch / 60);
     job_results.push({ hours, miles });
     total_hours += hours;
@@ -2069,6 +2077,8 @@ export function computeNoiseDose({ rows = [] } = {}) {
       per_row.push({ index: i, level_dBA: L, hours: H, permitted_hr: null, contribution_pct: 0, skipped: true, reason: "non-numeric input" });
       continue;
     }
+    // A negative duration was skipped as if blank until 2026-11-15.
+    if (H < 0) return { error: "Row " + (i + 1) + " hours cannot be negative." };
     if (H <= 0) {
       per_row.push({ index: i, level_dBA: L, hours: H, permitted_hr: null, contribution_pct: 0, skipped: true, reason: "zero or negative hours" });
       continue;

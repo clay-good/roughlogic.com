@@ -62,6 +62,8 @@ export function computePVStringSizing({
   cell_temp_rise_C = 30,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["inverter_mppt_max_V"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "The inverter MPPT maximum cannot be negative (V)." };
   for (const k of ["record_low_C", "record_high_C"]) { const v = arguments[0]?.[k]; if (v === undefined || v === null || v === "") return { error: "Enter the site's record low and record high temperatures (C); the string limits are set by them." }; }
   inverter_mppt_max_V = Number(inverter_mppt_max_V);
   if (!module_voc_V || !module_vmp_V) return { error: "Module Voc and Vmp are required." };
@@ -649,6 +651,8 @@ export function renderEvChargerLoad(inputRegion, outputRegion, citationEl) {
 // dims: in { module_isc_a: I, parallel_strings: dimensionless, ocpd_a: I } out: { max_current_a: I, min_ampacity_a: I, stacked_factor: dimensionless, ocpd_a: I }
 export function computePvCircuitAmpacity({ module_isc_a = 0, parallel_strings = 1, ocpd_a = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["ocpd_a"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "The OCPD rating cannot be negative (A)." };
   const isc = Number(module_isc_a) || 0;
   if (!(isc > 0)) return { error: "Module short-circuit current must be positive (A)." };
   const strings = Number(parallel_strings) || 0;

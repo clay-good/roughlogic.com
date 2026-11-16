@@ -698,6 +698,8 @@ CIVIL_RENDERERS["slope-stake-cut-fill"] = renderSlopeStakeCutFill;
 // dims: in { V_mph: L T^-1, R_ft: L, e_max: dimensionless, f: dimensionless } out: { e_req: dimensionless, R_min_ft: L }
 export function computeSuperelevation({ mode, V_mph, R_ft, e_max, f } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["f"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "The side-friction factor cannot be negative." };
   if (mode !== undefined && mode !== null && mode !== "" && !["e", "rmin"].includes(mode)) return { error: "Unknown mode; use e or rmin." };
   const V = Number(V_mph) || 0;
   if (!(V > 0)) return { error: "Design speed must be greater than zero." };

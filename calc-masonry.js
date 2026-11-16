@@ -1095,6 +1095,8 @@ export function computeMasonryCleaningDilution({ area_ft2 = 0, dilution_parts_wa
   if (!(dilution_parts_water > 0)) return { error: "The dilution must be positive (parts water to one part concentrate)." };
   if (!(coverage_ft2_per_gal > 0)) return { error: "Coverage must be positive (sq ft per gallon of DILUTED solution)." };
   if (prewet_gal_per_100ft2 < 0 || rinse_gal_per_100ft2 < 0) return { error: "A water rate cannot be negative (gal per 100 sq ft)." };
+  // A yes/no flag: -1 or 2 was read as "yes" until 2026-11-15.
+  if (typeof acid_safe_unit !== "boolean" && Number(acid_safe_unit) !== 0 && Number(acid_safe_unit) !== 1) return { error: "Unit tolerates acid must be 1 (yes) or 0 (no)." };
   const diluted_gal = area_ft2 / coverage_ft2_per_gal;
   // One part concentrate to N parts water is one part in N+1 of the mix.
   const total_parts = dilution_parts_water + 1;

@@ -856,6 +856,8 @@ PIPEFIT_RENDERERS["branch-saddle-cutback"] = _renderBranchSaddleCutback;
 // dims: in { large_od_in: L, small_od_in: L, lay_length_in: L, type: dimensionless } out: { centerline_offset_in: L, bop_shift_in: L, top_shift_in: L, lay_length_in: L }
 export function computeReducerOffset({ large_od_in = 0, small_od_in = 0, lay_length_in = 0, type = "concentric" } = {}) {
   const _g = _finiteGuard({ large_od_in, small_od_in, lay_length_in }); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["lay_length_in"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Lay length cannot be negative (in)." };
   const D = Number(large_od_in);
   const d = Number(small_od_in);
   if (!(D > 0)) return { error: "Large-end OD must be positive (in)." };

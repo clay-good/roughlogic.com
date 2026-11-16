@@ -225,6 +225,8 @@ export function computePITI({
   monthly_pmi,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["annual_property_tax", "annual_insurance", "monthly_hoa", "monthly_pmi"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Tax, insurance, HOA and PMI cannot be negative ($)." };
   for (const [k, v] of Object.entries(arguments[0] ?? {})) if (typeof v === "number" && v < 0) return { error: "Payment components cannot be negative (" + k + ")." };
   const P = Number(principal);
   const apr = Number(apr_percent);
@@ -679,6 +681,8 @@ export function renderPropertyTax(inputRegion, outputRegion, citationEl) {
 // (Cap rate and DSCR are dimensionless ratios of like-dim
 //  dollar aggregates; bands are categorical tokens.)
 export function computeCapRateDSCR({ noi_annual, property_value, annual_debt_service, loan_amount = 0, loan_rate_pct = 0, amort_years = 0, operating_expenses_annual = 0, potential_gross_income = 0 }) {
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["operating_expenses_annual"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Operating expenses cannot be negative ($/yr)." };
   if (Number(loan_rate_pct) < 0) return { error: "Loan rate cannot be negative (%)." };
   const noi = Number(noi_annual);
   const val = Number(property_value);
@@ -1375,6 +1379,8 @@ export function computeRentalWorksheet({
   utilities, hoa_fees, other_expenses,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["other_income_annual", "depreciation_annual"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Other income and depreciation cannot be negative ($)." };
   if ([property_value_in, cash_invested_in, market_grm_in].some((x) => Number(x) < 0)) return { error: "Property value, cash invested and market GRM cannot be negative." };
   const inputs = {
     advertising, auto_travel, cleaning_maintenance, commissions, insurance, legal_professional,
@@ -2088,6 +2094,8 @@ export function computeRentVsBuy({
   selling_cost_pct,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["insurance_annual", "hoa_monthly", "maintenance_pct", "selling_cost_pct"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Insurance, HOA, maintenance and selling cost cannot be negative." };
   const price = Number(purchase_price);
   const down = Number(down_payment);
   const rate = Number(mortgage_rate_pct);

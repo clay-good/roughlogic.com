@@ -274,6 +274,8 @@ METALAIR_RENDERERS["groove-weld-length-for-load"] = _renderGrooveWeldLengthForLo
 // dims: in { components: dimensionless, rated_esp_in_wc: M L^-1 T^-2 } out: { total_esp_in_wc: M L^-1 T^-2, remaining_in_wc: M L^-1 T^-2, rated_esp_in_wc: M L^-1 T^-2 }
 export function computeDuctStaticTotal({ components = [], rated_esp_in_wc = 0 } = {}) {
   const _g = _finiteGuard({ rated_esp_in_wc }); if (_g) return _g;
+  // A negative entry was accepted and changed the answer until 2026-11-15.
+  if (["rated_esp_in_wc"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "The blower rated ESP cannot be negative (in. w.c.)." };
   if (!Array.isArray(components) || components.length === 0) return { error: "Enter at least one component pressure drop (in. w.c.)." };
   let total_esp_in_wc = 0;
   const breakdown = [];
