@@ -128,7 +128,7 @@ function cannotAnswer(base, trimmed) {
   return false;
 }
 
-async function requiredKeys(id, rows) {
+async function requiredKeys(id, rows, blank = 0) {
   const out = new Set();
   let example = null;
   try {
@@ -152,7 +152,7 @@ async function requiredKeys(id, rows) {
     // instead let asphalt-tonnage fall back to its 145 pcf default and look
     // optional, while the real page showed "Density must be positive."
     const trimmed = { ...example };
-    if (row.k === "number" || row.k === undefined) trimmed[row.d] = 0;
+    if (row.k === "number" || row.k === undefined) trimmed[row.d] = blank;
     else if (row.k === "text" || row.k === "textarea") trimmed[row.d] = "";
     else delete trimmed[row.d];
     try {
@@ -250,6 +250,16 @@ for (const tool of TOOLS) {
   // spec-v1342: mark the fields the tile cannot answer without.
   const required = await requiredKeys(tool.id, rows);
   for (const r of rows) if (required.has(r.d)) r.r = 1;
+  // The agent door sends an unfilled number as null, not 0 (mcp/catalog.mjs,
+  // coerceForCompute), and many computes treat the two differently: a declared
+  // default applies to null in some and 0 is refused in others. `n` records the
+  // door's own answer where it differs from `r` (2026-11-16): 1 = the door must
+  // ask for it, 0 = the door may leave it to the default.
+  const requiredNull = await requiredKeys(tool.id, rows, null);
+  for (const r of rows) {
+    const rn = requiredNull.has(r.d);
+    if (rn !== required.has(r.d)) r.n = rn ? 1 : 0;
+  }
 
   const g = bucketFor(tool.group, tool.id);
   if (!shards.has(g)) shards.set(g, {});

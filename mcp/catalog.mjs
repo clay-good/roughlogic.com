@@ -1757,7 +1757,9 @@ export async function answerQuery({ query } = {}) {
   }
 
   // Name what it still needs, in one round trip instead of three.
-  const missingRequired = rows.filter((r) => r.r && !(r.d in filled)).map((r) => ({ key: r.d, label: r.l, unit: r.u || null }));
+  // `n`, where present, is whether the field is required when the door sends it
+  // as null (scripts/build-field-index.mjs); `r` is the page's answer.
+  const missingRequired = rows.filter((r) => (r.n !== undefined ? r.n === 1 : r.r) && !(r.d in filled)).map((r) => ({ key: r.d, label: r.l, unit: r.u || null }));
   // "Required" was measured in the tile's default mode. When the question
   // itself chose a mode or a solve-for ("pipe size for 10 gpm" -> size for a
   // flow), a field that mode does not read may be flagged anyway: the

@@ -40,8 +40,9 @@ test("answer_query never says OK while the calculator refused", async () => {
   const r = await answerQuery({ query: "ansi z21 400 ppm" });
   assert.notEqual(r.status, "OK");
   assert.equal(r.status, "MISSING_INPUTS");
-  assert.match(r.error, /O2/);
-  assert.ok(r.missing.length > 0);
+  // Either named before running (the door's own required flag) or relayed
+  // from the calculator's refusal: the O2 reading is what it lacks.
+  assert.ok(/O2/.test(r.error || "") || r.missing.some((m) => /O2/.test(m.label)), JSON.stringify(r));
 });
 
 // 2026-11-16: a mode the question chose is tried before naming "required" fields
@@ -55,4 +56,16 @@ test("a question that picks a mode is answered in that mode", async () => {
   const hp = await answerQuery({ query: "horsepower from torque 400 ft-lb at 5000 rpm" });
   assert.equal(hp.status, "OK");
   assert.ok(Math.abs(hp.result.hp - 380.8) < 0.1);
+});
+
+// 2026-11-16: the door's own required flag (`n`): a field that takes its
+// declared default when the door sends null is not asked for.
+test("the door answers with a field's default instead of asking for it", async () => {
+  const r = await answerQuery({ query: "btu per hour 400 cfm 20 degree delta t" });
+  assert.equal(r.id, "sensible-heat-airflow");
+  assert.equal(r.status, "OK");
+  assert.equal(r.result.q_btuh, 8640);
+  const s = await answerQuery({ query: "how many studs for a 40 ft wall 16 on center" });
+  assert.equal(s.status, "OK");
+  assert.equal(s.result.field_studs, 31);
 });
