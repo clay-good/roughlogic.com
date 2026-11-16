@@ -3758,12 +3758,18 @@ HVAC_RENDERERS["assembly-r-value"] = _rEnv({
     { key: "framing_factor", label: "Framing factor (0-1)", kind: "number", default: 0.25 },
     { key: "air_films_r", label: "Air films R", kind: "number", default: 0.85 },
     { key: "finish_layers_r", label: "Finish layers R", kind: "number", default: 1.05 },
+    // spec-v1505 was cut into this compute (the area-weighted-R error, and two fixes side
+    // by side), but the page never asked for or showed it until 2026-11-15.
+    { key: "alt_framing_factor", label: "Compare: advanced-framing fraction (0-1, optional)", kind: "number" },
+    { key: "alt_continuous_r", label: "Compare: added continuous insulation R (optional)", kind: "number" },
   ],
   outputs: [
     { key: "f", id: "arv-out-f", label: "Framing path R", value: (r) => fmt(r.r_framing_path, 2) },
     { key: "c", id: "arv-out-c", label: "Cavity path R", value: (r) => fmt(r.r_cavity_path, 2) },
     { key: "a", id: "arv-out-a", label: "Whole-assembly", value: (r) => "U " + fmt(r.u_assembly, 4) + " / R " + fmt(r.r_assembly, 1) },
     { key: "b", id: "arv-out-b", label: "vs center-of-cavity", value: (r) => "R " + fmt(r.r_center, 1) + " (bridging costs " + fmt(r.bridging_pct, 0) + "%)" },
+    { key: "w", id: "arv-out-w", label: "The common error", value: (r) => r.wrong_method_verdict },
+    { key: "x", id: "arv-out-x", label: "Two fixes compared", value: (r) => r.fixes_verdict },
     { key: "n", id: "arv-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeAssemblyRValue,
