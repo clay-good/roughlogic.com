@@ -135,16 +135,20 @@ export const rafterExample = {
 
 // --- Utility 43: Square Footage ---
 
-// dims: in { shape: dimensionless, dims: dimensionless } out: { area_ft2: L^2 }
-export function computeArea({ shape, ...dims }) {
+// dims: in { shape: dimensionless, dims: dimensionless } out: { area_ft2: L^2, area_yd2: L^2, area_m2: L^2, acres: L^2 }
+export function computeArea({ shape = "rectangle", ...dims }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
   if (["length_ft", "width_ft", "base_ft", "height_ft", "base1_ft", "base2_ft", "radius_ft"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Dimensions cannot be negative (ft)." };
-  if (shape === "rectangle") return { area_ft2: (dims.length_ft || 0) * (dims.width_ft || 0) };
-  if (shape === "triangle") return { area_ft2: 0.5 * (dims.base_ft || 0) * (dims.height_ft || 0) };
-  if (shape === "trapezoid") return { area_ft2: 0.5 * ((dims.base1_ft || 0) + (dims.base2_ft || 0)) * (dims.height_ft || 0) };
-  if (shape === "circle") return { area_ft2: Math.PI * Math.pow(dims.radius_ft || 0, 2) };
-  return { error: "Unknown shape." };
+  let a;
+  if (shape === "rectangle") a = (dims.length_ft || 0) * (dims.width_ft || 0);
+  else if (shape === "triangle") a = 0.5 * (dims.base_ft || 0) * (dims.height_ft || 0);
+  else if (shape === "trapezoid") a = 0.5 * ((dims.base1_ft || 0) + (dims.base2_ft || 0)) * (dims.height_ft || 0);
+  else if (shape === "circle") a = Math.PI * Math.pow(dims.radius_ft || 0, 2);
+  else return { error: "Unknown shape." };
+  // Since 2026-11-16 the same area in square yards, square meters and acres
+  // (43,560 sq ft per acre; 0.09290304 sq m per sq ft, exact).
+  return { area_ft2: a, area_yd2: a / 9, area_m2: a * 0.09290304, acres: a / 43560 };
 }
 
 export const areaExample = {
@@ -583,7 +587,7 @@ export function renderArea(inputRegion, outputRegion, citationEl) {
     const dims = {};
     for (const [k, el] of Object.entries(inputs)) dims[k] = Number(el.value) || 0;
     const r = computeArea({ shape: shape.select.value, ...dims }); stepsFor(outputRegion, inputRegion, null, r);
-    oA.textContent = r.error ? r.error : fmt(r.area_ft2, 2) + " ft^2";
+    oA.textContent = r.error ? r.error : fmt(r.area_ft2, 2) + " ft^2 (" + fmt(r.area_yd2, 2) + " yd^2, " + fmt(r.acres, 4) + " acres, " + fmt(r.area_m2, 2) + " m^2)";
   }
   shape.select.addEventListener("input", () => { refreshDims(); update(); });
   refreshDims();

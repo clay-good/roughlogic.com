@@ -237,3 +237,14 @@ test("bend-allowance EN.3: BD = 2*OSSB - BA and flat = legs - BD", () => {
   assert.ok(near(r.bend_deduction_in, 2 * r.setback_in - r.bend_allowance_in, 1e-9));
   assert.ok(near(r.flat_blank_in, 2 + 3 - r.bend_deduction_in, 1e-9));
 });
+
+// 2026-11-16: the area calculator also reports square yards, square meters and acres.
+test("square-footage: acres, square yards and square meters; a rectangle by default", async () => {
+  const { computeArea } = await import("../../calc-construction.js");
+  const r = computeArea({ length_ft: 300, width_ft: 400 });
+  assert.equal(r.area_ft2, 120000);
+  assert.ok(Math.abs(r.acres - 120000 / 43560) < 1e-12);
+  assert.ok(Math.abs(r.area_yd2 - 13333.3333333) < 1e-6);
+  assert.ok(Math.abs(r.area_m2 - 11148.3648) < 1e-9);
+  assert.equal(computeArea({ shape: "circle", radius_ft: 1 }).acres, Math.PI / 43560);
+});

@@ -44,7 +44,7 @@
     {
       "file": "e-4.json",
       "name": "Field descriptors, e-4 runtime shard (generated)",
-      "gzip_size_bytes": 20946
+      "gzip_size_bytes": 20944
     },
     {
       "file": "f.json",
@@ -135,7 +135,7 @@
     "e-1.json": "fd86915b68069d669fc70e9f95715acbfc5a61f51c85cc957c44eef866076a41",
     "e-2.json": "005b2bc2a433862a76b280cd6c4218ed43e78a42df5d5987b6786accad3dee6b",
     "e-3.json": "16387a421e091e55f22e660b6a92ac40825a3e499f9054ec6fa4a6e31510eb31",
-    "e-4.json": "b40ef0c86894ab2c364e6f77669c446575bbdbe2d1053469955d5fcbc5f18878",
+    "e-4.json": "737766ad7f402a82fc113f249eadc75d311303cfab9ed8b189056c5b0a4e2dea",
     "f.json": "aa6a2150849e6ab11704e59a82dfdd9f9c52bddd623c183a45e68adb616c6ee6",
     "g.json": "3a965ebee5e04cb7f180c085be1c6b1597dd5b16c068bb2ecd9e84f50a33c83e",
     "h.json": "492450310773cfd07c08de94568b08c9d15638251c728b0e70a001aa7fc85358",

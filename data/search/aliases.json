@@ -117892,6 +117892,16 @@
   "term": "cfm needed for btu",
   "target": "sensible-heat-airflow",
   "kind": "question"
+ },
+ {
+  "term": "acres in",
+  "target": "square-footage",
+  "kind": "question"
+ },
+ {
+  "term": "how many acres",
+  "target": "square-footage",
+  "kind": "question"
  }
  ]
 }

@@ -480,7 +480,7 @@ export function queryFill(query, rows, opts) {
   // a sloped surface, a wall or a ceiling is not a plan area and is left alone
   // (2026-11-16: these questions filled nothing, or filled the wrong field).
   {
-    const PLAN = /(^|[^\d.])(\d+(?:\.\d+)?)\s*(?:by|x)\s*(\d+(?:\.\d+)?)(?![\d.]|\s*(?:in\b|inch|"|ft\b|feet|foot|'|cm\b|mm\b|m\b))(\s+[a-z]+)?/;
+    const PLAN = /(^|[^\d.])(\d+(?:\.\d+)?)\s*(?:by|x)\s*(\d+(?:\.\d+)?)(?![\d.]|\s*(?:in\b|inch|"|'|cm\b|mm\b|m\b))(?:\s*(?:ft|feet|foot)\b)?(\s+[a-z]+)?/;
     const SURFACES = /^\s+(floor|room|slab|patio|deck|yard|driveway|kitchen|bathroom|bedroom|garage|basement|lawn|garden|pad|area|space|lot|walkway|sidewalk|shed|porch)s?$/;
     const m = text.match(PLAN);
     if (m) {
