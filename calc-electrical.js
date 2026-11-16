@@ -330,6 +330,8 @@ export const boxFillExample = {
 // dims: in { load_A: I, continuous: dimensionless, load_W: M L^2 T^-3, voltage_V: M L^2 T^-3 I^-1, power_factor: dimensionless, phase: dimensionless } out: { required_A: I, next_standard_A: I, derived_load_A: I, continuous_required_A: I, non_continuous_required_A: I }
 export function computeBreakerSize({ load_A, continuous, load_W = 0, voltage_V = 0, power_factor = 1, phase = "single" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
+  { const x = arguments[0]?.power_factor; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 1)) return { error: "Power factor must be from 0 to 1." }; }
   // v8 §C.1: optional watts + volts + pf input mode. When load_A is not
   // supplied, derive it from load_W / V / pf (single-phase) or
   // load_W / (sqrt(3) × V × pf) (three-phase).
@@ -4120,6 +4122,9 @@ ELECTRICAL_RENDERERS["service-load-optional"] = renderServiceLoadOptional;
 //    annotated dimensionless per spec-v14 §7.1's conservative rule for
 //    photometric quantities.)
 export function computeLuxFootcandle({ mode = "convert", lux = 0, footcandles = 0, lumens = 0, area_ft2 = 0, cu = 0.7, llf = 0.8 } = {}) {
+  // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
+  { const x = arguments[0]?.cu; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 1)) return { error: "The coefficient of utilization must be from 0 to 1." }; }
+  { const x = arguments[0]?.llf; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 1)) return { error: "The light-loss factor must be from 0 to 1." }; }
   const LUX_PER_FC = 1 / (0.3048 * 0.3048);
   if (mode === "room") {
     const area = Number(area_ft2) || 0;

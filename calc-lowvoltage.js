@@ -458,6 +458,8 @@ LOWVOLTAGE_RENDERERS["cable-tray-fill"] = _renderCableTrayFill;
 // dims: in { camera_count: dimensionless, bitrate_mbps: dimensionless, motion_duty_percent: dimensionless, retention_days: T } out: { total_storage_gb: dimensionless, aggregate_bandwidth_mbps: dimensionless, camera_count: dimensionless, per_camera_day_gb: dimensionless, recording_hours_per_day: T, total_storage_tb: dimensionless }
 export function computeCctvStorage({ camera_count = 1, bitrate_mbps = 0, recording_mode = "continuous", motion_duty_percent, retention_days = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
+  { const x = arguments[0]?.motion_duty_percent; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 100)) return { error: "Motion duty cycle must be from 0 to 100%." }; }
   // A negative entry was quietly read as 0 until 2026-11-15.
   if (Number(camera_count) < 0) return { error: "Camera count cannot be negative." };
   const n = Math.max(0, Number(camera_count) || 0);
@@ -524,6 +526,8 @@ LOWVOLTAGE_RENDERERS["cctv-storage"] = _renderCctvStorage;
 // dims: in { disk_capacity_gb: dimensionless, camera_count: dimensionless, bitrate_mbps: dimensionless, motion_duty_percent: dimensionless } out: { retention_days: T, per_camera_day_gb: dimensionless, aggregate_bandwidth_mbps: dimensionless, recording_hours_per_day: T, retention_weeks: T }
 export function computeCctvRetentionDays({ disk_capacity_gb = 0, camera_count = 1, bitrate_mbps = 0, recording_mode = "continuous", motion_duty_percent } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
+  { const x = arguments[0]?.motion_duty_percent; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 100)) return { error: "Motion duty cycle must be from 0 to 100%." }; }
   // A count of things is whole: fractional entries passed silently until 2026-11-15.
   if (camera_count != null && camera_count !== "" && !Number.isInteger(Number(camera_count))) return { error: "Camera count must be a whole number." };
   const cap = Number(disk_capacity_gb);

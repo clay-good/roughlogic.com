@@ -269,6 +269,8 @@ export function computeDryingTime({ material }) {
 //  and the germination-hours interval carry the §7.1 base-token `T`.)
 export function computeMoldRisk({ rh_percent, temperature_F, hours_elevated }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
+  { const x = arguments[0]?.rh_percent; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 100)) return { error: "Relative humidity must be from 0 to 100%." }; }
   // Both thresholds below are `>=`, so a NEGATIVE humidity or duration clears
   // neither and the tile reports "low" -- a reassurance derived from an
   // impossible reading. Measured 2026-09-10: `rh_percent = -81` took this
@@ -640,6 +642,8 @@ export const HEPA_LOADING = {
 //  dollar aggregates per the §7.1 convention.)
 export function computeHEPALife({ cfm, hours_per_day, particulate_category = "medium", capacity_grams = HEPA_LOADING.default_capacity_grams, job_days = 0, filter_cost_usd = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
+  { const x = arguments[0]?.hours_per_day; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 24)) return { error: "Hours per day must be from 0 to 24." }; }
   const c = Number(cfm) || 0;
   const h = Number(hours_per_day) || 0;
   const cap = Number(capacity_grams) || 0;

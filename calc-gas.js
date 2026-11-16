@@ -292,6 +292,8 @@ GAS_RENDERERS["gas-leak-rate"] = renderGasLeakRate;
 // dims: in { leak_rate_cfh: L^3 T^-1, upstream_psi: M L^-1 T^-2, gas: dimensionless, c: dimensionless } out: { orifice_diameter_in: L, orifice_area_in2: L^2, discharge_coefficient: dimensionless, specific_gravity: dimensionless }
 export function computeGasLeakHoleDiameter({ leak_rate_cfh, upstream_psi, gas, c = 0.7 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
+  { const x = arguments[0]?.c; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 1)) return { error: "The discharge coefficient must be from 0 to 1 (about 0.6 to 0.7 for a sharp hole)." }; }
   const props = GAS_PROPERTIES[gas];
   if (!props) return { error: "Unknown gas." };
   const Q = Number(leak_rate_cfh) || 0;

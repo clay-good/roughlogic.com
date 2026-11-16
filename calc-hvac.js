@@ -637,6 +637,8 @@ export function computeInsulationThickness({
   film_mode = "entered", jacket_emissivity = 0.9, wind_mph = 0,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
+  { const x = arguments[0]?.jacket_emissivity; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 1)) return { error: "Jacket emissivity must be from 0 to 1." }; }
   if (film_mode !== "entered" && film_mode !== "computed") return { error: "The film coefficient must be entered or computed." };
   const computedFilm = film_mode === "computed";
   if (computedFilm && !(jacket_emissivity > 0 && jacket_emissivity <= 1)) return { error: "Jacket emissivity must be above 0 and at most 1 (0.9 painted or PVC, 0.1 bright aluminum)." };
@@ -2299,6 +2301,8 @@ export function computeInsulationHeatLoss({
   thickness_in = 1.0, jacket_emissivity = 0.9,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
+  { const x = arguments[0]?.jacket_emissivity; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 1)) return { error: "Jacket emissivity must be from 0 to 1." }; }
   if (!(pipe_OD_in > 0)) return { error: "Pipe OD must be positive." };
   if (!(thickness_in >= 0)) return { error: "Thickness must be non-negative." };
   // Number(null) is 0, so a blank temperature has to be caught before the finite check.
@@ -4762,6 +4766,8 @@ HVAC_RENDERERS["economizer-enthalpy-changeover"] = _v443renderEconomizerEnthalpy
 // dims: in { pipe_od_in: L, pipe_temp_F: T, ambient_F: T, ambient_rh_pct: dimensionless, k_btu_in_per_hr_ft2_F: M L^2 T^-3, outside_film_coeff_btu_hr_ft2_F: M T^-3, film_mode: dimensionless, jacket_emissivity: dimensionless } out: { dew_point_F: T, thickness_in: L, r2_in: L, film_used_btu_hr_ft2_F: M T^-3 }
 export function computePipeInsulationForCondensation({ pipe_od_in = 0, pipe_temp_F = 40, ambient_F = 75, ambient_rh_pct = 50, k_btu_in_per_hr_ft2_F = 0.27, outside_film_coeff_btu_hr_ft2_F = 1.65, film_mode = "entered", jacket_emissivity = 0.9 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
+  { const x = arguments[0]?.jacket_emissivity; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 1)) return { error: "Jacket emissivity must be from 0 to 1." }; }
   // The page passes a blank field as null, and Number(null) is 0 F.
   if (pipe_temp_F === null || pipe_temp_F === "" || ambient_F === null || ambient_F === "") return { error: "Enter the cold-pipe surface and ambient dry-bulb temperatures (F)." };
   const od = Number(pipe_od_in) || 0;

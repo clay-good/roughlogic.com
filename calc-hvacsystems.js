@@ -827,6 +827,9 @@ export function computeHumidifierCapacity({
   altitude_ft = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
+  { const x = arguments[0]?.entering_rh_pct; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 100)) return { error: "Relative humidity must be from 0 to 100%." }; }
+  { const x = arguments[0]?.target_rh_pct; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 100)) return { error: "Relative humidity must be from 0 to 100%." }; }
   const CFM = Number(cfm) || 0;
   const Tdb = Number(supply_db_F);
   const rhIn = Number(entering_rh_pct);
@@ -2597,6 +2600,8 @@ export function computeRefractoryShellTemperature({
   film_mode = "entered", shell_emissivity = 0.8, wall_height_ft = 10,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
+  { const x = arguments[0]?.shell_emissivity; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 1)) return { error: "Shell emissivity must be from 0 to 1." }; }
   // 0 F is a real reading, so a blank temperature cannot stand in for it.
   if ([hot_face_f, ambient_f].some((x) => x === null || x === undefined || x === "")) return { error: "Enter the hot-face and ambient temperatures (F)." };
   if ([layer1_thickness_in, layer2_thickness_in, layer3_thickness_in].some((x) => Number(x) < 0)) return { error: "Layer thicknesses cannot be negative." };

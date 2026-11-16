@@ -806,6 +806,8 @@ export const perDiemExample = {
 // dims: in { shape: dimensionless, args: dimensionless } out: { area: L^2, volume: L^3, perimeter: L, circumference: L, sector_area: L^2 }
 export function computeGeometry({ shape, ...args }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
+  { const x = arguments[0]?.sector_deg; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 360)) return { error: "Sector angle must be from 0 to 360 deg." }; }
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
   if (["sector_deg"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Sector angle cannot be negative (deg)." };
   if (shape === "circle") {
@@ -854,6 +856,8 @@ export const geometryExample = {
 // dims: in { concentrate_percent: dimensionless, target_percent: dimensionless, final_volume: L^3 } out: { concentrate_volume: L^3, diluent_volume: L^3 }
 export function computeDilution({ concentrate_percent, target_percent, final_volume }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
+  { const x = arguments[0]?.concentrate_percent; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 100)) return { error: "Concentrate strength must be from 0 to 100%." }; }
   const C = Number(concentrate_percent) || 0;
   const T = Number(target_percent) || 0;
   const V = Number(final_volume) || 0;

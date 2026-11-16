@@ -2118,6 +2118,8 @@ export function computeRecircLoopSizing({
   fuel_price = null,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
+  { const x = arguments[0]?.heater_efficiency; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 1)) return { error: "Heater efficiency must be from 0 to 1 (0.80 = 80%)." }; }
   // The page passes a blank box as null, and Number(null) is 0 F; 0 F is a real reading, so a blank cannot stand in for it.
   if ([ambient_F].some((x) => x === null || x === "")) return { error: "Enter the ambient temperature around the pipe (F)." };
   const L = Number(loop_length_ft) || 0;

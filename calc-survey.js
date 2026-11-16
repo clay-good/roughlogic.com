@@ -886,6 +886,8 @@ function _toDms(deg) {
 // dims: in { mode: dimensionless, azimuth_deg: dimensionless, quadrant: dimensionless, quadrant_angle_deg: dimensionless } out: { azimuth_deg: dimensionless, quadrant_angle_deg: dimensionless }
 export function computeAzimuthBearing({ mode = "azimuth_to_bearing", azimuth_deg = null, quadrant = "NE", quadrant_angle_deg = 0 } = {}) {
   const _g = _finiteGuard({ azimuth_deg, quadrant_angle_deg }); if (_g) return _g;
+  // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
+  { const x = arguments[0]?.quadrant_angle_deg; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 90)) return { error: "A quadrant bearing angle must be from 0 to 90 deg." }; }
   const m = String(mode || "").toLowerCase();
   let A;
   if (m === "azimuth_to_bearing") {

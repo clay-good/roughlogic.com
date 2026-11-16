@@ -279,6 +279,8 @@ function renderSlingAngle(inputRegion, outputRegion, citationEl) {
 // dims: in { sweep_width_m: L, track_spacing_m: L, target_pod: dimensionless } out: { coverage: dimensionless, pod: dimensionless, spacing_for_pod_m: L }
 export function computeSearchTrackSpacing({ sweep_width_m = 0, track_spacing_m = 0, target_pod = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
+  { const x = arguments[0]?.target_pod; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 1)) return { error: "Target POD must be from 0 to 1 (0.80 = 80%)." }; }
   if ([track_spacing_m].some((x) => Number(x) < 0)) return { error: "Track spacing cannot be negative." };
   const w = Number(sweep_width_m) || 0;
   const s = Number(track_spacing_m) || 0;

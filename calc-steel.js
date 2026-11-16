@@ -913,6 +913,8 @@ STEEL_RENDERERS["steel-h1-interaction"] = _simpleRenderer({
 // dims: in { pr_kip: M L T^-2, i_in4: L^4, lc1_ft: L, transverse_load: dimensionless, m1_m2: dimensionless, method: dimensionless } out: { b1: dimensionless, pe1_kip: M L T^-2, cm: dimensionless, alpha: dimensionless, axial_ratio: dimensionless }
 export function computeSteelB1Amplifier({ pr_kip = 0, i_in4 = 0, lc1_ft = 0, transverse_load = "no", m1_m2 = 0, method = "LRFD" } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
+  { const x = arguments[0]?.m1_m2; if (x != null && x !== "" && (Number(x) < -1 || Number(x) > 1)) return { error: "M1/M2 is the smaller end moment over the larger, so it must be from -1 to 1." }; }
   const Pr = Number(pr_kip) || 0;
   const I = Number(i_in4) || 0;
   const Lc1 = Number(lc1_ft) || 0;

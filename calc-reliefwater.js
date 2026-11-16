@@ -243,6 +243,8 @@ const _BAFFLING = { unbaffled: 0.1, poor: 0.3, average: 0.5, superior: 0.7, perf
 // dims: in { vessel_shape: dimensionless, volume_gal: L^3, diameter_ft: L, length_ft: L, width_ft: L, min_depth_ft: L, peak_flow_gpm: L^3 T^-1, baffling_condition: dimensionless, custom_baffling_factor: dimensionless, residual_mg_l: M L^-3 } out: { vessel_volume_gal: L^3, tdt_min: T, baffling_factor: dimensionless, t10_min: T, t_unbaffled_min: T, t_poor_min: T, t_average_min: T, t_superior_min: T, t_perfect_min: T, ct_mg_min_l: M L^-3 T, residual_mg_l: M L^-3 }
 export function computeContactTimeBaffling({ vessel_shape = "volume", volume_gal = 0, diameter_ft = 0, length_ft = 0, width_ft = 0, min_depth_ft = 0, peak_flow_gpm = 0, baffling_condition = "unbaffled", custom_baffling_factor = 0, residual_mg_l = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Out-of-range values passed silently until 2026-11-15 (the page box already bounds them).
+  { const x = arguments[0]?.custom_baffling_factor; if (x != null && x !== "" && (Number(x) < 0 || Number(x) > 1)) return { error: "The baffling factor must be from 0 to 1." }; }
   let vessel_volume_gal;
   if (vessel_shape === "volume") {
     if (!(volume_gal > 0)) return { error: "Volume at the minimum operating level must be positive." };
