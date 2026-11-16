@@ -438,8 +438,8 @@ HVACSERVICE_RENDERERS["gas-meter-clock"] = _simpleRenderer({
   citation: "Citation: first-principles meter-clocking arithmetic - cfh = (3600 / seconds-per-rev) x dial size; firing rate = cfh x heating value (public). The default 1030 BTU/cf natural-gas (about 2500 for LP) heating value is an editable field; the gas utility's actual heating value and the equipment rating plate govern.",
   example: gasMeterClockExample.inputs,
   fields: [
-    { key: "sec_per_rev", label: "Seconds per revolution", kind: "number" },
-    { key: "dial_size_cf", label: "Test-dial size (cf/rev)", kind: "number" },
+    { key: "sec_per_rev", label: "Time per revolution (s)", kind: "number" },
+    { key: "dial_size_cf", label: "Test-dial size (ft³; cubic feet per revolution)", kind: "number" },
     { key: "heating_value_btu_cf", label: "Heating value (BTU/cf)", kind: "number", default: 1030 },
     { key: "nameplate_input_btuh", label: "Nameplate input (BTU/hr, optional)", kind: "number", default: 0 },
   ],
@@ -476,7 +476,7 @@ HVACSERVICE_RENDERERS["gas-meter-clock-target"] = _simpleRenderer({
   example: gasMeterClockTargetExample.inputs,
   fields: [
     { key: "target_input_btuh", label: "Target / nameplate firing rate (BTU/hr)", kind: "number" },
-    { key: "dial_size_cf", label: "Test-dial size (cf/rev)", kind: "number" },
+    { key: "dial_size_cf", label: "Test-dial size (ft³; cubic feet per revolution)", kind: "number" },
     { key: "heating_value_btu_cf", label: "Heating value (BTU/cf)", kind: "number" },
   ],
   outputs: [

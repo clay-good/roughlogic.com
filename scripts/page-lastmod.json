@@ -3366,12 +3366,12 @@
       "date": "2026-10-17"
     },
     "/tools/gas-meter-clock/": {
-      "sha": "b4780c94c0584c04",
-      "date": "2026-10-17"
+      "sha": "eca8747358e0971b",
+      "date": "2026-11-16"
     },
     "/tools/gas-meter-clock-target/": {
-      "sha": "e38a7a053023fd0e",
-      "date": "2026-10-17"
+      "sha": "36c31ade0abaa1f7",
+      "date": "2026-11-16"
     },
     "/tools/gas-pipe-max-flow/": {
       "sha": "a883156d1742ba75",

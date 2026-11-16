@@ -93,6 +93,24 @@
       "tile": "battery-peak-shaving",
       "mustNotBind": { "nameplate_kwh": "900" },
       "why": "900 kWh per month is a usage rate, not a 900 kWh battery."
+    },
+    {
+      "query": "subcooling 300 psig liquid 95 f r410a",
+      "tile": "flash-gas-subcool",
+      "mustNotBind": { "vertical_lift_ft": "95" },
+      "why": "95 F is the liquid-line temperature; with no temperature word in the query the bare f was dropped and the 95 became a vertical lift in feet."
+    },
+    {
+      "query": "gas meter clock 1 cubic foot dial 30 seconds",
+      "tile": "gas-meter-clock",
+      "mustNotBind": { "dial_size_cf": "30" },
+      "why": "30 seconds per revolution, read forward from \"dial\", became a 30 cubic foot test dial."
+    },
+    {
+      "query": "horsepower from torque 400 ft-lb at 5000 rpm",
+      "tile": "hp-from-torque",
+      "mustNotBind": { "solve_for": "torque" },
+      "why": "The question hands over the torque and asks for horsepower; the word torque chose Solve for torque, and the tile refused for want of a horsepower."
     }
   ]
 }

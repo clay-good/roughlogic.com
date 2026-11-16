@@ -132,7 +132,9 @@ const AMBIGUOUS_PAIR = /\b\d+\s*\/\s*\d+\b/;
 
 // Words that put a query in a temperature context, licensing the bare-letter
 // rewrite below.
-const TEMP_CONTEXT = /\b(temp|temperature|ambient|outdoor|indoor|db|wb|dry\s*bulb|wet\s*bulb|setpoint|supply\s*air|return\s*air|degrees?)\b/;
+// Refrigeration service words joined these 2026-11-16: "subcooling 300 psig liquid
+// 95 f" read the 95 as a vertical lift in feet.
+const TEMP_CONTEXT = /\b(temp|temperature|ambient|outdoor|indoor|db|wb|dry\s*bulb|wet\s*bulb|setpoint|supply\s*air|return\s*air|degrees?|superheat|subcool(?:ing)?|suction|liquid\s*line|condensing|evaporator|saturation)\b/;
 
 // `protect` is a set of literal strings a rewrite must not touch -- in
 // practice, the option values of the tile's own selects. `lumber-spans` has a
@@ -938,6 +940,20 @@ export function queryFill(query, rows, opts) {
     // One token claimed by two fields fills neither.
     if ((optionClaims.get(choice.toLowerCase()) || []).length !== 1) continue;
     filled[key] = choice;
+  }
+
+  // --- A "solve for" dropdown names the unknown ----------------------------
+  // When its options name the tile's quantities and the question gives values
+  // for all of them but one, that one is the unknown, whatever word the
+  // question happened to use: "horsepower from torque 400 ft-lb at 5000 rpm"
+  // chose "torque" (the word) and asked to solve for a torque it was handed
+  // (2026-11-16).
+  for (const r of selectRows) {
+    if (!/\b(solve|find|unknown|calculate)\b/i.test(r.l)) continue;
+    const map = r.o.map((o) => [o, numberRows.find((n) => n.d === o || n.d.startsWith(o + "_") || termsByRow.get(n.d).has(String(o).toLowerCase()))]);
+    if (map.some(([, n]) => !n)) continue;
+    const open = map.filter(([, n]) => !(n.d in filled));
+    if (open.length === 1 && map.length - open.length >= 1) filled[r.d] = String(open[0][0]);
   }
 
   // --- The unit-select veto ------------------------------------------------
