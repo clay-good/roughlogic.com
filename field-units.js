@@ -120,6 +120,10 @@ const UNIT_SPELLINGS = {
   min: ["min", "mins", "minute", "minutes"],
   hr: ["hr", "hrs", "hour", "hours"],
   day: ["day", "days"],
+  // Months and weeks since 2026-11-15: a loan "Term (months)" field had no unit, so
+  // "360 months" could not fill it and "30 years" could not be converted into it.
+  wk: ["wk", "wks", "week", "weeks"],
+  mo: ["mo", "mos", "month", "months"],
   yr: ["yr", "yrs", "year", "years"],
   // concentration / level
   ppm: ["ppm"],
@@ -219,7 +223,7 @@ const UNIT_FAMILIES = {
   heatrate: { btuh: 1 },
   speed: { mph: 1, fpm: 0.0113636364, kt: 1.15077945 },
   rotation: { rpm: 1 },
-  time: { s: 1, min: 60, hr: 3600, day: 86400, yr: 31557600 },
+  time: { s: 1, min: 60, hr: 3600, day: 86400, wk: 604800, mo: 2629800, yr: 31557600 },
   density: { pcf: 1 },
   concentration: { ppm: 1, "mg/l": 1 },
   sound: { db: 1 },

@@ -41,6 +41,10 @@ import { verifyShard } from "./integrity.js";
 // Each entry is a real spelling people type. Order matters: the more specific
 // patterns run first so `8'6"` is not first mangled by the `3/4"` rule.
 const REWRITES = [
+  // "$250,000" is 250000 dollars. A leading $ hid the number's unit, so a money
+  // field (usd) could not take it by unit (2026-11-15). Only a bare amount: "$3.50
+  // per gallon" and "$/ft" stay as written, since a rate is not a sum of money.
+  [/\$\s*(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)(?![\d.,]|\s*(?:\/|per\b|a\b|an\b|each\b|usd\b|dollars?\b))/g, (m, n) => `${n.replace(/,/g, "")} usd`],
   // Feet-and-inches, in both the tick and the spelled form. Collapsed to a
   // single decimal feet value rather than two quantities, because two
   // quantities would look like two separate answers to two separate fields.
@@ -414,6 +418,11 @@ export function queryFill(query, rows, opts) {
   const proposals = new Map();     // row key -> [quantity index]
   const rowsFor = new Map();       // quantity index -> [row key]
 
+  const optionWordsInText = new Set();
+  for (const r of selectRows) for (const o of r.o) {
+    const tok = String(o).toLowerCase();
+    if (tok.length > 2 && /[a-z]/.test(tok) && text.includes(tok)) for (const w of tok.split(/[^a-z]+/)) if (w) optionWordsInText.add(w);
+  }
   let prevEnd = 0;
   quantities.forEach((qty, qi) => {
     const window = text.slice(prevEnd, qty.index);
@@ -482,6 +491,20 @@ export function queryFill(query, rows, opts) {
       hits.push(row.d);
     }
     if (!hits.length) return;
+    // Two fields named by one fragment, where the words written are EXACTLY one
+    // field's label: "principal 250000" beside Principal and "Extra principal
+    // per month". The longer label's other words were not written, and every
+    // word that was belongs to the short one, so it is that field (2026-11-15).
+    // "extra principal 100" names neither exactly, and stays ambiguous.
+    if (hits.length > 1) {
+      // Literal words only: shorthand ("w" -> power) is a unit, not a name the reader wrote,
+      // and a word inside a select option written in the query ("power-ratio") is that
+      // option, not a field name.
+      const literal = new Set(String(window).toLowerCase().split(/[^a-z]+/).filter((w) => w && !optionWordsInText.has(w)));
+      const written = new Set([...wanted].filter((w) => labelWords.has(w) && literal.has(w)));
+      const exact = hits.filter((k) => { const t = termsByRow.get(k); return t && t.size > 0 && [...t].every((w) => written.has(w)) && [...written].every((w) => t.has(w)); });
+      if (exact.length === 1) hits.splice(0, hits.length, exact[0]);
+    }
     rowsFor.set(qi, hits);
     for (const key of hits) {
       if (!proposals.has(key)) proposals.set(key, []);

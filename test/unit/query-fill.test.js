@@ -452,3 +452,29 @@ test("query-fill: a grouped number is one number, not an option token", () => {
   assert.equal(grouped.awg, "12");
   assert.equal(grouped.length_ft, "1250");
 });
+
+// 2026-11-15: a number naming two fields goes to the one whose label words are exactly
+// the words written, and only then; months are a unit; "$250,000" is dollars.
+test("query-fill: an exact label wins a two-field tie, and only an exact one", () => {
+  const rows = [
+    { d: "principal", l: "Principal", k: "number", u: "usd", r: 1 },
+    { d: "annual_rate_pct", l: "Annual rate", k: "number", u: "pct", r: 1 },
+    { d: "term_months", l: "Term", k: "number", u: "mo", r: 1 },
+    { d: "extra_principal", l: "Extra principal per month", k: "number", u: "usd" },
+  ];
+  const a = queryFill("loan principal $250,000 at 6.5% for 30 years", rows, { name: "Loan Amortization" }).filled;
+  assert.equal(Number(a.principal), 250000);
+  assert.equal(Number(a.term_months), 360);
+  assert.equal(a.extra_principal, undefined);
+  // "extra principal" names neither field exactly: refused, not guessed.
+  const b = queryFill("loan extra principal 100", rows, { name: "Loan Amortization" }).filled;
+  assert.equal(b.principal, undefined);
+  // A word inside a written select option is the option, not a field name.
+  const db = [
+    { d: "mode", l: "Mode", k: "select", o: ["power-ratio", "voltage-ratio"], r: 1 },
+    { d: "p1", l: "Reference power p1", k: "number", u: "w", r: 1 },
+    { d: "p2", l: "Power p2", k: "number", u: "w", r: 1 },
+  ];
+  const c = queryFill("power-ratio, 1 w, 2 w", db, { name: "Decibel Converter" }).filled;
+  assert.notEqual(c.p2, "1");
+});
