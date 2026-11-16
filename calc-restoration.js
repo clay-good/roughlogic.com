@@ -1114,7 +1114,8 @@ function _v9d_renderDryingLog(inputRegion, outputRegion, citationEl) {
       const line = raw.trim();
       if (!line) continue;
       const parts = line.split(",").map((s) => Number(s.trim()));
-      if (parts.length < 4 || parts.some((n) => !Number.isFinite(n))) return null;
+      // A fifth field (a stray comma) was ignored until 2026-11-15.
+      if (parts.length !== 4 || parts.some((n) => !Number.isFinite(n))) return null;
       out.push({ ambient_T_F: parts[0], ambient_RH: parts[1], chamber_T_F: parts[2], chamber_RH: parts[3] });
     }
     return out;

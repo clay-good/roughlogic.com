@@ -4414,14 +4414,15 @@ function _v329renderBuildingUa(inputRegion, outputRegion, citationEl) {
     for (const raw of String(text).split("\n")) {
       const line = raw.trim(); if (!line) continue;
       const p = line.split(",").map((s) => Number(s.trim()));
-      if (p.length < 2 || !Number.isFinite(p[0]) || !Number.isFinite(p[1])) return null;
+      // A third field (a thousands comma: "1,200,17") was ignored until 2026-11-15, so the line read as 1 and 200.
+      if (p.length !== 2 || !Number.isFinite(p[0]) || !Number.isFinite(p[1])) return null;
       out.push({ area: p[0], r: p[1] });
     }
     return out;
   }
   const update = debounce(() => {
     const list = parse(asm.input.value);
-    if (list === null) { oCond.textContent = "Each line must be area_ft2,R-value with finite numbers."; oUa.textContent = "-"; oLoad.textContent = "-"; oNote.textContent = "-"; return; }
+    if (list === null) { oCond.textContent = "Each line must be area_ft2,R-value: two numbers, no thousands commas (1200,17)."; oUa.textContent = "-"; oLoad.textContent = "-"; oNote.textContent = "-"; return; }
     const r = computeBuildingUa({ assemblies: list, cfm_inf: Number(cfm.input.value) || 0, dt_f: Number(dt.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["assemblies", "cfm_inf", "dt_f"], r);
     if (r.error) { oCond.textContent = r.error; oUa.textContent = "-"; oLoad.textContent = "-"; oNote.textContent = "-"; return; }
     oCond.textContent = fmt(r.cond, 1) + " + " + fmt(r.ua_inf, 1) + " Btu/h-F";

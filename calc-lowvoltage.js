@@ -433,7 +433,8 @@ function _renderCableTrayFill(inputRegion, outputRegion, citationEl) {
       const line = raw.trim(); if (!line) continue;
       const p = line.split(",").map((s) => s.trim());
       const count = Number(p[0]), dia = Number(p[1]);
-      if (!Number.isFinite(count) || !Number.isFinite(dia)) return null;
+      // A fourth field (a thousands comma) was ignored until 2026-11-15.
+      if (p.length > 3 || !Number.isFinite(count) || !Number.isFinite(dia)) return null;
       out.push({ count, diameter_in: dia, large: (p[2] || "").toLowerCase().startsWith("l") });
     }
     return out;

@@ -5650,7 +5650,8 @@ function _renderSeismicVerticalDistribution(inputRegion, outputRegion, citationE
       const t = line.trim();
       if (!t) continue;
       const parts = t.split(",");
-      stories.push({ w: Number(parts[0]), h: Number(parts[1]) });
+      // Exactly weight,height: "1,200,24" read as 1 kip at 200 ft until 2026-11-15; a bad line now reaches the compute as NaN, which it refuses.
+      stories.push(parts.length === 2 ? { w: Number(parts[0]), h: Number(parts[1]) } : { w: NaN, h: NaN });
     }
     const r = computeSeismicVerticalDistribution({ base_shear_kip: Number(vIn.input.value) || 0, period_s: Number(tIn.input.value) || 0, stories }); stepsFor(outputRegion, inputRegion, ["base_shear_kip", "period_s", "stories"], r);
     if (r.error) { oK.textContent = r.error; oF.textContent = "-"; oS.textContent = "-"; oC.textContent = "-"; return; }
@@ -5733,7 +5734,8 @@ function _renderSeismicOverturningMoment(inputRegion, outputRegion, citationEl) 
       const t = line.trim();
       if (!t) continue;
       const parts = t.split(",");
-      stories.push({ w: Number(parts[0]), h: Number(parts[1]) });
+      // Exactly weight,height: "1,200,24" read as 1 kip at 200 ft until 2026-11-15; a bad line now reaches the compute as NaN, which it refuses.
+      stories.push(parts.length === 2 ? { w: Number(parts[0]), h: Number(parts[1]) } : { w: NaN, h: NaN });
     }
     const r = computeSeismicOverturningMoment({ base_shear_kip: Number(vIn.input.value) || 0, period_s: Number(tIn.input.value) || 0, stories }); stepsFor(outputRegion, inputRegion, ["base_shear_kip", "period_s", "stories"], r);
     if (r.error) { oK.textContent = r.error; oF.textContent = "-"; oM.textContent = "-"; oB.textContent = "-"; oR.textContent = "-"; return; }

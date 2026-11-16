@@ -44,6 +44,8 @@ export function parseLength(text, unit) {
   const t = String(text ?? "").trim().toLowerCase().replace(/[\u2032\u2018\u2019]/g, "'").replace(/[\u2033\u201c\u201d]/g, '"')
     .replace(/\u2044/g, "/").replace(/(\d?)\s*([\u00bc\u00bd\u00be\u215b\u215c\u215d\u215e])/g, (_, d, f) => (d ? d + " " : "") + VULGAR[f]);
   if (t === "") return { value: null };
+  // Grouped thousands, as this site prints them (5,280): until 2026-11-15 "5,280" read as junk.
+  if (/^[+-]?\d{1,3}(,\d{3})+(\.\d+)?$/.test(t)) return parseLength(t.replace(/,/g, ""), unit);
   if (/^[+-]?(\d+(?:\.\d+)?|\.\d+)(e[+-]?\d+)?$/.test(t)) return Number.isFinite(Number(t)) ? { value: Number(t) } : { error: "That number is too large for a length." };
   // A sign belongs to the whole reading: -2' 6" is -2.5 ft, not -2 ft + 6 in.
   const sm = t.match(/^([+-])\s*([^+-].*)$/);

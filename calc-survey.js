@@ -122,14 +122,15 @@ function renderAreaByCoordinates(inputRegion, outputRegion, citationEl) {
       const line = raw.trim();
       if (!line) continue;
       const parts = line.split(",").map((s) => Number(s.trim()));
-      if (parts.length < 2 || !Number.isFinite(parts[0]) || !Number.isFinite(parts[1])) return null;
+      // A third field (a thousands comma: "5,000,5,000") was ignored until 2026-11-15, so the line read as 5 and 0.
+      if (parts.length !== 2 || !Number.isFinite(parts[0]) || !Number.isFinite(parts[1])) return null;
       out.push({ n: parts[0], e: parts[1] });
     }
     return out;
   }
   const update = debounce(() => {
     const pointList = parsePoints(pts.input.value);
-    if (pointList === null) { oArea.textContent = "Each line must be N,E with finite numbers."; oPerim.textContent = "-"; oWind.textContent = "-"; return; }
+    if (pointList === null) { oArea.textContent = "Each line must be N,E: two numbers, no thousands commas (5000,5000)."; oPerim.textContent = "-"; oWind.textContent = "-"; return; }
     const r = computeAreaByCoordinates({ points: pointList }); stepsFor(outputRegion, inputRegion, ["points"], r);
     if (r.error) { oArea.textContent = r.error; oPerim.textContent = "-"; oWind.textContent = "-"; return; }
     oArea.textContent = fmt(r.area_ft2, 1) + " ft2 (" + fmt(r.area_acres, 4) + " ac / " + fmt(r.area_m2, 1) + " m2)";
@@ -218,14 +219,15 @@ function renderTraverseClosure(inputRegion, outputRegion, citationEl) {
       const line = raw.trim();
       if (!line) continue;
       const parts = line.split(",").map((s) => Number(s.trim()));
-      if (parts.length < 2 || !Number.isFinite(parts[0]) || !Number.isFinite(parts[1])) return null;
+      // A third field (a thousands comma: "5,000,5,000") was ignored until 2026-11-15, so the line read as 5 and 0.
+      if (parts.length !== 2 || !Number.isFinite(parts[0]) || !Number.isFinite(parts[1])) return null;
       out.push({ azimuth_deg: parts[0], distance: parts[1] });
     }
     return out;
   }
   const update = debounce(() => {
     const list = parseCourses(courses.input.value);
-    if (list === null) { oClosure.textContent = "Each line must be azimuth_deg,distance with finite numbers."; oComponents.textContent = "-"; oEnd.textContent = "-"; return; }
+    if (list === null) { oClosure.textContent = "Each line must be azimuth_deg,distance: two numbers, no thousands commas."; oComponents.textContent = "-"; oEnd.textContent = "-"; return; }
     const r = computeTraverseClosure({ courses: list, n0: readNum(n0.input), e0: readNum(e0.input) }); stepsFor(outputRegion, inputRegion, ["courses", "n0", "e0"], r);
     if (r.error) { oClosure.textContent = r.error; oComponents.textContent = "-"; oEnd.textContent = "-"; return; }
     oClosure.textContent = r.closure_note;

@@ -128,14 +128,15 @@ function _v26renderMotorFeederMultiple(inputRegion, outputRegion, citationEl) {
       const line = raw.trim();
       if (!line) continue;
       const parts = line.split(",").map((s) => Number(s.trim()));
-      if (parts.length < 2 || !Number.isFinite(parts[0]) || !Number.isFinite(parts[1])) return null;
+      // A third field (a thousands comma: "1,200,17") was ignored until 2026-11-15, so the line read as 1 and 200.
+      if (parts.length !== 2 || !Number.isFinite(parts[0]) || !Number.isFinite(parts[1])) return null;
       out.push({ flc_A: parts[0], branch_device_A: parts[1] });
     }
     return out;
   }
   const update = _v26debounce(() => {
     const motors = parseMotors(list.input.value);
-    if (motors === null) { oCond.textContent = "Each line must be FLC,device with finite numbers."; oDev.textContent = "-"; oLargest.textContent = "-"; oNote.textContent = ""; return; }
+    if (motors === null) { oCond.textContent = "Each line must be FLC,device: two numbers, no thousands commas."; oDev.textContent = "-"; oLargest.textContent = "-"; oNote.textContent = ""; return; }
     const r = computeMotorFeederMultiple({ motors, nonmotor_continuous_A: Number(nmC.input.value) || 0, nonmotor_noncontinuous_A: Number(nmN.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["motors", "nonmotor_continuous_A", "nonmotor_noncontinuous_A"], r);
     if (r.error) { oCond.textContent = r.error; oDev.textContent = "-"; oLargest.textContent = "-"; oNote.textContent = ""; return; }
     oCond.textContent = _v26fmt(r.conductor_min_A, 1) + " A";

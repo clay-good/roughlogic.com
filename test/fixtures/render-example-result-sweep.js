@@ -36,7 +36,7 @@ for (const r of ROWS) if (!first.has(r.tile_id)) first.set(r.tile_id, r);
 // At the precision a reader can see, as check-example-parity compares inputs:
 // the button types 66.82 where the fixture carries 66.8235.
 const close = (a, b) => a === b || Math.abs(a - b) <= Math.max(Math.abs(b) * 0.001, 1e-12);
-const report = { compared: 0, exampleErrors: [], mismatches: {}, dirty: [], link: [], noid: [] };
+const report = { grouped: [], compared: 0, exampleErrors: [], mismatches: {}, dirty: [], link: [], noid: [] };
 const { applyHashState } = await import('../../hash-state.js');
 if (!globalThis.CSS) globalThis.CSS = { escape: (s) => s };
 for (const { id } of TOOLS) {
@@ -90,6 +90,17 @@ for (const { id } of TOOLS) {
     const want = mod[creg.fn](structuredClone(inputs0));
     if (!want || typeof want !== "object" || want.error) continue;
     report.compared++;
+    // This site prints thousands with commas (fmt: "1,250"), so a reader pastes them back. A
+    // length or list box must read "5,280" as 5280 or refuse it -- never split it. Until
+    // 2026-11-15 survey points "5,000,5,000" read as N 5, E 0, and length boxes refused "5,280".
+    { const fire = (el) => { el.dispatchEvent(new Event("input", { bubbles: true })); el.dispatchEvent(new Event("change", { bubbles: true })); flushTimers(); };
+      const sig = (r) => JSON.stringify(r, (k, v) => (typeof v === "number" ? Math.round(v * 1e6) / 1e6 : v));
+      for (const el of [...inputs.querySelectorAll("textarea"), ...inputs.querySelectorAll("input").filter((e) => e.type === "text")]) {
+        const v0 = el.getAttribute ? el.value : el.value; if (!/(^|[^\d.])\d{4,}/.test(v0)) continue;
+        last = new Map(); fire(el); const base = last.get(creg.fn);
+        el.value = v0.replace(/(^|[^\d.])(\d{1,3})(\d{3})(?!\d)/, (m, p, a, b) => p + a + "," + b); last = new Map(); fire(el); const g = last.get(creg.fn);
+        if (base && g && !g.error && sig(g) !== sig(base)) report.grouped.push(id + " " + el.id);
+        el.value = v0; fire(el); } }
     const diff = Object.entries(want).filter(([k, v]) => printed.has(k) && typeof v === "number" && Number.isFinite(v) && !(typeof page[k] === "number" && close(v, page[k])));
     if (diff.length) report.mismatches[id] = diff.slice(0, 3).map(([k, v]) => `${k} page ${page[k]} vs example ${v}`).join("; ") + (diff.length > 3 ? ` (+${diff.length - 3} more)` : "");
   } catch { /* render-text-sweep reports crashes */ }
