@@ -636,6 +636,10 @@ export function queryFill(query, rows, opts) {
   // schedule, a percentage, and an ampacity all at once.
   const optionClaims = new Map();  // matched token -> [row key]
   const perRow = new Map();        // row key -> chosen option
+  // A grouped number is one number: "1,250 ft" offered the AWG option "1" (and a
+  // kcmil "250") as a second reading beside "12 awg", so the gauge filled neither
+  // way until 2026-11-15. Options are searched with the thousands commas closed up.
+  const optText = text.replace(/(^|[^\d.,])(\d{1,3}(?:,\d{3})+)(?![\d,])/g, (m, pre, n) => pre + n.replace(/,/g, ""));
   for (const row of selectRows) {
     const terms = termsByRow.get(row.d);
     const nameNear = [...terms].some((t) => text.includes(t));
@@ -645,10 +649,10 @@ export function queryFill(query, rows, opts) {
       if (!token) continue;
       const needsName = token.length < 3 || /^[\d.]+$/.test(token);
       const re = new RegExp(`(^|[^a-z0-9])${token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^a-z0-9]|$)`);
-      const at = text.search(re);
+      const at = optText.search(re);
       if (at < 0) continue;
       if (needsName && !nameNear) continue;
-      if (isNegated(text, at)) continue;
+      if (isNegated(optText, at)) continue;
       matches.push(String(opt));
     }
     if (matches.length !== 1) continue;   // two readings of one field: neither

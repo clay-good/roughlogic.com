@@ -44,6 +44,11 @@ const NONE_SAMPLES = new Map();
 // then the values. It is the only mode that exercises the rule keeping a tile's
 // own name from being read as a field name.
 const NAMED = process.argv.includes("--named");
+// `--grouped` writes every number of 1,000 or more the way this site prints it,
+// with thousands commas ("1,250"). Added 2026-11-15, when "1,250 ft" was found to
+// knock "12 awg" out of a voltage-drop question (the "1" read as an AWG option).
+const GROUPED = process.argv.includes("--grouped");
+const grp = (v) => (GROUPED && typeof v === "number" && Math.abs(v) >= 1000 ? v.toLocaleString("en-US", { maximumFractionDigits: 10 }) : v);
 
 const { queryFill } = await import(resolve(ROOT, "query-fill.js"));
 const { describe } = await import(resolve(ROOT, "mcp", "catalog.mjs"));
@@ -74,7 +79,7 @@ function phrase(rows, inputs) {
     if (v === null || v === undefined || v === "") continue;
     const label = TERSE ? "" : String(row.l).split(/\s+/).filter((w) => !/\d/.test(w)).join(" ").trim();
     if (row.k === "select" || row.k === "checkbox") parts.push(`${label} ${v}`.trim());
-    else parts.push(`${label} ${v}${row.u ? " " + row.u : ""}`.trim());
+    else parts.push(`${label} ${grp(v)}${row.u ? " " + row.u : ""}`.trim());
   }
   return parts.join(", ");
 }

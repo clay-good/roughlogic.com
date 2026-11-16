@@ -437,3 +437,18 @@ test("no new field label is left unnameable (ratchet: 9)", async () => {
     "labels with no matchable term rose to " + empty.length + ":\n  " + empty.join("\n  "),
   );
 });
+
+// "1,250 ft" offered the AWG option "1" as a second reading beside "12 awg", so the
+// gauge filled neither way and the door answered MISSING_INPUTS (fixed 2026-11-15).
+test("query-fill: a grouped number is one number, not an option token", () => {
+  const rows = [
+    { d: "awg", l: "AWG", k: "select", o: ["18", "16", "14", "12", "10", "8", "6", "4", "2", "1", "1/0"], r: 1 },
+    { d: "length_ft", l: "Length one-way", k: "number", u: "ft", r: 1 },
+    { d: "current_A", l: "Current", k: "number", u: "a", r: 1 },
+  ];
+  const plain = queryFill("voltage drop 1250 ft 12 awg 20a", rows, { name: "Voltage Drop" }).filled;
+  const grouped = queryFill("voltage drop 1,250 ft 12 awg 20a", rows, { name: "Voltage Drop" }).filled;
+  assert.deepEqual(grouped, plain);
+  assert.equal(grouped.awg, "12");
+  assert.equal(grouped.length_ft, "1250");
+});
