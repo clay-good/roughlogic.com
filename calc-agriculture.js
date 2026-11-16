@@ -1506,6 +1506,11 @@ export function computeNpkBlend({
   const dapN = Number(dap_n_pct) / 100;
   const dapP = Number(dap_p_pct) / 100;
   const mopK = Number(mop_k_pct) / 100;
+  // The grades are now page inputs (2026-11-15): a grade is a percent of the product's weight.
+  for (const [g, name] of [[urea_n_pct, "Urea N"], [dap_n_pct, "DAP N"], [dap_p_pct, "DAP P2O5"], [mop_k_pct, "Potash K2O"]]) {
+    if (!(Number(g) >= 0 && Number(g) <= 100)) return { error: name + " grade must be a percent from 0 to 100." };
+  }
+  if (Number(dap_n_pct) + Number(dap_p_pct) > 100) return { error: "DAP N plus P2O5 cannot exceed 100% of the product." };
 
   // Nutrient still needed after the soil-test credit (floored at zero).
   const rec_n = Math.max(0, demand.n - soilN);
@@ -1609,6 +1614,15 @@ function renderNpkBlend(inputRegion, outputRegion, citationEl) {
   // v23 EN.18: bag weight for the bag-count output.
   const bag = makeNumber("Bag weight (lb)", "npk-bag", { step: "any", min: "0", value: "50" });
   inputRegion.appendChild(bag.wrap);
+  // The compute always took the product grades; the page fixed 46-0-0, 18-46-0 and
+  // 0-0-60 until 2026-11-15, so a different urea, MAP-for-DAP or 0-0-62 product could
+  // not be entered.
+  const gUreaN = makeNumber("Urea grade (% N; 46 standard)", "npk-gun", { step: "any", min: "0", max: "100", value: "46" });
+  const gDapN = makeNumber("DAP grade (% N; 18 standard)", "npk-gdn", { step: "any", min: "0", max: "100", value: "18" });
+  const gDapP = makeNumber("DAP grade (% P2O5; 46 standard)", "npk-gdp", { step: "any", min: "0", max: "100", value: "46" });
+  const gMopK = makeNumber("Potash grade (% K2O; 60 standard)", "npk-gmk", { step: "any", min: "0", max: "100", value: "60" });
+  gUreaN.input.value = "46"; gDapN.input.value = "18"; gDapP.input.value = "46"; gMopK.input.value = "60";
+  for (const f of [gUreaN, gDapN, gDapP, gMopK]) inputRegion.appendChild(f.wrap);
   const oRec = makeOutputLine(outputRegion, "Nutrient recommendation", "npk-out-rec");
   const oRate = makeOutputLine(outputRegion, "Blend (lb/acre)", "npk-out-rate");
   const oKg = makeOutputLine(outputRegion, "Recommendation (kg/ha)", "npk-out-kg");
@@ -1625,7 +1639,11 @@ function renderNpkBlend(inputRegion, outputRegion, citationEl) {
       soil_k_lb_per_acre: readNum(soilK.input),
       area_acres: readNum(area.input),
       bag_weight_lb: bag.input.value === "" ? 50 : readNum(bag.input),
-    }); stepsFor(outputRegion, inputRegion, ["crop", "soil_n_lb_per_acre", "soil_p_lb_per_acre", "soil_k_lb_per_acre", "area_acres", "bag_weight_lb"], r);
+      urea_n_pct: gUreaN.input.value === "" ? undefined : readNum(gUreaN.input),
+      dap_n_pct: gDapN.input.value === "" ? undefined : readNum(gDapN.input),
+      dap_p_pct: gDapP.input.value === "" ? undefined : readNum(gDapP.input),
+      mop_k_pct: gMopK.input.value === "" ? undefined : readNum(gMopK.input),
+    }); stepsFor(outputRegion, inputRegion, ["crop", "soil_n_lb_per_acre", "soil_p_lb_per_acre", "soil_k_lb_per_acre", "area_acres", "bag_weight_lb", "urea_n_pct", "dap_n_pct", "dap_p_pct", "mop_k_pct"], r);
     if (r.error) { oRec.textContent = r.error; oRate.textContent = "-"; oKg.textContent = "-"; oTotal.textContent = "-"; oBags.textContent = "-"; oNote.textContent = ""; return; }
     oRec.textContent = fmt(r.rec_n_lb_per_acre, 0) + " N / " + fmt(r.rec_p_lb_per_acre, 0) + " P2O5 / " + fmt(r.rec_k_lb_per_acre, 0) + " K2O lb/acre still needed";
     oRate.textContent = "Urea " + fmt(r.urea_lb_per_acre, 1) + " + DAP " + fmt(r.dap_lb_per_acre, 1) + " + Potash " + fmt(r.mop_lb_per_acre, 1) + " lb/acre";
@@ -1634,7 +1652,7 @@ function renderNpkBlend(inputRegion, outputRegion, citationEl) {
     oBags.textContent = r.urea_bags + " urea + " + r.dap_bags + " DAP + " + r.mop_bags + " potash bags (" + fmt(r.bag_weight_lb, 0) + " lb each); " + fmt(r.total_blend_tons, 2) + " tons total";
     oNote.textContent = r.warnings.length ? r.warnings.join(" ") : "Blend delivers " + fmt(r.n_delivered_lb_per_acre, 0) + " N / " + fmt(r.p_delivered_lb_per_acre, 0) + " P2O5 / " + fmt(r.k_delivered_lb_per_acre, 0) + " K2O lb/acre. Apply per your certified soil-test recommendation.";
   }, DEBOUNCE_MS);
-  for (const el of [soilN.input, soilP.input, soilK.input, area.input, bag.input]) el.addEventListener("input", update);
+  for (const el of [soilN.input, soilP.input, soilK.input, area.input, bag.input, gUreaN.input, gDapN.input, gDapP.input, gMopK.input]) el.addEventListener("input", update);
   crop.select.addEventListener("change", update);
 }
 
