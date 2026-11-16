@@ -457,7 +457,9 @@ export function queryFill(query, rows, opts) {
     // the other words of that name still match.
     for (const r of selectRows) for (const o of r.o) {
       const tok = String(o).toLowerCase();
-      if (/^[a-z]+$/.test(tok) && toks.includes(tok)) wanted.delete(tok);
+      if (!/^[a-z]+$/.test(tok) || !toks.includes(tok)) continue;
+      // labelTerms also keeps a stem ("thickness" -> "thicknes"), so drop that too.
+      for (const w of [...wanted]) if (tok.startsWith(w) && tok.length - w.length <= 2) wanted.delete(w);
     }
     if (!wanted.size) return;
     const hits = [];
@@ -692,8 +694,19 @@ export function queryFill(query, rows, opts) {
       const token = String(opt).toLowerCase().trim();
       if (!token) continue;
       const needsName = token.length < 3 || /^[\d.]+$/.test(token);
-      const re = new RegExp(`(^|[^a-z0-9])${token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^a-z0-9]|$)`);
-      const at = optText.search(re);
+      const re = new RegExp(`(^|[^a-z0-9])${token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^a-z0-9]|$)`, "g");
+      // An option written as the unit of a number that a field measured in that
+      // unit can hold is that number's unit, not this select's choice: tank-mix
+      // read "300 gal" (the tank) as Product unit = gal (2026-11-16).
+      const asUnit = canonicalUnit(token);
+      const ownsUnit = asUnit && numberRows.some((r) => rowUnit(r) && unitsCompatible(asUnit, rowUnit(r)));
+      let at = -1;
+      for (const m of optText.matchAll(re)) {
+        const pos = m.index + m[1].length;
+        if (ownsUnit && /\d\s*$/.test(optText.slice(0, pos))) continue;
+        at = pos;
+        break;
+      }
       if (at < 0) continue;
       if (needsName && !nameNear) continue;
       if (isNegated(optText, at)) continue;

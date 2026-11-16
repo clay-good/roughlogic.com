@@ -519,3 +519,25 @@ test("field-units: newer label units resolve, and absolute pressure stays apart"
   assert.ok(Math.abs(convertUnit(1, "km", "ft") - 3280.8399) < 1e-3);
   assert.equal(unitFamily("hz"), "frequency");
 });
+
+// 2026-11-16: "300 gal" is the tank, not the Product unit option "gal"; and an
+// option word's stem ("thicknes") does not name "Material thickness" either.
+test("query-fill: a number's unit is not a select choice, and option stems name nothing", () => {
+  const tank = [
+    num("tank_gal", "Tank capacity", "gal"),
+    sel("product_unit", "Product unit", ["fl_oz", "pt", "qt", "gal", "oz", "lb"]),
+  ];
+  const t = queryFill("300 gal, product unit pt", tank).filled;
+  assert.equal(Number(t.tank_gal), 300);
+  assert.equal(t.product_unit, "pt");
+  assert.notEqual(queryFill("300 gal", tank).filled.product_unit, "gal");
+  const punch = [
+    sel("solve_for", "Solve for", ["thickness", "diameter"]),
+    num("diameter_in", "Hole diameter", "in"),
+    num("thickness_in", "Material thickness", "in"),
+  ];
+  const p = queryFill("thickness, 0.5 in, 0.25 in", punch).filled;
+  assert.equal(p.solve_for, "thickness");
+  assert.equal(p.thickness_in, undefined);
+  assert.equal(p.diameter_in, undefined);
+});
