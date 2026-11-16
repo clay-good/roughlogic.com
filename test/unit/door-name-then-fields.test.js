@@ -23,6 +23,13 @@ test("a calculator named in full, then given its own fields, answers", async () 
   }
 });
 
+// The first words of a name several siblings share ("Service Load" opens three)
+// go to the one sibling whose own fields account for every other word.
+test("a shared short name goes to the sibling whose fields the question gives", async () => {
+  assert.equal((await answerQuery({ query: "Service Load Conditioned area 2000 ft2, Small-appliance circuits 2, Laundry circuits 1" })).id, "service-load");
+  assert.equal((await answerQuery({ query: "Ceiling Speaker Ceiling height 10 ft, Listener ear height 4 ft, Target coverage diameter / spacing 8 ft" })).id, "ceiling-speaker-coverage-angle");
+});
+
 test("a word that is not the named calculator's still narrows to a sibling", async () => {
   // "hose" is not a Friction Loss field: the reader is asking for the fire-hose tile.
   assert.equal((await answerQuery({ query: "friction loss 200 ft of hose at 150 gpm" })).id, "fire-friction");

@@ -1343,17 +1343,23 @@ const NAME_FIELD_CONNECTIVES = new Set(["a", "an", "and", "at", "by", "for", "in
 async function nameThenOwnFields(q, byId) {
   const toks = String(q).toLowerCase().split(/[^a-z0-9.]+/).filter(Boolean);
   if (toks.length < 3) return null;
-  const candidates = [];
+  // Whole names first, longest first; then names the question only BEGINS
+  // ("Service Load ..." opens three calculators), where the remaining words
+  // must fit exactly one of them.
+  const whole = [], partial = [];
   for (const tool of byId.values()) {
     const nt = String(tool.name || "").toLowerCase().split(/[^a-z0-9.]+/).filter(Boolean);
-    if (nt.length < 2 || nt.length >= toks.length) continue;
-    if (nt.every((t, i) => toks[i] === t)) candidates.push({ tool, len: nt.length });
+    if (nt.length < 2) continue;
+    let k = 0;
+    while (k < nt.length && k < toks.length - 1 && nt[k] === toks[k]) k++;
+    if (k === nt.length) whole.push({ tool, len: k });
+    else if (k >= 2) partial.push({ tool, len: k });
   }
-  candidates.sort((a, b) => b.len - a.len);
+  whole.sort((a, b) => b.len - a.len);
   const { canonicalUnit } = await import(new URL("../field-units.js", import.meta.url).href);
-  for (const { tool, len } of candidates) {
+  const fits = async ({ tool, len }) => {
     const rows = await fieldRowsFor(tool.id, tool.group);
-    if (!rows || !rows.length) continue;
+    if (!rows || !rows.length) return false;
     const own = new Set();
     for (const r of rows) {
       for (const w of String(r.l || "").toLowerCase().split(/[^a-z0-9]+/)) if (w) own.add(w);
@@ -1361,11 +1367,15 @@ async function nameThenOwnFields(q, byId) {
       if (r.u) for (const w of String(r.u).toLowerCase().split(/[^a-z0-9]+/)) if (w) own.add(w);
     }
     const rest = toks.slice(len);
-    const ok = rest.every((t) => own.has(t) || NAME_FIELD_CONNECTIVES.has(t) || /^[\d.]+$/.test(t) ||
-      canonicalUnit(t) !== null || (t.endsWith("s") && own.has(t.slice(0, -1))));
-    if (ok && rest.some((t) => /\d/.test(t))) return { id: tool.id, name: tool.name };
-  }
-  return null;
+    return rest.some((t) => /\d/.test(t)) && rest.every((t) => own.has(t) || NAME_FIELD_CONNECTIVES.has(t) ||
+      /^[\d.]+$/.test(t) || canonicalUnit(t) !== null || (t.endsWith("s") && own.has(t.slice(0, -1))));
+  };
+  for (const c of whole) if (await fits(c)) return { id: c.tool.id, name: c.tool.name };
+  if (!partial.length || partial.length > 12) return null;
+  const best = Math.max(...partial.map((c) => c.len));
+  const ok = [];
+  for (const c of partial.filter((c) => c.len === best)) if (await fits(c)) ok.push(c);
+  return ok.length === 1 ? { id: ok[0].tool.id, name: ok[0].tool.name } : null;
 }
 
 async function fieldRowsFor(id, group) {
