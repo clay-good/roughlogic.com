@@ -1329,6 +1329,45 @@ function isPlainNumber(v) {
   return t !== "" && Number.isFinite(Number(t));
 }
 
+// The question OPENS with a calculator's whole published name and every word
+// after it is one of that calculator's own field labels, select options or
+// units (or a number or connective): "Voltage Drop Phase single, Material
+// copper, AWG 10, Length one-way 150 ft, ...". Measured 2026-11-16: 318 of
+// 2,243 tiles asked that way, by their own name and their own labelled
+// example, were answered by a different calculator or by NO_MATCH, because
+// the ranker's name-first signal requires the rest to be numbers only, and
+// coverage then rewarded whichever sibling matched more of the field words.
+// A leftover word that is NOT this tile's ("friction loss 200 ft of hose")
+// is the reader narrowing, and the ranker decides as before. Longest name wins.
+const NAME_FIELD_CONNECTIVES = new Set(["a", "an", "and", "at", "by", "for", "in", "is", "of", "on", "or", "per", "the", "to", "with", "x"]);
+async function nameThenOwnFields(q, byId) {
+  const toks = String(q).toLowerCase().split(/[^a-z0-9.]+/).filter(Boolean);
+  if (toks.length < 3) return null;
+  const candidates = [];
+  for (const tool of byId.values()) {
+    const nt = String(tool.name || "").toLowerCase().split(/[^a-z0-9.]+/).filter(Boolean);
+    if (nt.length < 2 || nt.length >= toks.length) continue;
+    if (nt.every((t, i) => toks[i] === t)) candidates.push({ tool, len: nt.length });
+  }
+  candidates.sort((a, b) => b.len - a.len);
+  const { canonicalUnit } = await import(new URL("../field-units.js", import.meta.url).href);
+  for (const { tool, len } of candidates) {
+    const rows = await fieldRowsFor(tool.id, tool.group);
+    if (!rows || !rows.length) continue;
+    const own = new Set();
+    for (const r of rows) {
+      for (const w of String(r.l || "").toLowerCase().split(/[^a-z0-9]+/)) if (w) own.add(w);
+      for (const o of r.o || []) for (const w of String(o).toLowerCase().split(/[^a-z0-9.]+/)) if (w) own.add(w);
+      if (r.u) for (const w of String(r.u).toLowerCase().split(/[^a-z0-9]+/)) if (w) own.add(w);
+    }
+    const rest = toks.slice(len);
+    const ok = rest.every((t) => own.has(t) || NAME_FIELD_CONNECTIVES.has(t) || /^[\d.]+$/.test(t) ||
+      canonicalUnit(t) !== null || (t.endsWith("s") && own.has(t.slice(0, -1))));
+    if (ok && rest.some((t) => /\d/.test(t))) return { id: tool.id, name: tool.name };
+  }
+  return null;
+}
+
 async function fieldRowsFor(id, group) {
   const { bucketFor } = await import(new URL("../field-bucket.js", import.meta.url).href);
   try {
@@ -1631,9 +1670,11 @@ export async function answerQuery({ query } = {}) {
   const exactAlias = results.find((r) => queryIsExactCuratedAliasFor(q, r.id, aliasRows))
     || soleAliasTarget;
   const exactName = results.find((r) => sameTokens(q, byId.get(r.id)));
+  const namedWithFields = exactAlias || exactName ? null : await nameThenOwnFields(q, byId);
   const top = literalId
     || exactAlias
     || exactName
+    || namedWithFields
     || results.find((r) => queryIsCuratedAliasFor(q, r.id, aliasRows))
     || results[0];
   if (!top) return { status: "NO_MATCH", query: q, message: "No calculator matched." };

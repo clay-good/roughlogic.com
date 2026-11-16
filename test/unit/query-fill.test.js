@@ -577,3 +577,17 @@ test("query-fill: value-then-name phrases bind backward, or not at all", () => {
   const t = [num("setpoint_f", "Setpoint", "degf"), num("limit_f", "High limit", "degf")];
   assert.equal(Number(queryFill("setpoint 70 °f high limit 80 °f", t).filled.limit_f), 80);
 });
+
+// 2026-11-16: plan dimensions ("a 10 by 12 floor") and square items ("12 inch tile").
+test("query-fill: plan dimensions fill length and width, or a plan area, never a wall area", () => {
+  const slab = [num("length_ft", "Length", "ft"), num("width_ft", "Width", "ft"), num("thickness_in", "Thickness", "in")];
+  const s = queryFill("concrete for a 20 by 30 slab 4 inches thick", slab).filled;
+  assert.deepEqual([Number(s.length_ft), Number(s.width_ft), Number(s.thickness_in)], [20, 30, 4]);
+  const area = [num("area_ft2", "Area", "ft2"), num("tile_width_in", "Tile width", "in"), num("tile_height_in", "Tile height", "in"), num("tile_thickness_in", "Tile thickness", "in")];
+  const t = queryFill("how many tiles for a 10 by 12 floor 12 inch tile", area).filled;
+  assert.deepEqual([Number(t.area_ft2), Number(t.tile_width_in), Number(t.tile_height_in)], [120, 12, 12]);
+  assert.equal(t.tile_thickness_in, undefined);
+  // A room may be about its walls; lumber is lumber.
+  assert.equal(queryFill("paint for a 12 by 12 room 8 ft walls", [num("area_ft2", "Area", "ft2")]).filled.area_ft2, undefined);
+  assert.equal(queryFill("2 by 4 studs", slab).filled.length_ft, undefined);
+});

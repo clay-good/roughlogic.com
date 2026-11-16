@@ -416,6 +416,42 @@ export function queryFill(query, rows, opts) {
   const claimed = new Set();       // quantity indexes already spent
   const unmatched = [];
 
+  // --- Plan dimensions: "a 10 by 12 floor", "20x30 slab" --------------------
+  // Two bare numbers joined by "by" or "x" are a plan, written in feet, when a
+  // surface word follows or a side is too big for lumber ("2 by 4 studs" is a
+  // stud). They fill the tile's one length and one width in feet, or, failing
+  // that pair, its one plan-area field with the product. An area labelled as
+  // a sloped surface, a wall or a ceiling is not a plan area and is left alone
+  // (2026-11-16: these questions filled nothing, or filled the wrong field).
+  {
+    const PLAN = /(^|[^\d.])(\d+(?:\.\d+)?)\s*(?:by|x)\s*(\d+(?:\.\d+)?)(?![\d.]|\s*(?:in\b|inch|"|ft\b|feet|foot|'|cm\b|mm\b|m\b))(\s+[a-z]+)?/;
+    const SURFACES = /^\s+(floor|room|slab|patio|deck|yard|driveway|kitchen|bathroom|bedroom|garage|basement|lawn|garden|pad|area|space|lot|walkway|sidewalk|shed|porch)s?$/;
+    const m = text.match(PLAN);
+    if (m) {
+      const a = Number(m[2]), b = Number(m[3]);
+      const surface = Boolean(m[4] && SURFACES.test(m[4]));
+      if (a > 0 && b > 0 && (surface || Math.max(a, b) > NOMINAL_LUMBER_MAX_IN)) {
+        const start = m.index + m[1].length, end = start + m[0].length - m[1].length - (m[4] || "").length;
+        const inPair = quantities.map((q, i) => (q.index >= start && q.index < end ? i : -1)).filter((i) => i >= 0);
+        const ft = (word) => numberRows.filter((r) => rowUnit(r) === "ft" && termsByRow.get(r.d).has(word));
+        const len = ft("length"), wid = ft("width");
+        const areas = numberRows.filter((r) => rowUnit(r) === "ft2" && !/slop|surface|wall|ceiling/i.test(r.l));
+        let done = false;
+        if (len.length === 1 && wid.length === 1 && len[0].d !== wid[0].d) {
+          filled[len[0].d] = String(a); filled[wid[0].d] = String(b); done = true;
+        } else if (!len.length && !wid.length && areas.length === 1 &&
+                   m[4] && /^\s+(floor|slab|patio|deck|yard|driveway|lawn|garden|pad|area|lot|walkway|sidewalk)s?$/.test(m[4]) &&
+                   !/\b(walls?|ceilings?|paint|primer)\b/.test(text)) {
+          // A room's plan is its floor, but a question about a room may be about
+          // its walls ("paint for a 12 by 12 room"): only a work surface fills
+          // a single area field.
+          filled[areas[0].d] = String(Math.round(a * b * 1e6) / 1e6); done = true;
+        }
+        if (done) for (const i of inPair) { suppressed.add(i); claimed.add(i); }
+      }
+    }
+  }
+
   // --- Phase A: name-then-value -------------------------------------------
   // The text between the previous number and this one is where a field name
   // lives: "length 40 width 20". This wins outright, because in a run of
@@ -451,7 +487,22 @@ export function queryFill(query, rows, opts) {
     else if (unitFamily(unit) === "length" && (m = after.match(/^\s+(tall|high|deep|wide|long|thick|apart)\b/i))) {
       terms = new Set([m[1].toLowerCase(), ...POST_WORDS.get(m[1].toLowerCase())]);
     }
-    if (!terms) return;
+    if (!terms) {
+      // "12 inch tile": a size followed by the name of an item whose two sides
+      // the tile asks for (Tile width + Tile height) is a square item, and
+      // fills both. Only that exact shape; any other trailing noun is left to
+      // the usual rules.
+      const n = after.match(/^\s+([a-z]+)\b/i);
+      if (!n) return;
+      const noun = n[1].toLowerCase().replace(/s$/, "");
+      const pair = numberRows.filter((r) => rowUnit(r) && unitsCompatible(unit, rowUnit(r)) && termsByRow.get(r.d).has(noun) &&
+        ["width", "height", "length"].some((w) => termsByRow.get(r.d).has(w)));
+      const sides = pair.map((r) => ["width", "height", "length"].filter((w) => termsByRow.get(r.d).has(w)));
+      if (pair.length === 2 && sides.every((x) => x.length === 1) && sides[0][0] !== sides[1][0]) {
+        backOf.set(qi, { cut: n[0].length, keys: pair.map((r) => r.d), square: true, dimension: false });
+      }
+      return;
+    }
     const keys = numberRows.filter((r) => rowUnit(r) && unitsCompatible(unit, rowUnit(r)) &&
       [...termsByRow.get(r.d)].some((t) => terms.has(t))).map((r) => r.d);
     backOf.set(qi, { cut: m[0].length, keys, dimension: !/^\s+of\s/i.test(m[0]) });
@@ -462,7 +513,15 @@ export function queryFill(query, rows, opts) {
     prevEnd = qty.end;
     if (suppressed.has(qi)) return;
     if (backOf.has(qi)) {
-      const { keys } = backOf.get(qi);
+      const { keys, square } = backOf.get(qi);
+      if (square) {
+        if (keys.some((k) => k in filled)) return;
+        const vals = keys.map((k) => valueFor(qty, numberRows.find((r) => r.d === k), text, labelWords));
+        if (vals.some((v) => v === null)) return;
+        keys.forEach((k, i) => { filled[k] = vals[i]; });
+        claimed.add(qi);
+        return;
+      }
       if (keys.length !== 1) return;
       const row = numberRows.find((r) => r.d === keys[0]);
       if (valueFor(qty, row, text, labelWords) === null) return;
