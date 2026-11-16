@@ -1492,6 +1492,9 @@ export function computeTimesheet({ jobs = [], regular_rate = 0, weekly_overtime_
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!Array.isArray(jobs) || jobs.length === 0) return { error: "Provide at least one job." };
   if (!(regular_rate >= 0)) return { error: "Regular rate must be non-negative." };
+  weekly_overtime_threshold_hr = Number(weekly_overtime_threshold_hr); irs_rate_per_mile = Number(irs_rate_per_mile);
+  if (!(weekly_overtime_threshold_hr >= 0)) return { error: "Overtime threshold must be 0 or more hours a week (40 under the FLSA)." };
+  if (!(irs_rate_per_mile >= 0)) return { error: "Mileage rate must be 0 or more dollars per mile." };
   let total_hours = 0;
   let total_miles = 0;
   const job_results = [];
@@ -1822,7 +1825,9 @@ function renderTimesheet(inputRegion, outputRegion, citationEl) {
     rows.push({ s, e, l, m });
   }
   const rate = _mnG("Hourly rate ($)", "ts-rate", { step: "any", min: "0" });
-  inputRegion.appendChild(rate.wrap);
+  const otT = _mnG("Overtime after (hr a week; blank = 40, the FLSA threshold)", "ts-ot", { step: "any", min: "0" });
+  const mRate = _mnG("Mileage rate ($/mi; blank = the IRS standard rate)", "ts-mr", { step: "any", min: "0" });
+  for (const f of [rate, otT, mRate]) inputRegion.appendChild(f.wrap);
   const oH = _moG(outputRegion, "Total hours", "ts-out-h");
   const oR = _moG(outputRegion, "Reg / OT", "ts-out-r");
   const oP = _moG(outputRegion, "Gross pay", "ts-out-p");
@@ -1838,15 +1843,15 @@ function renderTimesheet(inputRegion, outputRegion, citationEl) {
   function update() {
     const jobs = rows.map((r) => ({ start_hr: Number(r.s.value) || 0, end_hr: Number(r.e.value) || 0, lunch_min: Number(r.l.value) || 0, miles: Number(r.m.value) || 0 })).filter((j) => j.end_hr > j.start_hr);
     if (jobs.length === 0) { oH.textContent = "-"; oR.textContent = "-"; oP.textContent = "-"; oM.textContent = "-"; return; }
-    const r = computeTimesheet({ jobs, regular_rate: Number(rate.input.value) || 0 }); stepsFor(outputRegion, inputRegion, ["jobs", "regular_rate"], r);
-    if (r.error) { oH.textContent = r.error; return; }
+    const r = computeTimesheet({ jobs, regular_rate: Number(rate.input.value) || 0, weekly_overtime_threshold_hr: otT.input.value === "" ? undefined : Number(otT.input.value), irs_rate_per_mile: mRate.input.value === "" ? undefined : Number(mRate.input.value) }); stepsFor(outputRegion, inputRegion, ["jobs", "regular_rate", "weekly_overtime_threshold_hr", "irs_rate_per_mile"], r);
+    if (r.error) { oH.textContent = r.error; oR.textContent = oP.textContent = oM.textContent = ""; return; }
     oH.textContent = _fmtG(r.total_hours, 2) + " hr";
     oR.textContent = _fmtG(r.regular_hours, 2) + " / " + _fmtG(r.overtime_hours, 2) + " hr";
     oP.textContent = "$" + _fmtG(r.gross_pay, 2);
     oM.textContent = _fmtG(r.total_miles, 1) + " mi ($" + _fmtG(r.reimbursable, 2) + ")";
   }
   // Until 2026-10-08 the rate had no listener: a new rate showed no new pay until a day row changed.
-  rate.input.addEventListener("input", update);
+  for (const el of [rate.input, otT.input, mRate.input]) el.addEventListener("input", update);
 }
 
 const renderVehicleLoad = _simpleRendererG({

@@ -953,7 +953,7 @@ export const BESPOKE_LABELS = {
   "tile-count": {"area_ft2":"Area (ft²)","tile_width_in":"Tile width (in)","tile_height_in":"Tile height (in)","grout_joint_width_in":"Grout joint width (in)","tile_thickness_in":"Tile thickness (in)","waste_pct":"Waste allowance (%; 10 straight lay, 15 diagonal)"},
   "time-and-materials": {"hours":"Hours","labor_rate_per_hour":"Labor rate ($/hr)","material_cost":"Material cost ($)","overhead_percent":"Overhead (percent)","profit_percent":"Profit (percent)"},
   "time-of-concentration": {"l_ft":"Flow-path length L (ft)","s_slope":"Average slope S (ft/ft)"},
-  "timesheet": {"regular_rate":"Hourly rate ($)"},
+  "timesheet": {"regular_rate":"Hourly rate ($)","weekly_overtime_threshold_hr":"Overtime after (hr a week; blank = 40, the FLSA threshold)","irs_rate_per_mile":"Mileage rate ($/mi; blank = the IRS standard rate)"},
   "tip-out": {"total_amount":"Total amount ($)"},
   "tolerance-stack-rss": {"nominal_gap_in":"Nominal (mean) gap (in)","tolerances":"Tolerance half-widths (in, comma or space separated)"},
   "torus-volume": {"center_diameter_in":"Ring centerline diameter Dc (in)","tube_diameter_in":"Tube diameter dt (in)"},
