@@ -2287,4 +2287,5 @@ export const TOOLS = [
   {"id":"shower-pan-mortar-bed","name":"Shower Pan Mortar Bed: Pre-Slope Thickness and Volume","group":"E","trades":["tile","plumbing"],"desc":"How thick a shower pan's mortar bed is at the walls, how much mud it takes and how many bags to buy.","more":1},
   {"id":"mver-calcium-chloride","name":"Concrete Moisture Vapor Emission Rate from a Calcium Chloride Test (ASTM F1869)","group":"E","trades":["flooring","tile"],"desc":"The moisture vapor emission rate a calcium chloride dome test gives, and whether it is under the flooring maker's limit.","more":1},
   {"id":"work-zone-buffer-space","name":"Work Zone Longitudinal Buffer Space and Activity Area Length (MUTCD 6B.06)","group":"E","trades":["civil","construction"],"desc":"How long a lane closure's buffer space is, how far apart the drums go, and how long the whole closure runs, by the MUTCD 11th Edition.","more":1},
+  {"id":"wood-stud-wall-takeoff","name":"Wood Stud Wall Takeoff: Studs and Plates","group":"E","trades":["carpentry","framing"],"desc":"How many wood studs and how much plate one stud wall takes.","more":1},
 ];

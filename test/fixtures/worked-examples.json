@@ -172979,6 +172979,113 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "wood-stud-wall-takeoff",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "40 ft wall, 16 in on center, 2 corners, 1 intersection, 2 openings, 10% waste",
+  "source_edition_or_year": "spec-v1994 worked example",
+  "source_section_or_page": "field = ceil(480/16) + 1 = 31; extras = 2x2 + 1x2 + 2x2 = 10; studs 41, buy ceil(45.1) = 46; plates 40 x 3 = 120 LF, ceil(132/16) = 9 pieces",
+  "verified_by": "rl",
+  "verified_on": "2026-11-16",
+  "inputs": {
+   "wall_length_ft": 40,
+   "stud_oc_in": 16,
+   "corners": 2,
+   "studs_per_corner": 2,
+   "intersections": 1,
+   "studs_per_intersection": 2,
+   "openings": 2,
+   "studs_per_opening": 2,
+   "plate_courses": 3,
+   "plate_stock_ft": "16",
+   "waste_pct": 10
+  },
+  "outputs": {
+   "field_studs": {
+    "value": 31,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "extra_studs": {
+    "value": 10,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "total_studs": {
+    "value": 41,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "studs_to_buy": {
+    "value": 46,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "plate_lf": {
+    "value": 120,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "plate_pieces": {
+    "value": 9,
+    "tolerance": {
+     "abs": 0
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "wood-stud-wall-takeoff",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "cross-check: 24 in on center, single top plate, no waste",
+  "source_edition_or_year": "spec-v1994 worked example",
+  "source_section_or_page": "field = ceil(480/24) + 1 = 21; studs 21; plates 40 x 2 = 80 LF, ceil(80/16) = 5 pieces",
+  "verified_by": "rl",
+  "verified_on": "2026-11-16",
+  "inputs": {
+   "wall_length_ft": 40,
+   "stud_oc_in": 24,
+   "plate_courses": 2,
+   "waste_pct": 0
+  },
+  "outputs": {
+   "field_studs": {
+    "value": 21,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "total_studs": {
+    "value": 21,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "studs_to_buy": {
+    "value": 21,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "plate_lf": {
+    "value": 80,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "plate_pieces": {
+    "value": 5,
+    "tolerance": {
+     "abs": 0
+    }
+   }
+  }
  }
  ]
 }

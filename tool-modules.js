@@ -607,6 +607,7 @@ export const TOOL_MODULES = (() => {
     "truss-uplift-connector",
     "foundation-grade-slope-check",
     "work-zone-buffer-space",
+    "wood-stud-wall-takeoff",
   ]);
   // spec-v1871 cap-relief split: the specialty-building and temporary-works
   // tail moved intact from calc-construction.js. All 11 tiles keep Group E

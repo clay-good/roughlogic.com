@@ -582,3 +582,31 @@ test("work-zone-buffer-space: every Table 6B-2 row is within 5 ft of 1.47 V t + 
     assert.ok(Math.abs(r.buffer_ft - ssd) <= 5, s + " mph: table " + r.buffer_ft + " vs formula " + ssd.toFixed(1));
   }
 });
+
+// spec-v1994 wood stud wall takeoff, counted by hand: studs sit at 0, 16, 32 ...
+// inches along the run plus one at the far end when the spacing does not land on it.
+import { computeWoodStudWallTakeoff } from "../../calc-construction.js";
+test("wood-stud-wall-takeoff: field studs match a hand layout of stud positions", () => {
+  for (const [ft, oc] of [[8, 16], [10, 16], [12, 24], [40, 16], [13.5, 16], [7, 12]]) {
+    const run = ft * 12;
+    const pos = [];
+    for (let x = 0; x < run - 1e-9; x += oc) pos.push(x);
+    pos.push(run); // the end stud
+    assert.equal(computeWoodStudWallTakeoff({ wall_length_ft: ft, stud_oc_in: oc }).field_studs, pos.length, `${ft} ft at ${oc} in`);
+  }
+  // Waste rounds UP: 31 studs at 10% is 34.1, so buy 35; 30 at 10% is exactly 33.
+  assert.equal(computeWoodStudWallTakeoff({ wall_length_ft: 40, stud_oc_in: 16 }).studs_to_buy, 35);
+  assert.equal(computeWoodStudWallTakeoff({ wall_length_ft: 29 * 16 / 12, stud_oc_in: 16 }).studs_to_buy, 33);
+});
+
+// Review 2026-11-16: the agent door sends an unfilled box as null, which must
+// mean the default, not 0; impossible spacing and stock are refused.
+test("wood-stud-wall-takeoff: null means the default, and impossible inputs are refused", () => {
+  const base = computeWoodStudWallTakeoff({ wall_length_ft: 40, corners: 2 });
+  const nulls = computeWoodStudWallTakeoff({ wall_length_ft: 40, corners: 2, stud_oc_in: null, studs_per_corner: null, waste_pct: "", plate_courses: null, plate_stock_ft: null });
+  assert.deepEqual([nulls.total_studs, nulls.studs_to_buy, nulls.plate_pieces], [base.total_studs, base.studs_to_buy, base.plate_pieces]);
+  assert.equal(base.total_studs, 35);
+  for (const bad of [{ stud_oc_in: 0.01 }, { stud_oc_in: 6 }, { plate_stock_ft: 0.5 }, { plate_stock_ft: 1e6 }, { openings: 1e15 }, { studs_per_opening: 50 }]) {
+    assert.ok(computeWoodStudWallTakeoff({ wall_length_ft: 40, ...bad }).error, JSON.stringify(bad));
+  }
+});

@@ -2443,6 +2443,8 @@ const RELATED = {
   "mver-calcium-chloride": ["tile-flatness-lippage-check","self-leveler-bags","thinset-coverage"],
   // spec-v1991: work zone buffer space (calc-construction.js).
   "work-zone-buffer-space": ["traffic-taper-length","advance-warning-sign-spacing"],
+  // spec-v1994: wood stud wall takeoff (calc-construction.js).
+  "wood-stud-wall-takeoff": ["residential-framing","metal-stud-takeoff","header-sizing","sheathing-takeoff"],
 };
 
 export { RELATED };

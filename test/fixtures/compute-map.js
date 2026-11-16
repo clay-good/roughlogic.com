@@ -2390,6 +2390,7 @@ export const COMPUTE_MAP = {
   "shower-pan-mortar-bed": { module: "../../calc-finish.js", fn: "computeShowerPanMortarBed" },
   "mver-calcium-chloride": { module: "../../calc-finish.js", fn: "computeMverCalciumChloride" },
   "work-zone-buffer-space": { module: "../../calc-construction.js", fn: "computeWorkZoneBufferSpace" },
+  "wood-stud-wall-takeoff": { module: "../../calc-construction.js", fn: "computeWoodStudWallTakeoff" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

@@ -1539,6 +1539,8 @@ const _TILES = [
   ["mver-calcium-chloride", "E"],
   // spec-v1991: work zone buffer space (calc-construction.js).
   ["work-zone-buffer-space", "E"],
+  // spec-v1994: wood stud wall takeoff (calc-construction.js).
+  ["wood-stud-wall-takeoff", "E"],
 ];
 
 

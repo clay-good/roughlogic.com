@@ -62495,3 +62495,17 @@ test("hardening slice 59: blank strings stay blank, a wide patio is measured ove
   // A continuous fan in a bath over 100 sq ft is still told to boost.
   assert.match(_h59bf({ room_type: "bathroom", length_ft: 12, width_ft: 10, ceiling_ft: 8, operation: "continuous", rule: "ach8" }).advice, /boost it to/);
 });
+
+import { computeWoodStudWallTakeoff as _wsw } from "../../calc-construction.js";
+test("bounds: spec-v1994 computeWoodStudWallTakeoff pins the counts, plates and error seams", () => {
+  const ex = { wall_length_ft: 40, stud_oc_in: 16, corners: 2, studs_per_corner: 2, intersections: 1, studs_per_intersection: 2, openings: 2, studs_per_opening: 2, plate_courses: 3, plate_stock_ft: 16, waste_pct: 10 };
+  const r = _wsw(ex);
+  assert.strictEqual(r.field_studs, 31);
+  assert.strictEqual(r.total_studs, 41);
+  assert.strictEqual(r.studs_to_buy, 46);
+  assert.strictEqual(r.plate_lf, 120);
+  assert.strictEqual(r.plate_pieces, 9);
+  for (const bad of [{ wall_length_ft: 0 }, { stud_oc_in: 0 }, { stud_oc_in: 60 }, { corners: -1 }, { openings: 1.5 }, { plate_courses: 0 }, { plate_courses: 5 }, { plate_stock_ft: 0 }, { waste_pct: -1 }, { waste_pct: 101 }, { wall_length_ft: 2000 }]) {
+    assert.ok("error" in _wsw({ ...ex, ...bad }), JSON.stringify(bad));
+  }
+});

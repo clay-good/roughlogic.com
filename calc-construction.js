@@ -9969,6 +9969,77 @@ const _v868renderMetalStudTakeoff = _simpleRenderer({
 });
 CONSTRUCTION_RENDERERS["metal-stud-takeoff"] = _v868renderMetalStudTakeoff;
 
+// ===================== spec-v1994: wood stud wall takeoff =====================
+// field studs = ceil(L x 12 / spacing) + 1 (spaces plus one); the corner,
+// intersection and opening allowances are inputs because published estimating
+// texts disagree on them (Hicks' Builders' Guide; trade calculators use 2-3).
+// Plate courses default to 3: one bottom plate and the IRC R602.3.2 double top.
+const _wswCount = (v, what) => {
+  const n = Number(v);
+  if (!Number.isFinite(n) || !Number.isInteger(n)) return { error: what + " must be a whole number." };
+  if (n < 0) return { error: what + " cannot be negative." };
+  return { v: n };
+};
+// dims: in { wall_length_ft: L, stud_oc_in: L, corners: dimensionless, studs_per_corner: dimensionless, intersections: dimensionless, studs_per_intersection: dimensionless, openings: dimensionless, studs_per_opening: dimensionless, plate_courses: dimensionless, plate_stock_ft: L, waste_pct: dimensionless } out: { field_studs: dimensionless, extra_studs: dimensionless, total_studs: dimensionless, studs_to_buy: dimensionless, plate_lf: L, plate_pieces: dimensionless }
+export function computeWoodStudWallTakeoff({ wall_length_ft = 0, stud_oc_in = 16, corners = 0, studs_per_corner = 2, intersections = 0, studs_per_intersection = 2, openings = 0, studs_per_opening = 2, plate_courses = 3, plate_stock_ft = 16, waste_pct = 10 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The agent door sends an unfilled box as null; a blank or null means the
+  // stated default here, never 0 (2026-11-16 review).
+  const d = (v, D) => (v === null || v === undefined || v === "" ? D : v);
+  stud_oc_in = d(stud_oc_in, 16); studs_per_corner = d(studs_per_corner, 2); studs_per_intersection = d(studs_per_intersection, 2);
+  studs_per_opening = d(studs_per_opening, 2); plate_courses = d(plate_courses, 3); plate_stock_ft = d(plate_stock_ft, 16); waste_pct = d(waste_pct, 10);
+  corners = d(corners, 0); intersections = d(intersections, 0); openings = d(openings, 0);
+  const L = Number(wall_length_ft), oc = Number(stud_oc_in), stock = Number(plate_stock_ft), w = Number(waste_pct);
+  if (!(L > 0)) return { error: "Wall length must be positive (ft)." };
+  if (L > 1000) return { error: "A wall over 1,000 ft is outside this calculator; run it in sections." };
+  if (!(oc >= 12) || oc > 48) return { error: "Stud spacing must be 12 to 48 in on center for a light-frame wall." };
+  if (!(stock >= 6) || stock > 24) return { error: "Plate stock length must be 6 to 24 ft." };
+  if (!(w >= 0) || w > 100) return { error: "Waste must be 0 to 100%." };
+  const c = {};
+  for (const [k, v, what] of [["corners", corners, "Corners"], ["spc", studs_per_corner, "Studs per corner"], ["int", intersections, "Partition intersections"], ["spi", studs_per_intersection, "Studs per intersection"], ["open", openings, "Openings"], ["spo", studs_per_opening, "Studs per opening"], ["pc", plate_courses, "Plate courses"]]) {
+    const r = _wswCount(v, what); if (r.error) return { error: r.error }; c[k] = r.v;
+  }
+  if (c.corners > 1000 || c.int > 1000 || c.open > 1000) return { error: "More than 1,000 corners, intersections or openings is outside one wall; run it in sections." };
+  if (c.spc > 20 || c.spi > 20 || c.spo > 20) return { error: "More than 20 extra studs per corner, intersection or opening is outside this calculator." };
+  if (c.pc < 1 || c.pc > 4) return { error: "Plate courses must be 1 to 4 (3 = bottom plate plus a double top plate)." };
+  const field_studs = Math.ceil((L * 12) / oc - 1e-9) + 1;
+  const extra_studs = c.corners * c.spc + c.int * c.spi + c.open * c.spo;
+  const total_studs = field_studs + extra_studs;
+  const studs_to_buy = Math.ceil(total_studs * (1 + w / 100) - 1e-9);
+  const plate_lf = L * c.pc;
+  const plate_pieces = Math.ceil((plate_lf * (1 + w / 100)) / stock - 1e-9);
+  if (![field_studs, extra_studs, total_studs, studs_to_buy, plate_lf, plate_pieces].every(Number.isFinite)) return { error: "Stud takeoff math is not a finite value." };
+  return {
+    field_studs, extra_studs, total_studs, studs_to_buy, plate_lf, plate_pieces,
+    note: "Field studs are the spaces plus one: one at each end of the run. The corner, intersection and opening allowances are estimating allowances, not code: published texts use 2 or 3 per corner and per opening, so set them to how this crew frames. The default 2 per opening is a minimum: it covers the king studs where the opening displaces enough field studs to make its jacks and cripples, as a wide door or window does; a narrow window displaces only one or two, so allow 3 to 4, and more where a wide header needs double jacks. Three plate courses are a bottom plate and the double top plate of IRC R602.3.2; a single top plate (2 courses) is allowed under that section's exception when the plate is tied and the framing above lands within 1 in of the studs, and on interior nonbearing walls under R602.5. Plate pieces ignore where the splices land. Headers, blocking and sheathing are separate takeoffs; the plans and the framer's layout govern.",
+  };
+}
+export const woodStudWallTakeoffExample = { inputs: { wall_length_ft: 40, stud_oc_in: 16, corners: 2, studs_per_corner: 2, intersections: 1, studs_per_intersection: 2, openings: 2, studs_per_opening: 2, plate_courses: 3, plate_stock_ft: "16", waste_pct: 10 } };
+
+CONSTRUCTION_RENDERERS["wood-stud-wall-takeoff"] = _simpleRenderer({
+  citation: "Citation: Hicks' Builders' Guide, \"Estimating Studding\" (public domain): studs are the spaces plus one, with doubling at corners, partition angles and openings added on; IRC 2021 R602.3.2 by name (a double top plate, with a single top plate under its exception and on interior nonbearing walls under R602.5), free at codes.iccsafe.org. field = ceil(length x 12 / spacing) + 1; extras = corners x per corner + intersections x per intersection + openings x per opening; plates = length x courses. The plans and the framer's layout govern.",
+  example: woodStudWallTakeoffExample.inputs,
+  fields: [
+    { key: "wall_length_ft", label: "Wall length (ft)", kind: "number", attrs: { step: "any", min: "0" } },
+    { key: "stud_oc_in", label: "Spacing on center (in)", kind: "number", default: 16, attrs: { step: "any", min: "12", max: "48" } },
+    { key: "corners", label: "Corners (count)", kind: "number", default: 0, attrs: { step: "1", min: "0" } },
+    { key: "studs_per_corner", label: "Extra studs per corner", kind: "number", default: 2, attrs: { step: "1", min: "0" } },
+    { key: "intersections", label: "Partition intersections (count)", kind: "number", default: 0, attrs: { step: "1", min: "0" } },
+    { key: "studs_per_intersection", label: "Extra studs per intersection", kind: "number", default: 2, attrs: { step: "1", min: "0" } },
+    { key: "openings", label: "Door and window openings (count)", kind: "number", default: 0, attrs: { step: "1", min: "0" } },
+    { key: "studs_per_opening", label: "Extra studs per opening", kind: "number", default: 2, attrs: { step: "1", min: "0" } },
+    { key: "plate_courses", label: "Plate courses (3 = bottom + double top)", kind: "number", default: 3, attrs: { step: "1", min: "1", max: "4" } },
+    { key: "plate_stock_ft", label: "Plate stock length", kind: "select", default: "16", options: ["8", "10", "12", "14", "16", "18", "20"].map((v) => ({ value: v, label: v + " ft" })) },
+    { key: "waste_pct", label: "Waste (%)", kind: "number", default: 10, attrs: { step: "any", min: "0", max: "100" } },
+  ],
+  outputs: [
+    { key: "s", id: "wsw-out-s", label: "Studs", value: (r) => _fmtC(r.total_studs, 0) + " (" + _fmtC(r.field_studs, 0) + " field + " + _fmtC(r.extra_studs, 0) + " extra); buy " + _fmtC(r.studs_to_buy, 0) + " with waste" },
+    { key: "p", id: "wsw-out-p", label: "Plates", value: (r) => _fmtC(r.plate_lf, 1) + " LF; buy " + _fmtC(r.plate_pieces, 0) + " piece" + (r.plate_pieces === 1 ? "" : "s") + " with waste" },
+    { key: "note", id: "wsw-out-note", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeWoodStudWallTakeoff,
+});
+
 // --- suspended-ceiling-grid: Suspended Acoustical Ceiling Grid Takeoff ---
 //
 // Takes off a suspended acoustical (lay-in) ceiling for a 2x4 grid: panels,

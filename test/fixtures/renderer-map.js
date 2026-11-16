@@ -2291,4 +2291,5 @@ export const RENDERER_MAP = {
   "shower-pan-mortar-bed": { module: "../../calc-finish.js", exportName: "FINISH_RENDERERS" },
   "mver-calcium-chloride": { module: "../../calc-finish.js", exportName: "FINISH_RENDERERS" },
   "work-zone-buffer-space": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
+  "wood-stud-wall-takeoff": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
 };

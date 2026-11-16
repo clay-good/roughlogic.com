@@ -2,104 +2,104 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "7c57fe0d3fc36df9",
-      "date": "2026-11-07"
+      "sha": "357fe50f720fb3e8",
+      "date": "2026-11-16"
     },
     "/tools/": {
-      "sha": "01705a21c25fa06d",
-      "date": "2026-10-20"
+      "sha": "6ed6191585a683a4",
+      "date": "2026-11-16"
     },
     "/errata/": {
       "sha": "22300621aa59c264",
       "date": "2026-11-14"
     },
     "/collections/disaster-response/": {
-      "sha": "4b520075bada167a",
-      "date": "2026-10-20"
+      "sha": "7822e287682c7427",
+      "date": "2026-11-16"
     },
     "/groups/accounting/": {
-      "sha": "8fd62f7a9b4169ff",
-      "date": "2026-10-20"
+      "sha": "76b66b5c908e7115",
+      "date": "2026-11-16"
     },
     "/groups/agriculture/": {
-      "sha": "a1cf3ecfda7018ba",
-      "date": "2026-10-20"
+      "sha": "8811d0af3bc9cc13",
+      "date": "2026-11-16"
     },
     "/groups/construction/": {
-      "sha": "1bcff91735c2c993",
-      "date": "2026-10-20"
+      "sha": "8cd2014e764fb794",
+      "date": "2026-11-16"
     },
     "/groups/cross-trade/": {
-      "sha": "486daa5a41005836",
-      "date": "2026-10-20"
+      "sha": "21c6d562b900f3db",
+      "date": "2026-11-16"
     },
     "/groups/educators/": {
-      "sha": "f2fd30e12ba948bb",
-      "date": "2026-10-20"
+      "sha": "1f5fa8318b36c9f2",
+      "date": "2026-11-16"
     },
     "/groups/electrical/": {
-      "sha": "67da74450f72cbf0",
-      "date": "2026-10-20"
+      "sha": "e4c16223662feade",
+      "date": "2026-11-16"
     },
     "/groups/field/": {
-      "sha": "b6531b0ec885ebb2",
-      "date": "2026-10-20"
+      "sha": "67f805072f0198b7",
+      "date": "2026-11-16"
     },
     "/groups/fire-ground/": {
-      "sha": "4859a43a147b7244",
-      "date": "2026-10-20"
+      "sha": "b262688719d9ffae",
+      "date": "2026-11-16"
     },
     "/groups/historical/": {
-      "sha": "f90f9d473764cc4c",
-      "date": "2026-10-20"
+      "sha": "3bec6a1f11e929ca",
+      "date": "2026-11-16"
     },
     "/groups/hvac/": {
-      "sha": "e197bfafb9b464ea",
-      "date": "2026-10-20"
+      "sha": "8fbaf8ed551b3585",
+      "date": "2026-11-16"
     },
     "/groups/kitchen/": {
-      "sha": "265826e49a0cc23a",
-      "date": "2026-10-20"
+      "sha": "d3ba591f8a6b92d7",
+      "date": "2026-11-16"
     },
     "/groups/lab/": {
-      "sha": "66fe167ec03cab19",
-      "date": "2026-10-20"
+      "sha": "33ea8bd1c78004ca",
+      "date": "2026-11-16"
     },
     "/groups/mechanic/": {
-      "sha": "7892681c0fe96da2",
-      "date": "2026-10-20"
+      "sha": "1e1d3701c5ef561d",
+      "date": "2026-11-16"
     },
     "/groups/plumbing/": {
-      "sha": "9562608d5d361879",
-      "date": "2026-10-20"
+      "sha": "76cd67010eda846a",
+      "date": "2026-11-16"
     },
     "/groups/real-estate/": {
-      "sha": "daccc182d256a7de",
-      "date": "2026-10-20"
+      "sha": "c8539744f5eb95dd",
+      "date": "2026-11-16"
     },
     "/groups/references/": {
-      "sha": "6fe5167490501bc4",
-      "date": "2026-10-20"
+      "sha": "f07831d760a2053e",
+      "date": "2026-11-16"
     },
     "/groups/restoration/": {
-      "sha": "12155acba38a6324",
-      "date": "2026-10-20"
+      "sha": "9ded3954fb790c55",
+      "date": "2026-11-16"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "c40fca6e59cdced1",
-      "date": "2026-10-20"
+      "sha": "64f7cdc5c2d988ec",
+      "date": "2026-11-16"
     },
     "/groups/stage/": {
-      "sha": "a298b5d368a8028b",
-      "date": "2026-10-20"
+      "sha": "da4ded0000b061d6",
+      "date": "2026-11-16"
     },
     "/groups/trucking/": {
-      "sha": "af9517caacf0bd37",
-      "date": "2026-10-20"
+      "sha": "83136f21c16e3ab0",
+      "date": "2026-11-16"
     },
     "/groups/water/": {
-      "sha": "3327eddeb7148835",
-      "date": "2026-10-20"
+      "sha": "2a9f8eff94efbdce",
+      "date": "2026-11-16"
     },
     "/tools/aav-install-check/": {
       "sha": "e7fee2df40f2e807",
@@ -6759,7 +6759,7 @@
     },
     "/tools/scaffold-mudsill-bearing/": {
       "sha": "fea20c317fe8e9a6",
-      "date": "2026-10-17"
+      "date": "2026-11-16"
     },
     "/tools/scaffold-platform-check/": {
       "sha": "b53b0c68cfde393e",
@@ -7878,8 +7878,8 @@
       "date": "2026-10-17"
     },
     "/tools/stud-notch-bore-limit/": {
-      "sha": "9bba51ebbe04420b",
-      "date": "2026-10-20"
+      "sha": "03cf3bce892b8e74",
+      "date": "2026-11-16"
     },
     "/tools/stump-grinding-volume/": {
       "sha": "9c2d3741263a4dff",
@@ -9180,6 +9180,10 @@
     "/tools/wood-screw-withdrawal/": {
       "sha": "cfcdac84c433733c",
       "date": "2026-10-17"
+    },
+    "/tools/wood-stud-wall-takeoff/": {
+      "sha": "b985ef0f6393815e",
+      "date": "2026-11-16"
     },
     "/tools/wood-tension-bending/": {
       "sha": "1cd1f295e3df317b",

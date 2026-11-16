@@ -6498,6 +6498,11 @@
     {"term":"longitudinal buffer mutcd table 6B-2","target":"work-zone-buffer-space","kind":"industry"},
     {"term":"stopping sight distance buffer lane closure","target":"work-zone-buffer-space","kind":"industry"},
     {"term":"drum spacing in a work zone 2 times speed","target":"work-zone-buffer-space","kind":"industry"},
-    {"term":"how long is the activity area lane closure","target":"work-zone-buffer-space","kind":"question"}
+    {"term":"how long is the activity area lane closure","target":"work-zone-buffer-space","kind":"question"},
+    {"term":"how many studs for a wall","target":"wood-stud-wall-takeoff","kind":"question"},
+    {"term":"stud count 16 on center","target":"wood-stud-wall-takeoff","kind":"industry"},
+    {"term":"wood stud wall takeoff","target":"wood-stud-wall-takeoff","kind":"industry"},
+    {"term":"studs and plates for a wall","target":"wood-stud-wall-takeoff","kind":"industry"},
+    {"term":"framing lumber for a wall 2x4 studs","target":"wood-stud-wall-takeoff","kind":"industry"}
   ]
 }

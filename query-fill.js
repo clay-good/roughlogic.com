@@ -499,6 +499,26 @@ export function queryFill(query, rows, opts) {
       }
       if (!matched) continue;
       if (valueFor(qty, row, text, labelWords) === null) continue;   // unit disagreement
+      // The same in the other direction: "a 40 ft wall 16 on center" names the
+      // wall AFTER its 40 ft, and reading "wall" forward handed the bare 16 to
+      // Wall length (2026-11-16); "40 ft wall 16 in" handed it 16 in as 1.33 ft.
+      // When the words between two numbers are nothing but this field's name
+      // (connectives of one or two letters aside), and the number BEFORE them
+      // carries the field's own unit while this one does not carry it exactly,
+      // the name belongs to the number before. "8 in sheets for a 24" is a
+      // phrase, not a name, and is left alone.
+      {
+        const between = String(window).toLowerCase().split(/[^a-z]+/).filter((w) => w.length > 2);
+        const rowTerms = termsByRow.get(row.d);
+        const ru = rowUnit(row);
+        if (ru && qi > 0 && !suppressed.has(qi - 1) && between.length &&
+            between.every((w) => rowTerms.has(w) || rowTerms.has(w.replace(/s$/, "")))) {
+          const prevUnit = canonicalUnit(rawUnitOf(quantities[qi - 1], text));
+          const thisUnit = canonicalUnit(rawUnitOf(qty, text));
+          if (prevUnit === ru && thisUnit !== ru) continue;
+          if (prevUnit && !thisUnit && unitsCompatible(prevUnit, ru)) continue;
+        }
+      }
       // A name beside the number is evidence; a unit ON the number is stronger,
       // and this phase weighed only the first. "310 lb worker and 6 ft free
       // fall" put the 6 into Workers attached -- a count -- because "worker"

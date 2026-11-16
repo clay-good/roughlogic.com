@@ -541,3 +541,19 @@ test("query-fill: a number's unit is not a select choice, and option stems name 
   assert.equal(p.thickness_in, undefined);
   assert.equal(p.diameter_in, undefined);
 });
+
+// 2026-11-16: "a 40 ft wall 16 on center" names the wall after its 40 ft; the
+// bare 16 must not take Wall length by reading "wall" forward.
+test("query-fill: a bare number does not take a field named just after a quantity in its unit", () => {
+  const rows = [
+    num("wall_length_ft", "Wall length", "ft"),
+    num("stud_oc_in", "Spacing on center", "in"),
+    num("studs_per_corner", "Extra studs per corner"),
+    sel("plate_stock_ft", "Plate stock length", ["8", "10", "12", "14", "16", "18", "20"]),
+  ];
+  const f = queryFill("how many studs for a 40 ft wall 16 on center", rows).filled;
+  assert.equal(Number(f.wall_length_ft), 40);
+  assert.equal(f.stud_oc_in, undefined);
+  // Name-then-value still works when the number carries the unit.
+  assert.equal(Number(queryFill("wall length 40 ft", rows).filled.wall_length_ft), 40);
+});

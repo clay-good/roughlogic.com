@@ -26836,6 +26836,17 @@ export const CITATIONS = {
       { name: "Device count", value: "both ends of the buffer counted; the taper's own devices are the taper calculator's", source: "stated assumption" },
     ],
   },
+  "wood-stud-wall-takeoff": {
+    formula: "field studs = ceil(wall length x 12 / spacing) + 1; extra studs = corners x studs per corner + intersections x studs per intersection + openings x studs per opening; studs to buy = ceil((field + extra) x (1 + waste)); plate LF = wall length x plate courses; plate pieces = ceil(plate LF x (1 + waste) / stock length).",
+    edition: "Hicks' Builders' Guide, \"Estimating Studding\" (public domain), read at chestofbooks.com on 2026-11-16: count the studs along the walls by their spacing, then add the doubling at doors, windows, corners and partition angles (2 studs per partition angle); plates estimated separately from the wall length. IRC 2021 Section R602.3.2: a double top plate, with a single top plate permitted under its exception (plate tied per Table R602.3.2, framing above within 1 in of the studs); R602.5: a single top plate on interior nonbearing walls.",
+    freeAccess: "Hicks' Builders' Guide is public domain; the IRC is free to read at codes.iccsafe.org.",
+    governance: GOVERNANCE.general,
+    editionNote: "The spaces-plus-one count is the rule every estimating text shares; the allowances at corners and openings are not standardized (trade references use 2 or 3 per corner and per opening), so each is an input with a stated default of 2. Three plate courses are a bottom plate and the R602.3.2 double top plate; a wall framed with a single top plate (the R602.3.2 exception, or an interior nonbearing wall under R602.5) is 2.",
+    assumptions: [
+      { name: "Allowances", value: "2 extra studs per corner, per partition intersection and per opening; 2 per opening is a minimum (narrow openings need 3 to 4)", source: "estimating practice" },
+      { name: "Waste", value: "10% on studs and plates", source: "estimating practice" },
+    ],
+  },
 };
 
 // --- Reference block and copy text ---

@@ -44,7 +44,12 @@ import { measureFreeTextFill } from "../../scripts/measure-free-text-fill.mjs";
 //   1 -- 2026-11-15, after a calculator-name word beside a value stopped being
 //        struck from the question (it now discounts only the name's own
 //        occurrences, in the window where the name is written).
-const CEILING = 1;
+//   0 -- 2026-11-16, when `wood-stud-wall-takeoff` landed for "how many studs
+//        for a 40 ft wall 16 on center" (it had gone to the wall R-value tile
+//        and put 480 in into the stud depth), and a bare number stopped taking
+//        a field named just after a quantity in that field's unit, so the wall
+//        gets the 40 ft and not the 16.
+const CEILING = 0;
 
 test("free-text extraction does not get worse", async () => {
   const { rows, violations } = await measureFreeTextFill();
