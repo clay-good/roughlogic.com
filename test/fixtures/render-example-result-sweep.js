@@ -36,7 +36,7 @@ for (const r of ROWS) if (!first.has(r.tile_id)) first.set(r.tile_id, r);
 // At the precision a reader can see, as check-example-parity compares inputs:
 // the button types 66.82 where the fixture carries 66.8235.
 const close = (a, b) => a === b || Math.abs(a - b) <= Math.max(Math.abs(b) * 0.001, 1e-12);
-const report = { compared: 0, mismatches: {}, dirty: [], link: [], noid: [] };
+const report = { compared: 0, exampleErrors: [], mismatches: {}, dirty: [], link: [], noid: [] };
 const { applyHashState } = await import('../../hash-state.js');
 if (!globalThis.CSS) globalThis.CSS = { escape: (s) => s };
 for (const { id } of TOOLS) {
@@ -63,6 +63,9 @@ for (const { id } of TOOLS) {
     btn.click();
     flushTimers();
     const page = last.get(creg.fn);
+    // The example must produce an answer: pipe-heat-loss-radial's button printed an error
+    // (a blank optional box sent as NaN) until 2026-11-15, and this sweep skipped it.
+    if (page && page.error) report.exampleErrors.push(id + ": " + page.error.slice(0, 80));
     if (!page || typeof page !== "object" || page.error) continue;
     // Shared-link round trip: collect what the URL would carry, render the tile fresh,
     // apply it as the view does, and the answer must be the same.

@@ -2343,7 +2343,7 @@
     },
     "/tools/dp-flow-meter/": {
       "sha": "081e99521ef14955",
-      "date": "2026-10-17"
+      "date": "2026-11-16"
     },
     "/tools/dp-flow-signal-scaling/": {
       "sha": "49a0c1ad16c713f1",
@@ -3351,7 +3351,7 @@
     },
     "/tools/gas-dp-flow-meter/": {
       "sha": "769682be153e854d",
-      "date": "2026-10-17"
+      "date": "2026-11-16"
     },
     "/tools/gas-fuel-conversion/": {
       "sha": "39ec158b39db11a2",

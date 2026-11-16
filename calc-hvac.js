@@ -3222,8 +3222,12 @@ function renderPipeHeatLossRadial(inputRegion, outputRegion, citationEl) {
   const oS = makeOutputLine(outputRegion, "Jacket surface temperature", "phlr-out-s");
   const oNote = makeOutputLine(outputRegion, "Note", "phlr-out-note");
   function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
+  function readUnless(i, blankOk) { return blankOk && i.value === "" ? undefined : readNum(i); }
+  // A blank film box means conduction only (its label says so), and the computed-film boxes are unread
+  // in entered mode. Until 2026-11-15 each blank was sent as NaN, which the finite guard refuses, so
+  // the example and every blank-film entry printed an error.
   const update = debounce(() => {
-    const r = computePipeHeatLossRadial({ od_in: readNum(od.input), thickness_in: readNum(th.input), k_value: readNum(k.input), hot_f: readNum(hot.input), amb_f: readNum(amb.input), length_ft: readNum(len.input), film_coeff_btu_hr_ft2_f: readNum(film.input), film_mode: fm.select.value, jacket_emissivity: readNum(je.input), wind_mph: readNum(wind.input) }); stepsFor(outputRegion, inputRegion, ["od_in", "thickness_in", "k_value", "hot_f", "amb_f", "length_ft", "film_coeff_btu_hr_ft2_f", "film_mode", "jacket_emissivity", "wind_mph"], r);
+    const r = computePipeHeatLossRadial({ od_in: readNum(od.input), thickness_in: readNum(th.input), k_value: readNum(k.input), hot_f: readNum(hot.input), amb_f: readNum(amb.input), length_ft: readNum(len.input), film_coeff_btu_hr_ft2_f: readUnless(film.input, true), film_mode: fm.select.value, jacket_emissivity: readUnless(je.input, fm.select.value !== "computed"), wind_mph: readUnless(wind.input, fm.select.value !== "computed") }); stepsFor(outputRegion, inputRegion, ["od_in", "thickness_in", "k_value", "hot_f", "amb_f", "length_ft", "film_coeff_btu_hr_ft2_f", "film_mode", "jacket_emissivity", "wind_mph"], r);
     if (r.error) { oPF.textContent = r.error; oT.textContent = ""; oS.textContent = ""; oNote.textContent = ""; return; }
     oPF.textContent = fmt(r.q_per_ft_btuh, 1) + " BTU/hr-ft";
     oT.textContent = fmt(r.q_total_btuh, 1) + " BTU/hr";

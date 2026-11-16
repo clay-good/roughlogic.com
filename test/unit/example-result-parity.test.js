@@ -28,6 +28,7 @@ test("example result parity: the example button computes the worked example the 
   assert.deepEqual(fresh, [], "the button loads a different case than the printed example: make the button load the first fixture row, or move a matching verified row first");
   const gone = Object.keys(REVIEWED).filter((id) => !(id in report.mismatches));
   assert.deepEqual(gone, [], "fixed or gone: remove these from REVIEWED");
+  assert.deepEqual(report.exampleErrors, [], "the example button printed an error instead of the worked example");
   assert.deepEqual(report.noid, [], "give every input control an id, or a shared link drops it");
   assert.deepEqual(report.link, [], "a shared link (hash state) reopened the tile to a different answer");
   assert.deepEqual(report.dirty, [], "the example button kept a value the reader had typed: attachExampleButton resets every field as rendered before filling; a tile with its own button must do the same");

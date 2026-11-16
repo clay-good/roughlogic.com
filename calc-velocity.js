@@ -382,8 +382,10 @@ export function renderDpFlowMeter(inputRegion, outputRegion, citationEl) {
   const oC = _v23h_makeOut(outputRegion, "Discharge coefficient used", "dpf-out-c");
   const oNote = _v23h_makeOut(outputRegion, "Note", "dpf-out-n");
   function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
+  // A box the selected mode does not read may be left blank (sent as NaN, refused, until 2026-11-15).
+  function readUnless(i, unused) { return unused && i.value === "" ? undefined : readNum(i); }
   const update = _v23h_debounce(() => {
-    const r = computeDpFlowMeter({ pipe_id_in: readNum(D.input), bore_in: readNum(d.input), dp_psi: readNum(dp.input), cd: readNum(cd.input), fluid_density_lb_ft3: readNum(rho.input), cd_mode: mode.select.value, viscosity_cst: readNum(nu.input) }); stepsFor(outputRegion, inputRegion, ["pipe_id_in", "bore_in", "dp_psi", "cd", "fluid_density_lb_ft3", "cd_mode", "viscosity_cst"], r);
+    const r = computeDpFlowMeter({ pipe_id_in: readNum(D.input), bore_in: readNum(d.input), dp_psi: readNum(dp.input), cd: readUnless(cd.input, mode.select.value !== "entered"), fluid_density_lb_ft3: readNum(rho.input), cd_mode: mode.select.value, viscosity_cst: readUnless(nu.input, mode.select.value === "entered") }); stepsFor(outputRegion, inputRegion, ["pipe_id_in", "bore_in", "dp_psi", "cd", "fluid_density_lb_ft3", "cd_mode", "viscosity_cst"], r);
     if (r.error) { oQ.textContent = r.error; oV.textContent = "-"; oB.textContent = "-"; oC.textContent = "-"; oNote.textContent = ""; return; }
     oC.textContent = _v23h_fmt(r.cd_used, 4) + (r.cd_computed ? " (computed at Re " + _v23h_fmt(r.reynolds_number, 0) + ")" : " (entered)");
     oQ.textContent = _v23h_fmt(r.flow_gpm, 1) + " gpm";
@@ -495,8 +497,10 @@ export function renderGasDpFlowMeter(inputRegion, outputRegion, citationEl) {
   const oC = _v23h_makeOut(outputRegion, "Discharge coefficient used", "gdpf-out-c");
   const oNote = _v23h_makeOut(outputRegion, "Note", "gdpf-out-n");
   function readNum(i) { if (i.value === "") return NaN; const n = Number(i.value); return Number.isFinite(n) ? n : NaN; }
+  // A box the selected mode does not read may be left blank (sent as NaN, refused, until 2026-11-15).
+  function readUnless(i, unused) { return unused && i.value === "" ? undefined : readNum(i); }
   const update = _v23h_debounce(() => {
-    const r = computeGasDpFlowMeter({ pipe_id_in: readNum(D.input), bore_in: readNum(d.input), p1_psia: readNum(p1.input), dp_psi: readNum(dp.input), temp_f: readNum(tF.input), gas_sg: readNum(sg.input), kappa: readNum(kap.input), cd: readNum(cd.input), cd_mode: mode.select.value, viscosity_cp: readNum(mu.input) }); stepsFor(outputRegion, inputRegion, ["pipe_id_in", "bore_in", "p1_psia", "dp_psi", "temp_f", "gas_sg", "kappa", "cd", "cd_mode", "viscosity_cp"], r);
+    const r = computeGasDpFlowMeter({ pipe_id_in: readNum(D.input), bore_in: readNum(d.input), p1_psia: readNum(p1.input), dp_psi: readNum(dp.input), temp_f: readNum(tF.input), gas_sg: readNum(sg.input), kappa: readNum(kap.input), cd: readUnless(cd.input, mode.select.value !== "entered"), cd_mode: mode.select.value, viscosity_cp: readUnless(mu.input, mode.select.value === "entered") }); stepsFor(outputRegion, inputRegion, ["pipe_id_in", "bore_in", "p1_psia", "dp_psi", "temp_f", "gas_sg", "kappa", "cd", "cd_mode", "viscosity_cp"], r);
     if (r.error) { oE.textContent = r.error; oS.textContent = "-"; oM.textContent = "-"; oB.textContent = "-"; oC.textContent = "-"; oNote.textContent = ""; return; }
     oC.textContent = _v23h_fmt(r.cd_used, 4) + (r.cd_computed ? " (computed at Re " + _v23h_fmt(r.reynolds_number, 0) + ")" : " (entered)");
     oE.textContent = _v23h_fmt(r.expansion_factor, 4);
