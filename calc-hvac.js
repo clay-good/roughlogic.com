@@ -1589,6 +1589,7 @@ export function computeAirReceiver({
   if (!Array.isArray(tools)) return { error: "Tools must be a list." };
   if (!(p_high_psi > p_low_psi)) return { error: "P1 must exceed P2." };
   if (!(drawdown_minutes > 0)) return { error: "Drawdown minutes must be positive." };
+  if (!(Number(p_atm_psi) > 0)) return { error: "Atmospheric pressure must be above 0 psia (14.7 at sea level)." };
   let demand = 0;
   for (const t of tools) {
     const cfm = Number(t.cfm) || 0;
@@ -1919,7 +1920,10 @@ function renderAirReceiver(inputRegion, outputRegion, citationEl) {
   const ph = makeNumber("Pressure high (psi)", "ar-ph", { step: "any", min: "0" });
   const pl = makeNumber("Pressure low (psi)", "ar-pl", { step: "any", min: "0" });
   const dr = makeNumber("Drawdown minutes", "ar-dr", { step: "any", min: "0", value: "1" }); dr.input.value = "1";
-  for (const f of [ps, ph, pl, dr]) inputRegion.appendChild(f.wrap);
+  // The compute took atmospheric pressure; the page assumed sea level until 2026-11-15
+  // (at 5,000 ft it is about 12.2 psia, and the receiver needed is 17% smaller).
+  const pa = makeNumber("Atmospheric pressure (psia; 14.7 sea level, about 12.2 at 5,000 ft)", "ar-pa", { step: "any", min: "0", value: "14.7" }); pa.input.value = "14.7";
+  for (const f of [ps, ph, pl, dr, pa]) inputRegion.appendChild(f.wrap);
   const oD = makeOutputLine(outputRegion, "Demand SCFM", "ar-out-d");
   const oG = makeOutputLine(outputRegion, "Required receiver", "ar-out-g");
   const oC = makeOutputLine(outputRegion, "Concurrent tools (pump alone)", "ar-out-c");
@@ -1935,14 +1939,15 @@ function renderAirReceiver(inputRegion, outputRegion, citationEl) {
     const r = computeAirReceiver({
       tools, pump_scfm: Number(ps.input.value) || 0, p_high_psi: Number(ph.input.value) || 0,
       p_low_psi: Number(pl.input.value) || 0, drawdown_minutes: dr.input.value === "" ? 1 : Number(dr.input.value),
-    }); stepsFor(outputRegion, inputRegion, ["tools", "pump_scfm", "p_high_psi", "p_low_psi", "drawdown_minutes"], r);
+      p_atm_psi: pa.input.value === "" ? undefined : Number(pa.input.value),
+    }); stepsFor(outputRegion, inputRegion, ["tools", "pump_scfm", "p_high_psi", "p_low_psi", "drawdown_minutes", "p_atm_psi"], r);
     if (r.error) { oD.textContent = r.error; oG.textContent = "-"; oC.textContent = "-"; return; }
     oD.textContent = fmt(r.demand_scfm, 2) + " scfm";
     oG.textContent = fmt(r.receiver_gal, 1) + " gal";
     oC.textContent = String(r.concurrent);
   }
   // Until 2026-10-08 only the tool rows were listened to; pump, pressures, and drawdown were not.
-  for (const el of [ps.input, ph.input, pl.input, dr.input]) el.addEventListener("input", update);
+  for (const el of [ps.input, ph.input, pl.input, dr.input, pa.input]) el.addEventListener("input", update);
 }
 
 function renderGeothermalLoop(inputRegion, outputRegion, citationEl) {

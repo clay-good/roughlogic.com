@@ -19,7 +19,7 @@ export const BESPOKE_LABELS = {
   "affinity-laws": {"baseline_RPM":"Baseline RPM","baseline_CFM":"Baseline CFM","baseline_SP_in_wc":"Baseline SP (in wc)","baseline_kW":"Baseline kW","target_kind":"Target","target_RPM":"Target RPM","target_CFM":"Target CFM","target_SP_in_wc":"Target SP (in wc)","target_kW":"Target kW"},
   "air-changes-hour": {"volume_ft3":"Room volume (ft³)","supply_cfm":"Supply CFM","return_cfm":"Return CFM (blank = supply)","occupancy":"Occupancy (comparison band)"},
   "air-movers": {"affected_area_ft2":"Wet floor area (ft²)","water_class":"Water class","rooms":"Affected rooms","wall_ceiling_ft2":"Wet wall and ceiling above 2 ft (ft²)","insets":"Wall insets and offsets over 18 in"},
-  "air-receiver": {"pump_scfm":"Pump SCFM","p_high_psi":"Pressure high (psi)","p_low_psi":"Pressure low (psi)","drawdown_minutes":"Drawdown minutes"},
+  "air-receiver": {"pump_scfm":"Pump SCFM","p_high_psi":"Pressure high (psi)","p_low_psi":"Pressure low (psi)","drawdown_minutes":"Drawdown minutes","p_atm_psi":"Atmospheric pressure (psia; 14.7 sea level, about 12.2 at 5,000 ft)"},
   "air-sample-volume": {"flow_rate_lpm":"Pump flow (L/min, calibrated)","target_volume_L":"Target volume per cassette (L)","sample_count":"Cassettes in the event (incl. outdoor control)"},
   "alternate-readability": {"text":"Text to score (paste or type a paragraph)"},
   "ambient-ampacity-adjust": {"base_ampacity_a":"Base ampacity (A; from NEC 310.16)","temp_column":"Termination / insulation column","ambient_c":"Ambient temperature (°C)","conductor_count":"Current-carrying conductors"},
