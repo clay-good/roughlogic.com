@@ -507,7 +507,7 @@ export const BESPOKE_LABELS = {
   "livestock-dry-matter-intake": {"BW_lb":"Body weight (lb)","intake":"Dry-matter intake (% of body weight)","feed_DM":"Feed dry matter (%; 88 hay, 35 silage)","head":"Number of animals"},
   "livestock-water-requirement": {"method":"Method","head":"Head count","temp_f":"Air temperature (°F)","t_low_f":"Low breakpoint temp (°F)","gal_low":"Gallons/head at low temp","t_high_f":"High breakpoint temp (°F)","gal_high":"Gallons/head at high temp","dmi_lb":"Dry-matter intake (lb, intake method)","water_per_dmi":"Water per lb DMI (lb water per lb dry matter; 3.5 typical)"},
   "loader-production": {"bucket_cap_lcy":"Heaped bucket capacity (loose cy)","fill_factor":"Bucket fill factor","cycle_min":"Dig-dump cycle time (min)","eff_min_per_hr":"Working minutes per hour","hours_per_day":"Productive hours per day"},
-  "loan-amortization": {"principal":"Principal (USD)","annual_rate_pct":"Annual rate (percent)","term_months":"Term (months)","extra_principal":"Extra principal per month (USD, optional)"},
+  "loan-amortization": {"principal":"Principal (USD)","annual_rate_pct":"Annual rate (percent)","term_months":"Term (months)","extra_principal":"Extra principal per month (USD, optional)","first_payment_date":"First payment date (YYYY-MM-DD, optional; dates the schedule)"},
   "loan-limits": {"state":"State (2-letter, e.g., CA)","county_fips":"County FIPS (5-digit, optional)","county_name":"County name (optional)"},
   "loan-payment": {"principal":"Principal","apr_percent":"APR (%)","term_months":"Term (months)"},
   "log-limb-weight": {"butt_dia_in":"Butt (large end) diameter (in)","top_dia_in":"Top (small end) diameter (in)","length_ft":"Length (ft)","species":"Species (green density)"},

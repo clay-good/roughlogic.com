@@ -9,7 +9,7 @@
 // publication or a licensed CPA before filing."
 
 import {
-  DEBOUNCE_MS, debounce, makeNumber, makeSelect, makeTextarea, makeCheckbox,
+  DEBOUNCE_MS, debounce, makeNumber, makeText, makeSelect, makeTextarea, makeCheckbox,
   makeOutputLine, attachExampleButton, fmt,
   stepsFor,
 } from "./ui-fields.js";
@@ -1037,7 +1037,8 @@ function renderAmortization(inputRegion, outputRegion, citationEl) {
   const rate = makeNumber("Annual rate (percent)", "am-r", { step: "any", min: "0" });
   const term = makeNumber("Term (months)", "am-t", { step: "1", min: "1" });
   const extra = makeNumber("Extra principal per month (USD, optional)", "am-x", { step: "any", min: "0" });
-  for (const f of [principal, rate, term, extra]) inputRegion.appendChild(f.wrap);
+  const first = makeText("First payment date (YYYY-MM-DD, optional; dates the schedule)", "am-d", { placeholder: "2026-01-01" });
+  for (const f of [principal, rate, term, extra, first]) inputRegion.appendChild(f.wrap);
   const pmt = makeOutputLine(outputRegion, "Payment", "am-out-pmt");
   const ti = makeOutputLine(outputRegion, "Total interest", "am-out-ti");
   const po = makeOutputLine(outputRegion, "Payoff in (months)", "am-out-po");
@@ -1049,7 +1050,8 @@ function renderAmortization(inputRegion, outputRegion, citationEl) {
     const r = computeAmortization({
       principal: Number(principal.input.value), annual_rate_pct: Number(rate.input.value),
       term_months: Number(term.input.value), extra_principal: Number(extra.input.value || 0),
-    }); stepsFor(outputRegion, inputRegion, ["principal", "annual_rate_pct", "term_months", "extra_principal"], r);
+      first_payment_date: first.input.value.trim() || null,
+    }); stepsFor(outputRegion, inputRegion, ["principal", "annual_rate_pct", "term_months", "extra_principal", "first_payment_date"], r);
     while (tableWrap.firstChild) tableWrap.removeChild(tableWrap.firstChild);
     if (r.error) { pmt.textContent = r.error; ti.textContent = po.textContent = ""; return; }
     pmt.textContent = "$" + fmt(r.payment, 2);
@@ -1058,14 +1060,15 @@ function renderAmortization(inputRegion, outputRegion, citationEl) {
     const table = document.createElement("table");
     const thead = document.createElement("thead");
     const trh = document.createElement("tr");
-    for (const h of ["Month", "Payment", "Principal", "Interest", "Balance"]) {
+    const dated = r.schedule.length > 0 && r.schedule[0].date != null;
+    for (const h of dated ? ["Month", "Date", "Payment", "Principal", "Interest", "Balance"] : ["Month", "Payment", "Principal", "Interest", "Balance"]) {
       const th = document.createElement("th"); th.textContent = h; trh.appendChild(th);
     }
     thead.appendChild(trh); table.appendChild(thead);
     const tbody = document.createElement("tbody");
     for (const row of r.schedule) {
       const tr = document.createElement("tr");
-      for (const v of [row.month, "$" + fmt(row.payment, 2), "$" + fmt(row.principal, 2), "$" + fmt(row.interest, 2), "$" + fmt(row.balance, 2)]) {
+      for (const v of [row.month, ...(dated ? [row.date] : []), "$" + fmt(row.payment, 2), "$" + fmt(row.principal, 2), "$" + fmt(row.interest, 2), "$" + fmt(row.balance, 2)]) {
         const td = document.createElement("td"); td.textContent = String(v); tr.appendChild(td);
       }
       tbody.appendChild(tr);
@@ -1073,10 +1076,10 @@ function renderAmortization(inputRegion, outputRegion, citationEl) {
     table.appendChild(tbody); tableWrap.appendChild(table);
     attachCsvExport({
       table, parent: tableWrap, toolId: "loan-amortization",
-      inputProvider: () => principal.input.value + "|" + rate.input.value + "|" + term.input.value + "|" + extra.input.value,
+      inputProvider: () => principal.input.value + "|" + rate.input.value + "|" + term.input.value + "|" + extra.input.value + "|" + first.input.value,
     });
   }, DEBOUNCE_MS);
-  for (const f of [principal, rate, term, extra]) f.input.addEventListener("input", update);
+  for (const f of [principal, rate, term, extra, first]) f.input.addEventListener("input", update);
   attachExampleButton(inputRegion, () => {
     principal.input.value = 250000; rate.input.value = 6.5; term.input.value = 360; update();
   });
