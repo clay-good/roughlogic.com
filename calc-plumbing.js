@@ -3633,9 +3633,35 @@ const _V26_PIPE_ID_IN = {
   steel:  { "0.5": 0.622, "0.75": 0.824, "1": 1.049, "1.25": 1.380, "1.5": 1.610, "2": 2.067 },
 };
 
-// dims: in { flow_gpm: L^3 T^-1, diameter_in: L, target_velocity_fps: L T^-1 } out: { velocity_fps: L T^-1, max_flow_gpm: L^3 T^-1, ceiling_fps: L T^-1, diameter_in: L }
+// dims: in { flow_gpm: L^3 T^-1, diameter_in: L, target_velocity_fps: L T^-1 } out: { velocity_fps: L T^-1, max_flow_gpm: L^3 T^-1, ceiling_fps: L T^-1, diameter_in: L, nominal_size_in: L, target_velocity_fps: L T^-1 }
 export function computePipeVelocity({ mode = "velocity-from-flow", flow_gpm = 0, diameter_in = 0, material = "copper", service = "hot", target_velocity_fps = 0 } = {}) {
   const _g = _finiteGuard({ flow_gpm, diameter_in, target_velocity_fps }); if (_g) return _g;
+  // Since 2026-11-16: the smallest listed size whose actual bore keeps the flow
+  // at or under the velocity limit -- "what pipe size for 10 gpm" -- so the
+  // reader does not have to try sizes one at a time.
+  if (mode === "size-for-flow") {
+    const mat = String(material).toLowerCase();
+    const svc = String(service).toLowerCase() === "cold" ? "cold" : "hot";
+    if (!Object.hasOwn(_V26_VELOCITY_CEILING, mat)) return { error: "Material must be one of: " + Object.keys(_V26_VELOCITY_CEILING).join(", ") + "." };
+    const q = Number(flow_gpm);
+    if (!(q > 0)) return { error: "Flow must be positive (gpm)." };
+    const ceiling = _V26_VELOCITY_CEILING[mat][svc];
+    const vt = Number(target_velocity_fps);
+    if (vt < 0) return { error: "Target velocity cannot be negative (ft/s)." };
+    const v = vt > 0 ? vt : ceiling;
+    const sizes = Object.entries(_V26_PIPE_ID_IN[mat]).map(([nom, id]) => [Number(nom), id]).sort((a, b) => a[1] - b[1]);
+    const notes = [vt > 0 ? "" : "No target entered: sized to the " + mat + " " + svc + " erosion-corrosion ceiling (" + ceiling + " ft/s)."];
+    if (vt > ceiling) notes.push("The target " + fmt(vt, 2) + " ft/s is above the " + mat + " " + svc + " ceiling of " + ceiling + " ft/s.");
+    for (const [nom, id] of sizes) {
+      const velocity_fps = 0.4085 * q / (id * id);
+      if (velocity_fps <= v + 1e-9 * v) {
+        notes.push("Velocity sizing only: check the friction loss and the available pressure for the run (friction-loss) before choosing the size.");
+        return { mode, material: mat, service: svc, nominal_size_in: nom, diameter_in: id, velocity_fps, ceiling_fps: ceiling, target_velocity_fps: v, notes: notes.filter(Boolean) };
+      }
+    }
+    const big = sizes[sizes.length - 1];
+    return { error: fmt(q) + " gpm runs over " + fmt(v, 2) + " ft/s even in " + big[0] + " in " + mat + " (" + fmt(0.4085 * q / (big[1] * big[1]), 2) + " ft/s); this calculator lists sizes to 2 in." };
+  }
   const d = Number(diameter_in);
   if (!(d > 0)) return { error: "Pipe inside diameter must be positive (in)." };
   const mat = String(material).toLowerCase();
@@ -3672,6 +3698,7 @@ function _v26renderPipeVelocity(inputRegion, outputRegion, citationEl) {
   const mode = makeSelect("Mode", "pv-mode", [
     { value: "velocity-from-flow", label: "Velocity from flow", selected: true },
     { value: "max-flow-for-velocity", label: "Max flow for a velocity" },
+    { value: "size-for-flow", label: "Smallest size for a flow" },
   ]);
   const mat = makeSelect("Material", "pv-mat", [
     { value: "copper", label: "Copper (Type L)", selected: true },
@@ -3711,7 +3738,8 @@ function _v26renderPipeVelocity(inputRegion, outputRegion, citationEl) {
       target_velocity_fps: Number(vt.input.value) || 0,
     }); stepsFor(outputRegion, inputRegion, ["mode", "flow_gpm", "diameter_in", "material", "service", "target_velocity_fps"], r);
     if (r.error) { oV.textContent = r.error; oVerdict.textContent = "-"; oNote.textContent = ""; return; }
-    if (r.mode === "max-flow-for-velocity") { oV.textContent = fmt(r.max_flow_gpm, 2) + " gpm at " + fmt(r.target_velocity_fps, 2) + " ft/s"; oVerdict.textContent = "ceiling " + r.ceiling_fps + " ft/s (" + r.material + " " + r.service + ")"; }
+    if (r.mode === "size-for-flow") { oV.textContent = r.nominal_size_in + " in nominal (" + fmt(r.diameter_in, 3) + " in bore): " + fmt(r.velocity_fps, 2) + " ft/s"; oVerdict.textContent = "limit " + fmt(r.target_velocity_fps, 2) + " ft/s (" + r.material + " " + r.service + ")"; }
+    else if (r.mode === "max-flow-for-velocity") { oV.textContent = fmt(r.max_flow_gpm, 2) + " gpm at " + fmt(r.target_velocity_fps, 2) + " ft/s"; oVerdict.textContent = "ceiling " + r.ceiling_fps + " ft/s (" + r.material + " " + r.service + ")"; }
     else { oV.textContent = fmt(r.velocity_fps, 2) + " ft/s (ceiling " + r.ceiling_fps + " ft/s)"; oVerdict.textContent = r.verdict; }
     oNote.textContent = r.notes.join(" ");
   }, DEBOUNCE_MS);

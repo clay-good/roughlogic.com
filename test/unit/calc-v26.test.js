@@ -184,3 +184,22 @@ test("pressure-tank: precharge AT cut-in is the maximum-acceptance setting, not 
   assert.ok(above.notes.some((n) => /above cut-in/.test(n)));
   assert.ok(Math.abs(above.drawdown_gal - 100 * (1 - 54.7 / 64.7)) < 1e-9); // tank empties at the precharge
 });
+
+// 2026-11-16: size-for-flow picks the smallest listed size whose actual bore
+// keeps the flow at or under the limit, checked against velocity-from-flow.
+test("pipe-velocity: size-for-flow returns the smallest bore under the limit", () => {
+  for (const [material, service] of [["copper", "hot"], ["copper", "cold"], ["pex", "hot"], ["steel", "cold"], ["cpvc", "hot"]]) {
+    for (const gpm of [2, 5, 10, 18, 30]) {
+      const r = computePipeVelocity({ mode: "size-for-flow", flow_gpm: gpm, material, service });
+      if (r.error) { assert.match(r.error, /even in 2 in/); continue; }
+      const at = computePipeVelocity({ mode: "velocity-from-flow", flow_gpm: gpm, diameter_in: r.diameter_in, material, service });
+      assert.equal(at.verdict, "within-limit", `${gpm} gpm ${material} ${service}`);
+      assert.ok(Math.abs(at.velocity_fps - r.velocity_fps) < 1e-12);
+    }
+  }
+  const hot = computePipeVelocity({ mode: "size-for-flow", flow_gpm: 10, material: "copper", service: "hot" });
+  assert.equal(hot.nominal_size_in, 1); // 3/4 in would run 6.63 ft/s, over 5
+  assert.equal(computePipeVelocity({ mode: "size-for-flow", flow_gpm: 10, material: "copper", service: "cold" }).nominal_size_in, 0.75);
+  assert.ok(computePipeVelocity({ mode: "size-for-flow", flow_gpm: 0 }).error);
+  assert.ok(computePipeVelocity({ mode: "size-for-flow", flow_gpm: 100 }).error);
+});

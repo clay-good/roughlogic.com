@@ -173086,6 +173086,35 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "pipe-velocity",
+  "source_publisher": "Continuity; Copper Development Association / ASPE (by name)",
+  "source_title": "smallest size for a flow: v (ft/s) = 0.4085 * gpm / d^2 at each listed bore",
+  "source_edition_or_year": "first-principles continuity",
+  "source_section_or_page": "10 gpm hot in Type-L copper: 3/4 in (ID 0.785) runs 6.63 ft/s, over the 5 ft/s ceiling; 1 in (ID 1.025) runs 3.89 ft/s",
+  "verified_by": "rl",
+  "verified_on": "2026-11-16",
+  "inputs": {
+   "mode": "size-for-flow",
+   "flow_gpm": 10,
+   "material": "copper",
+   "service": "hot"
+  },
+  "outputs": {
+   "nominal_size_in": {
+    "value": 1,
+    "tolerance": {
+     "abs": 0
+    }
+   },
+   "velocity_fps": {
+    "value": 3.888,
+    "tolerance": {
+     "abs": 0.01
+    }
+   }
+  }
  }
  ]
 }
