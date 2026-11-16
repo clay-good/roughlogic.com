@@ -263,6 +263,7 @@ export function computeSuperheatSubcool({ refrigerant, system_pressure_psig, lin
     // (user-confirmable against the manufacturer chart). Default off.
     let target_superheat_F = null, charge_verdict = null;
     const iwb = Number(indoor_wet_bulb_F) || 0, odb = Number(outdoor_dry_bulb_F) || 0;
+    if (deadband_F != null && deadband_F !== "" && !(Number(deadband_F) >= 0)) return { error: "Superheat tolerance must be 0 or more (F)." };
     let dead = Number(deadband_F); if (!Number.isFinite(dead) || dead < 0) dead = 5;
     // A blank outdoor dry-bulb is not 0 F: without one there is no target superheat.
     const odbGiven = outdoor_dry_bulb_F !== null && outdoor_dry_bulb_F !== undefined && outdoor_dry_bulb_F !== "";
@@ -289,6 +290,7 @@ export function computeSuperheatSubcool({ refrigerant, system_pressure_psig, lin
     // the existing diagnostic band.
     let target_subcool_F_out = null, subcool_charge_verdict = null;
     const tgt = Number(target_subcool_F) || 0;
+    if (deadband_F != null && deadband_F !== "" && !(Number(deadband_F) >= 0)) return { error: "Superheat tolerance must be 0 or more (F)." };
     let dead = Number(deadband_F); if (!Number.isFinite(dead) || dead < 0) dead = 5;
     if (tgt > 0 && Number.isFinite(value)) {
       target_subcool_F_out = tgt;
@@ -556,7 +558,11 @@ export function renderSuperheatSubcool(inputRegion, outputRegion, citationEl) {
   const odb = makeNumber("Outdoor dry-bulb (°F)", "ss-odb", { step: "any" });
   // spec-v27 EN: optional TXV/EEV target-subcooling charge verdict.
   const tsc = makeNumber("Target subcool (F, TXV/EEV)", "ss-tsc", { step: "any", min: "0" });
-  for (const f of [ref, mode, press, temp, iwb, odb, tsc]) inputRegion.appendChild(f.wrap);
+  // The compute took the target tolerance; the page fixed +/-5 F until 2026-11-15 (some
+  // manufacturers' charging charts call for +/-3 F).
+  const tol = makeNumber("Charge tolerance on the target (± F; 5 default)", "ss-tol", { step: "any", min: "0", value: "5" });
+  tol.input.value = "5";
+  for (const f of [ref, mode, press, temp, iwb, odb, tsc, tol]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { ref.select.value = "R-410A"; mode.select.value = "superheat"; press.input.value = "118"; temp.input.value = "50"; iwb.input.value = "63"; odb.input.value = "95"; tsc.input.value = ""; update(); });
   const oSat = makeOutputLine(outputRegion, "Saturated temperature", "ss-out-sat");
   const oR = makeOutputLine(outputRegion, "Result", "ss-out-r");
@@ -573,7 +579,8 @@ export function renderSuperheatSubcool(inputRegion, outputRegion, citationEl) {
       indoor_wet_bulb_F: Number(iwb.input.value) || 0,
       outdoor_dry_bulb_F: odb.input.value === "" ? null : Number(odb.input.value),
       target_subcool_F: Number(tsc.input.value) || 0,
-    }); stepsFor(outputRegion, inputRegion, ["refrigerant", "line_temperature_F", "mode", "indoor_wet_bulb_F", "outdoor_dry_bulb_F", "target_subcool_F"], r);
+      deadband_F: tol.input.value === "" ? undefined : Number(tol.input.value),
+    }); stepsFor(outputRegion, inputRegion, ["refrigerant", "line_temperature_F", "mode", "indoor_wet_bulb_F", "outdoor_dry_bulb_F", "target_subcool_F", "deadband_F"], r);
     if (r.error) { oSat.textContent = r.error; oR.textContent = "-"; oD.textContent = "-"; oV.textContent = "-"; return; }
     oSat.textContent = fmt(r.saturated_temperature_F, 1) + " F";
     oR.textContent = mode.select.value === "superheat"
@@ -586,7 +593,7 @@ export function renderSuperheatSubcool(inputRegion, outputRegion, citationEl) {
       oV.textContent = (r.target_superheat_F == null) ? "(enter wet-bulb + outdoor dry-bulb)" : (fmt(r.target_superheat_F, 1) + " F target - " + (r.charge_verdict || "-"));
     }
   }, DEBOUNCE_MS);
-  for (const el of [ref.select, mode.select, press.input, temp.input, iwb.input, odb.input, tsc.input]) el.addEventListener("input", update);
+  for (const el of [ref.select, mode.select, press.input, temp.input, iwb.input, odb.input, tsc.input, tol.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }

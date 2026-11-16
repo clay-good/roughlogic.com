@@ -483,6 +483,8 @@ export function computeApproachDeltaT({
   delta_T_normal_low = 16, delta_T_normal_high = 22,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The bands are page inputs now (2026-11-15): an inverted pair is refused.
+  if (Number(approach_normal_low) > Number(approach_normal_high) || Number(delta_T_normal_low) > Number(delta_T_normal_high)) return { error: "Each normal band's low end must not exceed its high end (F)." };
   // 0 F is a real reading, so a blank temperature cannot stand in for it.
   if (![outdoor_F, condenser_saturation_F, supply_F, return_F].every((x) => x !== null && x !== undefined && x !== "")) return { error: "Enter all four temperatures (F)." };
   const approach = condenser_saturation_F - outdoor_F;
@@ -891,7 +893,14 @@ export function renderApproachDeltaT(inputRegion, outputRegion, citationEl) {
   const sat = makeNumber("Condenser saturation (°F)", "ad-sat", { step: "any" });
   const supply = makeNumber("Supply air (°F)", "ad-supply", { step: "any" });
   const ret = makeNumber("Return air (°F)", "ad-return", { step: "any" });
-  for (const f of [od, sat, supply, ret]) inputRegion.appendChild(f.wrap);
+  // The compute took the "normal" bands; the page fixed 5-20 F approach and 16-22 F
+  // delta-T until 2026-11-15. A high-efficiency condenser's own normal approach is tighter.
+  const aLo = makeNumber("Normal approach, low (°F; 5 default, from the equipment data)", "ad-alo", { step: "any", value: "5" });
+  const aHi = makeNumber("Normal approach, high (°F; 20 default)", "ad-ahi", { step: "any", value: "20" });
+  const dLo = makeNumber("Normal delta-T, low (°F; 16 default)", "ad-dlo", { step: "any", value: "16" });
+  const dHi = makeNumber("Normal delta-T, high (°F; 22 default)", "ad-dhi", { step: "any", value: "22" });
+  aLo.input.value = "5"; aHi.input.value = "20"; dLo.input.value = "16"; dHi.input.value = "22";
+  for (const f of [od, sat, supply, ret, aLo, aHi, dLo, dHi]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { od.input.value = "90"; sat.input.value = "105"; supply.input.value = "55"; ret.input.value = "75"; update(); });
   const oA = makeOutputLine(outputRegion, "Approach", "ad-out-a");
   const oAB = makeOutputLine(outputRegion, "Approach band", "ad-out-ab");
@@ -903,14 +912,18 @@ export function renderApproachDeltaT(inputRegion, outputRegion, citationEl) {
       condenser_saturation_F: sat.input.value === "" ? null : Number(sat.input.value),
       supply_F: supply.input.value === "" ? null : Number(supply.input.value),
       return_F: ret.input.value === "" ? null : Number(ret.input.value),
-    }); stepsFor(outputRegion, inputRegion, ["outdoor_F", "condenser_saturation_F", "supply_F", "return_F"], r);
+      approach_normal_low: aLo.input.value === "" ? undefined : Number(aLo.input.value),
+      approach_normal_high: aHi.input.value === "" ? undefined : Number(aHi.input.value),
+      delta_T_normal_low: dLo.input.value === "" ? undefined : Number(dLo.input.value),
+      delta_T_normal_high: dHi.input.value === "" ? undefined : Number(dHi.input.value),
+    }); stepsFor(outputRegion, inputRegion, ["outdoor_F", "condenser_saturation_F", "supply_F", "return_F", "approach_normal_low", "approach_normal_high", "delta_T_normal_low", "delta_T_normal_high"], r);
     if (r.error) { oA.textContent = r.error; oAB.textContent = "-"; oD.textContent = "-"; oDB.textContent = "-"; return; }
     oA.textContent = fmt(r.approach_F, 1) + " F";
     oAB.textContent = r.approach_band;
     oD.textContent = fmt(r.delta_T_F, 1) + " F";
     oDB.textContent = r.delta_T_band;
   }, DEBOUNCE_MS);
-  for (const el of [od.input, sat.input, supply.input, ret.input]) el.addEventListener("input", update);
+  for (const el of [od.input, sat.input, supply.input, ret.input, aLo.input, aHi.input, dLo.input, dHi.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
