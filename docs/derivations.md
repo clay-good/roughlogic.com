@@ -2597,6 +2597,7 @@ cross-check.
 | calc-hvacairside.js | `computeIsolatorDeflection` | `{ equipment_rpm = 0, target_efficiency = 0 } = {}` | _ | _ | _ |
 | calc-hvacairside.js | `computeManualDFrictionRate` | `{ blower_esp_inwg = 0, component_drop_inwg = 0, tel_ft = 0 } = {}` | _ | _ | _ |
 | calc-hvacairside.js | `computeMoistAirEnthalpy` | `{ t_db_f = null, w_lb_lb = 0 } = {}` | _ | _ | _ |
+| calc-hvacairside.js | `computeSensibleHeatAirflow` | `{ q_btuh = null, cfm = null, dt_f = null, factor = 1.08 } = {}` | _ | _ | _ |
 | calc-hvacairside.js | `computeVibrationIsolation` | `{ equipment_rpm = 0, static_deflection_in = 0 } = {}` | _ | _ | _ |
 | calc-hvacservice.js | `computeAshrae622Ventilation` | `{ floor_area_ft2 = 0, bedrooms = 0, infil_credit_cfm = 0, system_type = "unba...` | _ | _ | _ |
 | calc-hvacservice.js | `computeBathExhaustFanSizing` | `{ room_type = "bathroom", length_ft = 0, width_ft = 0, ceiling_ft = 8, operat...` | _ | _ | _ |
@@ -3955,7 +3956,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2539.
+Row count: 2540.
 
 <!-- END function-corpus-v14 -->
 
@@ -4453,7 +4454,7 @@ per spec-v14 §13.1 second paragraph.
 | `wobbe-index` | Wobbe Index (Fuel-Gas Interchangeability) | Wobbe index (fuel-gas interchangeabil...; WI = 1000 / sqrt(0.60) = 1000 / 0.77460 = 1290.99 | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wsfu-demand` | Probable Peak Demand (WSFU to GPM) | Hunter's curve (NBS BMS65) / IPC 2021...; 120 WSFU flush-valve -> 73.0 GPM, a printed row of Table ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 
-### Group C HVAC (223 tiles)
+### Group C HVAC (224 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -4654,6 +4655,7 @@ per spec-v14 §13.1 second paragraph.
 | `saturated-steam-properties` | Saturated Steam Properties (Steam Table by Pressure) | Project (first-principles); 114.696 psia: 337.88 F, vg 3.892 cu ft/lb, hf 309.1, hfg ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `secondary-glycol-loop` | Secondary Coolant (Glycol) Loop Flow and Pump Penalty | Project (first-principles); the standards named in the tile citation govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `seer-eer` | SEER and EER Conversion | Project (engineering approximation); EER 12 -> SEER 14.435 / SEER2 estimate 13.714 on the NREL... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
+| `sensible-heat-airflow` | Sensible Heat of an Airstream (1.08 x CFM x dT) | Project (first-principles); 1.08 x 400 x 20 = 8,640 Btu/h; 0.72 sensible tons | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `server-inlet-envelope` | Server Inlet Temperature and Humidity Envelope | Project (first-principles); current ASHRAE TC 9.9 and equipment limits govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 | `shr` | Sensible Heat Ratio | ASHRAE Handbook (Fundamentals); 24,000 BTU/hr sensible / 30,000 BTU/hr total -> SHR 0.80 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `shr-latent` | Sensible Heat Ratio / Latent Split (ASHRAE) | ASHRAE; Q_s = 1.08 * 1200 * 20 = 25,920; Q_l = 36,000 - 25,920 = ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
@@ -6413,6 +6415,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2285. Fixture-covered or reference-cadence: 2285 / 2285.
+Tile count: 2286. Fixture-covered or reference-cadence: 2286 / 2286.
 
 <!-- END tile-index-v14 -->

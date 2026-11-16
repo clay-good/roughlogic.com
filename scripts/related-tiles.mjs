@@ -2447,6 +2447,8 @@ const RELATED = {
   "wood-stud-wall-takeoff": ["residential-framing","metal-stud-takeoff","header-sizing","sheathing-takeoff"],
   // spec-v1995: lawn fertilizer product rate (calc-farmproduction.js).
   "lawn-fertilizer-rate": ["npk-blend","sod-takeoff","mulch-topsoil-volume","sprinkler-precip-rate"],
+  // spec-v1996: sensible heat of an airstream (calc-hvacairside.js).
+  "sensible-heat-airflow": ["cooling-coil-total-load","furnace-airflow-to-rise","shr-latent","air-density-correction"],
 };
 
 export { RELATED };

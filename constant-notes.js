@@ -5,7 +5,7 @@
 // the number first and keeps its explanation in the single place it belongs.
 // The compute still returns the note; only where it is PRINTED changes.
 //
-// 1650 of 2285 tiles, one bit each in TOOLS order (see the
+// 1650 of 2286 tiles, one bit each in TOOLS order (see the
 // generator for why this is a bitmap and not a list of ids).
 import { TOOLS } from "./tools-lead.js";
 

@@ -2,11 +2,11 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "ccba9c2bacb602da",
+      "sha": "551272ec6f260397",
       "date": "2026-11-16"
     },
     "/tools/": {
-      "sha": "8aec64a74c29bf2d",
+      "sha": "17e1dd315312eb72",
       "date": "2026-11-16"
     },
     "/errata/": {
@@ -14,91 +14,91 @@
       "date": "2026-11-14"
     },
     "/collections/disaster-response/": {
-      "sha": "ccf37e2896642960",
+      "sha": "ab747b860c4107f6",
       "date": "2026-11-16"
     },
     "/groups/accounting/": {
-      "sha": "43bee43636e81f9d",
+      "sha": "4d47630f9ac07b9a",
       "date": "2026-11-16"
     },
     "/groups/agriculture/": {
-      "sha": "fef907337b8ed6e6",
+      "sha": "4de44f98e607904b",
       "date": "2026-11-16"
     },
     "/groups/construction/": {
-      "sha": "a0ac080b6cc567b4",
+      "sha": "082e7b2ad2b9b448",
       "date": "2026-11-16"
     },
     "/groups/cross-trade/": {
-      "sha": "62746290c9ce0756",
+      "sha": "0716754522c3c8c6",
       "date": "2026-11-16"
     },
     "/groups/educators/": {
-      "sha": "babc12f5c51fed3f",
+      "sha": "4252d836ba7ebc59",
       "date": "2026-11-16"
     },
     "/groups/electrical/": {
-      "sha": "c6012c2d6b82148b",
+      "sha": "683ff51a334ccc98",
       "date": "2026-11-16"
     },
     "/groups/field/": {
-      "sha": "c9a15cffebcb9f83",
+      "sha": "f1b74d81b206f1d9",
       "date": "2026-11-16"
     },
     "/groups/fire-ground/": {
-      "sha": "ecfcf8a95e410252",
+      "sha": "7fe8e660a7ccd53f",
       "date": "2026-11-16"
     },
     "/groups/historical/": {
-      "sha": "e1356259f3aebd2e",
+      "sha": "9be7fa271405cd53",
       "date": "2026-11-16"
     },
     "/groups/hvac/": {
-      "sha": "7832ad36b3febb18",
+      "sha": "5a9561b8e2484e6b",
       "date": "2026-11-16"
     },
     "/groups/kitchen/": {
-      "sha": "ff5ab54c92b62020",
+      "sha": "71ac2f3e32387e30",
       "date": "2026-11-16"
     },
     "/groups/lab/": {
-      "sha": "ece77d3ac57e60b3",
+      "sha": "169c05160a6c237c",
       "date": "2026-11-16"
     },
     "/groups/mechanic/": {
-      "sha": "6f186b7de60de866",
+      "sha": "1272a46858386d99",
       "date": "2026-11-16"
     },
     "/groups/plumbing/": {
-      "sha": "bd0117734a12ed20",
+      "sha": "e57060c8b8966d2f",
       "date": "2026-11-16"
     },
     "/groups/real-estate/": {
-      "sha": "384845cda9c85928",
+      "sha": "1f4f0a0a62331dc9",
       "date": "2026-11-16"
     },
     "/groups/references/": {
-      "sha": "ac6221541508a391",
+      "sha": "5fd4460dba73683e",
       "date": "2026-11-16"
     },
     "/groups/restoration/": {
-      "sha": "261fb8260fa21939",
+      "sha": "c18d15d3c95978b3",
       "date": "2026-11-16"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "cef90bacc79ac9f3",
+      "sha": "f271f154ead4cecd",
       "date": "2026-11-16"
     },
     "/groups/stage/": {
-      "sha": "5df73dbe6fc4bc44",
+      "sha": "b07d3066f9aa5232",
       "date": "2026-11-16"
     },
     "/groups/trucking/": {
-      "sha": "3baa0ab150c71474",
+      "sha": "01805d2b70a55144",
       "date": "2026-11-16"
     },
     "/groups/water/": {
-      "sha": "937a68e91c0bf229",
+      "sha": "65a32c11a86e3a5b",
       "date": "2026-11-16"
     },
     "/tools/aav-install-check/": {
@@ -4058,8 +4058,8 @@
       "date": "2026-10-17"
     },
     "/tools/infiltration-load/": {
-      "sha": "0072247eaa4dcce0",
-      "date": "2026-10-17"
+      "sha": "ffa0a39879bfe316",
+      "date": "2026-11-16"
     },
     "/tools/injection-clamp-tonnage/": {
       "sha": "57b42aa7b3053c91",
@@ -6920,6 +6920,10 @@
     "/tools/seller-net-sheet/": {
       "sha": "dd7f33396d4b8c0e",
       "date": "2026-10-17"
+    },
+    "/tools/sensible-heat-airflow/": {
+      "sha": "505d9334b1c0213d",
+      "date": "2026-11-16"
     },
     "/tools/separator-retention-sizing/": {
       "sha": "4a6920ad529d5def",

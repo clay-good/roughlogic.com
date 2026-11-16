@@ -388,6 +388,7 @@ export const TOOL_MODULES = (() => {
     "moist-air-enthalpy", "drybulb-from-enthalpy", "cooling-coil-total-load",
     "coil-bypass-factor", "fan-affinity-laws", "colebrook-friction-factor",
     "manual-d-friction-rate",
+    "sensible-heat-airflow",
   ]);
   // spec-v89 cap-relief split: the cohesive refrigerant-circuit bench (the v2
   // refrigerant-pt P-T lookup, superheat-subcool diagnostic, compare-refrigerants,

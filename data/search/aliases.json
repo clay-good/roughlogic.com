@@ -117867,6 +117867,31 @@
   "term": "wind chill",
   "target": "wind-chill",
   "kind": "industry"
+ },
+ {
+  "term": "sensible heat",
+  "target": "sensible-heat-airflow",
+  "kind": "industry"
+ },
+ {
+  "term": "btu per hour cfm delta t",
+  "target": "sensible-heat-airflow",
+  "kind": "industry"
+ },
+ {
+  "term": "1.08 x cfm x delta t",
+  "target": "sensible-heat-airflow",
+  "kind": "industry"
+ },
+ {
+  "term": "how much heat does the airflow carry",
+  "target": "sensible-heat-airflow",
+  "kind": "question"
+ },
+ {
+  "term": "cfm needed for btu",
+  "target": "sensible-heat-airflow",
+  "kind": "question"
  }
  ]
 }

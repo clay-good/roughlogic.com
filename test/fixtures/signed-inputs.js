@@ -371,4 +371,6 @@ export const SIGNED_INPUTS = [
   "time-alignment::ambient_C",
   "flat-surface-heat-loss::surface_f",
   "flat-surface-heat-loss::amb_f",
+  // spec-v1996: a cooling airstream's temperature difference is negative (Q < 0 removes heat).
+  "sensible-heat-airflow::dt_f",
 ];

@@ -173188,6 +173188,58 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "sensible-heat-airflow",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "400 CFM at a 20 F difference",
+  "source_edition_or_year": "spec-v1996 worked example",
+  "source_section_or_page": "1.08 x 400 x 20 = 8,640 Btu/h; 0.72 sensible tons",
+  "verified_by": "rl",
+  "verified_on": "2026-11-16",
+  "inputs": {
+   "cfm": 400,
+   "dt_f": 20,
+   "q_btuh": null,
+   "factor": 1.08
+  },
+  "outputs": {
+   "q_btuh": {
+    "value": 8640,
+    "tolerance": {
+     "abs": 1e-06
+    }
+   },
+   "tons": {
+    "value": 0.72,
+    "tolerance": {
+     "abs": 1e-06
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "sensible-heat-airflow",
+  "source_publisher": "Project (first-principles)",
+  "source_title": "cross-check: CFM for 36,000 Btu/h at 20 F",
+  "source_edition_or_year": "spec-v1996 worked example",
+  "source_section_or_page": "36,000 / (1.08 x 20) = 1,666.67 CFM",
+  "verified_by": "rl",
+  "verified_on": "2026-11-16",
+  "inputs": {
+   "q_btuh": 36000,
+   "dt_f": 20,
+   "cfm": null,
+   "factor": 1.08
+  },
+  "outputs": {
+   "cfm": {
+    "value": 1666.666667,
+    "tolerance": {
+     "abs": 1e-06
+    }
+   }
+  }
  }
  ]
 }

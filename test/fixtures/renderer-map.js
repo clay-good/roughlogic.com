@@ -2293,4 +2293,5 @@ export const RENDERER_MAP = {
   "work-zone-buffer-space": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "wood-stud-wall-takeoff": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "lawn-fertilizer-rate": { module: "../../calc-farmproduction.js", exportName: "FARMPRODUCTION_RENDERERS" },
+  "sensible-heat-airflow": { module: "../../calc-hvacairside.js", exportName: "HVACAIRSIDE_RENDERERS" },
 };

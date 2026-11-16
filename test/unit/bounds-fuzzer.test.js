@@ -62523,3 +62523,11 @@ test("bounds: spec-v1995 computeLawnFertilizerRate pins the Penn State example a
   // A null from the agent door takes the default, not 0.
   assert.strictEqual(_lfr({ ...ex, n_lb_per_1000: null, bag_weight_lb: null, p_pct: null }).bags, 3);
 });
+
+import { computeSensibleHeatAirflow as _shx } from "../../calc-hvacairside.js";
+test("bounds: spec-v1996 computeSensibleHeatAirflow solves the blank one and pins the error seams", () => {
+  assert.strictEqual(_shx({ cfm: 400, dt_f: 20 }).q_btuh, 8640);
+  for (const bad of [{ cfm: 400 }, { cfm: 400, dt_f: 20, q_btuh: 1 }, { cfm: 0, dt_f: 20 }, { cfm: 400, dt_f: 0 }, { q_btuh: 8640, dt_f: -20 }, { cfm: 400, dt_f: 20, factor: 2 }, { cfm: 2e6, dt_f: 20 }, { cfm: 400, dt_f: 900 }]) {
+    assert.ok("error" in _shx(bad), JSON.stringify(bad));
+  }
+});

@@ -26858,6 +26858,16 @@ export const CITATIONS = {
       { name: "Bag weight", value: "50 lb unless entered", source: "common bag size" },
     ],
   },
+  "sensible-heat-airflow": {
+    formula: "Q (Btu/h) = factor x CFM x dT (F), factor = 1.08 for standard air = 60 min/h x 0.075 lb/cu ft x 0.24 Btu/lb-F; the blank one of Q, CFM, dT is solved; sensible tons = |Q| / 12,000.",
+    edition: "Sensible heat equation for air by name, as used in ASHRAE Handbook -- Fundamentals (psychrometrics chapter) and ACCA Manual J/S; first-principles derivation from standard air density and specific heat.",
+    freeAccess: "The relation and its constants are public engineering arithmetic; standard air is 0.075 lb/cu ft at sea level.",
+    governance: GOVERNANCE.general,
+    editionNote: "1.08 assumes standard sea-level air (0.075 lb/cu ft, cp 0.24). At altitude the factor scales with density (about 0.96 x at 1,000 ft, 0.87 x at 4,000 ft); enter the corrected factor or use the air density correction calculator. Latent and total loads use 0.68 and 4.5 and are separate calculators.",
+    assumptions: [
+      { name: "Standard air", value: "0.075 lb/cu ft and 0.24 Btu/lb-F unless the factor is changed", source: "first principles" },
+    ],
+  },
 };
 
 // --- Reference block and copy text ---

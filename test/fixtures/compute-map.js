@@ -2392,6 +2392,7 @@ export const COMPUTE_MAP = {
   "work-zone-buffer-space": { module: "../../calc-construction.js", fn: "computeWorkZoneBufferSpace" },
   "wood-stud-wall-takeoff": { module: "../../calc-construction.js", fn: "computeWoodStudWallTakeoff" },
   "lawn-fertilizer-rate": { module: "../../calc-farmproduction.js", fn: "computeLawnFertilizerRate" },
+  "sensible-heat-airflow": { module: "../../calc-hvacairside.js", fn: "computeSensibleHeatAirflow" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

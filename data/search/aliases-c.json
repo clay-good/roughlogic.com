@@ -2453,6 +2453,11 @@
     {"term":"how many btu to heat a house","target":"manual-j-heating","kind":"question"},
     {"term":"btu to heat","target":"manual-j-heating","kind":"question"},
     {"term":"btu to heat a room by square feet","target":"manual-j-heating","kind":"question"},
-    {"term":"ac tonnage for","target":"manual-j-cooling","kind":"question"}
+    {"term":"ac tonnage for","target":"manual-j-cooling","kind":"question"},
+    {"term":"sensible heat","target":"sensible-heat-airflow","kind":"industry"},
+    {"term":"btu per hour cfm delta t","target":"sensible-heat-airflow","kind":"industry"},
+    {"term":"1.08 x cfm x delta t","target":"sensible-heat-airflow","kind":"industry"},
+    {"term":"how much heat does the airflow carry","target":"sensible-heat-airflow","kind":"question"},
+    {"term":"cfm needed for btu","target":"sensible-heat-airflow","kind":"question"}
   ]
 }

@@ -634,3 +634,52 @@ HVACAIRSIDE_RENDERERS["manual-d-friction-rate"] = _rEnv({
   ],
   compute: computeManualDFrictionRate,
 });
+
+// ===================== spec-v1996: sensible heat of an airstream =====================
+// Q (Btu/h) = 1.08 x CFM x dT (F). 1.08 = 60 min/h x 0.075 lb/ft^3 (standard
+// air) x 0.24 Btu/lb-F. Leave one of the three blank and it is solved. The
+// factor is entered for air that is not standard (altitude, heat): 1.08 x the
+// density ratio.
+// dims: in { q_btuh: M L^2 T^-3, cfm: L^3 T^-1, dt_f: T, factor: dimensionless } out: { q_btuh: M L^2 T^-3, cfm: L^3 T^-1, dt_f: T, tons: M L^2 T^-3 }
+export function computeSensibleHeatAirflow({ q_btuh = null, cfm = null, dt_f = null, factor = 1.08 } = {}) {
+  const _g = _finiteGuardEnv(arguments[0]); if (_g) return _g;
+  const blank = (v) => v === null || v === undefined || v === "";
+  const f = blank(factor) ? 1.08 : Number(factor);
+  if (!(f > 0) || f > 1.2) return { error: "The air factor must be above 0 and at most 1.2 (1.08 for standard air; lower at altitude)." };
+  const given = { q: !blank(q_btuh), c: !blank(cfm), t: !blank(dt_f) };
+  const n = Object.values(given).filter(Boolean).length;
+  if (n !== 2) return { error: n === 3 ? "Leave one of Btu/h, CFM and temperature difference blank: that is the one solved." : "Enter two of Btu/h, CFM and temperature difference; the blank one is solved." };
+  let Q = given.q ? Number(q_btuh) : null, C = given.c ? Number(cfm) : null, T = given.t ? Number(dt_f) : null;
+  if (given.c && !(C > 0)) return { error: "Airflow must be positive (CFM)." };
+  if (given.t && !(T !== 0)) return { error: "The temperature difference cannot be 0 (F)." };
+  if (given.q && !(Q !== 0)) return { error: "The heat rate cannot be 0 (Btu/h)." };
+  if (C !== null && C > 1000000) return { error: "Airflow over 1,000,000 CFM is outside this calculator." };
+  if (T !== null && Math.abs(T) > 500) return { error: "A temperature difference over 500 F is outside air-side HVAC." };
+  let solved;
+  if (!given.q) { Q = f * C * T; solved = "q_btuh"; }
+  else if (!given.c) { C = Q / (f * T); solved = "cfm"; if (!(C > 0)) return { error: "Btu/h and the temperature difference must have the same sign." }; }
+  else { T = Q / (f * C); solved = "dt_f"; }
+  if (![Q, C, T].every(Number.isFinite)) return { error: "Sensible heat math is not a finite value." };
+  return {
+    q_btuh: Q, cfm: C, dt_f: T, tons: Math.abs(Q) / 12000, factor: f, solved,
+    note: "Sensible heat only: Q = " + f + " x CFM x temperature difference. 1.08 is 60 min/h x 0.075 lb/cu ft (standard air at sea level) x 0.24 Btu/lb-F; for thinner air multiply 1.08 by the density ratio (about 0.96 at 1,000 ft, 0.87 at 4,000 ft, 0.83 at 5,000 ft). Moisture removed or added is latent heat and is not in this number; total coil load is 4.5 x CFM x the enthalpy change. Tons are sensible tons (12,000 Btu/h each).",
+  };
+}
+export const sensibleHeatAirflowExample = { inputs: { cfm: 400, dt_f: 20, q_btuh: null, factor: 1.08 } };
+HVACAIRSIDE_RENDERERS["sensible-heat-airflow"] = _rEnv({
+  citation: "Citation: sensible heat of an airstream, Q = 1.08 x CFM x delta-T, by name per ASHRAE Handbook -- Fundamentals (psychrometrics) and ACCA Manual J/S; 1.08 = 60 x 0.075 lb/cu ft x 0.24 Btu/lb-F for standard sea-level air. First-principles derivation. Measured airflow and the equipment data govern.",
+  example: sensibleHeatAirflowExample.inputs,
+  fields: [
+    { key: "q_btuh", label: "Sensible heat (Btu/h; blank to solve)", required: true, attrs: { step: "any" } },
+    { key: "cfm", label: "Airflow (CFM; blank to solve)", required: true, attrs: { step: "any", min: "0" } },
+    { key: "dt_f", label: "Temperature difference (°F; blank to solve)", required: true, attrs: { step: "any" } },
+    { key: "factor", label: "Air factor (1.08 standard air)", default: 1.08, attrs: { step: "any", min: "0", max: "1.2" } },
+  ],
+  outputs: [
+    { key: "q", id: "shx-out-q", label: "Sensible heat", value: (r) => fmt(r.q_btuh, 0) + " Btu/h (" + fmt(r.tons, 2) + " tons)" + (r.solved === "q_btuh" ? " -- solved" : "") },
+    { key: "c", id: "shx-out-c", label: "Airflow", value: (r) => fmt(r.cfm, 0) + " CFM" + (r.solved === "cfm" ? " -- solved" : "") },
+    { key: "t", id: "shx-out-t", label: "Temperature difference", value: (r) => fmt(r.dt_f, 2) + " °F" + (r.solved === "dt_f" ? " -- solved" : "") },
+    { key: "n", id: "shx-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeSensibleHeatAirflow,
+});

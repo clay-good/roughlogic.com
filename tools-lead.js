@@ -2289,4 +2289,5 @@ export const TOOLS = [
   {"id":"work-zone-buffer-space","name":"Work Zone Longitudinal Buffer Space and Activity Area Length (MUTCD 6B.06)","group":"E","trades":["civil","construction"],"desc":"How long a lane closure's buffer space is, how far apart the drums go, and how long the whole closure runs, by the MUTCD 11th Edition.","more":1},
   {"id":"wood-stud-wall-takeoff","name":"Wood Stud Wall Takeoff: Studs and Plates","group":"E","trades":["carpentry","framing"],"desc":"How many wood studs and how much plate one stud wall takes.","more":1},
   {"id":"lawn-fertilizer-rate","name":"Lawn Fertilizer Product Rate","group":"L","trades":["landscaping","agriculture"],"desc":"How much lawn fertilizer to buy and spread, from the bag's three-number analysis.","more":1},
+  {"id":"sensible-heat-airflow","name":"Sensible Heat of an Airstream (1.08 x CFM x dT)","group":"C","trades":["hvac"],"desc":"The heat an airstream carries, Q = 1.08 x CFM x the temperature difference, solved for whichever of the three is left blank.","more":1},
 ];

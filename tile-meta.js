@@ -1543,6 +1543,8 @@ const _TILES = [
   ["wood-stud-wall-takeoff", "E"],
   // spec-v1995: lawn fertilizer product rate (calc-farmproduction.js).
   ["lawn-fertilizer-rate", "L"],
+  // spec-v1996: sensible heat of an airstream (calc-hvacairside.js).
+  ["sensible-heat-airflow", "C"],
 ];
 
 
