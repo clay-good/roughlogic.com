@@ -1,6 +1,6 @@
 {
   "_comment": "Free-text questions of the kind a tradesperson types, with bindings the query text itself rules out. scripts/measure-query-fill.mjs builds its corpus from each tile's worked example, so every number in it is labelled, in field order, with no distractors -- which is why it reports zero wrong values while these reproduce. Each row asserts what a number must NOT become, because that is what the query text settles on its own; which tile ought to answer is a separate question this fixture deliberately does not take a position on.",
-  "_updated": "2026-09-01",
+  "_updated": "2026-11-16",
   "_schema": "rows[]: { query, tile, mustNotBind: { field: value }, why }",
   "_experiment_not_taken": "Dropping the same-family unit conversion in the unit-agreement phase (fill only on an EXACT unit match) takes the wrong bindings below from 2 to 1 and leaves measure-query-fill.mjs completely unchanged: 4,349 / 7,184 fields, 0 wrong. That reads as free, and it is not. The recovery corpus is built from worked examples, so every number in it carries the field's OWN unit and no same-family conversion is ever exercised -- the harness cannot see what removing it would cost, which is a reader writing 3 ft into a field measured in inches. Refusing that is a real capability loss neither harness measures. Recorded so the next attempt does not spend the experiment again, and does not mistake an unmeasured cost for no cost.",
   "rows": [
@@ -33,6 +33,24 @@
       "tile": "metal-deck-takeoff",
       "mustNotBind": { "sheet_length_ft": "0.666666666667" },
       "why": "Eight inches converted to feet, into a field for the length of a sheet. No sheet is 0.67 ft long."
+    },
+    {
+      "query": "fence posts for 100 ft of fence 8 ft apart",
+      "tile": "fence-estimate",
+      "mustNotBind": { "post_spacing_ft": "100", "length_ft": "8" },
+      "why": "\"100 ft of fence\" is the fence; \"8 ft apart\" is the post spacing. Reading each name forward onto the NEXT number swapped them (2026-11-16)."
+    },
+    {
+      "query": "lumber for a 12 ft wall 8 ft tall 16 on center",
+      "tile": "wood-stud-wall-takeoff",
+      "mustNotBind": { "wall_length_ft": "8", "plate_stock_ft": "12", "stud_oc_in": "96" },
+      "why": "The wall is 12 ft long and 8 ft tall. \"wall\" read forward gave the length 8 ft, and the 8 ft height, which this tile has no field for, must not become a 96 in stud spacing."
+    },
+    {
+      "query": "gallons in a 10 ft round pool 4 ft deep",
+      "tile": "standing-water",
+      "mustNotBind": { "depth_in": "120" },
+      "why": "10 ft is the pool's diameter; \"4 ft deep\" is its depth. The diameter, converted to 120 in, filled the depth."
     }
   ]
 }

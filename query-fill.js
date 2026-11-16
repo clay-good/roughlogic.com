@@ -25,7 +25,7 @@
 // field index describes.
 
 import { extractQuantities } from "./search-discovery.js";
-import { canonicalUnit, unitsCompatible, convertUnit } from "./field-units.js";
+import { canonicalUnit, unitsCompatible, convertUnit, unitFamily } from "./field-units.js";
 import { bucketFor } from "./field-bucket.js";
 import { verifyShard } from "./integrity.js";
 
@@ -176,6 +176,9 @@ const TERM_STOPWORDS = new Set([
 // Query shorthand -> the word a label is likely to use. Kept small and
 // trade-specific on purpose; a large synonym table is how a matcher starts
 // guessing.
+// A dimension word written after a length, and the label word it means.
+const POST_WORDS = new Map([["tall", "height"], ["high", "height"], ["deep", "depth"], ["wide", "width"], ["long", "length"], ["thick", "thickness"], ["apart", "spacing"]]);
+
 const SHORTHAND = new Map([
   ["amps", "current"], ["amperage", "current"], ["amp", "current"],
   ["volts", "voltage"], ["volt", "voltage"],
@@ -427,10 +430,45 @@ export function queryFill(query, rows, opts) {
   for (const t of String((opts && opts.name) || "").toLowerCase().split(/[^a-z]+/)) if (t) nameTokCount.set(t, (nameTokCount.get(t) || 0) + 1);
   const firstQi = quantities.findIndex((q, i) => !suppressed.has(i));
   let prevEnd = 0;
+  // Value-then-name. "100 ft of fence 8 ft apart", "a 12 ft wall 8 ft tall":
+  // the words right AFTER a measured quantity describe it -- an "of" phrase,
+  // or a dimension word on a length -- and they are not the next number's
+  // name. Reading them forward swapped the fence's length and post spacing,
+  // and gave a 12 ft wall's length to its 8 ft height (2026-11-16). Such a
+  // quantity takes the one field those words name, or no field here at all.
+  const backOf = new Map();          // quantity index -> { cut, keys }
   quantities.forEach((qty, qi) => {
-    const window = text.slice(prevEnd, qty.index);
+    if (suppressed.has(qi)) return;
+    const unit = canonicalUnit(rawUnitOf(qty, text));
+    if (!unit) return;
+    const next = quantities[qi + 1];
+    const after = text.slice(qty.end, next ? next.index : text.length);
+    let m = after.match(/^\s+of\s+([a-z][a-z -]*)/i);
+    let terms = null;
+    if (m) terms = windowTerms(m[1]);
+    else if (unitFamily(unit) === "length" && (m = after.match(/^\s+(tall|high|deep|wide|long|thick|apart)\b/i))) {
+      terms = new Set([m[1].toLowerCase(), POST_WORDS.get(m[1].toLowerCase())]);
+    }
+    if (!terms) return;
+    const keys = numberRows.filter((r) => rowUnit(r) && unitsCompatible(unit, rowUnit(r)) &&
+      [...termsByRow.get(r.d)].some((t) => terms.has(t))).map((r) => r.d);
+    backOf.set(qi, { cut: m[0].length, keys, dimension: !/^\s+of\s/i.test(m[0]) });
+  });
+  quantities.forEach((qty, qi) => {
+    let window = text.slice(prevEnd, qty.index);
+    if (qi > 0 && backOf.has(qi - 1)) window = window.slice(backOf.get(qi - 1).cut);
     prevEnd = qty.end;
     if (suppressed.has(qi)) return;
+    if (backOf.has(qi)) {
+      const { keys } = backOf.get(qi);
+      if (keys.length !== 1) return;
+      const row = numberRows.find((r) => r.d === keys[0]);
+      if (valueFor(qty, row, text, labelWords) === null) return;
+      rowsFor.set(qi, keys);
+      if (!proposals.has(keys[0])) proposals.set(keys[0], []);
+      proposals.get(keys[0]).push(qi);
+      return;
+    }
     const wanted = windowTerms(window);
     // labelTerms keeps a short label whole -- "AWG", "GPM", "Run", "APR" -- and
     // windowTerms dropped every query word under four characters, so the two
@@ -563,6 +601,10 @@ export function queryFill(query, rows, opts) {
   // get to re-home a fragment a stronger rule already refused.
   const burned = new Set(suppressed);
   for (const [qi, hits] of rowsFor) if (hits.length > 1) burned.add(qi);
+  // "8 ft tall" on a tile with no height is not this tile's spacing or length
+  // either: a number its own words describe as a dimension the tile does not
+  // take goes nowhere, rather than to whichever field its unit fits.
+  for (const [qi, b] of backOf) if (b.dimension && b.keys.length !== 1) burned.add(qi);
 
   // Resolve only the unambiguous pairs: one field wanted by one fragment, and
   // that fragment wanting only that field. Everything else is dropped.

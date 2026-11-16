@@ -557,3 +557,23 @@ test("query-fill: a bare number does not take a field named just after a quantit
   // Name-then-value still works when the number carries the unit.
   assert.equal(Number(queryFill("wall length 40 ft", rows).filled.wall_length_ft), 40);
 });
+
+// 2026-11-16: words right after a measured quantity describe IT ("100 ft of
+// fence", "8 ft apart", "4 ft deep"), and are not the next number's name.
+test("query-fill: value-then-name phrases bind backward, or not at all", () => {
+  const fence = [num("length_ft", "Fence length", "ft"), num("post_spacing_ft", "Post spacing", "ft")];
+  const f = queryFill("fence posts for 100 ft of fence 8 ft apart", fence).filled;
+  assert.equal(Number(f.length_ft), 100);
+  assert.equal(Number(f.post_spacing_ft), 8);
+  const wall = [num("wall_length_ft", "Wall length", "ft"), num("stud_oc_in", "Spacing on center", "in")];
+  const w = queryFill("lumber for a 12 ft wall 8 ft tall", wall).filled;
+  assert.equal(Number(w.wall_length_ft), 12);
+  assert.equal(w.stud_oc_in, undefined, "a height the tile does not take goes nowhere");
+  // Label-first phrasing is unchanged.
+  const room = [num("length_ft", "Length", "ft"), num("width_ft", "Width", "ft")];
+  const r = queryFill("length 40 ft width 20 ft", room).filled;
+  assert.deepEqual([Number(r.length_ft), Number(r.width_ft)], [40, 20]);
+  // A post word on a non-length (a temperature) is left to the usual rules.
+  const t = [num("setpoint_f", "Setpoint", "degf"), num("limit_f", "High limit", "degf")];
+  assert.equal(Number(queryFill("setpoint 70 °f high limit 80 °f", t).filled.limit_f), 80);
+});
