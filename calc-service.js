@@ -987,7 +987,7 @@ function _v957renderInsulationResistancePi(inputRegion, outputRegion, citationEl
       // A CLEARED field is a missing reading, not the worked example's (which built a PI on a phantom 4,160 Mohm).
       ir_30s_mohm: t30.input.value === "" ? NaN : Number(t30.input.value), ir_1min_mohm: t60.input.value === "" ? NaN : Number(t60.input.value),
       ir_10min_mohm: t600.input.value === "" ? NaN : Number(t600.input.value),
-    }); stepsFor(outputRegion, inputRegion, ["ir_1min_mohm", "ir_10min_mohm"], r);
+    }); stepsFor(outputRegion, inputRegion, ["ir_30s_mohm", "ir_1min_mohm", "ir_10min_mohm"], r);
     if (r.error) { oPi.textContent = r.error; oDar.textContent = "-"; return; }
     oPi.textContent = fmt(r.polarization_index, 2) + " -- " + r.pi_verdict;
     oDar.textContent = fmt(r.dar, 2) + " -- " + r.dar_verdict;

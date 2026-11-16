@@ -396,7 +396,7 @@ function renderThermistorSteinhartHart(inputRegion, outputRegion, citationEl) {
       // Blank C means the two-constant form (C = 0) once A and B are your own; all three
       // blank uses the bundled 10k NTC set.
       coeff_c: c.input.value === "" ? (a.input.value === "" && b.input.value === "" ? 0.000000085663516 : 0) : Number(c.input.value),
-    }); stepsFor(outputRegion, inputRegion, ["resistance_ohms", "coeff_a", "coeff_b"], r);
+    }); stepsFor(outputRegion, inputRegion, ["resistance_ohms", "coeff_a", "coeff_b", "coeff_c"], r);
     if (r.error) { oC.textContent = r.error; oF.textContent = "-"; oNote.textContent = ""; return; }
     oC.textContent = fmt(r.temperature_c, 2) + " C";
     oF.textContent = fmt(r.temperature_f, 2) + " F";

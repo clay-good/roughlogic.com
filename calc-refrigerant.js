@@ -580,7 +580,7 @@ export function renderSuperheatSubcool(inputRegion, outputRegion, citationEl) {
       outdoor_dry_bulb_F: odb.input.value === "" ? null : Number(odb.input.value),
       target_subcool_F: Number(tsc.input.value) || 0,
       deadband_F: tol.input.value === "" ? undefined : Number(tol.input.value),
-    }); stepsFor(outputRegion, inputRegion, ["refrigerant", "line_temperature_F", "mode", "indoor_wet_bulb_F", "outdoor_dry_bulb_F", "target_subcool_F", "deadband_F"], r);
+    }); stepsFor(outputRegion, inputRegion, ["refrigerant", "system_pressure_psig", "line_temperature_F", "mode", "indoor_wet_bulb_F", "outdoor_dry_bulb_F", "target_subcool_F", "deadband_F"], r);
     if (r.error) { oSat.textContent = r.error; oR.textContent = "-"; oD.textContent = "-"; oV.textContent = "-"; return; }
     oSat.textContent = fmt(r.saturated_temperature_F, 1) + " F";
     oR.textContent = mode.select.value === "superheat"

@@ -13,6 +13,7 @@ test("typed zero: no number box turns a typed 0 into a default", () => {
   // duct-sizing computes in a Web Worker (async); the fake DOM does not await it, and the
   // renderer's own r.error branch is read by eye.
   assert.deepEqual(report.silentErrors.filter((x) => !x.startsWith("duct-sizing ")), [], "add `if (r.error) { first.textContent = r.error; ...; return; }` after the compute call");
+  assert.deepEqual(report.unshownInputs, [], "add the argument's key to the stepsFor key list so Show the steps lists it");
   assert.deepEqual(report.staleTables, [], "clear the table/plot/list container in the r.error branch");
   assert.deepEqual(report.blankDefault, [], "a box whose label states a default must run with it when left blank");
   assert.deepEqual(report.droppedLines, [], "a list box dropped an unreadable line without a word: name the line in the error instead");

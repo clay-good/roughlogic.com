@@ -2650,7 +2650,7 @@ function _v7renderGeneratorMotorStarting(inputRegion, outputRegion, citationEl) 
       dip_factor: dip.input.value === "" ? 0.30 : Number(dip.input.value),
       generator_xd: xdIn.input.value === "" ? 0.25 : Number(xdIn.input.value),
       starts_per_hour: starts.select.value,
-    }); stepsFor(outputRegion, inputRegion, ["motors", "dip_factor", "generator_xd", "starts_per_hour"], r);
+    }); stepsFor(outputRegion, inputRegion, ["motors", "non_motor_kW", "dip_factor", "generator_xd", "starts_per_hour"], r);
     if (r.error) { oR.textContent = r.error; oS.textContent = "-"; oReq.textContent = "-"; oRec.textContent = "-"; return; }
     oR.textContent = _v7fmt(r.running_kW, 1) + " kW";
     oS.textContent = _v7fmt(r.worst_starting_kVA, 1) + " kVA";

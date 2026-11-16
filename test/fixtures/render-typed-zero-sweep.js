@@ -32,7 +32,7 @@ for (const r of ROWS) if (!first.has(r.tile_id)) first.set(r.tile_id, r);
 // At the precision a reader can see, as check-example-parity compares inputs:
 // the button types 66.82 where the fixture carries 66.8235.
 const close = (a, b) => a === b || Math.abs(a - b) <= Math.max(Math.abs(b) * 0.001, 1e-12);
-const report = { compared: 0, mismatches: {}, outOfRange: [], droppedLines: [], blankDefault: [], silentErrors: [], staleTables: [] };
+const report = { compared: 0, mismatches: {}, outOfRange: [], droppedLines: [], blankDefault: [], silentErrors: [], staleTables: [], unshownInputs: [] };
 for (const { id } of TOOLS) {
   const reg = RENDERER_MAP[id], creg = COMPUTE_MAP[id], row0 = first.get(id);
   if (!reg || !creg || !row0) continue;
@@ -45,6 +45,12 @@ for (const { id } of TOOLS) {
   const inputs = doc.createElement("div"), outputs = doc.createElement("div"), cite = doc.createElement("p");
   view.append(inputs, outputs, cite);
   doc.body.appendChild(view);
+  // "Show the steps" lists the inputs its keys name (null = every box in the region).
+  // An argument the compute received but the list leaves out is missing from the
+  // steps: generator other loads, superheat pressure, drying indoor temperature,
+  // Steinhart-Hart C and the 30 s IR reading were until 2026-11-15.
+  let stepKeys = null, stepsObj;
+  Object.defineProperty(outputs, "_steps", { configurable: true, get() { return stepsObj; }, set(v) { const u = v.update.bind(v); v.update = (keys, p, r) => { stepKeys = keys && keys.map((k) => (k && typeof k === "object" ? k.key : k)); return u(keys, p, r); }; stepsObj = v; } });
   try {
     await render(inputs, outputs, cite);
     flushTimers();
@@ -53,6 +59,8 @@ for (const { id } of TOOLS) {
     last = new Map();
     btn.click();
     flushTimers();
+    { const args = lastArgs.get(creg.fn);
+      if (args && typeof args === "object" && Array.isArray(stepKeys)) { const miss = Object.keys(args).filter((k) => args[k] !== undefined && !stepKeys.includes(k)); if (miss.length) report.unshownInputs.push(id + ": " + miss.join(", ")); } }
     // A table, list, or plot drawn for the example must not survive an error: the
     // pump operating point kept its last curve table and plot beside the error
     // until 2026-11-15.

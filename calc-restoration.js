@@ -373,7 +373,7 @@ export function renderDryingGoal(inputRegion, outputRegion, citationEl) {
       // A blank indoor box takes the compute's own default; a typed 0 is no longer replaced by it.
       indoor_temperature_F: iT.input.value === "" ? undefined : Number(iT.input.value),
       margin_GPP: m.input.value === "" ? 10 : Number(m.input.value),
-    }); stepsFor(outputRegion, inputRegion, ["outdoor_temperature_F", "outdoor_RH_percent", "margin_GPP"], r);
+    }); stepsFor(outputRegion, inputRegion, ["outdoor_temperature_F", "outdoor_RH_percent", "indoor_temperature_F", "margin_GPP"], r);
     if (r.error) { ogpp.textContent = r.error; tgpp.textContent = "-"; trh.textContent = "-"; return; }
     ogpp.textContent = fmt(r.outdoor_GPP, 1);
     tgpp.textContent = fmt(r.target_indoor_GPP, 1);
