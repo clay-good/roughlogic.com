@@ -2739,7 +2739,7 @@ cross-check.
 | calc-lab.js | `computeSerialDilution` | `{ starting_concentration = 0, dilution_factor = 10, volume_per_tube = 0.001, ...` | _ | _ | _ |
 | calc-lab.js | `computeVanDerWaals` | `{ gas = "carbon-dioxide", moles = 0, volume_l = 0, temperature_c = 25 } = {}` | _ | _ | _ |
 | calc-lab.js | `renderOd600CellCount` | `inputRegion, outputRegion, citationEl` | _ | _ | _ |
-| calc-labmolecular.js | `computeCfuPlateCount` | `{ colonies = 0, dilution_factor = 0, volume_ml = 0, low = 15, high = 300 } = {}` | _ | _ | _ |
+| calc-labmolecular.js | `computeCfuPlateCount` | `{ colonies = 0, dilution_factor = 0, volume_ml = 0, low = 15, high = 300, cou...` | _ | _ | _ |
 | calc-labmolecular.js | `computeDoublingTime` | `{ initial_count = 0, final_count = 0, elapsed_time = 0 } = {}` | _ | _ | _ |
 | calc-labmolecular.js | `computeGrowthProjectedCount` | `{ initial_count = 0, doubling_time = 0, elapsed_time = 0 } = {}` | _ | _ | _ |
 | calc-labmolecular.js | `computeLigationMolarRatio` | `{ vector_ng = 0, vector_length_bp = 0, insert_length_bp = 0, molar_ratio = 3 ...` | _ | _ | _ |

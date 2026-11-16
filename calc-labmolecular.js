@@ -97,17 +97,24 @@ LABMOLECULAR_RENDERERS["primer-tm"] = renderPrimerTm;
 // --- v20 T.2: CFU/mL viable plate count (`cfu-plate-count`) ---
 // CFU/mL = colonies / (dilution_factor * volume_plated). Dilution accepted as
 // 1e-5 (factor) or 100000 (x) - both normalized to the same result.
-// dims: in { colonies: dimensionless, dilution_factor: dimensionless, volume_ml: L^3 } out: { cfu_per_ml: dimensionless }
+// dims: in { colonies: dimensionless, dilution_factor: dimensionless, volume_ml: L^3, low: dimensionless, high: dimensionless, countable_range: dimensionless } out: { cfu_per_ml: dimensionless }
 // Countable range defaults to FDA BAM Chapter 3's 15-300 per plate (revised
 // March 2025 from 25-250, and ISO's range). Until 2026-09-24 the default was
 // the superseded 25-250 and the note had APHA and BAM swapped.
-export function computeCfuPlateCount({ colonies = 0, dilution_factor = 0, volume_ml = 0, low = 15, high = 300 } = {}) {
+export function computeCfuPlateCount({ colonies = 0, dilution_factor = 0, volume_ml = 0, low = 15, high = 300, countable_range = null } = {}) {
+  // The page picks a method's range as "15-300", "25-250" or "30-300" (2026-11-15).
+  if (countable_range != null && countable_range !== "") {
+    const m = /^(\d+)-(\d+)$/.exec(String(countable_range));
+    if (!m) return { error: "Countable range must be written low-high, e.g. 15-300." };
+    low = Number(m[1]); high = Number(m[2]);
+  }
   const col = Number(colonies) || 0;
   let df = Number(dilution_factor) || 0;
   const vol = Number(volume_ml) || 0;
   if (col < 0 || !Number.isFinite(col)) return { error: "Colony count must be non-negative." };
   if (!(df > 0 && Number.isFinite(df))) return { error: "Dilution factor must be positive." };
   if (!(vol > 0 && Number.isFinite(vol))) return { error: "Volume plated must be positive (mL)." };
+  if (!(Number(low) >= 0 && Number(high) > Number(low))) return { error: "The countable range needs a low count below the high count." };
   // Normalize: if df >= 1 it is the "times" form (e.g. 100000); multiply.
   // If df < 1 it is the fraction form (e.g. 1e-5); divide.
   const cfuPerMl = df >= 1 ? col * df / vol : col / (df * vol);
@@ -126,20 +133,27 @@ function renderCfuPlateCount(inputRegion, outputRegion, citationEl) {
   const col = makeNumber("Colonies counted", "cfu-col", { step: "any", min: "0" });
   const df = makeNumber("Dilution factor (e.g. 1e-5 or 100000)", "cfu-df", { step: "any", min: "0" });
   const vol = makeNumber("Volume plated (mL)", "cfu-vol", { step: "any", min: "0" });
-  for (const f of [col, df, vol]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { col.input.value = "150"; df.input.value = "0.00001"; vol.input.value = "0.1"; update(); });
+  // The note named three methods' ranges but the page could only use 15-300 (until 2026-11-15).
+  const method = makeSelect("Countable range (the method your lab reports under)", "cfu-m", [
+    { value: "15-300", label: "15-300 (FDA BAM Ch. 3 since March 2025, ISO)", selected: true },
+    { value: "25-250", label: "25-250 (APHA Standard Methods)" },
+    { value: "30-300", label: "30-300 (USDA, AOAC)" },
+  ]);
+  for (const f of [col, df, vol, method]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { col.input.value = "150"; df.input.value = "0.00001"; vol.input.value = "0.1"; method.select.value = "15-300"; update(); });
   const oCfu = makeOutputLine(outputRegion, "CFU/mL", "cfu-out-cfu");
   const oRange = makeOutputLine(outputRegion, "Countable range", "cfu-out-range");
   const oNote = makeOutputLine(outputRegion, "Note", "cfu-out-note");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeCfuPlateCount({ colonies: readNum(col.input), dilution_factor: readNum(df.input), volume_ml: readNum(vol.input) }); stepsFor(outputRegion, inputRegion, ["colonies", "dilution_factor", "volume_ml"], r);
+    const r = computeCfuPlateCount({ colonies: readNum(col.input), dilution_factor: readNum(df.input), volume_ml: readNum(vol.input), countable_range: method.select.value }); stepsFor(outputRegion, inputRegion, ["colonies", "dilution_factor", "volume_ml", "countable_range"], r);
     if (r.error) { oCfu.textContent = r.error; oRange.textContent = ""; oNote.textContent = ""; return; }
     oCfu.textContent = r.cfu_per_ml.toExponential(2) + " CFU/mL";
     oRange.textContent = r.in_countable_range ? "Within countable range" : "Outside countable range";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [col.input, df.input, vol.input]) f.addEventListener("input", update);
+  method.select.addEventListener("change", update);
 }
 LABMOLECULAR_RENDERERS["cfu-plate-count"] = renderCfuPlateCount;
 

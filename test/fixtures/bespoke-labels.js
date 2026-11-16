@@ -133,7 +133,7 @@ export const BESPOKE_LABELS = {
   "center-of-gravity-2point": {"mode":"Mode","reading_1_lb":"Reading at point 1 (lb)","reading_2_lb":"Reading at point 2 (lb)","span_ft":"Distance between points (ft)","total_weight_lb":"Total weight (lb, inverse)","cg_from_1_ft":"CG from point 1 (ft, inverse)"},
   "center-pivot-runtime": {"system_flow_gpm":"System flow Q (gpm)","area_acres":"Irrigated area (acres)","target_depth_in":"Gross target depth (in)","efficiency_pct":"Application efficiency (%)"},
   "cfm-per-ton": {"tons":"Tons","climate":"Climate"},
-  "cfu-plate-count": {"colonies":"Colonies counted","dilution_factor":"Dilution factor (e.g. 1e-5 or 100000)","volume_ml":"Volume plated (mL)"},
+  "cfu-plate-count": {"colonies":"Colonies counted","dilution_factor":"Dilution factor (e.g. 1e-5 or 100000)","volume_ml":"Volume plated (mL)","countable_range":"Countable range (the method your lab reports under)"},
   "cg-load-share": {"total_weight_lb":"Total load weight (lb)","span_in":"Span between pick points (in)","cg_from_p1_in":"Distance from pick 1 to CG (in)"},
   "chain-lever-hoist": {"load_lb":"Load (lb)","rated_wll_lb":"Hoist rated WLL (lb)","mech_adv":"Mechanical advantage","efficiency":"Drivetrain efficiency","lift_ft":"Lift distance (ft)"},
   "chamber-turnover": {"chamber_volume_ft3":"Chamber volume (ft^3)","target_ach":"Target ACH","air_mover_total_cfm":"Air mover total CFM","dehu_cfm":"Dehumidifier CFM"},

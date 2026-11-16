@@ -1,6 +1,7 @@
 // Inputs whose worked examples do not move any output when the input alone changes,
 // each reviewed on 2026-10-07. Read by test/unit/inert-input-guard.test.js; see its header.
 export const INERT_INPUTS = {
+  "cfu-plate-count::countable_range": "the 150-colony example sits inside all three methods' ranges (15-300, 25-250, 30-300); the choice moves the in-range verdict at 20 or 260 colonies",
   "abatement-containment::nam_cfm": "moves the answer once another input changes (1,500 randomized settings)",
   "ada-stair-check::leading_edge_radius_in": "moves the answer once another input changes (1,500 randomized settings)",
   "backflow-test-psi::check2_psi": "moves the answer once another input changes (1,500 randomized settings)",
