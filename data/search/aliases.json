@@ -117692,6 +117692,81 @@
   "term": "framing lumber for a wall 2x4 studs",
   "target": "wood-stud-wall-takeoff",
   "kind": "industry"
+ },
+ {
+  "term": "how many bundles of shingles for a roof",
+  "target": "roofing-squares",
+  "kind": "question"
+ },
+ {
+  "term": "shingle bundles",
+  "target": "roofing-squares",
+  "kind": "industry"
+ },
+ {
+  "term": "btu to heat a room",
+  "target": "manual-j-heating",
+  "kind": "question"
+ },
+ {
+  "term": "how many btu to heat a house",
+  "target": "manual-j-heating",
+  "kind": "question"
+ },
+ {
+  "term": "how many tiles for a floor",
+  "target": "tile-count",
+  "kind": "question"
+ },
+ {
+  "term": "tile for a floor",
+  "target": "tile-count",
+  "kind": "industry"
+ },
+ {
+  "term": "how much mulch do i need",
+  "target": "mulch-topsoil-volume",
+  "kind": "question"
+ },
+ {
+  "term": "pipe size for gpm",
+  "target": "pipe-velocity",
+  "kind": "question"
+ },
+ {
+  "term": "bundles of shingles",
+  "target": "roofing-squares",
+  "kind": "industry"
+ },
+ {
+  "term": "btu to heat",
+  "target": "manual-j-heating",
+  "kind": "question"
+ },
+ {
+  "term": "tiles for a",
+  "target": "tile-count",
+  "kind": "question"
+ },
+ {
+  "term": "inch tiles for a floor",
+  "target": "tile-count",
+  "kind": "question"
+ },
+ {
+  "term": "btu to heat a room by square feet",
+  "target": "manual-j-heating",
+  "kind": "question"
+ },
+ {
+  "term": "mulch for",
+  "target": "mulch-topsoil-volume",
+  "kind": "question"
+ },
+ {
+  "term": "mulch inches deep",
+  "target": "mulch-topsoil-volume",
+  "kind": "industry"
  }
  ]
 }

@@ -1034,6 +1034,9 @@
     {"term":"stump extraction cubic yards","target":"hazard-tree-stump-screen","kind":"industry"},
     {"term":"hanger limb removal fema","target":"hazard-tree-stump-screen","kind":"industry"},
     {"term":"leaning tree 30 degrees","target":"hazard-tree-stump-screen","kind":"industry"},
-    {"term":"stump conversion table","target":"hazard-tree-stump-screen","kind":"industry"}
+    {"term":"stump conversion table","target":"hazard-tree-stump-screen","kind":"industry"},
+    {"term":"how much mulch do i need","target":"mulch-topsoil-volume","kind":"question"},
+    {"term":"mulch for","target":"mulch-topsoil-volume","kind":"question"},
+    {"term":"mulch inches deep","target":"mulch-topsoil-volume","kind":"industry"}
   ]
 }

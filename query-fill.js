@@ -177,7 +177,9 @@ const TERM_STOPWORDS = new Set([
 // trade-specific on purpose; a large synonym table is how a matcher starts
 // guessing.
 // A dimension word written after a length, and the label word it means.
-const POST_WORDS = new Map([["tall", "height"], ["high", "height"], ["deep", "depth"], ["wide", "width"], ["long", "length"], ["thick", "thickness"], ["apart", "spacing"]]);
+// "4 inches deep" on a slab is its thickness, so deep and thick name both.
+const POST_WORDS = new Map([["tall", ["height"]], ["high", ["height"]], ["deep", ["depth", "thickness"]], ["wide", ["width"]], ["long", ["length"]], ["thick", ["thickness", "depth"]], ["apart", ["spacing"]]]);
+const DIMENSION_WORDS = new Set(["height", "depth", "thickness", "width", "length", "spacing"]);
 
 const SHORTHAND = new Map([
   ["amps", "current"], ["amperage", "current"], ["amp", "current"],
@@ -447,7 +449,7 @@ export function queryFill(query, rows, opts) {
     let terms = null;
     if (m) terms = windowTerms(m[1]);
     else if (unitFamily(unit) === "length" && (m = after.match(/^\s+(tall|high|deep|wide|long|thick|apart)\b/i))) {
-      terms = new Set([m[1].toLowerCase(), POST_WORDS.get(m[1].toLowerCase())]);
+      terms = new Set([m[1].toLowerCase(), ...POST_WORDS.get(m[1].toLowerCase())]);
     }
     if (!terms) return;
     const keys = numberRows.filter((r) => rowUnit(r) && unitsCompatible(unit, rowUnit(r)) &&
@@ -604,7 +606,10 @@ export function queryFill(query, rows, opts) {
   // "8 ft tall" on a tile with no height is not this tile's spacing or length
   // either: a number its own words describe as a dimension the tile does not
   // take goes nowhere, rather than to whichever field its unit fits.
-  for (const [qi, b] of backOf) if (b.dimension && b.keys.length !== 1) burned.add(qi);
+  // Only where the tile names its dimensions in these words at all: a stair's
+  // "Total rise" is not refused a "9 ft high" just because no label says height.
+  const namesDimensions = numberRows.some((r) => [...termsByRow.get(r.d)].some((t) => DIMENSION_WORDS.has(t)));
+  for (const [qi, b] of backOf) if (b.dimension && b.keys.length !== 1 && namesDimensions) burned.add(qi);
 
   // Resolve only the unambiguous pairs: one field wanted by one fragment, and
   // that fragment wanting only that field. Everything else is dropped.

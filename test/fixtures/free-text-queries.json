@@ -51,6 +51,12 @@
       "tile": "standing-water",
       "mustNotBind": { "depth_in": "120" },
       "why": "10 ft is the pool's diameter; \"4 ft deep\" is its depth. The diameter, converted to 120 in, filled the depth."
+    },
+    {
+      "query": "how many tiles for a 10 by 12 floor 12 inch tile",
+      "tile": "shower-pan-mortar-bed",
+      "mustNotBind": { "drain_thickness_in": "12" },
+      "why": "A floor-tile count ranked the shower pan first, and the 12 inch TILE filled the mortar bed's thickness at the drain. It now reaches tile-count."
     }
   ]
 }
