@@ -559,6 +559,8 @@ CIVIL_RENDERERS["vertical-curve"] = renderVerticalCurve;
 // dims: in { interval_ft: L, mid_area_ft2: L^2, swell_shrink_factor: dimensionless } out: { total_ft3: L^3, total_yd3: L^3, prismoidal_ft3: L^3, adjusted_ft3: L^3 }
 export function computeEarthworkEndArea({ areas, interval_ft, mid_area_ft2, swell_shrink_factor } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // The page's box is a comma-separated list; a caller may send that same text.
+  if (typeof areas === "string") areas = areas.split(",").map((p) => p.trim()).filter((p) => p !== "");
   if (!Array.isArray(areas) || areas.length < 2) return { error: "Provide at least two station end areas." };
   const A = [];
   for (const a of areas) {

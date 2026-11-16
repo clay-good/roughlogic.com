@@ -41,23 +41,28 @@ const UNIT_SPELLINGS = {
   mm: ["mm", "millimeter", "millimeters"],
   cm: ["cm", "centimeter", "centimeters"],
   m: ["m", "meter", "meters", "metre", "metres"],
+  km: ["km", "kilometer", "kilometers"],
   // area
   in2: ["in²", "in2", "sq in", "sqin", "square inches", "square inch"],
-  ft2: ["ft²", "ft2", "sq ft", "sqft", "square feet", "square foot"],
+  ft2: ["ft²", "ft2", "ft^2", "sq ft", "sqft", "square feet", "square foot"],
   yd2: ["yd²", "yd2", "sq yd", "sqyd", "square yards"],
   m2: ["m²", "m2", "sq m", "square meters"],
+  // Since 2026-11-16 (with ft^2, ft^3, lbf, h, km, Hz, TPI, psia, fl oz and the
+  // dotted "in. w.c."): 80 labels wrote one of these and so declared no unit.
+  acre: ["acre", "acres"],
   // second moment of area -- rare but real (in⁴ x9)
   in4: ["in⁴", "in4"],
   // volume
   in3: ["in³", "in3", "cu in", "cubic inches"],
-  ft3: ["ft³", "ft3", "cu ft", "cuft", "cubic feet", "cubic foot"],
+  ft3: ["ft³", "ft3", "ft^3", "cu ft", "cuft", "cubic feet", "cubic foot"],
   yd3: ["yd³", "yd3", "cu yd", "cubic yards"],
   cy: ["cy", "cubic yard", "cubic yards"],
   gal: ["gal", "gallon", "gallons", "galon", "galones"],
   l: ["l", "liter", "liters", "litre", "litres"],
   ml: ["ml", "milliliter", "milliliters"],
+  floz: ["fl oz", "fl. oz", "floz", "fluid ounce", "fluid ounces"],
   // mass / force
-  lb: ["lb", "lbs", "pound", "pounds", "libra", "libras"],
+  lb: ["lb", "lbs", "lbf", "pound", "pounds", "libra", "libras"],
   kg: ["kg", "kilogram", "kilograms"],
   g: ["g", "gram", "grams"],
   oz: ["oz", "ounce", "ounces"],
@@ -73,7 +78,10 @@ const UNIT_SPELLINGS = {
   pcf: ["pcf"],
   kpa: ["kpa"],
   bar: ["bar"],
-  inwc: ["inwc", "in wc", "in. wc", "iwc", "in w.c."],
+  inwc: ["inwc", "in wc", "in. wc", "iwc", "in w.c.", "in. w.c.", "in w.c", "in. w.c"],
+  // Absolute pressure is its own family: psia and psig differ by the
+  // atmosphere, so neither may silently fill the other.
+  psia: ["psia"],
   // temperature -- NOTE the deliberate omission of a bare "C" and "F".
   // "(C)" in this catalog is as often a coefficient (Hazen-Williams C,
   // Manning's C) as it is Celsius, so a bare letter never reads as a
@@ -118,7 +126,7 @@ const UNIT_SPELLINGS = {
   // time
   s: ["s", "sec", "secs", "second", "seconds"],
   min: ["min", "mins", "minute", "minutes"],
-  hr: ["hr", "hrs", "hour", "hours"],
+  hr: ["h", "hr", "hrs", "hour", "hours"],
   day: ["day", "days"],
   // Months and weeks since 2026-11-15: a loan "Term (months)" field had no unit, so
   // "360 months" could not fill it and "30 years" could not be converted into it.
@@ -129,6 +137,8 @@ const UNIT_SPELLINGS = {
   ppm: ["ppm"],
   "mg/l": ["mg/l", "mgl"],
   db: ["db", "dba", "dbа"],
+  hz: ["hz", "hertz"],
+  tpi: ["tpi"],
 };
 
 // Flattened lookup, built once. Spellings are compared lowercased and with
@@ -201,9 +211,9 @@ export function labelLead(label) {
 // Factors are "how many base units is one of this unit". Base unit is the
 // first listed in each family.
 const UNIT_FAMILIES = {
-  length: { in: 1, ft: 12, yd: 36, mi: 63360, mm: 0.0393700787, cm: 0.393700787, m: 39.3700787 },
-  area: { in2: 1, ft2: 144, yd2: 1296, m2: 1550.0031 },
-  volume: { in3: 1, ft3: 1728, yd3: 46656, cy: 46656, gal: 231, l: 61.0237441, ml: 0.0610237441 },
+  length: { in: 1, ft: 12, yd: 36, mi: 63360, mm: 0.0393700787, cm: 0.393700787, m: 39.3700787, km: 39370.0787 },
+  area: { in2: 1, ft2: 144, yd2: 1296, m2: 1550.0031, acre: 6272640 },
+  volume: { in3: 1, ft3: 1728, yd3: 46656, cy: 46656, gal: 231, l: 61.0237441, ml: 0.0610237441, floz: 1.8046875 },
   mass: { lb: 1, kg: 2.20462262, g: 0.00220462262, oz: 0.0625, ton: 2000, kip: 1000 },
   pressure: { psi: 1, psig: 1, psf: 0.00694444444, ksi: 1000, kpa: 0.145037738, bar: 14.5037738, inwc: 0.0361272893 },
   moment: { "lb-ft": 1, "kip-ft": 1000 },
@@ -225,6 +235,9 @@ const UNIT_FAMILIES = {
   rotation: { rpm: 1 },
   time: { s: 1, min: 60, hr: 3600, day: 86400, wk: 604800, mo: 2629800, yr: 31557600 },
   density: { pcf: 1 },
+  abspressure: { psia: 1 },
+  frequency: { hz: 1 },
+  threadpitch: { tpi: 1 },
   concentration: { ppm: 1, "mg/l": 1 },
   sound: { db: 1 },
   count: { count: 1 },

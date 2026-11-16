@@ -490,3 +490,32 @@ test("query-fill: a name word repeated beside a value names the field", () => {
   assert.equal(Number(f.ceiling_ft), 9);
   assert.equal(Number(f.ear_ft), 4);
 });
+
+// 2026-11-16: a word written only as a select's option is that option, not a
+// field name, and TPI / psia / acres / Hz labels now declare their units.
+test("query-fill: an option word does not name a number field", () => {
+  const rows = [
+    sel("thread_standard", "Thread standard", ["inch", "metric"]),
+    num("major_dia_in", "Major (nominal) diameter"),
+    num("tpi", "Threads per inch", "tpi"),
+  ];
+  const f = queryFill("inch, 0.25, 20 tpi", rows).filled;
+  assert.equal(f.thread_standard, "inch");
+  assert.equal(Number(f.tpi), 20);
+  assert.notEqual(f.tpi, "0.25");
+  // Written as part of the field's name, the other words still match.
+  assert.equal(Number(queryFill("threads per inch 13", rows).filled.tpi), 13);
+});
+
+test("field-units: newer label units resolve, and absolute pressure stays apart", async () => {
+  const { unitFromLabel } = await import("../../field-units.js");
+  assert.equal(unitFromLabel("Threads per inch (TPI, inch)"), "tpi");
+  assert.equal(unitFromLabel("Total static pressure (in. w.c.)"), "inwc");
+  assert.equal(unitFromLabel("Field area (acres; optional)"), "acre");
+  assert.equal(unitFromLabel("Room volume (ft^3, optional)"), "ft3");
+  assert.equal(unitFromLabel("Suction pressure (psia)"), "psia");
+  assert.equal(unitsCompatible("psig", "psia"), false);
+  assert.ok(Math.abs(convertUnit(1, "acre", "ft2") - 43560) < 1e-6);
+  assert.ok(Math.abs(convertUnit(1, "km", "ft") - 3280.8399) < 1e-3);
+  assert.equal(unitFamily("hz"), "frequency");
+});

@@ -130,6 +130,17 @@ test("earthwork-end-area: prismoidal equals end-area for a linear section; swell
   assert.ok("error" in computeEarthworkEndArea({ areas: [100], interval_ft: 100 }));
 });
 
+// 2026-11-16: the End areas box is a comma-separated list. Its schema said
+// "number", so a typed question "end areas 100,100" filled the single value
+// 100100. It is advertised as text now, and the compute takes the same text the
+// page's box holds.
+test("earthwork-end-area: the areas list is text, and the compute reads it", async () => {
+  const { default: S } = await import("../fixtures/bespoke-schemas.js").then((m) => ({ default: Object.values(m)[0] }));
+  assert.strictEqual(S["earthwork-end-area"].inputs.find((i) => i.key === "areas").kind, "text");
+  assert.strictEqual(computeEarthworkEndArea({ areas: "100, 120, 80", interval_ft: 100 }).total_ft3, 21000);
+  assert.ok("error" in computeEarthworkEndArea({ areas: "100100", interval_ft: 100 }));
+});
+
 // --- v25 E.4 slope-stake: fill direction + on-grade ---
 test("slope-stake-cut-fill: fill case and on-grade zero", () => {
   const fill = computeSlopeStakeCutFill({ existing_elev_ft: 98, design_elev_ft: 100, slope_ratio_h: 2, offset_at_hinge_ft: 0 });

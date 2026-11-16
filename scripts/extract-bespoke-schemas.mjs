@@ -450,7 +450,11 @@ function parseFields(body, ns, aliases = DEFAULT_ALIASES) {
     if (fields.has(m[1])) continue;
     let attrs = null;
     if (m[4]) { try { attrs = JSON.parse(m[4].replace(/([{,]\s*)([A-Za-z_]\w*):/g, '$1"$2":').replace(/'/g, '"')); } catch { attrs = null; } }
-    fields.set(m[1], { kind: "number", label: JSON.parse(m[2]), attrs });
+    // A makeNumber box switched to type "text" holds a typed LIST ("100, 100"),
+    // not one number. Advertised as a number until 2026-11-16, so search read
+    // "end areas 100,100" as the single value 100100.
+    const kind = attrs && attrs.type === "text" ? "text" : "number";
+    fields.set(m[1], { kind, label: JSON.parse(m[2]), attrs });
   }
   return fields;
 }

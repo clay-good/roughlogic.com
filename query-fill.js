@@ -450,6 +450,15 @@ export function queryFill(query, rows, opts) {
       const inName = firstWindow ? (nameTokCount.get(w) || 0) : 0;
       if (inWindow <= inName) wanted.delete(w);
     }
+    // A word the window holds ONLY as a select's whole option value is that
+    // option, not a field name. "inch, 0.25, 20 tpi" chose the Inch thread
+    // standard, and "inch" then named "Threads per inch", which took the 0.25
+    // (2026-11-16). Written as part of a longer name ("threads per inch 20"),
+    // the other words of that name still match.
+    for (const r of selectRows) for (const o of r.o) {
+      const tok = String(o).toLowerCase();
+      if (/^[a-z]+$/.test(tok) && toks.includes(tok)) wanted.delete(tok);
+    }
     if (!wanted.size) return;
     const hits = [];
     // Selects compete here even though only number rows get filled in this
