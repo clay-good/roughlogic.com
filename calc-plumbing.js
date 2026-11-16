@@ -1987,7 +1987,8 @@ function _v7p_renderPumpOperatingPoint(inputRegion, outputRegion, citationEl) {
       static_head_ft: Number(stat.input.value) || 0,
       k_friction: Number(k.input.value) || 0,
     }); stepsFor(outputRegion, inputRegion, ["pump", "static_head_ft", "k_friction"], r);
-    if (r.error) { oQ.textContent = r.error; oH.textContent = "-"; oE.textContent = "-"; oA.textContent = "-"; return; }
+    // Until 2026-11-15 an error left the last good plot and curve table on the page beside it.
+    if (r.error) { oQ.textContent = r.error; oH.textContent = "-"; oE.textContent = "-"; oA.textContent = "-"; svgWrap.replaceChildren(); tableWrap.replaceChildren(); return; }
     oQ.textContent = _v7p_fmt(r.operating_gpm, 1) + " gpm";
     oH.textContent = _v7p_fmt(r.head_ft, 1) + " ft";
     oE.textContent = _v7p_fmt(r.efficiency * 100, 1) + " %";

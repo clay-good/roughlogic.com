@@ -32,7 +32,7 @@ for (const r of ROWS) if (!first.has(r.tile_id)) first.set(r.tile_id, r);
 // At the precision a reader can see, as check-example-parity compares inputs:
 // the button types 66.82 where the fixture carries 66.8235.
 const close = (a, b) => a === b || Math.abs(a - b) <= Math.max(Math.abs(b) * 0.001, 1e-12);
-const report = { compared: 0, mismatches: {}, outOfRange: [], droppedLines: [], blankDefault: [], silentErrors: [] };
+const report = { compared: 0, mismatches: {}, outOfRange: [], droppedLines: [], blankDefault: [], silentErrors: [], staleTables: [] };
 for (const { id } of TOOLS) {
   const reg = RENDERER_MAP[id], creg = COMPUTE_MAP[id], row0 = first.get(id);
   if (!reg || !creg || !row0) continue;
@@ -53,6 +53,11 @@ for (const { id } of TOOLS) {
     last = new Map();
     btn.click();
     flushTimers();
+    // A table, list, or plot drawn for the example must not survive an error: the
+    // pump operating point kept its last curve table and plot beside the error
+    // until 2026-11-15.
+    const shapes = () => outputs.querySelectorAll("tr").length + "/" + outputs.querySelectorAll("svg").length + "/" + outputs.querySelectorAll("li").length;
+    const shapes0 = shapes();
     const fire = (el) => { el.dispatchEvent(new Event("input", { bubbles: true })); el.dispatchEvent(new Event("change", { bubbles: true })); flushTimers(); };
     const labelOf = (el) => (view.querySelectorAll("label").find((l) => l.htmlFor === el.id)?.textContent || el.id);
     const argsAfter = (el, v) => { lastArgs.delete(creg.fn); el.value = v; fire(el); return lastArgs.get(creg.fn); };
@@ -73,6 +78,7 @@ for (const { id } of TOOLS) {
             const t = outputs.textContent;
             const words = r.error.replace(/[^A-Za-z ]/g, " ").split(/\s+/).filter((w) => w.length > 4).slice(0, 4);
             if (!words.length || !words.some((w) => t.includes(w))) report.silentErrors.push(id + " (" + el.id + "=" + bad + "): " + r.error.slice(0, 70));
+            if (shapes0 !== "0/0/0" && shapes() === shapes0) report.staleTables.push(id + " (" + el.id + "=" + bad + ") rows/svg/li " + shapes0);
             break;
           }
         }
