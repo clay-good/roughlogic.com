@@ -314,7 +314,7 @@ export function computePumpSize({ flow_gpm, total_dynamic_head_ft, efficiency = 
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (!(Number(flow_gpm) > 0) || !(Number(total_dynamic_head_ft) > 0)) return { error: "Flow (gpm) and total dynamic head (ft) must be positive." };
   if (Number(efficiency) > 1 || Number(efficiency) <= 0) return { error: "Pump efficiency is a fraction above 0 and at most 1 (0.65, not 65)." };
-  if ([fluid_specific_gravity].some((x) => Number(x) < 0)) return { error: "Fluid specific gravity cannot be negative." };
+  if (!(Number(fluid_specific_gravity) > 0)) return { error: "Fluid specific gravity must be above 0 (1.0 for water)." };
   // Hydraulic horsepower: HP_h = (Q * H * SG) / 3960.  Pump shaft hp = HP_h / efficiency.
   const hp_h = (flow_gpm * total_dynamic_head_ft * fluid_specific_gravity) / 3960;
   const hp_shaft = efficiency > 0 ? hp_h / efficiency : null;
@@ -533,17 +533,21 @@ export function renderPumpSizing(inputRegion, outputRegion, citationEl) {
   const tdh = makeNumber("Total dynamic head (ft)", "pm-h", { step: "any", min: "0" });
   const eff = makeNumber("Pump efficiency (0-1)", "pm-e", { step: "any", min: "0", max: "1", value: "0.65" });
   eff.input.value = "0.65";
-  for (const f of [flow, tdh, eff]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { flow.input.value = "100"; tdh.input.value = "80"; eff.input.value = "0.65"; update(); });
+  // The citation's formula carries SG, and the compute took it; the page assumed water
+  // until 2026-11-15 (a 1.2 SG brine needs 20% more horsepower).
+  const sg = makeNumber("Fluid specific gravity (1.0 water)", "pm-sg", { step: "any", min: "0", value: "1" });
+  sg.input.value = "1";
+  for (const f of [flow, tdh, eff, sg]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { flow.input.value = "100"; tdh.input.value = "80"; eff.input.value = "0.65"; sg.input.value = "1"; update(); });
   const oH = makeOutputLine(outputRegion, "Hydraulic hp", "pm-out-h");
   const oS = makeOutputLine(outputRegion, "Shaft hp", "pm-out-s");
   const update = debounce(() => {
-    const r = computePumpSize({ flow_gpm: Number(flow.input.value) || 0, total_dynamic_head_ft: Number(tdh.input.value) || 0, efficiency: eff.input.value === "" ? 0.65 : Number(eff.input.value) }); stepsFor(outputRegion, inputRegion, ["flow_gpm", "total_dynamic_head_ft", "efficiency"], r);
+    const r = computePumpSize({ flow_gpm: Number(flow.input.value) || 0, total_dynamic_head_ft: Number(tdh.input.value) || 0, efficiency: eff.input.value === "" ? 0.65 : Number(eff.input.value), fluid_specific_gravity: sg.input.value === "" ? undefined : Number(sg.input.value) }); stepsFor(outputRegion, inputRegion, ["flow_gpm", "total_dynamic_head_ft", "efficiency", "fluid_specific_gravity"], r);
     if (r.error) { oH.textContent = r.error; oS.textContent = "-"; return; }
     oH.textContent = fmt(r.hydraulic_hp, 2);
     oS.textContent = r.shaft_hp === null ? "-" : fmt(r.shaft_hp, 2);
   }, DEBOUNCE_MS);
-  for (const el of [flow.input, tdh.input, eff.input]) el.addEventListener("input", update);
+  for (const el of [flow.input, tdh.input, eff.input, sg.input]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }

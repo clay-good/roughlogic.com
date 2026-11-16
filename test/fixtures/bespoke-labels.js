@@ -692,7 +692,7 @@ export const BESPOKE_LABELS = {
   "pulling-tension": {"cable_weight_lb_per_ft":"Cable weight (lb/ft)","run_length_ft":"Total run length (ft)","lubricant":"Lubricant","straight_run_ft":"Straight run before bends (ft)"},
   "pulse-flowmeter-k-factor": {"frequency_hz":"Output frequency (Hz = pulses/sec)","k_factor_pulses_per_gal":"K-factor (pulses per gallon)"},
   "pump-operating-point": {"pump":"Pump curve","static_head_ft":"Static head (ft)","k_friction":"Friction k (ft per gpm²)"},
-  "pump-sizing": {"flow_gpm":"Flow (gpm)","total_dynamic_head_ft":"Total dynamic head (ft)","efficiency":"Pump efficiency (0-1)"},
+  "pump-sizing": {"flow_gpm":"Flow (gpm)","total_dynamic_head_ft":"Total dynamic head (ft)","efficiency":"Pump efficiency (0-1)","fluid_specific_gravity":"Fluid specific gravity (1.0 water)"},
   "pump-tdh": {"flow_gpm":"Flow rate (GPM)","internal_diameter_in":"Pipe internal diameter (in)","hw_c":"Hazen-Williams C (150 PVC / 130 steel)","static_suction_lift_ft":"Static suction lift (ft; negative if flooded)","static_discharge_head_ft":"Static discharge head (ft)","suction_length_ft":"Suction pipe length (ft)","discharge_length_ft":"Discharge pipe length (ft)","fittings_equiv_length_ft":"Fittings equivalent length (ft)"},
   "punch-capacity": {"capacity_tons":"Press capacity (tons)","shear_strength_psi":"Shear strength (psi, ~0.8 x UTS)","solve_for":"Solve for","diameter_in":"Hole diameter (in)","thickness_in":"Material thickness (in)"},
   "punch-force": {"shape":"Hole shape","diameter_in":"Hole diameter (in, round)","side_a_in":"Side a (in, rectangular)","side_b_in":"Side b (in, rectangular)","perimeter_in":"Cut perimeter (in, direct)","thickness_in":"Material thickness T (in)","shear_strength_psi":"Shear strength (psi)"},
