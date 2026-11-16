@@ -746,7 +746,8 @@ function renderHOS(inputRegion, outputRegion, citationEl) {
   for (let i = 0; i < 6; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
     const k = document.createElement("select");
-    k.setAttribute("aria-label", "Duty status for segment " + (i + 1));
+    // An id, so a shared link carries the duty status (until 2026-11-15 it reopened as "drive").
+    k.setAttribute("aria-label", "Duty status for segment " + (i + 1)); k.id = "hos-s" + i + "-k";
     for (const v of ["drive", "on_duty", "sleeper", "off_duty"]) {
       const o = document.createElement("option"); o.value = v; o.textContent = v.replace("_", " "); k.appendChild(o);
     }

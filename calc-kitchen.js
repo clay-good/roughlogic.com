@@ -358,7 +358,7 @@ function renderRecipeScale(inputRegion, outputRegion, citationEl) {
   for (let i = 0; i < 6; i++) {
     const wrap = document.createElement("div"); wrap.className = "field";
     const ing = document.createElement("select");
-    ing.setAttribute("aria-label", "Ingredient " + (i + 1));
+    ing.setAttribute("aria-label", "Ingredient " + (i + 1)); ing.id = "rs-i" + i + "-ing";
     const noneOpt = document.createElement("option"); noneOpt.value = ""; noneOpt.textContent = "(none)";
     ing.appendChild(noneOpt);
     for (const k of Object.keys(INGREDIENT_DENSITIES_G_PER_CUP)) {
@@ -367,7 +367,7 @@ function renderRecipeScale(inputRegion, outputRegion, citationEl) {
     const qtyF = makeRowField("Ingredient " + (i + 1) + " quantity", "rs-i" + i + "-qty", { step: "any", min: "0" });
     const qty = qtyF.input;
     const unit = document.createElement("select");
-    unit.setAttribute("aria-label", "Unit for ingredient " + (i + 1));
+    unit.setAttribute("aria-label", "Unit for ingredient " + (i + 1)); unit.id = "rs-i" + i + "-unit";
     for (const u of ["cup", "tbsp", "tsp", "egg", "g", "oz", "ml"]) {
       const o = document.createElement("option"); o.value = u; o.textContent = u; unit.appendChild(o);
     }

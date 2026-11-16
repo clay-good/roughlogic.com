@@ -2041,7 +2041,7 @@ function renderPhaseBalance(inputRegion, outputRegion, citationEl, params) {
     wrap.className = "field";
     const circuitNum = rows.length + 1;
     const ph = document.createElement("select");
-    ph.setAttribute("aria-label", "Phase for circuit " + circuitNum);
+    ph.setAttribute("aria-label", "Phase for circuit " + circuitNum); ph.id = "pb-c" + circuitNum + "-ph";
     for (const v of ["A", "B", "C"]) {
       const o = document.createElement("option"); o.value = v; o.textContent = "Phase " + v; if (v === phaseVal) o.selected = true; ph.appendChild(o);
     }

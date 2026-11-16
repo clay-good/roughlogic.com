@@ -36,7 +36,9 @@ for (const r of ROWS) if (!first.has(r.tile_id)) first.set(r.tile_id, r);
 // At the precision a reader can see, as check-example-parity compares inputs:
 // the button types 66.82 where the fixture carries 66.8235.
 const close = (a, b) => a === b || Math.abs(a - b) <= Math.max(Math.abs(b) * 0.001, 1e-12);
-const report = { compared: 0, mismatches: {}, dirty: [] };
+const report = { compared: 0, mismatches: {}, dirty: [], link: [], noid: [] };
+const { applyHashState } = await import('../../hash-state.js');
+if (!globalThis.CSS) globalThis.CSS = { escape: (s) => s };
 for (const { id } of TOOLS) {
   const reg = RENDERER_MAP[id], creg = COMPUTE_MAP[id], row0 = first.get(id);
   if (!reg || !creg || !row0) continue;
@@ -52,6 +54,9 @@ for (const { id } of TOOLS) {
   try {
     await render(inputs, outputs, cite);
     flushTimers();
+    // A shared link (hash-state.js) carries only controls with an id: the row selects of
+    // phase balance, hours of service and recipe scale had none until 2026-11-15.
+    { const n = inputs.querySelectorAll("input, select, textarea").filter((el) => !el.id && el.type !== "button"); if (n.length) report.noid.push(id + " " + n.length + " " + [...new Set(n.map((e) => e.tagName + ":" + (e.getAttribute("aria-label") || "")))].slice(0,2).join(" | ")); }
     const btn = view.querySelectorAll("button").find((b) => b.classList.contains("example-btn"));
     if (!btn) continue;
     last = new Map();
@@ -59,6 +64,16 @@ for (const { id } of TOOLS) {
     flushTimers();
     const page = last.get(creg.fn);
     if (!page || typeof page !== "object" || page.error) continue;
+    // Shared-link round trip: collect what the URL would carry, render the tile fresh,
+    // apply it as the view does, and the answer must be the same.
+    { const params = {}; const noId = [];
+      for (const el of inputs.querySelectorAll("input, select, textarea")) { if (el.type === "button") continue; if (!el.id) { if (el.value !== "" || el.checked) noId.push(el.tagName); continue; } const v = el.type === "checkbox" ? (el.checked ? "1" : "0") : el.value; if (v !== "") params[el.id] = v; }
+      doc.body.replaceChildren(); const view2 = doc.createElement("section"); const in2 = doc.createElement("div"), out2 = doc.createElement("div"), c2 = doc.createElement("p"); view2.append(in2, out2, c2); doc.body.appendChild(view2);
+      await render(in2, out2, c2); flushTimers(); last = new Map(); applyHashState(in2, params); flushTimers();
+      const back = last.get(creg.fn);
+      const d = back && typeof back === "object" ? Object.entries(page).filter(([k, v]) => typeof v === "number" && Number.isFinite(v) && !(typeof back[k] === "number" && close(v, back[k]))) : [["(no compute)", 0]];
+      if (d.length || (back && back.error)) report.link.push(id + (noId.length ? " [noId " + noId.length + "]" : "") + ": " + (back && back.error ? "ERROR " + back.error.slice(0, 60) : d.slice(0, 2).map(([k, v]) => k + " " + v + " -> " + (back ? back[k] : "-")).join("; ")));
+      doc.body.replaceChildren(view); }
     // Fill every box and pick the last option of every select, then press the button
     // again: the answer must be the same, because the example resets what it does not
     // name (103 tiles kept the reader's optional boxes until 2026-11-15).
