@@ -117812,6 +117812,11 @@
   "term": "ac tonnage for",
   "target": "manual-j-cooling",
   "kind": "question"
+ },
+ {
+  "term": "markup percent on dollars of cost",
+  "target": "markup",
+  "kind": "question"
  }
  ]
 }
