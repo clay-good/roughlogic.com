@@ -69,3 +69,10 @@ test("the door answers with a field's default instead of asking for it", async (
   assert.equal(s.status, "OK");
   assert.equal(s.result.field_studs, 31);
 });
+
+// 2026-11-16: a dropdown's value after its label, and abbreviations, do not
+// stop a calculator answering to its own name.
+test("named with a dropdown value the field index does not list", async () => {
+  assert.equal((await answerQuery({ query: "Pressure Conversion Value 1, From atm, To psi" })).id, "pressure-conversion");
+  assert.equal((await answerQuery({ query: "Culvert Headwater by Inlet Control (HDS-5) Culvert diameter 36 in, Design discharge Q 30 cfs, Barrel slope S 0.01, Shape and inlet edge concrete_square_headwall" })).id, "culvert-inlet-control");
+});

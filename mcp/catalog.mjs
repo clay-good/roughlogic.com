@@ -1366,9 +1366,33 @@ async function nameThenOwnFields(q, byId) {
       for (const o of r.o || []) for (const w of String(o).toLowerCase().split(/[^a-z0-9.]+/)) if (w) own.add(w);
       if (r.u) for (const w of String(r.u).toLowerCase().split(/[^a-z0-9]+/)) if (w) own.add(w);
     }
-    const rest = toks.slice(len);
+    // Select options the field index does not carry come from the tile's own
+    // contract, and a checkbox's value is a boolean word (2026-11-16: "From
+    // atm", "Surcharge load near trench false", "pinned", "incl." kept 9
+    // calculators from answering to their own name).
+    try {
+      const described = await describe({ id: tool.id });
+      for (const inp of described.inputs || []) for (const o of inp.options || []) {
+        for (const w of String(o && typeof o === "object" ? o.value : o).toLowerCase().split(/[^a-z0-9]+/)) if (w) own.add(w);
+      }
+    } catch { /* the field rows alone */ }
+    // A comma-separated segment that opens with a dropdown's or checkbox's
+    // label carries that field's value after it, whatever its words are.
+    const choiceLabels = rows.filter((r) => r.k === "select" || r.k === "checkbox" || r.k === "text")
+      .map((r) => String(r.l || "").toLowerCase().split(/[^a-z0-9]+/).filter(Boolean)).filter((w) => w.length);
+    for (const seg of String(q).toLowerCase().split(",")) {
+      const w = seg.split(/[^a-z0-9.]+/).filter(Boolean).map((t) => (/\d/.test(t) ? t : t.replace(/\./g, "")));
+      for (const lab of choiceLabels) {
+        // the label may follow the calculator's name in the first segment
+        for (let at = 0; at + lab.length <= w.length; at++) {
+          if (lab.every((x, i) => w[at + i] === x)) { for (const v of w.slice(at + lab.length)) if (!/\d/.test(v)) own.add(v); break; }
+        }
+      }
+    }
+    const rest = toks.slice(len).map((t) => (/\d/.test(t) ? t : t.replace(/\./g, ""))).filter(Boolean);
     return rest.some((t) => /\d/.test(t)) && rest.every((t) => own.has(t) || NAME_FIELD_CONNECTIVES.has(t) ||
-      /^[\d.]+$/.test(t) || canonicalUnit(t) !== null || (t.endsWith("s") && own.has(t.slice(0, -1))));
+      /^[\d.]+$/.test(t) || canonicalUnit(t) !== null || (t.endsWith("s") && own.has(t.slice(0, -1))) ||
+      /^(true|false|yes|no|eg)$/.test(t));
   };
   for (const c of whole) if (await fits(c)) return { id: c.tool.id, name: c.tool.name };
   if (!partial.length || partial.length > 12) return null;
