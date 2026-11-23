@@ -628,3 +628,26 @@ test("query-fill: weather degrees are temperatures", () => {
   const bend = [num("angle_deg", "Bend angle", "deg"), num("t_f", "Temperature", "degf")];
   assert.equal(queryFill("bend angle 30 degrees", bend).filled.angle_deg, "30");
 });
+
+// 2026-11-23: question-sweep fills that came back empty or half-filled.
+test("query-fill: a post-word names the label that uses it, run keeps its term", () => {
+  const stairs = [num("total_rise_in", "Total rise", "in"), num("preferred_riser_height_in", "Preferred riser height", "in")];
+  assert.deepEqual(queryFill("stair stringer 9 ft rise", stairs).filled, { total_rise_in: "108" });
+  const rafter = [num("horizontal_span_ft", "Horizontal run", "ft"), num("pitch_rise_per_12", "Pitch"), num("overhang_ft", "Overhang", "ft")];
+  assert.equal(queryFill("roof pitch 6/12 rafter length 14 ft run", rafter).filled.horizontal_span_ft, "14");
+  assert.ok(labelTerms("Horizontal run").has("run"));
+});
+
+test("query-fill: a 2x6 is thickness by width, pieces is the count", () => {
+  const bf = [num("thickness_in", "Thickness", "in"), num("width_in", "Width", "in"), num("length_ft", "Length", "ft"), num("count", "Count", "count")];
+  assert.deepEqual(queryFill("board feet in 2x6 8 ft long 20 pieces", bf).filled,
+    { thickness_in: "2", width_in: "6", length_ft: "8", count: "20" });
+});
+
+test("query-fill: a third plan side is the depth", () => {
+  const vol = [num("area_ft2", "Area", "ft2"), num("depth_in", "Depth", "in"), num("bulk_density", "Bulk density")];
+  assert.deepEqual(queryFill("cubic yards of dirt 30 by 40 by 2 ft", vol).filled, { area_ft2: "1200", depth_in: "24" });
+  assert.deepEqual(queryFill("30 by 40 by 6 inches of topsoil", vol).filled, { area_ft2: "1200", depth_in: "6" });
+  // Two sides only: no depth is invented.
+  assert.equal(queryFill("30 by 40 by", vol).filled.depth_in, undefined);
+});

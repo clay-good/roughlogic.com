@@ -88,11 +88,15 @@ function _r(spec) {
 // ===================== spec-v417..v419: landscape/agriculture trio (Group L) =====================
 
 // dims: in { area_ft2: L^2, depth_in: L, bulk_density: M L^-3, bag_ft3: L^3, load_yd3: L^3, waste_pct: dimensionless } out: { yd3: L^3, bags: dimensionless, tons: M, loads: dimensionless }
-export function computeMulchTopsoilVolume({ area_ft2 = 0, depth_in = 0, bulk_density = 0, bag_ft3 = 2, load_yd3 = 10, waste_pct = 0 } = {}) {
+export function computeMulchTopsoilVolume({ area_ft2 = 0, depth_in = 0, bulk_density, bag_ft3 = 2, load_yd3 = 10, waste_pct = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const area = Number(area_ft2) || 0;
   const depth = Number(depth_in) || 0;
-  const dens = Number(bulk_density) || 0;
+  // Density only weighs the volume. Left blank, the yards, bags and loads
+  // still answer and tons is null (2026-11-23: "yards of mulch for 200 sq ft
+  // 3 inches deep" was refused for a density nobody needs to answer it).
+  const densBlank = bulk_density == null || bulk_density === "";
+  const dens = densBlank ? null : Number(bulk_density);
   // A typed 0 or negative was quietly read as the default until 2026-11-15.
   if (bag_ft3 != null && bag_ft3 !== "" && !(Number(bag_ft3) > 0)) return { error: "Bag volume must be above 0 cu ft (2 default)." };
   if (load_yd3 != null && load_yd3 !== "" && !(Number(load_yd3) > 0)) return { error: "Bulk load must be above 0 cu yd (10 default)." };
@@ -101,11 +105,11 @@ export function computeMulchTopsoilVolume({ area_ft2 = 0, depth_in = 0, bulk_den
   const waste = Number(waste_pct) || 0;
   if (!(area > 0)) return { error: "Area must be positive (ft^2)." };
   if (!(depth > 0)) return { error: "Depth must be positive (in)." };
-  if (!(dens > 0)) return { error: "Bulk density must be positive (ton/yd^3)." };
+  if (!densBlank && !(dens > 0)) return { error: "Bulk density must be positive (ton/yd^3), or left blank to skip the weight." };
   if (waste < 0) return { error: "Waste allowance must be non-negative (%)." };
   const yd3 = area * (depth / 12) / 27 * (1 + waste / 100);
   const bags = Math.ceil(yd3 * 27 / bag - 1e-9);
-  const tons = yd3 * dens;
+  const tons = dens === null ? null : yd3 * dens;
   const loads = Math.ceil(yd3 / load - 1e-9);
   return {
     yd3, bags, tons, loads,
@@ -128,10 +132,10 @@ function renderMulchTopsoilVolume(inputRegion, outputRegion, citationEl) {
   const oNote = makeOutputLine(outputRegion, "Note", "mtv-out-n");
   function readNum(i) { if (i.value === "") return 0; const n = Number(i.value); return Number.isFinite(n) ? n : 0; }
   const update = debounce(() => {
-    const r = computeMulchTopsoilVolume({ area_ft2: readNum(area.input), depth_in: readNum(depth.input), bulk_density: readNum(dens.input), bag_ft3: bag.input.value === "" ? undefined : Number(bag.input.value), load_yd3: load.input.value === "" ? undefined : Number(load.input.value), waste_pct: readNum(waste.input) }); stepsFor(outputRegion, inputRegion, ["area_ft2", "depth_in", "bulk_density", "bag_ft3", "load_yd3", "waste_pct"], r);
+    const r = computeMulchTopsoilVolume({ area_ft2: readNum(area.input), depth_in: readNum(depth.input), bulk_density: dens.input.value === "" ? undefined : Number(dens.input.value), bag_ft3: bag.input.value === "" ? undefined : Number(bag.input.value), load_yd3: load.input.value === "" ? undefined : Number(load.input.value), waste_pct: readNum(waste.input) }); stepsFor(outputRegion, inputRegion, ["area_ft2", "depth_in", "bulk_density", "bag_ft3", "load_yd3", "waste_pct"], r);
     if (r.error) { oYd.textContent = r.error; oBags.textContent = ""; oNote.textContent = ""; return; }
     oYd.textContent = fmt(r.yd3, 2) + " yd^3";
-    oBags.textContent = r.bags + " " + (r.bags === 1 ? "bag" : "bags") + " / " + fmt(r.tons, 1) + " tons / " + r.loads + " load(s)";
+    oBags.textContent = r.bags + " " + (r.bags === 1 ? "bag" : "bags") + " / " + (r.tons === null ? "tons: enter a bulk density" : fmt(r.tons, 1) + " tons") + " / " + r.loads + " load(s)";
     oNote.textContent = r.note;
   }, DEBOUNCE_MS);
   for (const f of [area.input, depth.input, dens.input, bag.input, load.input, waste.input]) f.addEventListener("input", update);

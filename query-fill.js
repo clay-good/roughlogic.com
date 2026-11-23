@@ -221,6 +221,9 @@ export function labelTerms(labelLead) {
   const whole = cleaned.trim();
   if (whole && whole.length >= 2 && whole.length <= 5 && !/\s/.test(whole)) out.add(whole);
   for (const raw of cleaned.split(/[^a-z]+/)) {
+    // "Horizontal run" lost its "run" to the floor, so "14 ft run" had no
+    // field to name (2026-11-23). The one three-letter dimension word stays.
+    if (raw === "run") { out.add(raw); continue; }
     if (!raw || raw.length < 4) continue;
     if (TERM_STOPWORDS.has(raw)) continue;
     out.add(raw);
@@ -504,8 +507,40 @@ export function queryFill(query, rows, opts) {
           // a single area field.
           filled[areas[0].d] = String(Math.round(a * b * 1e6) / 1e6); done = true;
         }
+        // "30 by 40 by 2 ft": the third side is the depth. A tile that takes
+        // the plan as an area and asks for one depth or thickness gets both
+        // (2026-11-23; the area was left empty and only the 2 ft filled).
+        const third = text.slice(end).match(/^\s*(?:by|x)\s*(\d+(?:\.\d+)?)\s*(?:ft|feet|foot|in\b|inch|inches)/);
+        if (third) {
+          const thirdQi = quantities.findIndex((q) => q.index >= end && q.index < end + third[0].length);
+          const deep = numberRows.filter((r) => rowUnit(r) && unitFamily(rowUnit(r)) === "length" &&
+            ["depth", "thickness"].some((w) => termsByRow.get(r.d).has(w)));
+          const value = thirdQi >= 0 && deep.length === 1 ? valueFor(quantities[thirdQi], deep[0], text, labelWords) : null;
+          if (value !== null && !done && !len.length && !wid.length && areas.length === 1) {
+            filled[areas[0].d] = String(Math.round(a * b * 1e6) / 1e6); done = true;
+          }
+          if (value !== null && done) {
+            filled[deep[0].d] = value;
+            for (const i of [...inPair, thirdQi]) { suppressed.add(i); claimed.add(i); }
+          }
+        }
         if (done) for (const i of inPair) { suppressed.add(i); claimed.add(i); }
       }
+    }
+  }
+
+  // --- Nominal lumber on a tile that asks for thickness and width -----------
+  // A 2x6 is 2 thick by 6 wide. The rewrite names the sides "width" and
+  // "depth" (a joist's words), so on board-footage the 2 took Width and the 6
+  // went nowhere (2026-11-23).
+  {
+    const lumber = quantities.map((q, i) => (q.lumber ? i : -1)).filter((i) => i >= 0);
+    const inRow = (w) => numberRows.filter((r) => rowUnit(r) === "in" && termsByRow.get(r.d).has(w));
+    const thick = inRow("thickness"), wide = inRow("width");
+    if (lumber.length === 2 && thick.length === 1 && wide.length === 1 && !inRow("depth").length && thick[0].d !== wide[0].d) {
+      filled[thick[0].d] = String(quantities[lumber[0]].value);
+      filled[wide[0].d] = String(quantities[lumber[1]].value);
+      for (const i of lumber) { suppressed.add(i); claimed.add(i); }
     }
   }
 
@@ -544,6 +579,10 @@ export function queryFill(query, rows, opts) {
       const noun = raw.replace(/(?<=[a-z]{3})s$/, "");
       let keys = numberRows.filter((r) => (!rowUnit(r) || rowUnit(r) === "count") &&
         (termsByRow.get(r.d).has(noun) || termsByRow.get(r.d).has(raw))).map((r) => r.d);
+      // "20 pieces" names no label, but it is the tile's one Count/Quantity.
+      if (!keys.length && /^(?:pieces?|pcs)$/.test(raw)) {
+        keys = numberRows.filter((r) => ["count", "quantity"].some((w) => termsByRow.get(r.d).has(w))).map((r) => r.d);
+      }
       // "Corners" beside "Extra studs per corner": the label using the word
       // exactly as typed is the count.
       if (keys.length > 1) {
@@ -577,8 +616,16 @@ export function queryFill(query, rows, opts) {
       }
       return;
     }
-    const keys = numberRows.filter((r) => rowUnit(r) && unitsCompatible(unit, rowUnit(r)) &&
+    let keys = numberRows.filter((r) => rowUnit(r) && unitsCompatible(unit, rowUnit(r)) &&
       [...termsByRow.get(r.d)].some((t) => terms.has(t))).map((r) => r.d);
+    // "9 ft rise" names "Total rise", not "Preferred riser height", which only
+    // shares the synonym: the label using the written word itself wins
+    // (2026-11-23; the tie dropped the rise and the stair tile filled nothing).
+    if (keys.length > 1 && !/^\s+of\s/i.test(m[0])) {
+      const word = m[1].toLowerCase();
+      const literal = keys.filter((k) => termsByRow.get(k).has(word));
+      if (literal.length === 1) keys = literal;
+    }
     backOf.set(qi, { cut: m[0].length, keys, dimension: !/^\s+of\s/i.test(m[0]) });
   });
   quantities.forEach((qty, qi) => {

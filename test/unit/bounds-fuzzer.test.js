@@ -23124,6 +23124,10 @@ test("bounds: spec-v417 computeMulchTopsoilVolume pins the volume, bags/tons/loa
   assert.ok("error" in _v417({ area_ft2: 0, depth_in: 3, bulk_density: 1.1 }));
   assert.ok("error" in _v417({ area_ft2: 1000, depth_in: 0, bulk_density: 1.1 }));
   assert.ok("error" in _v417({ area_ft2: 1000, depth_in: 3, bulk_density: 0 }));
+  // 2026-11-23: a blank density still answers the volume; only tons is null.
+  const blank = _v417({ area_ft2: 1000, depth_in: 3 });
+  assert.ok(Math.abs(blank.yd3 - r.yd3) < 1e-12 && blank.bags === 125 && blank.loads === 1 && blank.tons === null);
+  assert.ok("error" in _v417({ area_ft2: 1000, depth_in: 3, bulk_density: -1 }));
   assert.ok("error" in _v417({ area_ft2: Infinity, depth_in: 3, bulk_density: 1.1 }));
 });
 
