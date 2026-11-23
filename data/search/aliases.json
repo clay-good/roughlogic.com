@@ -117967,6 +117967,16 @@
   "term": "pavers for square feet",
   "target": "paver-patio",
   "kind": "question"
+ },
+ {
+  "term": "how many joists",
+  "target": "joist-hanger-count",
+  "kind": "question"
+ },
+ {
+  "term": "number of deck joists at inches on center",
+  "target": "joist-hanger-count",
+  "kind": "question"
  }
  ]
 }

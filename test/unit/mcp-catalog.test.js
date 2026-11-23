@@ -799,3 +799,13 @@ test("answer_query: drywall for a room answers from its size", async () => {
   assert.equal(a.status, "OK");
   assert.equal(a.result.total_ft2, 584);
 });
+
+test("answer_query: joists for a deck and siding for a wall reach their calculators", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  const j = await answerQuery({ query: "how many joists for a 16 ft deck 16 inches on center" });
+  assert.equal(j.id, "joist-hanger-count");
+  assert.deepEqual([j.inputs.run_width_ft, j.inputs.spacing_in], ["16", "16"]);
+  const s = await answerQuery({ query: "how many square feet of siding 40 ft wall 10 ft tall" });
+  assert.equal(s.id, "siding-takeoff");
+  assert.equal(s.inputs.wall_area_sf, "400");
+});

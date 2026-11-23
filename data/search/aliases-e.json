@@ -6520,6 +6520,8 @@
     {"term":"how much paint","target":"paint-coverage","kind":"question"},
     {"term":"carpet for","target":"carpet-takeoff","kind":"question"},
     {"term":"how many pavers","target":"paver-patio","kind":"question"},
-    {"term":"pavers for square feet","target":"paver-patio","kind":"question"}
+    {"term":"pavers for square feet","target":"paver-patio","kind":"question"},
+    {"term":"how many joists","target":"joist-hanger-count","kind":"question"},
+    {"term":"number of deck joists at inches on center","target":"joist-hanger-count","kind":"question"}
   ]
 }

@@ -691,3 +691,11 @@ test("query-fill: an item's two sides, and a room's floor for a floor covering",
   // A room's plan is still not a paint area.
   assert.equal(queryFill("paint for a 12 by 15 room", [num("area_ft2", "Area", "ft2")]).filled.area_ft2, undefined);
 });
+
+test("query-fill: a wall by its length and height is its area", () => {
+  const sid = [num("wall_area_sf", "Gross wall area", "ft2"), num("exposure_in", "Lap exposure / reveal", "in")];
+  assert.deepEqual(queryFill("siding for a 40 ft wall 10 ft tall", sid).filled, { wall_area_sf: "400" });
+  // Not where the tile asks for the length and height themselves.
+  const wall = [num("wall_area_sf", "Wall area", "ft2"), num("length_ft", "Wall length", "ft"), num("height_ft", "Wall height", "ft")];
+  assert.equal(queryFill("40 ft wall 10 ft tall", wall).filled.wall_area_sf, undefined);
+});

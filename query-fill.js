@@ -550,6 +550,19 @@ export function queryFill(query, rows, opts) {
     }
   }
 
+  // --- A wall by its length and height: "40 ft wall 10 ft tall" ----------
+  // On a tile that takes the wall as one area and asks for no length or
+  // height, the two are its area (2026-11-23: siding filled nothing).
+  {
+    const m = text.match(/(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)\s+(?:long\s+)?walls?\s+(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)\s+(?:tall|high)\b/);
+    const wallArea = numberRows.filter((r) => rowUnit(r) === "ft2" && termsByRow.get(r.d).has("wall"));
+    const sides = numberRows.filter((r) => rowUnit(r) && unitFamily(rowUnit(r)) === "length" && ["length", "height"].some((w) => termsByRow.get(r.d).has(w)));
+    if (m && wallArea.length === 1 && !sides.length && !(wallArea[0].d in filled)) {
+      filled[wallArea[0].d] = String(Math.round(Number(m[1]) * Number(m[2]) * 1e6) / 1e6);
+      quantities.forEach((q, i) => { if (q.index >= m.index && q.index < m.index + m[0].length) { suppressed.add(i); claimed.add(i); } });
+    }
+  }
+
   // --- An item's two sides: "4 by 8 pavers", "6x24 tile" -------------------
   // A size pair followed by the name of an item whose two sides the tile asks
   // for in inches (length or height, and width) fills both, the larger as the
