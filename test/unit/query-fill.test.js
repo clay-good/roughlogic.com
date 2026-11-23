@@ -806,3 +806,9 @@ test("query-fill: an exact-label tie-break counts every word of the label", () =
   assert.deepEqual(queryFill("inverter 49", pv).filled, {});
   assert.deepEqual(queryFill("principal 250000", [num("p", "Principal", "usd"), num("x", "Extra principal per month", "usd")]).filled, { p: "250000" });
 });
+
+test("query-fill: an activity word after a number is not a field it does not name", () => {
+  const hos = [num("weekly_on_duty_used_hr", "Weekly on-duty already used", "hr")];
+  assert.deepEqual(queryFill("11 hour driving limit hours of service", hos).filled, {});
+  assert.equal(queryFill("8 hours running", [num("run_hr", "Running time", "hr")]).filled.run_hr, "8");
+});

@@ -189,6 +189,12 @@
       "tile": "pv-string-sizing",
       "mustNotBind": { "inverter_vdc_max_V": "49" },
       "why": "The term floor reduced 'Inverter Vdc max' to the word 'inverter', so the exact-label tie-break handed it the module Voc of 49."
+    },
+    {
+      "query": "11 hour driving limit hours of service",
+      "tile": "hos-math",
+      "mustNotBind": { "weekly_on_duty_used_hr": "11" },
+      "why": "The 11 hours are driving time, which the tile has no field for; the unit alone put them in the weekly on-duty hours already used."
     }
   ]
 }

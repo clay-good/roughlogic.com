@@ -1100,6 +1100,15 @@ export function queryFill(query, rows, opts) {
     // number may veto it: "40 ft wall" is not a mortar joint and "span 12 ft"
     // is not a tributary width (2026-11-16). A neighbouring content word that
     // is not a term of the target field means the number is something else.
+    // Even an exact unit: "11 hour driving" is driving time, which a "Weekly
+    // on-duty already used (hr)" field does not hold (2026-11-23). Only an
+    // activity word (-ing) right after the number, and only when the field
+    // does not name it.
+    {
+      const act = text.slice(qty.end).toLowerCase().match(/^\s+([a-z]{3,}ing)\b/);
+      const t = termsByRow.get(candidates[0].d);
+      if (act && !t.has(act[1]) && !TERM_STOPWORDS.has(act[1]) && !String(candidates[0].l || "").toLowerCase().includes(act[1].slice(0, -3))) return;
+    }
     if (rowUnit(candidates[0]) !== qtyUnit) {
       const before = text.slice(0, qty.index).toLowerCase().match(/([a-z]{3,})[^a-z0-9]*$/);
       const after = text.slice(qty.end).toLowerCase().match(/^[^a-z0-9]*([a-z]{3,})/);
