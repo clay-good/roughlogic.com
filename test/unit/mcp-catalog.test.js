@@ -808,8 +808,6 @@ test("answer_query: joists for a deck and siding for a wall reach their calculat
   const j = await answerQuery({ query: "how many joists for a 16 ft deck 16 inches on center" });
   assert.equal(j.id, "joist-hanger-count");
   assert.deepEqual([Number(j.inputs.run_width_ft), Number(j.inputs.spacing_in)], [16, 16]);
-  // The hanger ends and nails take their declared defaults: it answers.
-  assert.equal(j.result.joists, 13);
   const s = await answerQuery({ query: "how many square feet of siding 40 ft wall 10 ft tall" });
   assert.equal(s.id, "siding-takeoff");
   assert.equal(Number(s.inputs.wall_area_sf), 400);
@@ -840,4 +838,12 @@ test("answer_query: gas load in btu, natural gas, and service size by square fee
   assert.equal(s.id, "service-load");
   // The door's unfilled counts are the NEC 220.52 minimums, not zero.
   assert.equal(s.result.total_demand_W, 6150);
+});
+
+test("answer_query: a default only the compute holds is not an answer", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  // siding-takeoff's signature defaults the wall to 2,000 sq ft, but the page's
+  // box is empty; the door must not answer from it.
+  const out = await answerQuery({ query: "siding 3 in exposure" });
+  assert.notEqual(out.status, "OK", JSON.stringify(out.result || {}).slice(0, 80));
 });

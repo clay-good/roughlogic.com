@@ -1588,16 +1588,23 @@ function coerceForCompute(filled, rows, defaults) {
   return out;
 }
 
-// The compute parameters that declare a default other than null: omitting one
-// is exactly what gives the compute that default. A parameter defaulting to
-// null keeps its explicit null (ohms-law's "solve for this").
+// The inputs whose default the page SHOWS: the field's own declared default
+// (what describe() reports, and what the page prefills) where the compute also
+// declares one. Omitting such a key is exactly what gives the compute that
+// default. A default only the compute signature holds is a phantom -- the
+// page's box is empty -- and is not taken: siding's `wall_area_sf = 2000`
+// answered "mulch 300 sqft 3 in" with a 2,000 sq ft wall (2026-11-23). A
+// parameter defaulting to null keeps its explicit null (ohms-law).
 export async function inputDefaults(id) {
   try {
     const { COMPUTE_MAP, modCache } = await load();
     const reg = COMPUTE_MAP[id];
     if (!reg) return new Map();
     const fn = await importCompute(reg, modCache);
-    return new Map(introspectInputs(fn).filter((p) => p.hasDefault && p.default !== null).map((p) => [p.name, true]));
+    const shown = new Map(((await describe({ id })).inputs || []).map((f) => [f.key || f.name, f.default]));
+    return new Map(introspectInputs(fn)
+      .filter((p) => p.hasDefault && p.default !== null && shown.get(p.name) != null)
+      .map((p) => [p.name, true]));
   } catch { return new Map(); }
 }
 
