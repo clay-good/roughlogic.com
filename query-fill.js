@@ -649,6 +649,18 @@ export function queryFill(query, rows, opts) {
   }
   quantities.forEach((qty, qi) => {
     if (suppressed.has(qi)) return;
+    // "3.50 per gallon" fills the one field whose label says "per gallon"
+    // (2026-11-23), with or without a unit on the number.
+    {
+      // The extractor hands back "per" as the unit of "3.50 per gallon".
+      const said = /^per$/i.test(String(qty.unit || "")) ? text.slice(qty.end).match(/^\s+([a-z]+)\b/i)
+        : text.slice(qty.end).match(/^\s*per\s+([a-z]+)\b/i);
+      if (said) {
+        const w = said[1].toLowerCase().replace(/s$/, "");
+        const hit = numberRows.filter((r) => new RegExp("\\bper " + w + "s?\\b").test(String(r.l || "").toLowerCase()));
+        if (hit.length === 1) { backOf.set(qi, { cut: 0, keys: [hit[0].d], dimension: false }); return; }
+      }
+    }
     const unit = canonicalUnit(rawUnitOf(qty, text));
     if (!unit) {
       // A count written with its noun -- "500 bricks", "10 post holes", "4

@@ -809,3 +809,11 @@ test("answer_query: joists for a deck and siding for a wall reach their calculat
   assert.equal(s.id, "siding-takeoff");
   assert.equal(s.inputs.wall_area_sf, "400");
 });
+
+test("answer_query: fuel cost for a trip answers outright", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  const a = await answerQuery({ query: "fuel cost for 300 miles at 25 mpg 3.50 per gallon" });
+  assert.equal(a.status, "OK");
+  assert.equal(a.id, "mileage-cost");
+  assert.ok(Math.abs(a.result.fuel_cost - 42) < 1e-9);
+});

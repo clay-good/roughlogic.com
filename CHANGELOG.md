@@ -6,6 +6,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **"Fuel cost for 300 miles at 25 mpg 3.50 per gallon" answers outright: $42.** The mileage calculator's labels carried no units ("Round-trip miles", "Fuel price ($/gal)"), so the 300 miles and the price went unread. They are now "Round-trip distance (mi)" and "Fuel price per gallon ($)". A number followed by "per X" now fills the one field whose label says "per X", with or without a $ on the number.
 - **Two more wrong values from a third question sweep, now pinned in `test/fixtures/free-text-queries.json`.**
   - "Tankless water heater 5 gpm 70 degree rise" made the target outlet temperature 70 F. A temperature followed by rise, difference, delta, split or increase is now a temperature difference. It fills only a field that is one. An outlet temperature still fills the outlet.
   - "Retaining wall blocks 50 ft long 3 ft tall" made a 600 in block. The wall's length field was labeled "Wall run", so "long" named only "Block face length". It is now labeled "Wall length". Where a dimension word names more than one field, the field measured in the unit written wins, so the wall is 50 ft and the exposed height 3 ft.

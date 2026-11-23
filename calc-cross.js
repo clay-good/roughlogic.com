@@ -1000,9 +1000,9 @@ export function renderUpgradeROI(inputRegion, outputRegion, citationEl) {
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 export function renderMileageCost(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: gallons = miles / mpg; cost = gallons * price; reimbursement = miles * IRS standard rate.";
-  const m = makeNumber("Round-trip miles", "mc-m", { step: "any", min: "0" });
+  const m = makeNumber("Round-trip distance (mi)", "mc-m", { step: "any", min: "0" });
   const mpg = makeNumber("MPG", "mc-mpg", { step: "any", min: "0" });
-  const p = makeNumber("Fuel price ($/gal)", "mc-p", { step: "any", min: "0" });
+  const p = makeNumber("Fuel price per gallon ($)", "mc-p", { step: "any", min: "0" });
   const irs = makeNumber("IRS rate ($/mi)", "mc-irs", { step: "any", min: "0", value: String(IRS_STANDARD_MILEAGE_RATE) });
   irs.input.value = String(IRS_STANDARD_MILEAGE_RATE);
   for (const f of [m, mpg, p, irs]) inputRegion.appendChild(f.wrap);
