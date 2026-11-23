@@ -699,3 +699,13 @@ test("query-fill: a wall by its length and height is its area", () => {
   const wall = [num("wall_area_sf", "Wall area", "ft2"), num("length_ft", "Wall length", "ft"), num("height_ft", "Wall height", "ft")];
   assert.equal(queryFill("40 ft wall 10 ft tall", wall).filled.wall_area_sf, undefined);
 });
+
+test("query-fill: a size before a material word, and options written with spaces", () => {
+  const fl = [sel("method", "Method", ["hazen-williams", "darcy-weisbach"]), sel("material", "Material", ["PVC", "copper", "pex"]),
+    sel("nominal_size", "Nominal size", ["1", "2", "0.5", "0.75"]), num("length_ft", "Length", "ft"), num("flow_gpm", "Flow", "gpm")];
+  assert.deepEqual(queryFill("friction loss hazen williams 100 ft 3/4 pex 5 gpm", fl).filled,
+    { method: "hazen-williams", material: "pex", nominal_size: "0.75", length_ft: "100", flow_gpm: "5" });
+  assert.equal(queryFill("200 ft 2 pvc 40 gpm", fl).filled.nominal_size, "2");
+  // A bare fraction with no material word after it is still ambiguous.
+  assert.equal(queryFill("3/4 at 5 gpm", fl).filled.nominal_size, undefined);
+});

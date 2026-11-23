@@ -469,6 +469,9 @@ export function queryFill(query, rows, opts) {
   // inch field nobody named). Real fills, but too weak to say on their own
   // that this is the calculator being asked about; the door reads them so.
   const converted = new Set();
+  // Sizes read from "3/4 pex": a fraction before a material word is a pipe
+  // size, so the ambiguous-pair veto below leaves them alone.
+  const optionSized = new Set();
 
   // --- Roof pitch: "6/12 pitch", "4 in 12" ----------------------------------
   // Rise per 12 of run, in the two ways roofers write it. It fills a unitless
@@ -930,7 +933,19 @@ export function queryFill(query, rows, opts) {
     quantities.forEach((qty, qi) => {
       if (claimed.has(qi) || burned.has(qi)) return;
       const qtyUnit = canonicalUnit(rawUnitOf(qty, text));
-      if (!qtyUnit) return;                                // a bare number is not evidence
+      if (!qtyUnit) {
+        // ...except one written right before an option word of another of the
+        // tile's dropdowns: "3/4 pex", "2 pvc" is a size of that pipe
+        // (2026-11-23). It fills the one numeric dropdown holding that value.
+        const raw = rawUnitOf(qty, text);
+        if (!raw || !selectRows.some((r) => !numericSelects.includes(r) && r.o.some((o) => String(o).toLowerCase() === raw))) return;
+        const takers = numericSelects.filter((r) => !(r.d in filled) && r.o.filter((o) => Number(o) === Number(qty.value)).length === 1);
+        if (takers.length !== 1) return;
+        filled[takers[0].d] = String(takers[0].o.find((o) => Number(o) === Number(qty.value)));
+        optionSized.add(takers[0].d);
+        claimed.add(qi);
+        return;
+      }
       // A number field measured in exactly this unit is the better home.
       if (numberRows.some((r) => !(r.d in filled) && rowUnit(r) === qtyUnit)) return;
       // The unit corroborates that the number means something. It does not
@@ -1064,7 +1079,10 @@ export function queryFill(query, rows, opts) {
       const token = String(opt).toLowerCase().trim();
       if (!token) continue;
       const needsName = token.length < 3 || /^[\d.]+$/.test(token);
-      const re = new RegExp(`(^|[^a-z0-9])${token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}([^a-z0-9]|$)`, "g");
+      // A hyphen in an option is also written as a space: "hazen williams" is
+      // the option hazen-williams (2026-11-23). Not an underscore: those are
+      // code keys (end_chill, liquid_flow) whose words sit in labels and names.
+      const re = new RegExp(`(^|[^a-z0-9])${token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/-/g, "[- ]")}([^a-z0-9]|$)`, "g");
       // An option written as the unit of a number that a field measured in that
       // unit can hold is that number's unit, not this select's choice: tank-mix
       // read "300 gal" (the tank) as Product unit = gal (2026-11-16).
@@ -1152,7 +1170,7 @@ export function queryFill(query, rows, opts) {
       const q = quantities[qi];
       if (q && /\//.test(text.slice(q.index, q.end))) {
         for (const [k, v] of Object.entries(filled)) {
-          if (v === String(q.value)) delete filled[k];
+          if (v === String(q.value) && !optionSized.has(k)) delete filled[k];
         }
       }
     }
