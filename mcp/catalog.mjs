@@ -1789,7 +1789,7 @@ export async function answerQuery({ query } = {}) {
   // flow), a field that mode does not read may be flagged anyway: the
   // diameter, in the mode that finds the diameter (2026-11-16). Try it, and
   // answer only if the calculator accepts the values without refusing.
-  const choseMode = rows.some((r) => r.k === "select" && r.d in filled && /\b(mode|solve|find)\b/i.test(r.l + " " + r.d))
+  const choseMode = rows.some((r) => r.k === "select" && r.d in filled && /\b(mode|solve|find|shape)\b/i.test(r.l + " " + r.d))
     // An "Or ..." field is the other way in: "paint for a 12 by 14 room" fills
     // the room, and the Area it replaces was measured as required (2026-11-23).
     || rows.some((r) => /^or\b/i.test(r.l || "") && r.d in filled);

@@ -766,3 +766,15 @@ test("answer_query: paint for a room answers from the room's size", async () => 
   // A partial room is still a request for what is missing, not an answer.
   assert.equal((await answerQuery({ query: "paint coverage room length 12" })).status, "MISSING_INPUTS");
 });
+
+test("answer_query: pool gallons and duct size answer outright", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  const pool = await answerQuery({ query: "how many gallons in my pool 16 by 32 4 ft shallow 8 ft deep" });
+  assert.equal(pool.status, "OK");
+  assert.ok(Math.abs(pool.result.gallons - 512 * 6 * 1728 / 231) < 1e-6);
+  assert.equal((await answerQuery({ query: "gallons in a 20 by 40 pool 5 ft deep" })).id, "pool-volume");
+  // A blank friction rate is the declared 0.08 design rate.
+  const duct = await answerQuery({ query: "duct size for 400 cfm" });
+  assert.equal(duct.status, "OK");
+  assert.ok(duct.result.round_diameter_in > 9.5 && duct.result.round_diameter_in < 10.5);
+});

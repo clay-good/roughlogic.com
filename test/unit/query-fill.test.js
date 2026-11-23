@@ -651,3 +651,11 @@ test("query-fill: a third plan side is the depth", () => {
   // Two sides only: no depth is invented.
   assert.equal(queryFill("30 by 40 by", vol).filled.depth_in, undefined);
 });
+
+test("query-fill: shallow and round describe the length before them", () => {
+  const pool = [num("length_ft", "Length", "ft"), num("width_ft", "Width", "ft"), num("diameter_ft", "Diameter", "ft"),
+    num("shallow_ft", "Shallow-end depth", "ft"), num("deep_ft", "Deep-end depth", "ft")];
+  assert.deepEqual(queryFill("16 by 32 pool 4 ft shallow 8 ft deep", pool).filled,
+    { length_ft: "16", width_ft: "32", shallow_ft: "4", deep_ft: "8" });
+  assert.equal(queryFill("an 18 ft round pool 4 ft deep", pool).filled.diameter_ft, "18");
+});

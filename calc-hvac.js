@@ -206,6 +206,9 @@ export function computeDuctSize({ cfm, friction_in_wc_per_100ft = 0.08, roughnes
   }
   // `!(x > 0)` rather than `x <= 0`: a CFM left out is undefined, and NaN <= 0 is false, so a call with no
   // airflow used to return a 2 in duct.
+  // A blank (null) friction rate is the declared 0.08 design rate, the same
+  // value the page prefills; a typed 0 is still refused (2026-11-23).
+  if (friction_in_wc_per_100ft == null || friction_in_wc_per_100ft === "") friction_in_wc_per_100ft = 0.08;
   if (!(cfm > 0) || !(friction_in_wc_per_100ft > 0)) return { error: "Provide positive CFM and friction rate." };
 
   // Solve d (in inches) such that Darcy-Weisbach friction rate equals target.

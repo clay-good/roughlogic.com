@@ -117907,6 +117907,21 @@
   "term": "how much paint",
   "target": "paint-coverage",
   "kind": "question"
+ },
+ {
+  "term": "how many gallons in my pool",
+  "target": "pool-volume",
+  "kind": "question"
+ },
+ {
+  "term": "pool gallons",
+  "target": "pool-volume",
+  "kind": "question"
+ },
+ {
+  "term": "pool size in feet and how deep",
+  "target": "pool-volume",
+  "kind": "question"
  }
  ]
 }

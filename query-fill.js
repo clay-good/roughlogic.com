@@ -190,7 +190,9 @@ const UNIT_QUANTITY_WORDS = {
 // "4 inches deep" on a slab is its thickness, so deep and thick name both.
 const POST_WORDS = new Map([["tall", ["height"]], ["high", ["height"]], ["deep", ["depth", "thickness"]], ["wide", ["width"]], ["long", ["length"]], ["thick", ["thickness", "depth"]], ["apart", ["spacing"]],
   // "2 ft rise over 50 ft" (2026-11-16): the rise is not the run.
-  ["rise", ["rise", "height"]], ["drop", ["drop", "fall"]], ["fall", ["fall", "drop"]], ["run", ["run"]]]);
+  ["rise", ["rise", "height"]], ["drop", ["drop", "fall"]], ["fall", ["fall", "drop"]], ["run", ["run"]],
+  // "4 ft shallow 8 ft deep", "an 18 ft round pool" (2026-11-23).
+  ["shallow", ["shallow"]], ["round", ["diameter"]]]);
 const DIMENSION_WORDS = new Set(["height", "depth", "thickness", "width", "length", "spacing", "rise", "run", "fall", "drop"]);
 
 const SHORTHAND = new Map([
@@ -597,7 +599,7 @@ export function queryFill(query, rows, opts) {
     let m = after.match(/^\s+of\s+([a-z][a-z -]*)/i);
     let terms = null;
     if (m) terms = windowTerms(m[1]);
-    else if (unitFamily(unit) === "length" && (m = after.match(/^\s+(tall|high|deep|wide|long|thick|apart|rise|drop|fall|run)\b/i))) {
+    else if (unitFamily(unit) === "length" && (m = after.match(/^\s+(tall|high|deep|wide|long|thick|apart|rise|drop|fall|run|shallow|round)\b/i))) {
       terms = new Set([m[1].toLowerCase(), ...POST_WORDS.get(m[1].toLowerCase())]);
     }
     if (!terms) {

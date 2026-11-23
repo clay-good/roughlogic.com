@@ -852,6 +852,9 @@
     {"term":"natatorium evaporation","target":"pool-evaporation-rate","kind":"industry"},
     {"term":"pool water loss from evaporation","target":"pool-evaporation-rate","kind":"industry"},
     {"term":"how much water does my pool evaporate","target":"pool-evaporation-rate","kind":"question"},
-    {"term":"pool dehumidification load","target":"pool-evaporation-rate","kind":"industry"}
+    {"term":"pool dehumidification load","target":"pool-evaporation-rate","kind":"industry"},
+    {"term":"how many gallons in my pool","target":"pool-volume","kind":"question"},
+    {"term":"pool gallons","target":"pool-volume","kind":"question"},
+    {"term":"pool size in feet and how deep","target":"pool-volume","kind":"question"}
   ]
 }
