@@ -817,3 +817,11 @@ test("answer_query: fuel cost for a trip answers outright", async () => {
   assert.equal(a.id, "mileage-cost");
   assert.ok(Math.abs(a.result.fuel_cost - 42) < 1e-9);
 });
+
+test("answer_query: board feet for a stack of lumber; thinset routes", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  const a = await answerQuery({ query: "board feet in 100 2x4 8 ft" });
+  assert.equal(a.status, "OK");
+  assert.ok(Math.abs(a.result.total_board_feet - 100 * 2 * 4 * 8 / 12) < 1e-9);
+  assert.equal((await answerQuery({ query: "how many bags of thinset for 200 sq ft" })).id, "thinset-coverage");
+});

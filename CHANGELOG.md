@@ -6,6 +6,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **"Board feet in 100 2x4 8 ft" answers outright: 533.3 board feet.** "Board feet" ranked the spray-foam tile first. A "board feet in" phrase now routes it to lumber board footage, and a number right before a lumber size ("100 2x4") is how many sticks, filling the one count field. "How many bags of thinset for 200 sq ft" got no match; it now reaches thin-set coverage with the area filled.
 - **"Fuel cost for 300 miles at 25 mpg 3.50 per gallon" answers outright: $42.** The mileage calculator's labels carried no units ("Round-trip miles", "Fuel price ($/gal)"), so the 300 miles and the price went unread. They are now "Round-trip distance (mi)" and "Fuel price per gallon ($)". A number followed by "per X" now fills the one field whose label says "per X", with or without a $ on the number.
 - **Two more wrong values from a third question sweep, now pinned in `test/fixtures/free-text-queries.json`.**
   - "Tankless water heater 5 gpm 70 degree rise" made the target outlet temperature 70 F. A temperature followed by rise, difference, delta, split or increase is now a temperature difference. It fills only a field that is one. An outlet temperature still fills the outlet.

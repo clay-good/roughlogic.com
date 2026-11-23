@@ -600,6 +600,13 @@ export function queryFill(query, rows, opts) {
       filled[thick[0].d] = String(quantities[lumber[0]].value);
       filled[wide[0].d] = String(quantities[lumber[1]].value);
       for (const i of lumber) { suppressed.add(i); claimed.add(i); }
+      // "100 2x4": the number before the size is how many sticks (2026-11-23).
+      const before = lumber[0] - 1;
+      const counts = numberRows.filter((r) => ["count", "quantity", "pieces"].some((w) => termsByRow.get(r.d).has(w)));
+      if (before >= 0 && rawUnitOf(quantities[before], text) === "nominal" && counts.length === 1 && Number.isInteger(Number(quantities[before].value))) {
+        filled[counts[0].d] = String(quantities[before].value);
+        suppressed.add(before); claimed.add(before);
+      }
     }
   }
 

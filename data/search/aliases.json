@@ -117977,6 +117977,21 @@
   "term": "number of deck joists at inches on center",
   "target": "joist-hanger-count",
   "kind": "question"
+ },
+ {
+  "term": "board feet in",
+  "target": "board-footage",
+  "kind": "question"
+ },
+ {
+  "term": "bags of thinset",
+  "target": "thinset-coverage",
+  "kind": "question"
+ },
+ {
+  "term": "bags of thinset for square feet",
+  "target": "thinset-coverage",
+  "kind": "question"
  }
  ]
 }
