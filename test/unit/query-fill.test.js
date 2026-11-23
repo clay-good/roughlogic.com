@@ -759,3 +759,13 @@ test("field-units: temperature (F), ft/s, and a unit leading a note", async () =
   assert.equal(unitFromLabel("Stud spacing (in o.c.)"), "in");
   assert.equal(unitFromLabel("Tap (V on a 120 V base)"), null);
 });
+
+test("field-units: compound rates fill only their exact unit", async () => {
+  const { unitFromLabel, unitsCompatible } = await import("../../field-units.js");
+  assert.equal(unitFromLabel("Steam mass flow (lb/hr)"), "lbhr");
+  assert.equal(unitFromLabel("Rainfall intensity (in/hr)"), "inhr");
+  assert.equal(unitFromLabel("Latent heat (Btu/lb)"), "btulb");
+  assert.ok(!unitsCompatible("lbhr", "lb") && !unitsCompatible("inhr", "in") && !unitsCompatible("lbgal", "pcf"));
+  const st = [num("steam_flow_lbhr", "Steam mass flow", "lbhr"), num("pipe_id_in", "Pipe ID", "in")];
+  assert.deepEqual(queryFill("steam 5000 lb/hr 4 in pipe", st).filled, { steam_flow_lbhr: "5000", pipe_id_in: "4" });
+});
