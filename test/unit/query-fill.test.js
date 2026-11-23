@@ -780,3 +780,10 @@ test("query-fill: a count noun naming several fields fills the one that is a cou
   const lw = [num("head", "Head count"), num("gal_low", "Gallons/head at low temp"), num("gal_high", "Gallons/head at high temp")];
   assert.deepEqual(queryFill("water for 50 head of cattle", lw).filled, { head: "50" });
 });
+
+test("query-fill: inches per hour is a rate in in/hr", () => {
+  assert.equal(rewriteQuery("roof drain 3 in per hour"), "roof drain 3 in/hr");
+  assert.equal(rewriteQuery("4 in per foot"), "4 in per foot");
+  const rd = [num("roof_area", "Roof area served", "ft2"), num("rainfall_rate", "Design rainfall, 100-yr / 1-hr", "inhr")];
+  assert.deepEqual(queryFill("roof drain size 2000 sq ft roof 3 in per hour", rd).filled, { roof_area: "2000", rainfall_rate: "3" });
+});

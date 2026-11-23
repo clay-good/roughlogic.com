@@ -41,6 +41,8 @@ import { verifyShard } from "./integrity.js";
 // Each entry is a real spelling people type. Order matters: the more specific
 // patterns run first so `8'6"` is not first mangled by the `3/4"` rule.
 const REWRITES = [
+  // A rainfall or infiltration rate: "3 in per hour" is 3 in/hr (2026-11-23).
+  [/\b(\d+(?:\.\d+)?)\s*(?:in|inch|inches)\s*(?:per|an|a|\/)\s*(?:hour|hr|h)\b/g, (m, n) => `${n} in/hr`],
   // An electricity price is quoted in cents: "$0.15 per kwh" is 15 cents
   // per kWh (2026-11-23). Only a per-kWh price; other per-unit prices stay out.
   [/\$\s*(\d*\.?\d+)\s*(?:\/|per\s+)\s*kwh\b/g, (m, n) => `${Number((Number(n) * 100).toPrecision(12))} cents per kwh`],
