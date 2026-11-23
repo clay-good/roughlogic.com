@@ -536,7 +536,9 @@ export function queryFill(query, rows, opts) {
     const m = text.match(PLAN);
     if (m) {
       const a = Number(m[2]), b = Number(m[3]);
-      const surface = Boolean(m[4] && SURFACES.test(m[4]));
+      // ...or one just before it: "room 12 by 12" (2026-11-23).
+      const surface = Boolean(m[4] && SURFACES.test(m[4])) ||
+        /\b(?:floor|room|slab|patio|deck|kitchen|bathroom|bedroom|garage|basement|space)s?\s*$/.test(text.slice(0, m.index + m[1].length));
       if (a > 0 && b > 0 && (surface || Math.max(a, b) > NOMINAL_LUMBER_MAX_IN)) {
         const start = m.index + m[1].length, end = start + m[0].length - m[1].length - (m[4] || "").length;
         const inPair = quantities.map((q, i) => (q.index >= start && q.index < end ? i : -1)).filter((i) => i >= 0);
@@ -577,7 +579,21 @@ export function queryFill(query, rows, opts) {
             for (const i of [...inPair, thirdQi]) { suppressed.add(i); claimed.add(i); }
           }
         }
+        // A room's volume, on a tile that takes one and no length, width or
+        // area: the plan times its ceiling height ("room 12 by 12, 8 ft
+        // ceiling" is 1,152 cu ft; 2026-11-23 it read "room 12" as 12 cu ft).
+        const vols = numberRows.filter((r) => rowUnit(r) === "ft3" && termsByRow.get(r.d).has("volume"));
+        const hm = text.match(/\bceiling(?:\s+height)?\s+(?:of\s+)?(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)\b/) ||
+          text.match(/(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)\s+(?:high\s+)?ceilings?\b/);
+        if (!done && hm && vols.length === 1 && !len.length && !wid.length) {
+          filled[vols[0].d] = String(Math.round(a * b * Number(hm[1]) * 1e6) / 1e6); done = true;
+          const hq = quantities.findIndex((q) => q.index >= hm.index && q.index < hm.index + hm[0].length);
+          if (hq >= 0) { suppressed.add(hq); claimed.add(hq); }
+        }
         if (done) for (const i of inPair) { suppressed.add(i); claimed.add(i); }
+        // A surface's plan no rule here could use is still two sides of it,
+        // never one field's value on its own ("room 12" is not a volume).
+        else if (surface) for (const i of inPair) suppressed.add(i);
       }
     }
   }
@@ -700,8 +716,11 @@ export function queryFill(query, rows, opts) {
       const raw = rawUnitOf(qty, text);
       if (!raw || !/^[a-z]{3,}$/.test(raw) || NON_UNIT_WORDS.has(raw)) return;
       const noun = raw.replace(/(?<=[a-z]{3})s$/, "");
+      // The label's own words too: "6 air changes" names "Target air changes
+      // per hour", though "air" is under the label-term floor (2026-11-23).
       let keys = numberRows.filter((r) => (!rowUnit(r) || rowUnit(r) === "count") &&
-        (termsByRow.get(r.d).has(noun) || termsByRow.get(r.d).has(raw))).map((r) => r.d);
+        (termsByRow.get(r.d).has(noun) || termsByRow.get(r.d).has(raw) ||
+         (raw.length === 3 && String(r.l || "").toLowerCase().split(/[^a-z]+/).includes(raw)))).map((r) => r.d);
       // "20 pieces" names no label, but it is the tile's one Count/Quantity.
       if (!keys.length && /^(?:pieces?|pcs)$/.test(raw)) {
         keys = numberRows.filter((r) => ["count", "quantity"].some((w) => termsByRow.get(r.d).has(w))).map((r) => r.d);

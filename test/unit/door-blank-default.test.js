@@ -27,3 +27,16 @@ test("door: a question that is only a calculator's name gives no values", async 
   const name = TOOLS.find((t) => t.id === "loop-voltage-budget").name;
   assert.equal((await answerQuery({ query: name })).status, "NO_VALUES");
 });
+
+test("door: an OK answer names what it did not read and what it defaulted", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  const a = await answerQuery({ query: "electricity cost 1500 watts 8 hours a day 15 cents per kwh for 3 people" });
+  assert.equal(a.status, "OK");
+  assert.deepEqual(a.unread, ["3 people"]);
+  assert.ok(a.defaulted.includes("days_per_year"));
+  // A room by its plan and ceiling height is its volume (2026-11-23: "room 12"
+  // read as a 12 cu ft room and answered 1.2 CFM).
+  const n = await answerQuery({ query: "ceiling height 8 ft room 12 by 12 cfm for 6 air changes" });
+  assert.equal(n.id, "nam-sizing");
+  assert.ok(Math.abs(n.result.required_cfm - 115.2) < 1e-9);
+});

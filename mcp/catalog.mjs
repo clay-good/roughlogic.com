@@ -1747,7 +1747,16 @@ export async function answerQuery({ query } = {}) {
   const { queryFill } = await import(new URL("../query-fill.js", import.meta.url).href);
   // The tile's own name goes in so the words the agent used to NAME the
   // calculator are not mistaken for the names of its fields.
-  const { filled, converted = [] } = rows.length ? queryFill(q, rows, { name: top.name }) : { filled: {} };
+  const { filled, converted = [], unmatched = [] } = rows.length ? queryFill(q, rows, { name: top.name }) : { filled: {} };
+  // What an OK answer did not read from the question, said out loud: the
+  // numbers it could not place, and the fields that took the page's default
+  // (2026-11-23). An agent can then tell "4 air changes" was used from "the
+  // default 6 was".
+  const disclose = async () => {
+    const dflt = await inputDefaults(top.id);
+    const defaulted = rows.filter((r) => !(r.d in filled) && dflt.has(r.d)).map((r) => r.d);
+    return { ...(unmatched.length ? { unread: unmatched } : {}), ...(defaulted.length ? { defaulted } : {}) };
+  };
   const recovered = Object.keys(filled);
   // A fill that is only a unit conversion nobody named does not corroborate
   // the route: "how many studs for a 40 ft wall..." reached siding-takeoff on
@@ -1826,7 +1835,7 @@ export async function answerQuery({ query } = {}) {
     try {
       const trial = await run({ id: top.id, inputs: coerceForCompute(filled, rows, await inputDefaults(top.id)) });
       if (trial && trial.result && !trial.result.error && !(trial.warnings || []).some((w) => w && (w.rule === "min" || w.rule === "max") && w.key in filled)) {
-        return { ...trial, status: "OK", query: q, name: top.name, via: "registry" };
+        return { ...trial, status: "OK", query: q, name: top.name, via: "registry", ...(await disclose()) };
       }
     } catch { /* fall through to naming what is missing */ }
   }
@@ -1886,7 +1895,7 @@ export async function answerQuery({ query } = {}) {
         message: `"${top.name}" did not answer from the values read from the question: ${out.result.error}`,
       };
     }
-    return { ...out, status: "OK", query: q, name: top.name, via: "registry" };
+    return { ...out, status: "OK", query: q, name: top.name, via: "registry", ...(await disclose()) };
   } catch (e) {
     return {
       status: "MISSING_INPUTS", query: q, id: top.id, name: top.name, inputs: filled,

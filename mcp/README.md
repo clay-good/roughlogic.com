@@ -215,7 +215,10 @@ asphalt mix); a field with no default that the calculator cannot answer without
 is named instead. So a question that covers only part of a calculator comes back
 as `MISSING_INPUTS` naming what it still needs. A question that is only the
 calculator's name carries no values and returns `NO_VALUES`, even where the name
-holds a number.
+holds a number. An `OK` answer also says what it did not read: `unread`
+lists numbers from the question it could not place, and `defaulted` lists the
+fields that took the page's default, so an agent can tell a value it gave from
+one the calculator assumed.
 
 It will not answer from a weak match, so a question has to corroborate the
 calculator it reached: by carrying values, by naming it, or by matching a phrase

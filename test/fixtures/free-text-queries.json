@@ -171,6 +171,12 @@
       "tile": "ladder-angle",
       "mustNotBind": { "ladder_length_ft": "5" },
       "why": "'5 ft from wall' is the base offset, which this tile does not take; 'ladder' before it made it the ladder length, and the 20 ft ladder became the working height."
+    },
+    {
+      "query": "ceiling height 8 ft room 12 by 12 cfm for 6 air changes",
+      "tile": "nam-sizing",
+      "mustNotBind": { "room_volume_ft3": "12" },
+      "why": "'room 12 by 12' was not seen as a plan (the surface word came first), so 'room 12' read as a 12 cu ft room volume and the tile answered 1.2 CFM."
     }
   ]
 }
