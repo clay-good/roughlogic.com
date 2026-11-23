@@ -118042,6 +118042,11 @@
   "term": "how many concrete blocks for a wall feet tall",
   "target": "masonry-count",
   "kind": "question"
+ },
+ {
+  "term": "fuel needed for",
+  "target": "mileage-cost",
+  "kind": "question"
  }
  ]
 }

@@ -328,6 +328,7 @@ function valueFor(qty, row, text, labelWords) {
   const fieldUnit = rowUnit(row);
   // ...unless the field is itself that rate: "8 hours a day" is "Hours used
   // per day" (2026-11-23).
+  if (qty.offset && !/\b(from|distance|offset|away|setback|base|clearance|spacing)\b/i.test(String(row.l || "") + " " + row.d.replace(/_/g, " "))) return null;
   if (qty.delta && !/\b(rise|difference|delta|split|increase|differential|dt|drop|change)\b/i.test(String(row.l || "") + " " + row.d.replace(/_/g, " "))) return null;
   if (qty.rate && fieldUnit && !new RegExp("\\bper " + qty.rate + "\\b").test(String(row.l || "").toLowerCase())) return null;
   const raw = rawUnitOf(qty, String(text || ""));
@@ -470,6 +471,11 @@ export function queryFill(query, rows, opts) {
   }
   for (const q of quantities) {
     if (/nominal (?:width|depth)\s*$/.test(text.slice(0, q.index))) q.lumber = true;
+  }
+  // "5 ft from the wall" is an offset: it fills only a field about a distance,
+  // offset or setback, never a ladder's length (2026-11-23).
+  for (const q of quantities) {
+    if (unitFamily(canonicalUnit(rawUnitOf(q, text)) || "") === "length" && /^\s+(?:from|away|off)\b/.test(text.slice(q.end))) q.offset = true;
   }
   // "70 degree rise" is a temperature DIFFERENCE: it fills only a field that
   // is one, never a setpoint or outlet temperature (2026-11-23).

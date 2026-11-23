@@ -769,3 +769,9 @@ test("field-units: compound rates fill only their exact unit", async () => {
   const st = [num("steam_flow_lbhr", "Steam mass flow", "lbhr"), num("pipe_id_in", "Pipe ID", "in")];
   assert.deepEqual(queryFill("steam 5000 lb/hr 4 in pipe", st).filled, { steam_flow_lbhr: "5000", pipe_id_in: "4" });
 });
+
+test("query-fill: a length 'from' something is an offset", () => {
+  const ld = [num("ladder_length_ft", "Ladder length", "ft"), num("working_height_ft", "Working height", "ft")];
+  assert.equal(queryFill("ladder angle 20 ft ladder 5 ft from wall", ld, { name: "Ladder Placement Angle" }).filled.ladder_length_ft, undefined);
+  assert.equal(queryFill("5 ft from the wall", [num("base_ft", "Base distance from wall", "ft")]).filled.base_ft, "5");
+});

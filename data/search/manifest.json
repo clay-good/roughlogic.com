@@ -9,7 +9,7 @@
     {
       "file": "aliases.json",
       "name": "Search aliases master (authoring source; runtime loads the per-group aliases-<letter>.json shards)",
-      "gzip_size_bytes": 338967
+      "gzip_size_bytes": 338981
     },
     {
       "file": "aliases-a.json",
@@ -44,7 +44,7 @@
     {
       "file": "aliases-g.json",
       "name": "Search aliases, group G runtime shard (generated from aliases.json)",
-      "gzip_size_bytes": 19182
+      "gzip_size_bytes": 19202
     },
     {
       "file": "aliases-h.json",
@@ -128,14 +128,14 @@
     }
   ],
   "hashes": {
-    "aliases.json": "ddea16e5d997dc4a26d187fbac07aa076cb7f325952d80ba20e71614fe8758cd",
+    "aliases.json": "f090666ea28afdcff9111b3c9e1f908b5d658ee281121559f3a1d1f4371981bb",
     "aliases-a.json": "40f96cbf6d0ad10e6b08633df7778623c60e638590bb5ae1662e4b962b673fbc",
     "aliases-b.json": "ba7c79b192b9b27221c711738776657039c3c7c6c87d54a60b50cf16f83ad3d0",
     "aliases-c.json": "b83c038ba0685254a81338c27b66c77a339999372650ec81dead074f145d7ebc",
     "aliases-d.json": "1d34f4d7356d4b6a722695dfc0b6bb9b4e114de57ca4b2af73e9072ef4a92dff",
     "aliases-e.json": "70423793dd3550a40129cdf677c7ce05d6cdc385422cc3e5105e7ea66980644a",
     "aliases-f.json": "55ff548618395776e95d546853ea3f332564c2e15467f65f1d91cf7c00d87539",
-    "aliases-g.json": "b3230b7a24bb440f0e493f1620c0ff0c615afe9701fe41b0928a76a9c3759953",
+    "aliases-g.json": "d9a6e34bf245ed0dafac97b50a83448f12695418dab8b42a66c7afec77e684c3",
     "aliases-h.json": "524289408a182bcf2c84dc9c2a279946a114495d11410e363cfd891e6844d812",
     "aliases-j.json": "672218f8c645284968b17e1772e24f8769063c069db77dc54a945425f2a1a541",
     "aliases-k.json": "d81594ca423a1851604c6476cc535c54e777c7ef4e8d21b01084743f5be07901",

@@ -165,6 +165,12 @@
       "tile": "gear-mph-rpm",
       "mustNotBind": { "tire_dia_in": "3.785714" },
       "why": "A P-metric tire size read as the fraction 265/70; '70r' has no word boundary, so the fraction veto missed it."
+    },
+    {
+      "query": "ladder angle 20 ft ladder 5 ft from wall",
+      "tile": "ladder-angle",
+      "mustNotBind": { "ladder_length_ft": "5" },
+      "why": "'5 ft from wall' is the base offset, which this tile does not take; 'ladder' before it made it the ladder length, and the 20 ft ladder became the working height."
     }
   ]
 }
