@@ -2449,6 +2449,8 @@ const RELATED = {
   "lawn-fertilizer-rate": ["npk-blend","sod-takeoff","mulch-topsoil-volume","sprinkler-precip-rate"],
   // spec-v1996: sensible heat of an airstream (calc-hvacairside.js).
   "sensible-heat-airflow": ["cooling-coil-total-load","furnace-airflow-to-rise","shr-latent","air-density-correction"],
+  // spec-v1997: appliance electricity use and cost (calc-electricalanalysis.js).
+  "appliance-energy-cost": ["motor-operating-cost","ev-charge-cost","ohms-law","generator-sizing"],
 };
 
 export { RELATED };

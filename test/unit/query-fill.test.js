@@ -659,3 +659,12 @@ test("query-fill: shallow and round describe the length before them", () => {
     { length_ft: "16", width_ft: "32", shallow_ft: "4", deep_ft: "8" });
   assert.equal(queryFill("an 18 ft round pool 4 ft deep", pool).filled.diameter_ft, "18");
 });
+
+test("query-fill: a per-day quantity fills a per-day field; a utility rate is cents", () => {
+  const ae = [num("watts", "Power", "w"), num("hours_per_day", "Hours used per day", "hr"), num("rate_cents_per_kwh", "Electricity rate", "cents")];
+  assert.deepEqual(queryFill("1500 watts 8 hours a day 15 cents per kwh", ae).filled, { watts: "1500", hours_per_day: "8", rate_cents_per_kwh: "15" });
+  assert.equal(queryFill("1500 watts 8 hours a day at $0.15 per kwh", ae).filled.rate_cents_per_kwh, "15");
+  // A per-day rate still never fills a field that is not per day.
+  assert.equal(queryFill("8 hours a day", [num("run_hr", "Run time", "hr")]).filled.run_hr, undefined);
+  assert.equal(rewriteQuery("$3.50 per ft"), "$3.50 per ft");
+});

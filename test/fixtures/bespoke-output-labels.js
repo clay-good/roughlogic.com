@@ -26,6 +26,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "anhydrous-ammonia-rate": {"product_lb_per_ac":"Anhydrous rate","acres_per_tank":"Acres per tank"},
   "annulus-area": {"ring_area":"Ring (annulus) area","wall_thickness":"Wall thickness","note":"Note"},
   "antimicrobial-dilution": {"finished_gal":"Finished solution","concentrate_oz":"Total concentrate","water_gal":"Total water","per_tank_conc_oz":"Per full tank","tanks_needed":"Tank fills"},
+  "appliance-energy-cost": {"kwh_per_day":"Energy","cost_per_day":"Cost","note":"Note"},
   "approach-delta-t": {"approach_F":"Approach","approach_band":"Approach band","delta_T_F":"Delta-T","delta_T_band":"Delta-T band"},
   "arc-flash-screen": {"incident_energy_cal_cm2":"Incident energy (cal/cm²)","boundary_distance_in":"Arc-flash boundary (in)","ppe_band":"PPE band (NFPA 70E)","warnings":"Notes"},
   "area-by-coordinates": {"area_ft2":"Area","perimeter_ft":"Perimeter","winding":"Winding"},

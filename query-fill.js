@@ -41,6 +41,9 @@ import { verifyShard } from "./integrity.js";
 // Each entry is a real spelling people type. Order matters: the more specific
 // patterns run first so `8'6"` is not first mangled by the `3/4"` rule.
 const REWRITES = [
+  // An electricity price is quoted in cents: "$0.15 per kwh" is 15 cents
+  // per kWh (2026-11-23). Only a per-kWh price; other per-unit prices stay out.
+  [/\$\s*(\d*\.?\d+)\s*(?:\/|per\s+)\s*kwh\b/g, (m, n) => `${Number((Number(n) * 100).toPrecision(12))} cents per kwh`],
   // "$250,000" is 250000 dollars. A leading $ hid the number's unit, so a money
   // field (usd) could not take it by unit (2026-11-15). Only a bare amount: "$3.50
   // per gallon" and "$/ft" stay as written, since a rate is not a sum of money.
@@ -321,7 +324,9 @@ function isLabelWord(raw, labelWords) {
 
 function valueFor(qty, row, text, labelWords) {
   const fieldUnit = rowUnit(row);
-  if (qty.rate && fieldUnit) return null;
+  // ...unless the field is itself that rate: "8 hours a day" is "Hours used
+  // per day" (2026-11-23).
+  if (qty.rate && fieldUnit && !new RegExp("\\bper " + qty.rate + "\\b").test(String(row.l || "").toLowerCase())) return null;
   const raw = rawUnitOf(qty, String(text || ""));
   const prose =
     raw !== null &&
@@ -442,7 +447,8 @@ export function queryFill(query, rows, opts) {
     if (/nominal (?:width|depth)\s*$/.test(text.slice(0, q.index))) q.lumber = true;
   }
   for (const q of quantities) {
-    if (/^\s*(?:per|\/|a)\s*(?:month|mo|year|yr|day|week|wk|hour|hr|h|minute|min|second|sec)\b/.test(text.slice(q.end))) q.rate = true;
+    const per = text.slice(q.end).match(/^\s*(?:per|\/|a)\s*(month|mo|year|yr|day|week|wk|hour|hr|h|minute|min|second|sec)\b/);
+    if (per) q.rate = { mo: "month", yr: "year", wk: "week", hr: "hour", h: "hour", min: "minute", sec: "second" }[per[1]] || per[1];
   }
   const suppressed = new Set();
   quantities.forEach((qty, qi) => {

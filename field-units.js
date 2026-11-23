@@ -95,6 +95,9 @@ const UNIT_SPELLINGS = {
   count: ["count", "each", "ea"],
   // money
   usd: ["$", "usd", "dollars"],
+  // A utility rate is quoted in cents (2026-11-23): "15 cents per kwh", and a
+  // "$0.15" converts into it.
+  cents: ["cents", "cent", "¢", "cents per kwh", "cents/kwh", "¢/kwh"],
   // flow
   gpm: ["gpm"],
   gph: ["gph"],
@@ -228,7 +231,7 @@ const UNIT_FAMILIES = {
   moment: { "lb-ft": 1, "kip-ft": 1000 },
   angle: { deg: 1 },
   ratio: { pct: 1 },
-  money: { usd: 1 },
+  money: { usd: 1, cents: 0.01 },
   liquidflow: { gpm: 1, gph: 0.0166666667, gpd: 0.000694444444, mgd: 694.444444, lpm: 0.264172052 },
   airflow: { cfm: 1, cfs: 60 },
   voltage: { v: 1 },

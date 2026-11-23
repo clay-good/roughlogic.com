@@ -173240,6 +173240,64 @@
     }
    }
   }
+ },
+ {
+  "tile_id": "appliance-energy-cost",
+  "source_publisher": "Virginia Cooperative Extension",
+  "source_title": "Estimating Appliance and Home Electronic Energy Use: window fan",
+  "source_edition_or_year": "Publication 2901-9014 (2020)",
+  "source_section_or_page": "200 W x 4 h/day x 120 days / 1000 = 96 kWh; x 8.5 cents = $8.16",
+  "verified_by": "rl",
+  "verified_on": "2026-11-23",
+  "inputs": {
+   "watts": 200,
+   "hours_per_day": 4,
+   "days_per_year": 120,
+   "rate_cents_per_kwh": 8.5
+  },
+  "outputs": {
+   "kwh_per_year": {
+    "value": 96,
+    "tolerance": {
+     "abs": 1e-06
+    }
+   },
+   "cost_per_year": {
+    "value": 8.16,
+    "tolerance": {
+     "abs": 1e-06
+    }
+   }
+  }
+ },
+ {
+  "tile_id": "appliance-energy-cost",
+  "source_publisher": "Virginia Cooperative Extension",
+  "source_title": "Estimating Appliance and Home Electronic Energy Use: personal computer and monitor",
+  "source_edition_or_year": "Publication 2901-9014 (2020)",
+  "source_section_or_page": "(120 + 150 W) x 4 h/day x 365 days / 1000 = 394 kWh; x 8.5 cents = $33.51",
+  "verified_by": "rl",
+  "verified_on": "2026-11-23",
+  "inputs": {
+   "watts": 270,
+   "hours_per_day": 4,
+   "days_per_year": 365,
+   "rate_cents_per_kwh": 8.5
+  },
+  "outputs": {
+   "kwh_per_year": {
+    "value": 394.2,
+    "tolerance": {
+     "abs": 1e-06
+    }
+   },
+   "cost_per_year": {
+    "value": 33.51,
+    "tolerance": {
+     "abs": 0.005
+    }
+   }
+  }
  }
  ]
 }

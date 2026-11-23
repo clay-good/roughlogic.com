@@ -62535,3 +62535,13 @@ test("bounds: spec-v1996 computeSensibleHeatAirflow solves the blank one and pin
     assert.ok("error" in _shx(bad), JSON.stringify(bad));
   }
 });
+
+import { computeApplianceEnergyCost as _aec } from "../../calc-electricalanalysis.js";
+test("bounds: spec-v1997 computeApplianceEnergyCost pins the Extension example and the error seams", () => {
+  assert.strictEqual(_aec({ watts: 200, hours_per_day: 4, days_per_year: 120, rate_cents_per_kwh: 8.5 }).kwh_per_year, 96);
+  for (const bad of [{ hours_per_day: 4, rate_cents_per_kwh: 15 }, { watts: -5, hours_per_day: 4, rate_cents_per_kwh: 15 }, { watts: 2e6, hours_per_day: 4, rate_cents_per_kwh: 15 },
+    { watts: 100, hours_per_day: 0, rate_cents_per_kwh: 15 }, { watts: 100, hours_per_day: 4, rate_cents_per_kwh: 500 }, { watts: 100, hours_per_day: 4, days_per_year: 0, rate_cents_per_kwh: 15 },
+    { amps: 10, volts: 900, hours_per_day: 4, rate_cents_per_kwh: 15 }]) {
+    assert.ok("error" in _aec(bad), JSON.stringify(bad));
+  }
+});

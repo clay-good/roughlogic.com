@@ -1545,6 +1545,8 @@ const _TILES = [
   ["lawn-fertilizer-rate", "L"],
   // spec-v1996: sensible heat of an airstream (calc-hvacairside.js).
   ["sensible-heat-airflow", "C"],
+  // spec-v1997: appliance electricity use and cost (calc-electricalanalysis.js).
+  ["appliance-energy-cost", "A"],
 ];
 
 

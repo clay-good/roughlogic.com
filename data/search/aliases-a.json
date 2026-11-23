@@ -3009,6 +3009,12 @@
     {"term":"parallel conduit bend radius","target":"conduit-concentric-bend","kind":"industry"},
     {"term":"bending a rack of conduits around a corner","target":"conduit-concentric-bend","kind":"question"},
     {"term":"concentric 90 radius each conduit","target":"conduit-concentric-bend","kind":"industry"},
-    {"term":"extra length for outer conduit in a concentric bend","target":"conduit-concentric-bend","kind":"industry"}
+    {"term":"extra length for outer conduit in a concentric bend","target":"conduit-concentric-bend","kind":"industry"},
+    {"term":"electricity cost","target":"appliance-energy-cost","kind":"question"},
+    {"term":"cost to run","target":"appliance-energy-cost","kind":"question"},
+    {"term":"how much does it cost to run","target":"appliance-energy-cost","kind":"question"},
+    {"term":"appliance energy use","target":"appliance-energy-cost","kind":"industry"},
+    {"term":"kwh per day","target":"appliance-energy-cost","kind":"industry"},
+    {"term":"watts to kwh","target":"appliance-energy-cost","kind":"question"}
   ]
 }

@@ -117922,6 +117922,36 @@
   "term": "pool size in feet and how deep",
   "target": "pool-volume",
   "kind": "question"
+ },
+ {
+  "term": "electricity cost",
+  "target": "appliance-energy-cost",
+  "kind": "question"
+ },
+ {
+  "term": "cost to run",
+  "target": "appliance-energy-cost",
+  "kind": "question"
+ },
+ {
+  "term": "how much does it cost to run",
+  "target": "appliance-energy-cost",
+  "kind": "question"
+ },
+ {
+  "term": "appliance energy use",
+  "target": "appliance-energy-cost",
+  "kind": "industry"
+ },
+ {
+  "term": "kwh per day",
+  "target": "appliance-energy-cost",
+  "kind": "industry"
+ },
+ {
+  "term": "watts to kwh",
+  "target": "appliance-energy-cost",
+  "kind": "question"
  }
  ]
 }

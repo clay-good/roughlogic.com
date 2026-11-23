@@ -67,6 +67,8 @@ export const TOOL_MODULES = (() => {
     "motor-efficiency-upgrade-savings", "transformer-loading-efficiency", "economic-conductor-sizing",
     // spec-v487 generator fuel runtime and backup duration
     "generator-fuel-runtime",
+    // spec-v1997 appliance electricity use and cost
+    "appliance-energy-cost",
     // spec-v494/v806 transformer voltage regulation and turns ratio
     "transformer-voltage-regulation", "transformer-turns-ratio",
     // spec-v495 capacitor discharge time and bleed resistor

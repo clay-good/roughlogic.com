@@ -2,104 +2,104 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "551272ec6f260397",
-      "date": "2026-11-16"
+      "sha": "10121b1e5891ec1a",
+      "date": "2026-11-23"
     },
     "/tools/": {
-      "sha": "17e1dd315312eb72",
-      "date": "2026-11-16"
+      "sha": "8fb5a34397226531",
+      "date": "2026-11-23"
     },
     "/errata/": {
       "sha": "22300621aa59c264",
       "date": "2026-11-14"
     },
     "/collections/disaster-response/": {
-      "sha": "ab747b860c4107f6",
-      "date": "2026-11-16"
+      "sha": "210da1733789e62e",
+      "date": "2026-11-23"
     },
     "/groups/accounting/": {
-      "sha": "4d47630f9ac07b9a",
-      "date": "2026-11-16"
+      "sha": "4caa24233d054b5d",
+      "date": "2026-11-23"
     },
     "/groups/agriculture/": {
-      "sha": "4de44f98e607904b",
-      "date": "2026-11-16"
+      "sha": "d7002d5e5bd19378",
+      "date": "2026-11-23"
     },
     "/groups/construction/": {
-      "sha": "082e7b2ad2b9b448",
-      "date": "2026-11-16"
+      "sha": "659140c3974b5ca8",
+      "date": "2026-11-23"
     },
     "/groups/cross-trade/": {
-      "sha": "0716754522c3c8c6",
-      "date": "2026-11-16"
+      "sha": "827b317f9e328b13",
+      "date": "2026-11-23"
     },
     "/groups/educators/": {
-      "sha": "4252d836ba7ebc59",
-      "date": "2026-11-16"
+      "sha": "5e7ae21909a3ea4c",
+      "date": "2026-11-23"
     },
     "/groups/electrical/": {
-      "sha": "683ff51a334ccc98",
-      "date": "2026-11-16"
+      "sha": "8f41172a5f7e0638",
+      "date": "2026-11-23"
     },
     "/groups/field/": {
-      "sha": "f1b74d81b206f1d9",
-      "date": "2026-11-16"
+      "sha": "58f3115b9ee06e0f",
+      "date": "2026-11-23"
     },
     "/groups/fire-ground/": {
-      "sha": "7fe8e660a7ccd53f",
-      "date": "2026-11-16"
+      "sha": "c58826f154d553f8",
+      "date": "2026-11-23"
     },
     "/groups/historical/": {
-      "sha": "9be7fa271405cd53",
-      "date": "2026-11-16"
+      "sha": "ce315ab09b7f0705",
+      "date": "2026-11-23"
     },
     "/groups/hvac/": {
-      "sha": "5a9561b8e2484e6b",
-      "date": "2026-11-16"
+      "sha": "a5b57510f3b27636",
+      "date": "2026-11-23"
     },
     "/groups/kitchen/": {
-      "sha": "71ac2f3e32387e30",
-      "date": "2026-11-16"
+      "sha": "2afbd863b78ad6d3",
+      "date": "2026-11-23"
     },
     "/groups/lab/": {
-      "sha": "169c05160a6c237c",
-      "date": "2026-11-16"
+      "sha": "bb46567914e0c335",
+      "date": "2026-11-23"
     },
     "/groups/mechanic/": {
-      "sha": "1272a46858386d99",
-      "date": "2026-11-16"
+      "sha": "7cb6251aab3697f5",
+      "date": "2026-11-23"
     },
     "/groups/plumbing/": {
-      "sha": "e57060c8b8966d2f",
-      "date": "2026-11-16"
+      "sha": "ca15a1d992259bb1",
+      "date": "2026-11-23"
     },
     "/groups/real-estate/": {
-      "sha": "1f4f0a0a62331dc9",
-      "date": "2026-11-16"
+      "sha": "7c99eda04a061ed9",
+      "date": "2026-11-23"
     },
     "/groups/references/": {
-      "sha": "5fd4460dba73683e",
-      "date": "2026-11-16"
+      "sha": "d2e736ecba1d02fc",
+      "date": "2026-11-23"
     },
     "/groups/restoration/": {
-      "sha": "c18d15d3c95978b3",
-      "date": "2026-11-16"
+      "sha": "49afed85230d5aec",
+      "date": "2026-11-23"
     },
     "/groups/rigging-and-heavy-lift/": {
-      "sha": "f271f154ead4cecd",
-      "date": "2026-11-16"
+      "sha": "a8365ce64ce432d3",
+      "date": "2026-11-23"
     },
     "/groups/stage/": {
-      "sha": "b07d3066f9aa5232",
-      "date": "2026-11-16"
+      "sha": "d28486a3533c8b89",
+      "date": "2026-11-23"
     },
     "/groups/trucking/": {
-      "sha": "01805d2b70a55144",
-      "date": "2026-11-16"
+      "sha": "d5b6237f898945a3",
+      "date": "2026-11-23"
     },
     "/groups/water/": {
-      "sha": "65a32c11a86e3a5b",
-      "date": "2026-11-16"
+      "sha": "2984a7b07770d4de",
+      "date": "2026-11-23"
     },
     "/tools/aav-install-check/": {
       "sha": "e7fee2df40f2e807",
@@ -316,6 +316,10 @@
     "/tools/antimicrobial-dilution/": {
       "sha": "39f928c12563a492",
       "date": "2026-10-17"
+    },
+    "/tools/appliance-energy-cost/": {
+      "sha": "27c70b18da6c8109",
+      "date": "2026-11-23"
     },
     "/tools/approach-delta-t/": {
       "sha": "bbbf35b7e19a45ec",
@@ -2774,8 +2778,8 @@
       "date": "2026-10-17"
     },
     "/tools/ev-charge-cost/": {
-      "sha": "7743110a93b1172a",
-      "date": "2026-10-17"
+      "sha": "12e29817ad315382",
+      "date": "2026-11-23"
     },
     "/tools/ev-charge-time/": {
       "sha": "395f2661919a3d35",

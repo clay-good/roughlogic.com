@@ -875,3 +875,67 @@ function _v1111renderEgcParallelRaceways(inputRegion, outputRegion, citationEl) 
   update();
 }
 ELECTRICALANALYSIS_RENDERERS["egc-parallel-raceways"] = _v1111renderEgcParallelRaceways;
+
+// ===================== spec-v1997: appliance electricity use and cost =====================
+// Daily kWh = watts x hours per day / 1,000; annual kWh = daily x days used per
+// year; cost = kWh x the rate (Virginia Cooperative Extension 2901-9014, after
+// DOE Energy Saver). With no wattage on the label, watts = amps x volts.
+// dims: in { watts: M L^2 T^-3, amps: I, volts: M L^2 T^-3 I^-1, hours_per_day: T, days_per_year: dimensionless, rate_cents_per_kwh: dimensionless } out: { watts: M L^2 T^-3, kwh_per_day: M L^2 T^-2, kwh_per_year: M L^2 T^-2, cost_per_day: dimensionless, cost_per_month: dimensionless, cost_per_year: dimensionless }
+export function computeApplianceEnergyCost({ watts = null, amps = null, volts = 120, hours_per_day = null, days_per_year = 365, rate_cents_per_kwh = null } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  const blank = (v) => v === null || v === undefined || v === "";
+  const V = blank(volts) ? 120 : Number(volts);
+  const D = blank(days_per_year) ? 365 : Number(days_per_year);
+  let W;
+  if (!blank(watts)) {
+    W = Number(watts);
+    if (!blank(amps)) return { error: "Enter the wattage or the amps, not both." };
+  } else if (!blank(amps)) {
+    if (!(Number(amps) > 0)) return { error: "Current must be above 0 A." };
+    if (!(V > 0) || V > 600) return { error: "Voltage must be above 0 and at most 600 V (120 for most outlets, 240 for a dryer or range)." };
+    W = Number(amps) * V;
+  } else return { error: "Enter the wattage (or the amps) from the appliance label." };
+  if (!(W > 0) || W > 1000000) return { error: "Power must be above 0 and at most 1,000,000 W." };
+  const H = Number(hours_per_day);
+  if (blank(hours_per_day) || !(H > 0) || H > 24) return { error: "Hours used per day must be above 0 and at most 24." };
+  if (!(D >= 1) || D > 366) return { error: "Days used per year must be 1 to 366 (365 every day)." };
+  const R = Number(rate_cents_per_kwh);
+  if (blank(rate_cents_per_kwh) || !(R >= 1) || R > 200) return { error: "Enter the rate in cents per kWh, 1 to 200 (15 for $0.15)." };
+  const kwh_per_day = W * H / 1000;
+  const kwh_per_year = kwh_per_day * D;
+  const cost_per_year = kwh_per_year * R / 100;
+  return {
+    watts: W, kwh_per_day, kwh_per_year,
+    cost_per_day: kwh_per_day * R / 100, cost_per_month: cost_per_year / 12, cost_per_year,
+    note: "kWh per day = watts x hours per day / 1,000; per year = that x the days it is used; cost = kWh x the rate. Label wattage is the most the appliance draws: a thermostat-cycled load (refrigerator, space heater, water heater) runs at it only part of the time, so enter its running hours, not its plugged-in hours, or measure it with a plug-in meter. Without a wattage, watts = amps x volts (120 V outlets, 240 V for dryers and ranges).",
+  };
+}
+export const applianceEnergyCostExample = { inputs: { watts: 200, hours_per_day: 4, days_per_year: 120, rate_cents_per_kwh: 8.5 } };
+
+function _v1997renderApplianceEnergyCost(inputRegion, outputRegion, citationEl) {
+  citationEl.textContent = "Citation: Virginia Cooperative Extension publication 2901-9014, Estimating Appliance and Home Electronic Energy Use (after the U.S. DOE Energy Saver method): daily kWh = watts x hours / 1,000, annual kWh = daily x days, cost = kWh x rate. Your utility bill's rate and a measured draw govern.";
+  const w = makeNumber("Power (W, from the label)", "aec-w", { step: "any", min: "0" });
+  const a = makeNumber("Or current (A)", "aec-a", { step: "any", min: "0" });
+  const v = makeNumber("Voltage (V, with amps)", "aec-v", { step: "any", min: "0", max: "600", value: "120" });
+  v.input.value = "120";
+  const h = makeNumber("Hours used per day (hr)", "aec-h", { step: "any", min: "0", max: "24" });
+  const d = makeNumber("Days used per year (days)", "aec-d", { step: "1", min: "1", max: "366", value: "365" });
+  d.input.value = "365";
+  const r = makeNumber("Electricity rate (cents per kWh)", "aec-r", { step: "any", min: "1", max: "200" });
+  const all = [w, a, v, h, d, r];
+  for (const f of all) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { w.input.value = "200"; a.input.value = ""; v.input.value = "120"; h.input.value = "4"; d.input.value = "120"; r.input.value = "8.5"; update(); });
+  const oE = makeOutputLine(outputRegion, "Energy", "aec-out-e");
+  const oC = makeOutputLine(outputRegion, "Cost", "aec-out-c");
+  const oN = makeOutputLine(outputRegion, "Note", "aec-out-n");
+  const update = debounce(() => {
+    const res = computeApplianceEnergyCost({ watts: w.input.value === "" ? null : Number(w.input.value), amps: a.input.value === "" ? null : Number(a.input.value), volts: v.input.value === "" ? null : Number(v.input.value), hours_per_day: h.input.value === "" ? null : Number(h.input.value), days_per_year: d.input.value === "" ? null : Number(d.input.value), rate_cents_per_kwh: r.input.value === "" ? null : Number(r.input.value) }); stepsFor(outputRegion, inputRegion, ["watts", "amps", "volts", "hours_per_day", "days_per_year", "rate_cents_per_kwh"], res);
+    if (res.error) { oE.textContent = res.error; oC.textContent = "-"; oN.textContent = "-"; return; }
+    oE.textContent = fmt(res.kwh_per_day, 2) + " kWh per day, " + fmt(res.kwh_per_year, 1) + " kWh per year (" + fmt(res.watts, 0) + " W)";
+    oC.textContent = "$" + fmt(res.cost_per_day, 2) + " per day, $" + fmt(res.cost_per_month, 2) + " per month, $" + fmt(res.cost_per_year, 2) + " per year";
+    oN.textContent = res.note;
+  }, DEBOUNCE_MS);
+  for (const f of all) f.input.addEventListener("input", update);
+  update();
+}
+ELECTRICALANALYSIS_RENDERERS["appliance-energy-cost"] = _v1997renderApplianceEnergyCost;

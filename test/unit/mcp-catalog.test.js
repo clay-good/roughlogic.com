@@ -778,3 +778,17 @@ test("answer_query: pool gallons and duct size answer outright", async () => {
   assert.equal(duct.status, "OK");
   assert.ok(duct.result.round_diameter_in > 9.5 && duct.result.round_diameter_in < 10.5);
 });
+
+test("answer_query: what an appliance costs to run (spec-v1997)", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  const a = await answerQuery({ query: "electricity cost 1500 watts 8 hours a day 15 cents per kwh" });
+  assert.equal(a.status, "OK");
+  assert.equal(a.id, "appliance-energy-cost");
+  assert.ok(Math.abs(a.result.cost_per_year - 657) < 1e-9);
+  const b = await answerQuery({ query: "cost to run a 12 amp space heater 6 hours a day 14 cents per kwh" });
+  assert.equal(b.status, "OK");
+  assert.equal(b.result.watts, 1440);
+  // The days a year it runs must not be dropped for the 365 default.
+  const c = await answerQuery({ query: "how much does it cost to run a 200 watt fan 4 hours a day 120 days at 8.5 cents per kwh" });
+  assert.equal(c.result.kwh_per_year, 96);
+});

@@ -42,6 +42,7 @@ const LABEL_UNIT = Object.freeze({
 const EXEMPT = new Map([
   ["steam-pipe-capacity.nps", "NPS is a nominal SIZE designation, not a measured length"],
   ["motor-feeder-multiple.motors", "a typed list of motors; the (A) describes an item inside it"],
+  ["appliance-energy-cost.days_per_year", "days used out of a year (days / yr, dimensionless); the (days) names what to type, so \"120 days\" fills it"],
 ]);
 
 

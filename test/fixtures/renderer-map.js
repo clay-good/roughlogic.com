@@ -2294,4 +2294,5 @@ export const RENDERER_MAP = {
   "wood-stud-wall-takeoff": { module: "../../calc-construction.js", exportName: "CONSTRUCTION_RENDERERS" },
   "lawn-fertilizer-rate": { module: "../../calc-farmproduction.js", exportName: "FARMPRODUCTION_RENDERERS" },
   "sensible-heat-airflow": { module: "../../calc-hvacairside.js", exportName: "HVACAIRSIDE_RENDERERS" },
+  "appliance-energy-cost": { module: "../../calc-electricalanalysis.js", exportName: "ELECTRICALANALYSIS_RENDERERS" },
 };

@@ -2393,6 +2393,7 @@ export const COMPUTE_MAP = {
   "wood-stud-wall-takeoff": { module: "../../calc-construction.js", fn: "computeWoodStudWallTakeoff" },
   "lawn-fertilizer-rate": { module: "../../calc-farmproduction.js", fn: "computeLawnFertilizerRate" },
   "sensible-heat-airflow": { module: "../../calc-hvacairside.js", fn: "computeSensibleHeatAirflow" },
+  "appliance-energy-cost": { module: "../../calc-electricalanalysis.js", fn: "computeApplianceEnergyCost" },
 };
 
 // Resolve a COMPUTE_MAP module path (relative to this file) and import it.

@@ -26868,6 +26868,17 @@ export const CITATIONS = {
       { name: "Standard air", value: "0.075 lb/cu ft and 0.24 Btu/lb-F unless the factor is changed", source: "first principles" },
     ],
   },
+  "appliance-energy-cost": {
+    formula: "kWh/day = W x h/day / 1,000; kWh/yr = kWh/day x days/yr; cost/yr = kWh/yr x rate (cents/kWh) / 100; W = A x V when only amps are known; per month = per year / 12.",
+    edition: "Virginia Cooperative Extension publication 2901-9014, Estimating Appliance and Home Electronic Energy Use (2020), after the U.S. DOE Energy Saver method; its window-fan (200 W, 4 h, 120 days, 96 kWh, $8.16 at 8.5 cents) and computer (270 W, 4 h, 365 days, 394 kWh, $33.51) examples are reproduced.",
+    freeAccess: "Free at pubs.ext.vt.edu (2901-9014).",
+    governance: GOVERNANCE.general,
+    editionNote: "Label wattage is the maximum draw; a thermostat-cycled appliance runs at it only part of its plugged-in time, so the running hours (or a plug-in meter reading) govern. The utility bill's rate, including delivery charges, governs the cost.",
+    assumptions: [
+      { name: "Voltage with amps", value: "120 V unless entered", source: "US outlet voltage" },
+      { name: "Days per year", value: "365 unless entered", source: "every day" },
+    ],
+  },
 };
 
 // --- Reference block and copy text ---

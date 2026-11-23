@@ -2290,4 +2290,5 @@ export const TOOLS = [
   {"id":"wood-stud-wall-takeoff","name":"Wood Stud Wall Takeoff: Studs and Plates","group":"E","trades":["carpentry","framing"],"desc":"How many wood studs and how much plate one stud wall takes.","more":1},
   {"id":"lawn-fertilizer-rate","name":"Lawn Fertilizer Product Rate","group":"L","trades":["landscaping","agriculture"],"desc":"How much lawn fertilizer to buy and spread, from the bag's three-number analysis.","more":1},
   {"id":"sensible-heat-airflow","name":"Sensible Heat of an Airstream (1.08 x CFM x dT)","group":"C","trades":["hvac"],"desc":"The heat an airstream carries, Q = 1.08 x CFM x the temperature difference, solved for whichever of the three is left blank.","more":1},
+  {"id":"appliance-energy-cost","name":"Appliance Electricity Use and Cost","group":"A","trades":["electrical","energy-audit"],"desc":"What it costs to run one appliance or load: kWh per day = watts x hours per day / 1,000, per year = that x the days it is used, and cost = kWh x your rate in cents.","more":1},
 ];
