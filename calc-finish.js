@@ -267,7 +267,7 @@ FINISH_RENDERERS["retaining-wall-block"] = _simpleRenderer({
   citation: "Citation: Segmental retaining-wall maker guidance (Allan Block / Versa-Lok, by name). Bury ~1 in per ft of height; 2 ft x 6 in base pad; 12 in drainage zone. Over 4 ft needs an engineered design.",
   example: retainingWallBlockExample.inputs,
   fields: [
-    { key: "wall_length_ft", label: "Wall run (ft)", kind: "number" },
+    { key: "wall_length_ft", label: "Wall length (ft)", kind: "number" },
     { key: "exposed_height_ft", label: "Exposed height (ft)", kind: "number" },
     { key: "block_length_in", label: "Block face length (in)", kind: "number" },
     { key: "block_height_in", label: "Block face height (in)", kind: "number" },

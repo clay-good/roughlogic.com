@@ -326,6 +326,7 @@ function valueFor(qty, row, text, labelWords) {
   const fieldUnit = rowUnit(row);
   // ...unless the field is itself that rate: "8 hours a day" is "Hours used
   // per day" (2026-11-23).
+  if (qty.delta && !/\b(rise|difference|delta|split|increase|differential|dt|drop|change)\b/i.test(String(row.l || "") + " " + row.d.replace(/_/g, " "))) return null;
   if (qty.rate && fieldUnit && !new RegExp("\\bper " + qty.rate + "\\b").test(String(row.l || "").toLowerCase())) return null;
   const raw = rawUnitOf(qty, String(text || ""));
   const prose =
@@ -453,6 +454,12 @@ export function queryFill(query, rows, opts) {
   }
   for (const q of quantities) {
     if (/nominal (?:width|depth)\s*$/.test(text.slice(0, q.index))) q.lumber = true;
+  }
+  // "70 degree rise" is a temperature DIFFERENCE: it fills only a field that
+  // is one, never a setpoint or outlet temperature (2026-11-23).
+  for (const q of quantities) {
+    if (unitFamily(canonicalUnit(rawUnitOf(q, text)) || "") === "temperature" &&
+        /^\s+(?:rise|difference|delta|split|increase|differential|dt)\b/.test(text.slice(q.end))) q.delta = true;
   }
   for (const q of quantities) {
     const per = text.slice(q.end).match(/^\s*(?:per|\/|a)\s*(month|mo|year|yr|day|week|wk|hour|hr|h|minute|min|second|sec)\b/);
@@ -703,6 +710,10 @@ export function queryFill(query, rows, opts) {
       const word = m[1].toLowerCase();
       const literal = keys.filter((k) => termsByRow.get(k).has(word));
       if (literal.length === 1) keys = literal;
+      // "50 ft long" beside a Wall length (ft) and a Block face length (in):
+      // the field measured in the unit written (2026-11-23: 600 in of block).
+      const exact = keys.filter((k) => rowUnit(numberRows.find((r) => r.d === k)) === unit);
+      if (keys.length > 1 && exact.length === 1) keys = exact;
     }
     backOf.set(qi, { cut: m[0].length, keys, dimension: !/^\s+of\s/i.test(m[0]) });
   });

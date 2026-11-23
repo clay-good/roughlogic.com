@@ -709,3 +709,13 @@ test("query-fill: a size before a material word, and options written with spaces
   // A bare fraction with no material word after it is still ambiguous.
   assert.equal(queryFill("3/4 at 5 gpm", fl).filled.nominal_size, undefined);
 });
+
+test("query-fill: a temperature rise is a difference; a post-word prefers the unit written", () => {
+  const tk = [num("target_outlet_F", "Target outlet", "degf"), num("target_gpm", "Target flow", "gpm")];
+  assert.deepEqual(queryFill("tankless water heater 5 gpm 70 degree rise", tk).filled, { target_gpm: "5" });
+  assert.equal(queryFill("tankless 5 gpm 120 degree outlet", tk).filled.target_outlet_F, "120");
+  assert.equal(queryFill("70 degree rise", [num("rise_F", "Temperature rise", "degf")]).filled.rise_F, "70");
+  const rw = [num("wall_length_ft", "Wall length", "ft"), num("exposed_height_ft", "Exposed height", "ft"),
+    num("block_length_in", "Block face length", "in"), num("block_height_in", "Block face height", "in")];
+  assert.deepEqual(queryFill("retaining wall blocks 50 ft long 3 ft tall", rw).filled, { wall_length_ft: "50", exposed_height_ft: "3" });
+});

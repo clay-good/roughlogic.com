@@ -141,6 +141,18 @@
       "tile": "board-footage",
       "mustNotBind": { "width_in": "2" },
       "why": "A 2x6 is 2 thick by 6 wide; the lumber rewrite's 'width' put the 2 in Width and the 6 went nowhere."
+    },
+    {
+      "query": "tankless water heater 5 gpm 70 degree rise",
+      "tile": "tankless-gpm",
+      "mustNotBind": { "target_outlet_F": "70" },
+      "why": "A 70 degree rise is a temperature difference; it filled the target outlet temperature by unit alone."
+    },
+    {
+      "query": "retaining wall blocks 50 ft long 3 ft tall",
+      "tile": "retaining-wall-block",
+      "mustNotBind": { "block_length_in": "600" },
+      "why": "'50 ft long' named only the block face length, because the wall's own label said 'Wall run'; the 50 ft became a 600 in block."
     }
   ]
 }
