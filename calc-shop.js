@@ -2816,7 +2816,7 @@ SHOP_RENDERERS["hydraulic-reservoir-cooler"] = _simpleRenderer({
     { key: "pump_gpm", label: "Pump flow (gpm)", kind: "number" },
     { key: "pressure_psi", label: "System pressure (psi)", kind: "number" },
     { key: "pump_efficiency", label: "Pump and drive efficiency (0-1)", kind: "number" },
-    { key: "heat_fraction", label: "Fraction of input that becomes heat (0.25 typical)", kind: "number" },
+    { key: "heat_fraction", label: "Fraction of input that becomes heat (0.25 typical)", kind: "number", default: 0.25 },
     { key: "reservoir_multiplier", label: "Reservoir multiplier (3 industrial, 1-2 mobile)", kind: "number" },
     { key: "reservoir_dissipation_btu_hr", label: "Reservoir dissipation at design oil temp (BTU/hr)", kind: "number" },
   ],

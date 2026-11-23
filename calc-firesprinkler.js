@@ -392,7 +392,7 @@ FIRESPRINKLER_RENDERERS["drypipe-air-compressor"] = _simpleRenderer({
   fields: [
     { key: "dry_volume_gal", label: "Dry system volume (gal, from pipe schedule)", kind: "number" },
     { key: "normal_pressure_psig", label: "Normal air pressure (psig)", kind: "number" },
-    { key: "restore_minutes", label: "Restore time (min, NFPA 13 <= 30)", kind: "number" },
+    { key: "restore_minutes", label: "Restore time (min, NFPA 13 <= 30)", kind: "number", default: 30 },
   ],
   outputs: [
     { key: "v", id: "dac-out-v", label: "System volume", value: (r) => fmt(r.system_ft3, 1) + " ft3" },

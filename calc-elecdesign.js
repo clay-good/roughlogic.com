@@ -694,7 +694,7 @@ ELECDESIGN_RENDERERS["rolling-sphere-protection"] = _simpleRenderer({
   example: rollingSphereProtectionExample.inputs,
   fields: [
     { key: "mast_height_ft", label: "Mast / air-terminal height (ft)", kind: "number" },
-    { key: "sphere_radius_ft", label: "Rolling-sphere radius (ft, 150 standard)", kind: "number" },
+    { key: "sphere_radius_ft", label: "Rolling-sphere radius (ft, 150 standard)", kind: "number", default: 150 },
   ],
   outputs: [
     { key: "r", id: "rsp-out-r", label: "Protected ground radius", value: (r) => fmt(r.protected_radius_ft, 1) + " ft" + (r.capped ? " (capped at R; see note)" : "") },

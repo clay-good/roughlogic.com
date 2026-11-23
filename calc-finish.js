@@ -583,7 +583,7 @@ FINISH_RENDERERS["cement-board-takeoff"] = _simpleRenderer({
   example: cementBoardTakeoffExample.inputs,
   fields: [
     { key: "area_sf", label: "Backer area (sf)", kind: "number" },
-    { key: "sheet_area_sf", label: "Sheet area (sf, 3x5 = 15)", kind: "number" },
+    { key: "sheet_area_sf", label: "Sheet area (sf, 3x5 = 15)", kind: "number", default: 15 },
     { key: "waste_pct", label: "Waste / cuts (%)", kind: "number", default: 10 },
     { key: "screws_per_sheet", label: "Screws per sheet (~30-40)", kind: "number" },
   ],

@@ -880,7 +880,7 @@ GEOTECH_RENDERERS["liquefaction-screening"] = _simpleRenderer({
     { key: "sigma_vp_psf", label: "Effective vertical stress (psf)", kind: "number" },
     { key: "depth_ft", label: "Depth (ft)", kind: "number" },
     { key: "crr", label: "Cyclic resistance ratio CRR", kind: "number" },
-    { key: "msf", label: "Magnitude scaling factor (Mw 7.5 = 1.0)", kind: "number" },
+    { key: "msf", label: "Magnitude scaling factor (Mw 7.5 = 1.0)", kind: "number", default: 1.0 },
   ],
   outputs: [
     { key: "csr", id: "liq-out-csr", label: "Cyclic stress ratio CSR", value: (r) => fmt(r.csr, 3) + " (rd " + fmt(r.rd, 3) + ")" },

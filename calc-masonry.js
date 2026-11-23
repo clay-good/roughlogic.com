@@ -424,7 +424,7 @@ MASONRY_RENDERERS["masonry-anchor-bolt"] = _simpleRenderer({
     { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
     { key: "lbe_in", label: "Effective embedment lb (in)", kind: "number" },
     { key: "ab_in2", label: "Bolt effective tensile area Ab (in², net: 1/2 in 0.142, 3/4 in 0.334)", kind: "number" },
-    { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number" },
+    { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number", default: 36000 },
   ],
   outputs: [
     { key: "ba", id: "mab-out-ba", label: "Allowable tension Ba", value: (r) => fmt(r.ba_lb, 0) + " lb (" + (r.masonry_governs ? "masonry breakout governs" : "steel governs") + ")" },
@@ -472,7 +472,7 @@ MASONRY_RENDERERS["masonry-anchor-embedment"] = _simpleRenderer({
     { key: "required_tension_lb", label: "Required tension T (lb)", kind: "number" },
     { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
     { key: "ab_in2", label: "Bolt effective tensile area Ab (in², net: 1/2 in 0.142, 3/4 in 0.334)", kind: "number" },
-    { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number" },
+    { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number", default: 36000 },
   ],
   outputs: [
     { key: "lbe", id: "mae-out-lbe", label: "Required embedment lbe", value: (r) => fmt(r.lbe_in, 2) + " in for strength" + (r.below_min_embedment ? " -- BELOW the TMS 402 minimum; set the bolt at 4 bolt diameters and not less than 2 in" : " (and not less than 4 bolt diameters or 2 in)") },
@@ -531,7 +531,7 @@ MASONRY_RENDERERS["masonry-anchor-shear"] = _simpleRenderer({
     { key: "lb_in", label: "Effective embedment lb (in)", kind: "number" },
     { key: "lbe_in", label: "Edge distance lbe (in)", kind: "number" },
     { key: "ab_in2", label: "Bolt effective tensile area Ab (in², net: 1/2 in 0.142, 3/4 in 0.334)", kind: "number" },
-    { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number" },
+    { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number", default: 36000 },
   ],
   outputs: [
     { key: "bv", id: "mas-out-bv", label: "Allowable shear Bv", value: (r) => fmt(r.bv_lb, 0) + " lb (" + r.governing_mode + " governs)" },

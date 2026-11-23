@@ -5197,7 +5197,7 @@ const renderMasonryCoursing = _simpleRenderer({
   fields: [
     { key: "target_in", label: "Height to reach (in)", kind: "number" },
     { key: "unit_in", label: "Unit height (in, CMU 7.625 / brick 2.25)", kind: "number" },
-    { key: "joint_in", label: "Bed joint (in, typ 0.375 / brick 0.4167)", kind: "number" },
+    { key: "joint_in", label: "Bed joint (in, typ 0.375 / brick 0.4167)", kind: "number", default: 0.375 },
   ],
   outputs: [
     { key: "ci", id: "mco-out-ci", label: "Course height", value: (r) => _fmtC(r.course_in, 4) + " in" },
@@ -9491,7 +9491,7 @@ const _v850renderShingleNails = _simpleRenderer({
   fields: [
     { key: "squares", label: "Roof area (squares)", kind: "number" },
     { key: "shingles_per_square", label: "Shingles per square (~80 three-tab, ~64 architectural)", kind: "number" },
-    { key: "nails_per_shingle", label: "Nails per shingle (4 standard, 6 high-wind)", kind: "number" },
+    { key: "nails_per_shingle", label: "Nails per shingle (4 standard, 6 high-wind)", kind: "number", default: 4 },
     { key: "nails_per_lb", label: "Nails per pound", kind: "number" },
   ],
   outputs: [
@@ -11376,7 +11376,7 @@ CONSTRUCTION_RENDERERS["stud-notch-bore-limit"] = _simpleRenderer({
   citation: "Citation: IRC R602.6 wall-stud notch/bore limits by name, on the actual stud width. Notch <= 25% (bearing) / 40% (nonbearing); bore <= 60% (any stud), and an exterior- or bearing-wall stud bored over 40% must be doubled; hole edge >= 5/8 in; no hole in the same section as a notch. The AHJ-adopted code governs.",
   example: studNotchBoreLimitExample.inputs,
   fields: [
-    { key: "stud_width_in", label: "Actual stud width (in, 2x4 = 3.5, 2x6 = 5.5)", kind: "number" },
+    { key: "stud_width_in", label: "Actual stud width (in, 2x4 = 3.5, 2x6 = 5.5)", kind: "number", default: 5.5 },
   ],
   outputs: [
     { key: "nb", id: "snb-out-nb", label: "Max notch (bearing / exterior)", value: (r) => fmt(r.notch_max_bearing_in, 3) + " in (25%)" },
@@ -11417,7 +11417,7 @@ CONSTRUCTION_RENDERERS["joist-notch-bore-limit"] = _simpleRenderer({
   citation: "Citation: IRC R502.8.1 sawn-lumber floor-joist notch/bore limits by name, on the actual joist depth. End notch <= D/4; top/bottom notch <= D/6 deep and D/3 long (not in the middle third); bore <= D/3 dia, edge >= 2 in. Engineered I-joists follow the manufacturer's chart only. The AHJ-adopted code governs.",
   example: joistNotchBoreLimitExample.inputs,
   fields: [
-    { key: "joist_depth_in", label: "Actual joist depth (in, 2x10 = 9.25, 2x12 = 11.25)", kind: "number" },
+    { key: "joist_depth_in", label: "Actual joist depth (in, 2x10 = 9.25, 2x12 = 11.25)", kind: "number", default: 9.25 },
   ],
   outputs: [
     { key: "en", id: "jnb-out-en", label: "Max end notch (at bearing)", value: (r) => fmt(r.end_notch_max_in, 3) + " in (D/4)" },
@@ -12155,7 +12155,7 @@ CONSTRUCTION_RENDERERS["carpet-seam-layout"] = _simpleRenderer({
   fields: [
     { key: "room_length_ft", label: "Room length (ft)", kind: "number" },
     { key: "room_width_ft", label: "Room width (ft)", kind: "number" },
-    { key: "roll_width_ft", label: "Roll width (ft; 12 or 15 typical)", kind: "number" },
+    { key: "roll_width_ft", label: "Roll width (ft; 12 or 15 typical)", kind: "number", default: 12 },
     { key: "pattern_repeat_in", label: "Pattern repeat (in; 0 for plain)", kind: "number" },
     { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 5 },
     { key: "min_fill_strip_in", label: "Minimum acceptable fill strip (in)", kind: "number" },

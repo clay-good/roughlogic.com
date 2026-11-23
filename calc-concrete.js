@@ -1569,7 +1569,7 @@ CONCRETE_RENDERERS["concrete-longterm-defl"] = _simpleRenderer({
   example: concreteLongtermDeflExample.inputs,
   fields: [
     { key: "immediate_defl_in", label: "Immediate deflection from sustained load (in)", kind: "number" },
-    { key: "duration_months", label: "Sustained-load duration (months, >=60 = 5 yr)", kind: "number" },
+    { key: "duration_months", label: "Sustained-load duration (months, >=60 = 5 yr)", kind: "number", default: 60 },
     { key: "comp_steel_ratio", label: "Compression-steel ratio rho' = As'/(b d) (0 if none)", kind: "number" },
   ],
   outputs: [
@@ -2457,7 +2457,7 @@ CONCRETE_RENDERERS["concrete-isolation-joint"] = _simpleRenderer({
     { key: "slab_length_ft", label: "Slab length (ft)", kind: "number" },
     { key: "slab_width_ft", label: "Slab width (ft)", kind: "number" },
     { key: "num_columns", label: "Columns / piers in the slab", kind: "number" },
-    { key: "column_perimeter_ft", label: "Perimeter per column (ft, 12 in sq = 4)", kind: "number" },
+    { key: "column_perimeter_ft", label: "Perimeter per column (ft, 12 in sq = 4)", kind: "number", default: 4 },
     { key: "strip_length_ft", label: "Filler strip length (ft)", kind: "number" },
   ],
   outputs: [

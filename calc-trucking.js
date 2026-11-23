@@ -2031,7 +2031,7 @@ TRUCKING_RENDERERS["truck-startability"] = _simpleRenderer({
   fields: [
     { key: "gross_weight_lb", label: "Gross combination weight (lb)", kind: "number" },
     { key: "drive_axle_weight_lb", label: "Weight on drive axles (lb)", kind: "number" },
-    { key: "friction_coeff", label: "Tire-road friction (0.6 dry, 0.3 wet, 0.15 ice)", kind: "number" },
+    { key: "friction_coeff", label: "Tire-road friction (0.6 dry, 0.3 wet, 0.15 ice)", kind: "number", default: 0.6 },
     { key: "rolling_resistance_coeff", label: "Rolling resistance coefficient (~0.012 pavement)", kind: "number", default: 0.012 },
   ],
   outputs: [
