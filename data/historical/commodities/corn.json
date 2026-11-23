@@ -4,8 +4,8 @@
   "agency": "USDA NASS",
   "series_id": "CORN, GRAIN - PRICE RECEIVED, MEASURED IN $ / BU",
   "units": "USD/bushel",
-  "built": "2026-11-16",
-  "fetched": "2026-11-16",
+  "built": "2026-11-23",
+  "fetched": "2026-11-23",
   "cadence": "monthly",
   "points": [
     {

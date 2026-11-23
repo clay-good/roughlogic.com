@@ -4,8 +4,8 @@
   "agency": "EIA",
   "series_id": "PET.EMM_EPMR_PTE_NUS_DPG.M",
   "units": "USD/gal",
-  "built": "2026-11-16",
-  "fetched": "2026-11-16",
+  "built": "2026-11-23",
+  "fetched": "2026-11-23",
   "cadence": "monthly",
   "points": [
     {

@@ -1,9 +1,9 @@
 {
   "name": "physical-constants",
-  "version": "2026-11-16",
-  "fetched": "2026-11-16",
+  "version": "2026-11-23",
+  "fetched": "2026-11-23",
   "edition": "NIST CODATA 2018; physical-fact constants do not have an edition cycle.",
-  "asOf": "2026-11-16",
+  "asOf": "2026-11-23",
   "refresh_cadence": "annual",
   "shards": [
     {
