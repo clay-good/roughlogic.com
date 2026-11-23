@@ -6,6 +6,11 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Two more wrong values from a tenth sweep, both pinned in `test/fixtures/free-text-queries.json`.**
+  - "Crown molding for 12 by 14 room" put the 12 in "Trim stock length" and the 14 in "Total door-opening width", as if they were the plan's length and width. A plan's length or width is now only a field about the surface itself ("Length", "Room length", "Slab width"). A room's plan fills a single perimeter field: 52 ft.
+  - "Fertilizer for 10 acres 150 lb nitrogen" made the bag weight 150 lb, because it was the only field in pounds. When the word after a number names another field whose key carries that unit (`n_lb_per_1000`), the unit alone no longer places it. "310 lb worker" still goes to the anchorage capacity, because a head count holds no pounds.
+
+  Both worked-example lenses are unchanged: 8,751 named and 2,883 terse, 0 wrong.
 - **"11 hour driving limit hours of service" no longer fills the weekly on-duty hours.** The hours-of-service calculator has no driving-time box, and the 11 hours went into "Weekly on-duty already used" by unit alone. An activity word right after a number ("driving", "idling") now keeps it out of a field whose label does not name that activity. Both worked-example lenses are unchanged: 8,751 named and 2,883 terse, 0 wrong.
 - **17 fields now show the default their label already names.** A sweep found 942 page fields whose box is empty but whose calculator silently uses a default. Most need a decision about whether to show the value or refuse a blank. Seventeen are clear: the label itself states the value used, for example "Tire-road friction (0.6 dry, 0.3 wet, 0.15 ice)" defaulting to 0.6, "Bolt yield fy (psi, A307 = 36000)", or "Rolling-sphere radius (ft, 150 standard)". These are now prefilled, so the page shows the number it computes with, and the agent door can use it. No answer changes.
 - **143 field units an earlier rule got wrong are removed, and two wrong values from a ninth sweep are fixed.**

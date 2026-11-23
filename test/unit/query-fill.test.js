@@ -812,3 +812,13 @@ test("query-fill: an activity word after a number is not a field it does not nam
   assert.deepEqual(queryFill("11 hour driving limit hours of service", hos).filled, {});
   assert.equal(queryFill("8 hours running", [num("run_hr", "Running time", "hr")]).filled.run_hr, "8");
 });
+
+test("query-fill: a room's plan fills a perimeter; an item's length is not the plan's", () => {
+  const trim = [num("perimeter_ft", "Room perimeter", "ft"), num("openings_ft", "Total door-opening width", "ft"), num("stock_len_ft", "Trim stock length", "ft")];
+  assert.deepEqual(queryFill("crown molding for 12 by 14 room", trim).filled, { perimeter_ft: "52" });
+});
+
+test("query-fill: the word after a number can name the field its unit points away from", () => {
+  const lf = [num("n_lb_per_1000", "Nitrogen rate"), num("bag_weight_lb", "Bag weight", "lb")];
+  assert.equal(queryFill("fertilizer 150 lb nitrogen", lf).filled.bag_weight_lb, undefined);
+});

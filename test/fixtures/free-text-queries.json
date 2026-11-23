@@ -195,6 +195,18 @@
       "tile": "hos-math",
       "mustNotBind": { "weekly_on_duty_used_hr": "11" },
       "why": "The 11 hours are driving time, which the tile has no field for; the unit alone put them in the weekly on-duty hours already used."
+    },
+    {
+      "query": "crown molding for 12 by 14 room",
+      "tile": "trim-linear-footage",
+      "mustNotBind": { "stock_len_ft": "12", "openings_ft": "14" },
+      "why": "The room's 12 by 14 went to 'Trim stock length' and 'Total door-opening width' as if they were the plan's length and width; the room's perimeter is 52 ft."
+    },
+    {
+      "query": "fertilizer for 10 acres 150 lb nitrogen 46-0-0",
+      "tile": "lawn-fertilizer-rate",
+      "mustNotBind": { "bag_weight_lb": "150" },
+      "why": "150 lb of nitrogen became the bag weight, the only field in pounds."
     }
   ]
 }

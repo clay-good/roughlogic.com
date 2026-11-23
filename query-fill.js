@@ -544,7 +544,12 @@ export function queryFill(query, rows, opts) {
       if (a > 0 && b > 0 && (surface || Math.max(a, b) > NOMINAL_LUMBER_MAX_IN)) {
         const start = m.index + m[1].length, end = start + m[0].length - m[1].length - (m[4] || "").length;
         const inPair = quantities.map((q, i) => (q.index >= start && q.index < end ? i : -1)).filter((i) => i >= 0);
-        const ft = (word) => numberRows.filter((r) => rowUnit(r) === "ft" && termsByRow.get(r.d).has(word));
+        // A plan's length or width is the surface's own: "Length", "Room
+        // length", "Slab width". Not an item's ("Trim stock length", "Total
+        // door-opening width"), which took a room's 12 by 14 (2026-11-23).
+        const PLAN_NOUNS = new Set(["length", "width", "room", "slab", "floor", "patio", "deck", "area", "pad", "overall", "plan", "building", "lot", "yard", "pool", "roof", "house", "garage", "footprint", "driveway", "lawn", "garden", "space", "bed", "shed", "porch", "kitchen", "bathroom", "bedroom", "basement", "walkway", "sidewalk", "surface"]);
+        const ft = (word) => numberRows.filter((r) => rowUnit(r) === "ft" && termsByRow.get(r.d).has(word) &&
+          String(r.l || "").toLowerCase().split(/[^a-z]+/).filter((w) => w.length > 2 && !TERM_STOPWORDS.has(w)).every((w) => PLAN_NOUNS.has(w) || PLAN_NOUNS.has(w.replace(/s$/, ""))));
         const len = ft("length"), wid = ft("width");
         const areas = numberRows.filter((r) => rowUnit(r) === "ft2" && !/slop|surface|wall|ceiling/i.test(r.l));
         let done = false;
@@ -580,6 +585,13 @@ export function queryFill(query, rows, opts) {
             filled[deep[0].d] = value;
             for (const i of [...inPair, thirdQi]) { suppressed.add(i); claimed.add(i); }
           }
+        }
+        // A room's perimeter, on a tile that takes one and no length or width:
+        // trim and baseboard (2026-11-23: "crown molding for 12 by 14 room"
+        // filled a 12 ft stock length and 14 ft of openings).
+        const perim = numberRows.filter((r) => rowUnit(r) === "ft" && termsByRow.get(r.d).has("perimeter"));
+        if (!done && surface && perim.length === 1 && !len.length && !wid.length) {
+          filled[perim[0].d] = String(Math.round(2 * (a + b) * 1e6) / 1e6); done = true;
         }
         // A room's volume, on a tile that takes one and no length, width or
         // area: the plan times its ceiling height ("room 12 by 12, 8 ft
@@ -1104,6 +1116,18 @@ export function queryFill(query, rows, opts) {
     // on-duty already used (hr)" field does not hold (2026-11-23). Only an
     // activity word (-ing) right after the number, and only when the field
     // does not name it.
+    // ...and "150 lb nitrogen" names the nitrogen field: when the word right
+    // after the number is another field's term and not this one's, the unit
+    // alone does not make it this field (2026-11-23: it became a bag weight).
+    {
+      const nxt = text.slice(qty.end).toLowerCase().match(/^\s+([a-z]{4,})\b/);
+      const own = termsByRow.get(candidates[0].d);
+      // Only where that field's key carries this unit ("n_lb_per_1000" for
+      // "150 lb"): "310 lb worker" names a head count, which holds no pounds.
+      if (nxt && !own.has(nxt[1]) && !own.has(nxt[1].replace(/s$/, "")) &&
+          numberRows.some((r) => r.d !== candidates[0].d && termsByRow.get(r.d).has(nxt[1]) &&
+            r.d.toLowerCase().split("_").includes(qtyUnit))) return;
+    }
     {
       const act = text.slice(qty.end).toLowerCase().match(/^\s+([a-z]{3,}ing)\b/);
       const t = termsByRow.get(candidates[0].d);
