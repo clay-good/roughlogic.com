@@ -125,6 +125,7 @@ const UNIT_SPELLINGS = {
   mph: ["mph"],
   // Surface feet per minute is a cutting speed in ft/min (2026-11-23).
   fpm: ["fpm", "ft/min", "sfm", "sfpm"],
+  fps: ["fps", "ft/s", "ft/sec", "feet per second"],
   rpm: ["rpm"],
   kt: ["kt", "knot", "knots"],
   // time
@@ -193,6 +194,17 @@ export function unitFromLabel(label) {
   // the lead word to say it (2026-11-23).
   const unit = canonicalUnit(head);
   if (unit) return unit;
+  // "(F)" on a temperature label is degrees F. A bare letter is refused
+  // elsewhere because "C" is as often Hazen-Williams C as Celsius; a label
+  // about a temperature settles it (2026-11-23: 22 temperature fields had
+  // no unit, so "95 f" could not fill them).
+  const tidyHead = tidy(head);
+  if ((tidyHead === "f" || tidyHead === "c") && /\b(temp|temperature|bulb|dew|ambient|superheat|subcool|rise|outdoor|indoor|supply|return|setpoint|design|coil|water|air)\b/i.test(labelLead(label))) {
+    return tidyHead === "f" ? "degf" : "degc";
+  }
+  // "(in o.c.)", "(V on a 120 V base)": a unit word leading a note.
+  const first = tidyHead.split(/\s+/);
+  if (first.length > 1 && canonicalUnit(first[0]) && first[0].length > 1) return canonicalUnit(first[0]);
   const lead = tidy(labelLead(label));
   return WHOLE_LABEL_UNITS.has(lead) ? canonicalUnit(lead) : null;
 }
@@ -251,7 +263,7 @@ const UNIT_FAMILIES = {
   wiresize: { awg: 1 },
   heat: { btu: 1 },
   heatrate: { btuh: 1 },
-  speed: { mph: 1, fpm: 0.0113636364, kt: 1.15077945 },
+  speed: { mph: 1, fpm: 0.0113636364, fps: 0.681818182, kt: 1.15077945 },
   rotation: { rpm: 1 },
   time: { s: 1, min: 60, hr: 3600, day: 86400, wk: 604800, mo: 2629800, yr: 31557600 },
   density: { pcf: 1 },

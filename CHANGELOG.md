@@ -6,6 +6,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **286 more fields now carry the unit their label states, and none lost one.** A sweep for field-index rows whose key names a unit (`_in`, `_ft`, `_f`...) but whose label declares none found 382, most of them legitimate (per-unit prices, coefficients). In that sample, 22 temperature labels end "(F)". A bare F or C stays refused in general, because "C" is as often Hazen-Williams C as Celsius, but on a label about a temperature it is now degrees. Fourteen labels end "(ft/s)", which was not a unit; ft/s is now a speed (60 ft/min). Labels like "(in o.c.)" or "(in above the floor)" now take their leading unit word. Measured again, 8,725 of 10,678 fields are recovered (+9) with 0 wrong.
 - **A fifth question sweep: two more wrong values, three misroutes that answered OK, and a solve-for that picked the given quantity.**
   - "Cutting speed 300 sfm 2 inch diameter" made the chip load 2 in. The diameter label's unit sat behind a colon ("in: cutter for mill/drill"), which hid it. A label's unit now ends at a colon too, and SFM (surface feet per minute) is read as ft/min.
   - "Tire size 265/70r17" was read as the fraction 265/70 (3.79 in). The fraction veto missed it because "70r" has no word boundary. On a calculator that asks for a tire diameter in inches, a P-metric size is now its diameter: 2 x 265 mm x 70% / 25.4 + 17 = 31.61 in. Anywhere else the veto drops it. A fraction written with a length unit ("1/2 inch drill") is a measurement and is no longer vetoed.

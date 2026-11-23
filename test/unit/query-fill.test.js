@@ -747,3 +747,15 @@ test("query-fill: label units behind a colon or a note, tire sizes, on center", 
   const rb = [num("spacing_in", "Spacing on center", "in"), num("edge_clearance_in", "Edge clearance", "in")];
   assert.deepEqual(queryFill("rebar 12 inches on center", rb).filled, { spacing_in: "12" });
 });
+
+test("field-units: temperature (F), ft/s, and a unit leading a note", async () => {
+  const { unitFromLabel, convertUnit } = await import("../../field-units.js");
+  assert.equal(unitFromLabel("Initial temperature (F)"), "degf");
+  assert.equal(unitFromLabel("Outdoor dry-bulb (F)"), "degf");
+  // A bare C or F on a label that is not about a temperature stays refused.
+  assert.equal(unitFromLabel("Hazen-Williams C (C)"), null);
+  assert.equal(unitFromLabel("Velocity (ft/s)"), "fps");
+  assert.ok(Math.abs(convertUnit(1, "fps", "fpm") - 60) < 1e-6);
+  assert.equal(unitFromLabel("Stud spacing (in o.c.)"), "in");
+  assert.equal(unitFromLabel("Tap (V on a 120 V base)"), null);
+});
