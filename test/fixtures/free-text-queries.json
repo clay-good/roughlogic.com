@@ -153,6 +153,18 @@
       "tile": "retaining-wall-block",
       "mustNotBind": { "block_length_in": "600" },
       "why": "'50 ft long' named only the block face length, because the wall's own label said 'Wall run'; the 50 ft became a 600 in block."
+    },
+    {
+      "query": "cutting speed 300 sfm 2 inch diameter",
+      "tile": "cutting-speed-rpm",
+      "mustNotBind": { "chip_load_in": "2" },
+      "why": "The diameter label's unit sat behind a colon ('in: cutter for mill/drill'), so the chip load was the only inch field and took the 2 inch diameter."
+    },
+    {
+      "query": "tire size 265/70r17 diameter",
+      "tile": "gear-mph-rpm",
+      "mustNotBind": { "tire_dia_in": "3.785714" },
+      "why": "A P-metric tire size read as the fraction 265/70; '70r' has no word boundary, so the fraction veto missed it."
     }
   ]
 }

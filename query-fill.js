@@ -132,7 +132,9 @@ function frac(s) {
 // 20x30 is a slab, and reading it as a stick of wood invents an inch.
 const NOMINAL_LUMBER_MAX_IN = 12;
 
-const AMBIGUOUS_PAIR = /\b\d+\s*\/\s*\d+\b/;
+// No word boundary after the second number: "265/70r17" (a tire size) is a
+// pair too, and was read as 3.79 (2026-11-23).
+const AMBIGUOUS_PAIR = /\b\d+\s*\/\s*\d+(?![\d.])/;
 
 // Words that put a query in a temperature context, licensing the bare-letter
 // rewrite below.
@@ -390,6 +392,14 @@ export function queryFill(query, rows, opts) {
   if (text && !numberRows.some((r) => rowUnit(r) === "deg") && numberRows.some((r) => rowUnit(r) === "degf")) {
     text = text.replace(/(-?\d+(?:\.\d+)?)\s*degrees?\b(?!\s*(?:f|c|fahrenheit|celsius)\b)/g, "$1 degf");
   }
+  // A P-metric tire size, "265/70r17", is a diameter: 2 x 265 mm x 70% /
+  // 25.4 + 17 = 31.6 in. On a tile that asks for a tire diameter in inches it
+  // fills that (2026-11-23); anywhere else the fraction veto drops it.
+  const tireRow = numberRows.find((r) => rowUnit(r) === "in" && /\btire\b/i.test(r.l) && /\bdiameter\b/i.test(r.l));
+  if (text && tireRow) {
+    text = text.replace(/\b(\d{3})\s*\/\s*(\d{2,3})\s*-?\s*z?r\s*(\d{2})\b/g, (m, w, a, rim) =>
+      `${Math.round((2 * Number(w) * Number(a) / 100 / 25.4 + Number(rim)) * 100) / 100} in tire diameter`);
+  }
   // "a 150000 btu furnace" is an input RATE: appliance ratings are written in
   // Btu and mean Btu/h. On a tile with a Btu/h field and no Btu field, read
   // them so (2026-11-23: gas pipe sizing dropped the load).
@@ -570,7 +580,9 @@ export function queryFill(query, rows, opts) {
   // On a tile that takes the wall as one area and asks for no length or
   // height, the two are its area (2026-11-23: siding filled nothing).
   {
-    const m = text.match(/(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)\s+(?:long\s+)?walls?\s+(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)\s+(?:tall|high)\b/);
+    // ...or "a 10 by 8 wall", its length by its height.
+    const m = text.match(/(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)\s+(?:long\s+)?walls?\s+(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)\s+(?:tall|high)\b/) ||
+      text.match(/(\d+(?:\.\d+)?)\s*(?:by|x)\s*(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)?\s+walls?\b/);
     const wallArea = numberRows.filter((r) => rowUnit(r) === "ft2" && termsByRow.get(r.d).has("wall"));
     const sides = numberRows.filter((r) => rowUnit(r) && unitFamily(rowUnit(r)) === "length" && ["length", "height"].some((w) => termsByRow.get(r.d).has(w)));
     if (m && wallArea.length === 1 && !sides.length && !(wallArea[0].d in filled)) {
@@ -704,6 +716,11 @@ export function queryFill(query, rows, opts) {
     if (m) terms = windowTerms(m[1]);
     else if (unitFamily(unit) === "length" && (m = after.match(/^\s+(tall|high|deep|wide|long|thick|apart|rise|drop|fall|run|shallow|round)\b/i))) {
       terms = new Set([m[1].toLowerCase(), ...POST_WORDS.get(m[1].toLowerCase())]);
+    }
+    // "12 inches on center" is a spacing (2026-11-23: beside an edge
+    // clearance in inches it went unread).
+    else if (unitFamily(unit) === "length" && (m = after.match(/^\s+(?:on\s+cent(?:er|re)|o\.?c\.?)(?![a-z])/i))) {
+      terms = new Set(["spacing", "center"]);
     }
     if (!terms && namesAfter) {
       const n = after.match(/^\s+([a-z]+)\b/i);
@@ -1208,7 +1225,9 @@ export function queryFill(query, rows, opts) {
   if (AMBIGUOUS_PAIR.test(String(query).toLowerCase()) && !/\bpitch|slope|rise|run\b/.test(text)) {
     for (const qi of claimed) {
       const q = quantities[qi];
-      if (q && /\//.test(text.slice(q.index, q.end))) {
+      // A fraction with a length unit on it ("1/2 inch drill") is a measurement,
+      // not a cable spec or a pitch (2026-11-23).
+      if (q && /\//.test(text.slice(q.index, q.end)) && unitFamily(canonicalUnit(rawUnitOf(q, text)) || "") !== "length") {
         for (const [k, v] of Object.entries(filled)) {
           if (v === String(q.value) && !optionSized.has(k)) delete filled[k];
         }

@@ -118002,6 +118002,46 @@
   "term": "electrical service size for a house by square feet",
   "target": "service-load",
   "kind": "question"
+ },
+ {
+  "term": "rebar for",
+  "target": "rebar",
+  "kind": "question"
+ },
+ {
+  "term": "how much grout for",
+  "target": "tile-count",
+  "kind": "question"
+ },
+ {
+  "term": "how many bricks for",
+  "target": "masonry-count",
+  "kind": "question"
+ },
+ {
+  "term": "concrete blocks for",
+  "target": "masonry-count",
+  "kind": "question"
+ },
+ {
+  "term": "fence boards",
+  "target": "fence-estimate",
+  "kind": "question"
+ },
+ {
+  "term": "rebar for a slab inches on center",
+  "target": "rebar",
+  "kind": "question"
+ },
+ {
+  "term": "how much grout for square feet of tile joint",
+  "target": "tile-count",
+  "kind": "question"
+ },
+ {
+  "term": "how many concrete blocks for a wall feet tall",
+  "target": "masonry-count",
+  "kind": "question"
  }
  ]
 }

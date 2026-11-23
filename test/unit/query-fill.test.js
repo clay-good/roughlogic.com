@@ -729,3 +729,21 @@ test("query-fill: btu on a btu/h-only tile is a rating; underscored options read
   const rf = [sel("cooling", "End chill, or a drag chill between risers", ["end_effect", "end_chill", "drag_chill"])];
   assert.equal(queryFill("end chill, or a drag chill between risers", rf).filled.cooling, undefined);
 });
+
+test("query-fill: label units behind a colon or a note, tire sizes, on center", async () => {
+  const { unitFromLabel } = await import("../../field-units.js");
+  assert.equal(unitFromLabel("Diameter (in: cutter for mill/drill, work for turning)"), "in");
+  assert.equal(unitFromLabel("MPH (for RPM solve)"), "mph");
+  assert.equal(unitFromLabel("Surface speed (SFM)"), "fpm");
+  const cs = [num("surface_speed_sfm", "Surface speed", "fpm"), num("diameter_in", "Diameter", "in"), num("chip_load_in", "Chip load per tooth", "in")];
+  const f = queryFill("cutting speed 300 sfm 2 inch diameter", cs, { name: "Machining Speed and Feed" }).filled;
+  assert.equal(f.diameter_in, "2");
+  assert.equal(f.chip_load_in, undefined);
+  const gear = [num("tire_dia_in", "Tire diameter", "in"), num("mph", "MPH", "mph"), sel("solve_for", "Solve for", ["mph", "rpm"]), num("rpm", "Engine RPM")];
+  const g = queryFill("gear ratio 3.73 tire 265/70r17 65 mph", gear).filled;
+  assert.deepEqual([g.tire_dia_in, g.mph, g.solve_for], ["31.61", "65", "rpm"]);
+  // A tire size on a tile with no tire diameter fills nothing.
+  assert.deepEqual(queryFill("tire size 265/70r17", [num("w", "Width", "in")]).filled, {});
+  const rb = [num("spacing_in", "Spacing on center", "in"), num("edge_clearance_in", "Edge clearance", "in")];
+  assert.deepEqual(queryFill("rebar 12 inches on center", rb).filled, { spacing_in: "12" });
+});

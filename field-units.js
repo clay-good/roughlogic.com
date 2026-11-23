@@ -123,7 +123,8 @@ const UNIT_SPELLINGS = {
   ton_ref: ["tons refrigeration", "tons ref"],
   // rate / speed
   mph: ["mph"],
-  fpm: ["fpm", "ft/min"],
+  // Surface feet per minute is a cutting speed in ft/min (2026-11-23).
+  fpm: ["fpm", "ft/min", "sfm", "sfpm"],
   rpm: ["rpm"],
   kt: ["kt", "knot", "knots"],
   // time
@@ -184,9 +185,16 @@ export function unitFromLabel(label) {
     const whole = tidy(label);
     return WHOLE_LABEL_UNITS.has(whole) ? canonicalUnit(whole) : null;
   }
-  // Keep the first delimited segment: "ft, optional" -> "ft".
-  const head = inner.split(/[,;]/)[0];
-  return canonicalUnit(head);
+  // Keep the first delimited segment: "ft, optional" -> "ft", and "in: cutter
+  // for mill/drill" -> "in" (2026-11-23: the colon hid a machining diameter's
+  // unit, and "2 inch diameter" became a 2 in chip load).
+  const head = inner.split(/[,;:]/)[0];
+  // "MPH (for RPM solve)": a parenthetical that is a note, not a unit, leaves
+  // the lead word to say it (2026-11-23).
+  const unit = canonicalUnit(head);
+  if (unit) return unit;
+  const lead = tidy(labelLead(label));
+  return WHOLE_LABEL_UNITS.has(lead) ? canonicalUnit(lead) : null;
 }
 
 // The label with its trailing parenthetical removed -- the human text the
