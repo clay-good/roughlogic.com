@@ -177,6 +177,18 @@
       "tile": "nam-sizing",
       "mustNotBind": { "room_volume_ft3": "12" },
       "why": "'room 12 by 12' was not seen as a plan (the surface word came first), so 'room 12' read as a 12 cu ft room volume and the tile answered 1.2 CFM."
+    },
+    {
+      "query": "duct velocity 800 cfm 12 inch round",
+      "tile": "duct-sizing",
+      "mustNotBind": { "friction_in_wc_per_100ft": "12" },
+      "why": "The friction label '(in w.c. / 100 ft)' was read as inches by the leading-unit-word rule, so a 12 inch duct became a friction rate of 12."
+    },
+    {
+      "query": "string size 400 w panels 600 v inverter voc 49",
+      "tile": "pv-string-sizing",
+      "mustNotBind": { "inverter_vdc_max_V": "49" },
+      "why": "The term floor reduced 'Inverter Vdc max' to the word 'inverter', so the exact-label tie-break handed it the module Voc of 49."
     }
   ]
 }

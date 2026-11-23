@@ -936,7 +936,13 @@ export function queryFill(query, rows, opts) {
       // option, not a field name.
       const literal = new Set(String(window).toLowerCase().split(/[^a-z]+/).filter((w) => w && !optionWordsInText.has(w)));
       const written = new Set([...wanted].filter((w) => labelWords.has(w) && literal.has(w)));
-      const exact = hits.filter((k) => { const t = termsByRow.get(k); return t && t.size > 0 && [...t].every((w) => written.has(w)) && [...written].every((w) => t.has(w)); });
+      // ...and EXACTLY means every word of the label, the short ones the term
+      // floor drops included: "Inverter Vdc max" is not the word "inverter"
+      // (2026-11-23: "inverter 49" filled it beside the MPPT limits).
+      const fullWords = (k) => String((rows.find((r) => r.d === k) || {}).l || "").toLowerCase().split(/[^a-z]+/)
+        .filter((w) => w.length > 2 && !TERM_STOPWORDS.has(w));
+      const exact = hits.filter((k) => { const t = termsByRow.get(k); return t && t.size > 0 && [...t].every((w) => written.has(w)) && [...written].every((w) => t.has(w)) &&
+        fullWords(k).every((w) => literal.has(w) || literal.has(w + "s")); });
       if (exact.length === 1) hits.splice(0, hits.length, exact[0]);
     }
     rowsFor.set(qi, hits);

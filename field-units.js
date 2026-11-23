@@ -87,7 +87,9 @@ const UNIT_SPELLINGS = {
   klf: ["klf", "kip/ft"],
   kpa: ["kpa"],
   bar: ["bar"],
-  inwc: ["inwc", "in wc", "in. wc", "iwc", "in w.c.", "in. w.c.", "in w.c", "in. w.c"],
+  inwc: ["inwc", "in wc", "in. wc", "iwc", "in w.c.", "in. w.c.", "in w.c", "in. w.c", "in wg", "in. wg", "in w.g.", "in. w.g.", "iwg"],
+  // Inches of mercury, a pressure (2026-11-23: "(in Hg)" read as inches).
+  inhg: ["inhg", "in hg", "in. hg", "\"hg"],
   // Absolute pressure is its own family: psia and psig differ by the
   // atmosphere, so neither may silently fill the other.
   psia: ["psia"],
@@ -212,8 +214,19 @@ export function unitFromLabel(label) {
     return tidyHead === "f" ? "degf" : "degc";
   }
   // "(in o.c.)", "(V on a 120 V base)": a unit word leading a note.
+  // Not when the rest makes it a rate or a compound unit: "(in w.c. / 100 ft)"
+  // is a friction rate, not inches (2026-11-23: "12 inch round" filled it).
   const first = tidyHead.split(/\s+/);
-  if (first.length > 1 && canonicalUnit(first[0]) && first[0].length > 1) return canonicalUnit(first[0]);
+  // Only a unit followed by a connective: "in above the floor", "lb of CO2",
+  // "in o.c.", "in w.c. at the unit". Not "min 2", "second number", "bar
+  // diameters", "lb ft", "fl oz for gallons" (2026-11-23).
+  const CONNECTIVE = /^(above|below|from|of|at|after|before|total|up|down|each|o\.?c\.?|absolute|a|the|in|on)$/;
+  if (first.length > 1 && !/\/|\bper\b/.test(tidyHead)) {
+    for (const n of [3, 2, 1]) {
+      const u = first.length > n && canonicalUnit(first.slice(0, n).join(" "));
+      if (u && (n > 1 || first[0].length > 1) && CONNECTIVE.test(first[n])) return u;
+    }
+  }
   const lead = tidy(labelLead(label));
   return WHOLE_LABEL_UNITS.has(lead) ? canonicalUnit(lead) : null;
 }
@@ -256,7 +269,7 @@ const UNIT_FAMILIES = {
   area: { in2: 1, ft2: 144, yd2: 1296, m2: 1550.0031, acre: 6272640 },
   volume: { in3: 1, ft3: 1728, yd3: 46656, cy: 46656, gal: 231, l: 61.0237441, ml: 0.0610237441, floz: 1.8046875 },
   mass: { lb: 1, kg: 2.20462262, g: 0.00220462262, oz: 0.0625, ton: 2000, kip: 1000 },
-  pressure: { psi: 1, psig: 1, psf: 0.00694444444, ksi: 1000, kpa: 0.145037738, bar: 14.5037738, inwc: 0.0361272893 },
+  pressure: { psi: 1, psig: 1, psf: 0.00694444444, ksi: 1000, kpa: 0.145037738, bar: 14.5037738, inwc: 0.0361272893, inhg: 0.491154077 },
   moment: { "lb-ft": 1, "kip-ft": 1000 },
   angle: { deg: 1 },
   ratio: { pct: 1 },

@@ -787,3 +787,22 @@ test("query-fill: inches per hour is a rate in in/hr", () => {
   const rd = [num("roof_area", "Roof area served", "ft2"), num("rainfall_rate", "Design rainfall, 100-yr / 1-hr", "inhr")];
   assert.deepEqual(queryFill("roof drain size 2000 sq ft roof 3 in per hour", rd).filled, { roof_area: "2000", rainfall_rate: "3" });
 });
+
+test("field-units: a leading unit word needs a connective; in wg and in Hg are pressures", async () => {
+  const { unitFromLabel } = await import("../../field-units.js");
+  assert.equal(unitFromLabel("Friction rate (in w.c. / 100 ft)"), null);
+  assert.equal(unitFromLabel("Cable resistance (ohm per 1,000 ft)"), null);
+  assert.equal(unitFromLabel("Duct static (in wg)"), "inwc");
+  assert.equal(unitFromLabel("Static (in w.c. at the unit)"), "inwc");
+  assert.equal(unitFromLabel("Vacuum (in Hg)"), "inhg");
+  for (const l of ["Small-appliance circuits (min 2)", "Phosphate % (second number)", "Lap (bar diameters)", "Slip torque (lb ft, blank to skip)", "Dose (fl oz for gallons, mL for liters)"]) {
+    assert.equal(unitFromLabel(l), null, l);
+  }
+  assert.equal(unitFromLabel("Mounting height (in above the floor)"), "in");
+});
+
+test("query-fill: an exact-label tie-break counts every word of the label", () => {
+  const pv = [num("module_voc_V", "Module Voc", "v"), num("inverter_mppt_max_V", "Inverter MPPT max", "v"), num("inverter_vdc_max_V", "Inverter Vdc max", "v")];
+  assert.deepEqual(queryFill("inverter 49", pv).filled, {});
+  assert.deepEqual(queryFill("principal 250000", [num("p", "Principal", "usd"), num("x", "Extra principal per month", "usd")]).filled, { p: "250000" });
+});
