@@ -755,3 +755,14 @@ test("run_calculator: a select value that looks numeric stays a string", async (
   assert.equal(out.inputs.length_ft, 150);
   assert.ok(Math.abs(out.result.drop_V - 11.853) < 0.01, `drop_V ${out.result.drop_V}`);
 });
+
+// 2026-11-23: an "Or ..." field is the other way in; the door tries the run.
+test("answer_query: paint for a room answers from the room's size", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  const out = await answerQuery({ query: "how much paint for a 12 by 14 room with 8 ft ceilings" });
+  assert.equal(out.status, "OK");
+  assert.equal(out.id, "paint-coverage");
+  assert.equal(out.result.wall_area_ft2, 416);
+  // A partial room is still a request for what is missing, not an answer.
+  assert.equal((await answerQuery({ query: "paint coverage room length 12" })).status, "MISSING_INPUTS");
+});

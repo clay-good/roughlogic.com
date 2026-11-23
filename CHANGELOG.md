@@ -6,6 +6,7 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Paint coverage takes a room.** "How much paint for a 12 by 14 room with 8 ft ceilings" got no match, and the calculator only took a wall area. It now also takes an optional room length, width and wall height. It paints the walls, 2 x (L + W) x H, with no openings deducted, and shows that wall area. That room is 416 sq ft, 2.38 gal for two coats. An entered area still wins, and a partial room is refused. On the agent door, a filled "Or ..." field (the other way to give an input) now makes the door try the calculation before naming the field it replaces. A blank Coats box now means the default 2. A "how much paint" phrase routes the question.
 - **Five more everyday questions fill their calculator.** A sweep of 20 typed questions found these filled nothing, or filled the wrong box:
   - "Stair stringer 9 ft rise" filled nothing: "rise" matched both "Total rise" and "Preferred riser height", so the tie dropped it. A dimension word after a length now goes to the label that uses that word itself, and the total rise is 108 in.
   - "Rafter length 14 ft run" left the run empty: the 3-letter "run" was dropped from the label "Horizontal run". It is now kept, and the run is 14 ft.

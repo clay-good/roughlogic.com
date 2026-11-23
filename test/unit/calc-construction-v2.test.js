@@ -615,3 +615,20 @@ test("excavation: a rectangular pit with sloped sides is a prismoid, not a pyram
   const sq = computeExcavationVolume({ length_ft: 10, width_ft: 10, depth_ft: 5, side_slope_angle_deg: 45 });
   assert.ok(Math.abs(sq.volume_ft3 - (5 / 3) * (100 + 400 + 200)) < 1e-9);
 });
+
+// 2026-11-23: a room instead of an area -- the walls, 2 x (L + W) x H.
+test("paint coverage takes a room's length, width and wall height", () => {
+  const r = computePaintCoverage({ room_length_ft: 12, room_width_ft: 14, wall_height_ft: 8 });
+  assert.equal(r.wall_area_ft2, 416);
+  assert.ok(Math.abs(r.total_paint_gallons - 416 / 350 * 2) < 1e-12);
+  // An entered area wins and reports no wall area.
+  const a = computePaintCoverage({ area_ft2: 700, room_length_ft: 12, room_width_ft: 14, wall_height_ft: 8 });
+  assert.equal(a.total_paint_gallons, 4);
+  assert.equal(a.wall_area_ft2, undefined);
+  // A partial room, or a negative side, is refused.
+  assert.ok("error" in computePaintCoverage({ room_length_ft: 12, wall_height_ft: 8 }));
+  assert.ok("error" in computePaintCoverage({ room_length_ft: -12, room_width_ft: 14, wall_height_ft: 8 }));
+  // A blank coats box is the default 2; a typed 0 is refused.
+  assert.equal(computePaintCoverage({ area_ft2: 700, coats: null }).total_paint_gallons, 4);
+  assert.ok("error" in computePaintCoverage({ area_ft2: 700, coats: 0 }));
+});

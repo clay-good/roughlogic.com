@@ -1740,7 +1740,7 @@ cross-check.
 | calc-construction.js | `computeMortarMix` | `{ unit_count = 0, unit_kind = "brick", joint_in = 0.375, mortar_type = "N" }` | _ | _ | _ |
 | calc-construction.js | `computeMultiBendFlatPattern` | `{ mold_line_in = 0, n_bends = 0, bd_in = 0 } = {}` | _ | _ | _ |
 | calc-construction.js | `computeOccupantLoad` | `{ spaces = [] } = {}` | _ | _ | _ |
-| calc-construction.js | `computePaintCoverage` | `{ area_ft2, coats = 2, primer_needed = false, surface_porosity = "smooth" }` | _ | _ | _ |
+| calc-construction.js | `computePaintCoverage` | `{ area_ft2, coats = 2, primer_needed = false, surface_porosity = "smooth", ro...` | _ | _ | _ |
 | calc-construction.js | `computePavementMillingProduction` | `{ drum_width_ft = 7, speed_fpm = 30, depth_in = 4, density_pcf = 148, efficie...` | _ | _ | _ |
 | calc-construction.js | `computePlumbingFixtureCount` | `{ occupant_load = 0, wc_ratio = 25, wc_ratio_over = 50, wc_tier = 50, lav_rat...` | _ | _ | _ |
 | calc-construction.js | `computePlywoodSpan` | `{ span_rating = "24/16", panel_thickness_in = 0, application = "roof", suppor...` | _ | _ | _ |

@@ -117902,6 +117902,11 @@
   "term": "how many acres",
   "target": "square-footage",
   "kind": "question"
+ },
+ {
+  "term": "how much paint",
+  "target": "paint-coverage",
+  "kind": "question"
  }
  ]
 }

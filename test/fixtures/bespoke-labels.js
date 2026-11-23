@@ -615,7 +615,7 @@ export const BESPOKE_LABELS = {
   "overtime": {"total_hours":"Total hours","regular_rate":"Regular rate ($/hr)","overtime_multiplier":"OT multiplier","double_time_multiplier":"Double-time multiplier","double_time_threshold_hr":"Double-time threshold (hr)"},
   "oxyfuel-cutting-gas": {"oxygen_cfh":"Cutting-oxygen flow (cfh)","fuel_cfh":"Preheat fuel-gas flow (cfh)","cut_length_in":"Total cut length (in)","cut_speed_ipm":"Travel speed (ipm)","oxygen_cyl_ft3":"Oxygen per cylinder (ft3)","fuel_cyl_ft3":"Fuel per cylinder (ft3)"},
   "ozone-shock-treatment": {"structure_volume_ft3":"Volume to deodorize (ft³ = area x ceiling height)","rated_volume_per_unit":"Generator rated treatable volume (ft³)","treatment_time_hr":"Shock duration (hours)","aeration_min":"Minimum ventilate-before-reentry (minutes)"},
-  "paint-coverage": {"area_ft2":"Area (ft²)","coats":"Coats","surface_porosity":"Surface porosity"},
+  "paint-coverage": {"area_ft2":"Area (ft²)","coats":"Coats","surface_porosity":"Surface porosity","room_length_ft":"Or room length (ft)","room_width_ft":"Room width (ft)","wall_height_ft":"Wall height (ft)"},
   "paired-t-test": {"mean_diff":"Mean of the differences d_bar","sd_diff":"SD of the differences s_d","n_pairs":"Number of pairs n","tail":"Tail"},
   "parabolic-segment": {"base_span":"Base / span b","rise_height":"Rise / height h (at midspan)"},
   "paraboloid-volume": {"base_diameter_ft":"Base (rim) diameter (ft)","height_ft":"Height, rim to apex (ft)","fill_depth_ft":"Fill depth from the apex (ft, optional)"},

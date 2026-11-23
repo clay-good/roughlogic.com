@@ -976,14 +976,24 @@ export const tileCountExample = {
 
 export const PAINT_COVERAGE_FT2_PER_GAL = { smooth: 350, textured: 250, rough: 175 };
 
-// dims: in { area_ft2: L^2, coats: dimensionless, primer_needed: dimensionless, surface_porosity: dimensionless } out: { total_paint_gallons: L^3, primer_gallons: L^3, gallons_per_coat: L^3 }
-export function computePaintCoverage({ area_ft2, coats = 2, primer_needed = false, surface_porosity = "smooth" }) {
+// dims: in { area_ft2: L^2, coats: dimensionless, primer_needed: dimensionless, surface_porosity: dimensionless, room_length_ft: L, room_width_ft: L, wall_height_ft: L } out: { total_paint_gallons: L^3, primer_gallons: L^3, gallons_per_coat: L^3, wall_area_ft2: L^2 }
+export function computePaintCoverage({ area_ft2, coats = 2, primer_needed = false, surface_porosity = "smooth", room_length_ft, room_width_ft, wall_height_ft }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank (null) coats box is the default 2; a typed 0 is still refused.
+  if (coats == null || coats === "") coats = 2;
   if (!(Number(coats) >= 1)) return { error: "Coats must be 1 or more." };
   if (typeof primer_needed === "string") primer_needed = primer_needed === "true" || primer_needed === "yes";
   // Until 2026-09-26 a negative entry here returned a negative quantity with no error.
-  if (["area_ft2", "coats"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Area and number of coats cannot be negative." };
-  const a = Number(area_ft2) || 0;
+  if (["area_ft2", "coats", "room_length_ft", "room_width_ft", "wall_height_ft"].some((k) => Number(arguments[0]?.[k]) < 0)) return { error: "Area, room size and number of coats cannot be negative." };
+  // A room instead of an area (2026-11-23): "paint for a 12 by 14 room with
+  // 8 ft ceilings" is the walls, 2 x (L + W) x H. An entered area wins.
+  const room = [room_length_ft, room_width_ft, wall_height_ft].map((v) => Number(v) || 0);
+  let wall = null;
+  if (!(Number(area_ft2) > 0) && room.some((v) => v > 0)) {
+    if (!room.every((v) => v > 0)) return { error: "Enter the room length, width and wall height, or the area." };
+    wall = 2 * (room[0] + room[1]) * room[2];
+  }
+  const a = wall !== null ? wall : Number(area_ft2) || 0;
   const c = Number(coats) || 1;
   const cov = PAINT_COVERAGE_FT2_PER_GAL[surface_porosity];
   if (cov === undefined) return { error: "Unknown surface porosity." };
@@ -993,7 +1003,7 @@ export function computePaintCoverage({ area_ft2, coats = 2, primer_needed = fals
   const gallons_per_coat = a / cov;
   const total_paint = gallons_per_coat * c;
   const primer = primer_needed ? gallons_per_coat : 0;
-  return { gallons_per_coat, total_paint_gallons: total_paint, primer_gallons: primer };
+  return { gallons_per_coat, total_paint_gallons: total_paint, primer_gallons: primer, ...(wall !== null ? { wall_area_ft2: wall } : {}) };
 }
 
 export const paintCoverageExample = {
@@ -1374,6 +1384,9 @@ export function renderTileCount(inputRegion, outputRegion, citationEl) {
 export function renderPaintCoverage(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: gallons per coat = area / the coverage for the surface (350 ft^2/gal smooth, 250 textured, 175 rough); total = per coat x coats.";
   const a = makeNumber("Area (ft²)", "pc-a", { step: "any", min: "0" });
+  const rl = makeNumber("Or room length (ft)", "pc-rl", { step: "any", min: "0" });
+  const rw = makeNumber("Room width (ft)", "pc-rw", { step: "any", min: "0" });
+  const rh = makeNumber("Wall height (ft)", "pc-rh", { step: "any", min: "0" });
   const c = makeNumber("Coats", "pc-c", { step: "1", min: "1", value: "2" });
   c.input.value = "2";
   const prim = makeCheckbox("Primer needed", "pc-p");
@@ -1382,22 +1395,27 @@ export function renderPaintCoverage(inputRegion, outputRegion, citationEl) {
     { value: "textured", label: "Textured" },
     { value: "rough", label: "Rough" },
   ]);
-  for (const f of [a, c, prim, sp]) inputRegion.appendChild(f.wrap);
-  attachExampleButton(inputRegion, () => { a.input.value = "700"; c.input.value = "2"; prim.input.checked = true; sp.select.value = "smooth"; update(); });
+  for (const f of [a, rl, rw, rh, c, prim, sp]) inputRegion.appendChild(f.wrap);
+  attachExampleButton(inputRegion, () => { a.input.value = "700"; rl.input.value = ""; rw.input.value = ""; rh.input.value = ""; c.input.value = "2"; prim.input.checked = true; sp.select.value = "smooth"; update(); });
   const oG = makeOutputLine(outputRegion, "Total paint", "pc-out-g");
   const oP = makeOutputLine(outputRegion, "Primer", "pc-out-p");
+  const oW = makeOutputLine(outputRegion, "Wall area", "pc-out-w");
   const update = debounce(() => {
     const r = computePaintCoverage({
       area_ft2: Number(a.input.value) || 0,
+      room_length_ft: Number(rl.input.value) || 0,
+      room_width_ft: Number(rw.input.value) || 0,
+      wall_height_ft: Number(rh.input.value) || 0,
       coats: c.input.value === "" ? 2 : Number(c.input.value),
       primer_needed: prim.input.checked,
       surface_porosity: sp.select.value,
-    }); stepsFor(outputRegion, inputRegion, ["area_ft2", "coats", "primer_needed", "surface_porosity"], r);
-    if (r.error) { oG.textContent = r.error; oP.textContent = "-"; return; }
+    }); stepsFor(outputRegion, inputRegion, ["area_ft2", "room_length_ft", "room_width_ft", "wall_height_ft", "coats", "primer_needed", "surface_porosity"], r);
+    if (r.error) { oG.textContent = r.error; oP.textContent = "-"; oW.textContent = "-"; return; }
     oG.textContent = fmt(r.total_paint_gallons, 2) + " gal";
     oP.textContent = fmt(r.primer_gallons, 2) + " gal";
+    oW.textContent = r.wall_area_ft2 === undefined ? "-" : fmt(r.wall_area_ft2, 0) + " ft² (2 x (L + W) x H, no openings deducted)";
   }, DEBOUNCE_MS);
-  for (const el of [a.input, c.input, prim.input, sp.select]) el.addEventListener("input", update);
+  for (const el of [a.input, rl.input, rw.input, rh.input, c.input, prim.input, sp.select]) el.addEventListener("input", update);
 }
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }

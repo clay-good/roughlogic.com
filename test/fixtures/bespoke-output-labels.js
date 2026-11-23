@@ -621,7 +621,7 @@ export const BESPOKE_OUTPUT_LABELS = {
   "overtime": {"regular_pay":"Regular pay","overtime_pay":"Overtime pay","double_time_pay":"Double-time pay","gross_pay":"Gross pay"},
   "oxyfuel-cutting-gas": {"cut_time_min":"Cut time","oxygen_used_ft3":"Oxygen used","fuel_used_ft3":"Fuel used","oxygen_runtime_hr":"Oxygen runtime per cylinder","fuel_runtime_hr":"Fuel runtime per cylinder"},
   "ozone-shock-treatment": {"generators_needed":"Ozone generators","aeration_min":"Before reentry"},
-  "paint-coverage": {"total_paint_gallons":"Total paint","primer_gallons":"Primer"},
+  "paint-coverage": {"total_paint_gallons":"Total paint","primer_gallons":"Primer","wall_area_ft2":"Wall area"},
   "paired-t-test": {"note":"Note"},
   "panel-rebalance": {"totals_A_amps":"Phase A total","totals_B_amps":"Phase B total","totals_C_amps":"Phase C total"},
   "parabolic-segment": {"area":"Segment area","arc_length":"Curved arc length","note":"Note"},
