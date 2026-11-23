@@ -118047,6 +118047,11 @@
   "term": "fuel needed for",
   "target": "mileage-cost",
   "kind": "question"
+ },
+ {
+  "term": "head of cattle drink",
+  "target": "livestock-water-requirement",
+  "kind": "question"
  }
  ]
 }

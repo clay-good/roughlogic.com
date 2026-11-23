@@ -775,3 +775,8 @@ test("query-fill: a length 'from' something is an offset", () => {
   assert.equal(queryFill("ladder angle 20 ft ladder 5 ft from wall", ld, { name: "Ladder Placement Angle" }).filled.ladder_length_ft, undefined);
   assert.equal(queryFill("5 ft from the wall", [num("base_ft", "Base distance from wall", "ft")]).filled.base_ft, "5");
 });
+
+test("query-fill: a count noun naming several fields fills the one that is a count", () => {
+  const lw = [num("head", "Head count"), num("gal_low", "Gallons/head at low temp"), num("gal_high", "Gallons/head at high temp")];
+  assert.deepEqual(queryFill("water for 50 head of cattle", lw).filled, { head: "50" });
+});

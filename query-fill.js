@@ -711,6 +711,10 @@ export function queryFill(query, rows, opts) {
       if (keys.length > 1) {
         const literal = keys.filter((k) => String(rows.find((r) => r.d === k).l).toLowerCase().split(/[^a-z]+/).includes(raw));
         if (literal.length === 1) keys = literal;
+        // "50 head" beside "Gallons/head at low temp": the field that is a
+        // count (2026-11-23).
+        const counted = keys.filter((k) => ["count", "number"].some((w) => termsByRow.get(k).has(w)));
+        if (keys.length > 1 && counted.length === 1) keys = counted;
       }
       if (keys.length === 1 && Number.isInteger(Number(qty.value)) && Number(qty.value) >= 0) backOf.set(qi, { cut: 0, keys, count: true, dimension: false });
       return;
