@@ -390,6 +390,12 @@ export function queryFill(query, rows, opts) {
   if (text && !numberRows.some((r) => rowUnit(r) === "deg") && numberRows.some((r) => rowUnit(r) === "degf")) {
     text = text.replace(/(-?\d+(?:\.\d+)?)\s*degrees?\b(?!\s*(?:f|c|fahrenheit|celsius)\b)/g, "$1 degf");
   }
+  // "a 150000 btu furnace" is an input RATE: appliance ratings are written in
+  // Btu and mean Btu/h. On a tile with a Btu/h field and no Btu field, read
+  // them so (2026-11-23: gas pipe sizing dropped the load).
+  if (text && numberRows.some((r) => rowUnit(r) === "btuh") && !numberRows.some((r) => rowUnit(r) === "btu")) {
+    text = text.replace(/(\d)\s*btus?\b(?!\s*(?:\/|per\b))/g, "$1 btuh");
+  }
   if (!text) return { filled: {}, missing: rows.map((r) => r.d), unmatched: [] };
   const termsByRow = new Map(rows.map((r) => [r.d, labelTerms(r.l)]));
   // Every word that names a field on THIS tile. valueFor uses it to tell a
@@ -1110,9 +1116,13 @@ export function queryFill(query, rows, opts) {
       if (!token) continue;
       const needsName = token.length < 3 || /^[\d.]+$/.test(token);
       // A hyphen in an option is also written as a space: "hazen williams" is
-      // the option hazen-williams (2026-11-23). Not an underscore: those are
-      // code keys (end_chill, liquid_flow) whose words sit in labels and names.
-      const re = new RegExp(`(^|[^a-z0-9])${token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/-/g, "[- ]")}([^a-z0-9]|$)`, "g");
+      // the option hazen-williams (2026-11-23). An underscore too ("natural
+      // gas"), unless the spaced phrase is the tile's own wording: end_chill
+      // and drag_chill sit in the label "End chill, or a drag chill", and
+      // reading them there picked both.
+      const spaced = token.replace(/_/g, " ");
+      const ownWords = /_/.test(token) && (rows.some((r) => String(r.l || "").toLowerCase().includes(spaced)) || String((opts && opts.name) || "").toLowerCase().includes(spaced));
+      const re = new RegExp(`(^|[^a-z0-9])${token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/-/g, "[- ]").replace(/_/g, ownWords ? "_" : "[_ ]")}([^a-z0-9]|$)`, "g");
       // An option written as the unit of a number that a field measured in that
       // unit can hold is that number's unit, not this select's choice: tank-mix
       // read "300 gal" (the tank) as Product unit = gal (2026-11-16).

@@ -3015,6 +3015,8 @@
     {"term":"how much does it cost to run","target":"appliance-energy-cost","kind":"question"},
     {"term":"appliance energy use","target":"appliance-energy-cost","kind":"industry"},
     {"term":"kwh per day","target":"appliance-energy-cost","kind":"industry"},
-    {"term":"watts to kwh","target":"appliance-energy-cost","kind":"question"}
+    {"term":"watts to kwh","target":"appliance-energy-cost","kind":"question"},
+    {"term":"service size for","target":"service-load","kind":"question"},
+    {"term":"electrical service size for a house by square feet","target":"service-load","kind":"question"}
   ]
 }

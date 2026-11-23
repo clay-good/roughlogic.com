@@ -825,3 +825,14 @@ test("answer_query: board feet for a stack of lumber; thinset routes", async () 
   assert.ok(Math.abs(a.result.total_board_feet - 100 * 2 * 4 * 8 / 12) < 1e-9);
   assert.equal((await answerQuery({ query: "how many bags of thinset for 200 sq ft" })).id, "thinset-coverage");
 });
+
+test("answer_query: gas load in btu, natural gas, and service size by square feet", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  const g = await answerQuery({ query: "gas pipe size 100 ft 150000 btu natural gas" });
+  assert.equal(g.id, "gas-pipe-sizing");
+  assert.deepEqual([g.inputs.btu_load, g.inputs.gas], ["150000", "natural_gas"]);
+  const s = await answerQuery({ query: "service size for 2500 sq ft house" });
+  assert.equal(s.id, "service-load");
+  // The door's unfilled counts are the NEC 220.52 minimums, not zero.
+  assert.equal(s.result.total_demand_W, 6150);
+});

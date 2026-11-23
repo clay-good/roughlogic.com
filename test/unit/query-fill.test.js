@@ -719,3 +719,13 @@ test("query-fill: a temperature rise is a difference; a post-word prefers the un
     num("block_length_in", "Block face length", "in"), num("block_height_in", "Block face height", "in")];
   assert.deepEqual(queryFill("retaining wall blocks 50 ft long 3 ft tall", rw).filled, { wall_length_ft: "50", exposed_height_ft: "3" });
 });
+
+test("query-fill: btu on a btu/h-only tile is a rating; underscored options read with spaces", () => {
+  const gp = [num("btu_load", "BTU load", "btuh"), num("length_ft", "Pipe length", "ft"), sel("gas", "Gas", ["natural_gas", "propane"])];
+  assert.deepEqual(queryFill("gas pipe size 100 ft 150000 btu natural gas", gp).filled, { btu_load: "150000", length_ft: "100", gas: "natural_gas" });
+  // Not where the tile also measures heat in Btu.
+  assert.equal(queryFill("150000 btu", [num("q", "Heat", "btu"), num("r", "Rate", "btuh")]).filled.r, undefined);
+  // An underscored option whose words are the tile's own label is not read from them.
+  const rf = [sel("cooling", "End chill, or a drag chill between risers", ["end_effect", "end_chill", "drag_chill"])];
+  assert.equal(queryFill("end chill, or a drag chill between risers", rf).filled.cooling, undefined);
+});

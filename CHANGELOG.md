@@ -6,6 +6,10 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **Service size, gas pipe load and "natural gas" read from the question; a service load with blank circuits was low.**
+  - "Service size for 2500 sq ft house" went to roofing squares with a 2,500 sq ft roof. A service-size phrase now routes it to the NEC dwelling service load. The agent door sends unfilled boxes as null, and the calculator read a null small-appliance or laundry circuit count as 0, so it answered 4,575 W. A blank count is now the declared minimum (2 and 1, NEC 220.52): 6,150 W. A typed 0 still means 0.
+  - "Gas pipe size 100 ft 150000 btu" dropped the load, because Btu (energy) is not Btu/h. Appliance ratings are written in Btu and mean Btu/h, so on a calculator with a Btu/h field and no Btu field, "btu" now reads as Btu/h.
+  - "Natural gas" now picks the option natural_gas. A spaced underscore option is read unless that phrase is the calculator's own label wording, which is what made underscores cost two fields before.
 - **"Board feet in 100 2x4 8 ft" answers outright: 533.3 board feet.** "Board feet" ranked the spray-foam tile first. A "board feet in" phrase now routes it to lumber board footage, and a number right before a lumber size ("100 2x4") is how many sticks, filling the one count field. "How many bags of thinset for 200 sq ft" got no match; it now reaches thin-set coverage with the area filled.
 - **"Fuel cost for 300 miles at 25 mpg 3.50 per gallon" answers outright: $42.** The mileage calculator's labels carried no units ("Round-trip miles", "Fuel price ($/gal)"), so the 300 miles and the price went unread. They are now "Round-trip distance (mi)" and "Fuel price per gallon ($)". A number followed by "per X" now fills the one field whose label says "per X", with or without a $ on the number.
 - **Two more wrong values from a third question sweep, now pinned in `test/fixtures/free-text-queries.json`.**

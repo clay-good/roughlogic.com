@@ -1095,6 +1095,12 @@ export function computeServiceLoad({
   hvac_heating_W = 0,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A blank (null) count is the declared minimum, not 0: NEC 220.52 requires at
+  // least 2 small-appliance circuits and 1 laundry circuit in a dwelling, and
+  // the agent door sends an unfilled box as null (2026-11-23: 2,500 sq ft read
+  // as 19 A with neither).
+  if (small_appliance_circuits == null || small_appliance_circuits === "") small_appliance_circuits = 2;
+  if (laundry_circuits == null || laundry_circuits === "") laundry_circuits = 1;
   // A count of things is whole: fractional entries passed silently until 2026-11-15.
   if (small_appliance_circuits != null && small_appliance_circuits !== "" && !Number.isInteger(Number(small_appliance_circuits))) return { error: "Small-appliance circuits must be a whole number." };
   if (laundry_circuits != null && laundry_circuits !== "" && !Number.isInteger(Number(laundry_circuits))) return { error: "Laundry circuits must be a whole number." };

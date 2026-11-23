@@ -117992,6 +117992,16 @@
   "term": "bags of thinset for square feet",
   "target": "thinset-coverage",
   "kind": "question"
+ },
+ {
+  "term": "service size for",
+  "target": "service-load",
+  "kind": "question"
+ },
+ {
+  "term": "electrical service size for a house by square feet",
+  "target": "service-load",
+  "kind": "question"
  }
  ]
 }
