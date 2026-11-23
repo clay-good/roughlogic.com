@@ -1583,10 +1583,22 @@ export function renderAnchorEmbedment(inputRegion, outputRegion, citationEl) {
 
 export const SHEET_AREAS_FT2 = { "4x8": 32, "4x10": 40, "4x12": 48 };
 
-// dims: in { wall_area_ft2: L^2, ceiling_area_ft2: L^2, sheet_size: dimensionless, waste_percent: dimensionless } out: { sheets: dimensionless, mud_gal: L^3, screws: dimensionless, tape_lf: L, total_ft2: L^2 }
-export function computeDrywall({ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_size = "4x8", waste_percent = 10 }) {
+// dims: in { wall_area_ft2: L^2, ceiling_area_ft2: L^2, sheet_size: dimensionless, waste_percent: dimensionless, room_length_ft: L, room_width_ft: L, wall_height_ft: L, room_ceiling: dimensionless } out: { sheets: dimensionless, mud_gal: L^3, screws: dimensionless, tape_lf: L, total_ft2: L^2, wall_area_ft2: L^2, ceiling_area_ft2: L^2, from_room: dimensionless }
+export function computeDrywall({ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_size = "4x8", waste_percent = 10, room_length_ft, room_width_ft, wall_height_ft, room_ceiling = "include" }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
-  wall_area_ft2 = Number(wall_area_ft2); ceiling_area_ft2 = Number(ceiling_area_ft2);
+  wall_area_ft2 = Number(wall_area_ft2) || 0; ceiling_area_ft2 = Number(ceiling_area_ft2) || 0;
+  if (waste_percent == null || waste_percent === "") waste_percent = 10;
+  // A room instead of areas (2026-11-23): walls 2 x (L + W) x H and, unless
+  // excluded, its L x W ceiling. Entered areas win.
+  const room = [room_length_ft, room_width_ft, wall_height_ft].map((v) => Number(v) || 0);
+  let fromRoom = false;
+  if (room.some((v) => v < 0)) return { error: "Room size cannot be negative." };
+  if (!(wall_area_ft2 > 0) && !(ceiling_area_ft2 > 0) && room.some((v) => v > 0)) {
+    if (!room.every((v) => v > 0)) return { error: "Enter the room length, width and wall height, or the areas." };
+    wall_area_ft2 = 2 * (room[0] + room[1]) * room[2];
+    ceiling_area_ft2 = room_ceiling === "exclude" ? 0 : room[0] * room[1];
+    fromRoom = true;
+  }
   if (!(wall_area_ft2 >= 0 && ceiling_area_ft2 >= 0)) return { error: "Areas must be non-negative." };
   if (waste_percent < 0) return { error: "Waste cannot be negative (%)." };
   const sheetA = SHEET_AREAS_FT2[sheet_size];
@@ -1606,7 +1618,7 @@ export function computeDrywall({ wall_area_ft2 = 0, ceiling_area_ft2 = 0, sheet_
   // USG Gypsum Construction Handbook: 875 screws per 1,000 ft^2 on walls (28 a 4x8) and 1,125 on
   // ceilings (36 a 4x8; 32 until 2026-10-02, 11% low).
   const screws = Math.ceil((wall_area_ft2 / 32) * 28 + (ceiling_area_ft2 / 32) * 36 - 1e-9);
-  return { sheets, mud_gal, tape_lf, screws, total_ft2 };
+  return { sheets, mud_gal, tape_lf, screws, total_ft2, wall_area_ft2, ceiling_area_ft2, from_room: fromRoom };
 }
 
 export const drywallExample = {
@@ -2156,9 +2168,14 @@ const renderDrywall = _simpleRenderer({
     { key: "ceiling_area_ft2", label: "Ceiling area (ft²)", kind: "number" },
     { key: "sheet_size", label: "Sheet size", kind: "select", options: [{ value: "4x8", label: "4x8" }, { value: "4x10", label: "4x10" }, { value: "4x12", label: "4x12" }] },
     { key: "waste_percent", label: "Waste (%)", kind: "number", default: 10 },
+    { key: "room_length_ft", label: "Or room length (ft)", kind: "number" },
+    { key: "room_width_ft", label: "Room width (ft)", kind: "number" },
+    { key: "wall_height_ft", label: "Wall height (ft)", kind: "number" },
+    { key: "room_ceiling", label: "Room ceiling", kind: "select", options: [{ value: "include", label: "Include the ceiling" }, { value: "exclude", label: "Walls only" }] },
   ],
   outputs: [
     { key: "sheets", id: "dr-out-s", label: "Sheets", value: (r) => _fmtC(r.sheets, 0) },
+    { key: "room", id: "dr-out-r", label: "Board area", value: (r) => _fmtC(r.total_ft2, 0) + " ft²" + (r.from_room ? " (walls " + _fmtC(r.wall_area_ft2, 0) + " + ceiling " + _fmtC(r.ceiling_area_ft2, 0) + ", no openings deducted)" : "") },
     { key: "mud", id: "dr-out-m", label: "Mud (gal)", value: (r) => _fmtC(r.mud_gal, 1) },
     { key: "tape", id: "dr-out-t", label: "Tape (lf)", value: (r) => _fmtC(r.tape_lf, 0) },
     { key: "screws", id: "dr-out-c", label: "Screws", value: (r) => _fmtC(r.screws, 0) },

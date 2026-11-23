@@ -8,6 +8,7 @@ import {
   computeFootingArea,
   computeTileCount,
   computePaintCoverage,
+  computeDrywall,
   computeExcavationVolume,
   computeMasonryCount,
   computeWindPressure,
@@ -631,4 +632,16 @@ test("paint coverage takes a room's length, width and wall height", () => {
   // A blank coats box is the default 2; a typed 0 is refused.
   assert.equal(computePaintCoverage({ area_ft2: 700, coats: null }).total_paint_gallons, 4);
   assert.ok("error" in computePaintCoverage({ area_ft2: 700, coats: 0 }));
+});
+
+test("drywall takes a room: walls 2 x (L + W) x H plus the ceiling", () => {
+  const r = computeDrywall({ room_length_ft: 12, room_width_ft: 14, wall_height_ft: 8 });
+  assert.equal(r.wall_area_ft2, 416);
+  assert.equal(r.ceiling_area_ft2, 168);
+  assert.equal(r.sheets, Math.ceil(584 * 1.1 / 32));
+  assert.equal(computeDrywall({ room_length_ft: 12, room_width_ft: 14, wall_height_ft: 8, room_ceiling: "exclude" }).sheets, Math.ceil(416 * 1.1 / 32));
+  // Entered areas win; a partial room or a negative side is refused.
+  assert.equal(computeDrywall({ wall_area_ft2: 1200, ceiling_area_ft2: 600, room_length_ft: 12, room_width_ft: 14, wall_height_ft: 8 }).sheets, 62);
+  assert.ok("error" in computeDrywall({ room_length_ft: 12 }));
+  assert.ok("error" in computeDrywall({ room_length_ft: -12, room_width_ft: 14, wall_height_ft: 8 }));
 });

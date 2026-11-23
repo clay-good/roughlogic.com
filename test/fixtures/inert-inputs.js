@@ -7,6 +7,7 @@ export const INERT_INPUTS = {
   "backflow-test-psi::check2_psi": "moves the answer once another input changes (1,500 randomized settings)",
   "baseboard-output::flow_gpm": "a step at 4 gpm (the chart's 4 gpm row)",
   "breaker-sizing::phase": "read only when the load is entered in watts, not amps",
+  "drywall::room_ceiling": "read only when the room is given by its size; the example enters wall and ceiling areas (2026-11-23)",
   "capacitor-discharge-time::rated_voltage_v": "moves the answer once another input changes (1,500 randomized settings)",
   "carpet-seam-layout::min_fill_strip_in": "moves the answer once another input changes (1,500 randomized settings)",
   "category-deterioration::contacted_contaminant": "moves the answer once another input changes (1,500 randomized settings)",

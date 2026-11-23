@@ -792,3 +792,10 @@ test("answer_query: what an appliance costs to run (spec-v1997)", async () => {
   const c = await answerQuery({ query: "how much does it cost to run a 200 watt fan 4 hours a day 120 days at 8.5 cents per kwh" });
   assert.equal(c.result.kwh_per_year, 96);
 });
+
+test("answer_query: drywall for a room answers from its size", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  const a = await answerQuery({ query: "how many sheets of drywall for a 12 by 14 room 8 ft walls" });
+  assert.equal(a.status, "OK");
+  assert.equal(a.result.total_ft2, 584);
+});

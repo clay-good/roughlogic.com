@@ -668,3 +668,14 @@ test("query-fill: a per-day quantity fills a per-day field; a utility rate is ce
   assert.equal(queryFill("8 hours a day", [num("run_hr", "Run time", "hr")]).filled.run_hr, undefined);
   assert.equal(rewriteQuery("$3.50 per ft"), "$3.50 per ft");
 });
+
+test("query-fill: names written after their numbers, and a tie the post-word wins", () => {
+  const dw = [num("wall_area_ft2", "Wall area", "ft2"), num("ceiling_area_ft2", "Ceiling area", "ft2")];
+  const want = { wall_area_ft2: "1200", ceiling_area_ft2: "600" };
+  for (const q of ["drywall 1200 sq ft walls 600 sq ft ceiling", "drywall walls 1200 sq ft ceiling 600 sq ft", "1200 sq ft of walls and 600 sq ft of ceiling"]) {
+    assert.deepEqual(queryFill(q, dw, { name: "Drywall Sheet Count and Mud" }).filled, want, q);
+  }
+  const fence = [num("length_ft", "Fence run", "ft"), num("post_spacing_ft", "Post spacing", "ft")];
+  assert.deepEqual(queryFill("fence posts for 150 ft fence 8 ft apart", fence, { name: "Fence Material Takeoff" }).filled,
+    { length_ft: "150", post_spacing_ft: "8" });
+});

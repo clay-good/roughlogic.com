@@ -443,6 +443,14 @@ export function queryFill(query, rows, opts) {
   // nominal depth 4 in") are its own, not the reader's: they may fill a field
   // that the word "nominal"/"width"/"depth" names, never one their unit alone
   // fits. "2x4 studs 16 on center" put 2 in into the stud spacing (2026-11-16).
+  // "1200 sq ft" comes back with unit `sq` and a span that stops before "ft",
+  // so every rule reading the words AFTER the number saw "ft" and not "walls"
+  // or "of walls" (2026-11-23). The span takes the unit's second word.
+  for (const q of quantities) {
+    const u = q.unit ? String(q.unit).toLowerCase() : "";
+    const w = (u === "sq" || u === "cu") && text.slice(q.end).match(/^\s+[a-z]+\b/);
+    if (w) q.end += w[0].length;
+  }
   for (const q of quantities) {
     if (/nominal (?:width|depth)\s*$/.test(text.slice(0, q.index))) q.lumber = true;
   }
@@ -575,6 +583,27 @@ export function queryFill(query, rows, opts) {
   // and gave a 12 ft wall's length to its 8 ft height (2026-11-16). Such a
   // quantity takes the one field those words name, or no field here at all.
   const backOf = new Map();          // quantity index -> { cut, keys }
+  // Which way the whole question names its numbers. "1200 sq ft walls 600 sq
+  // ft ceiling" names each AFTER it, and reading forward swapped the two
+  // areas (2026-11-23). Backward only when the last number is followed by a
+  // field's name and the first is not preceded by one, so "walls 1200 sq ft
+  // ceiling 600 sq ft" still reads forward.
+  const live = quantities.map((q, i) => i).filter((i) => !suppressed.has(i));
+  const namesRow = (word, qty) => {
+    const unit = canonicalUnit(rawUnitOf(qty, text));
+    if (!unit || !word) return [];
+    const w = word.toLowerCase();
+    return numberRows.filter((r) => rowUnit(r) && unitsCompatible(unit, rowUnit(r)) &&
+      (termsByRow.get(r.d).has(w) || termsByRow.get(r.d).has(w.replace(/s$/, ""))));
+  };
+  let namesAfter = false;
+  if (live.length >= 2) {
+    const first = quantities[live[0]], last = quantities[live[live.length - 1]];
+    const tail = text.slice(last.end).match(/^\s+([a-z]+)\b/i);
+    const nameTok = new Set(String((opts && opts.name) || "").toLowerCase().split(/[^a-z]+/));
+    const lead = text.slice(0, first.index).toLowerCase().split(/[^a-z]+/).filter((w) => w && !nameTok.has(w));
+    namesAfter = Boolean(tail) && namesRow(tail[1], last).length === 1 && !lead.some((w) => namesRow(w, first).length);
+  }
   quantities.forEach((qty, qi) => {
     if (suppressed.has(qi)) return;
     const unit = canonicalUnit(rawUnitOf(qty, text));
@@ -607,6 +636,11 @@ export function queryFill(query, rows, opts) {
     if (m) terms = windowTerms(m[1]);
     else if (unitFamily(unit) === "length" && (m = after.match(/^\s+(tall|high|deep|wide|long|thick|apart|rise|drop|fall|run|shallow|round)\b/i))) {
       terms = new Set([m[1].toLowerCase(), ...POST_WORDS.get(m[1].toLowerCase())]);
+    }
+    if (!terms && namesAfter) {
+      const n = after.match(/^\s+([a-z]+)\b/i);
+      const hit = n ? namesRow(n[1], qty) : [];
+      if (hit.length === 1) { backOf.set(qi, { cut: n[0].length, keys: [hit[0].d], dimension: false }); return; }
     }
     if (!terms) {
       // "12 inch tile": a size followed by the name of an item whose two sides
@@ -807,6 +841,18 @@ export function queryFill(query, rows, opts) {
   // "Total rise" is not refused a "9 ft high" just because no label says height.
   const namesDimensions = numberRows.some((r) => [...termsByRow.get(r.d)].some((t) => DIMENSION_WORDS.has(t)));
   for (const [qi, b] of backOf) if (b.dimension && b.keys.length !== 1 && namesDimensions) burned.add(qi);
+
+  // A field wanted twice, once by the words AFTER a number ("8 ft apart") and
+  // once by the words before another ("fence posts for 150 ft"), goes to the
+  // value-then-name reading, which names its own number; the other number is
+  // left for the later phases (2026-11-23: the tie dropped both).
+  for (const [key, qis] of proposals) {
+    if (qis.length < 2) continue;
+    const back = qis.filter((qi) => backOf.has(qi) && !backOf.get(qi).count);
+    if (back.length !== 1) continue;
+    for (const qi of qis) if (qi !== back[0]) rowsFor.set(qi, (rowsFor.get(qi) || []).filter((k) => k !== key));
+    proposals.set(key, back);
+  }
 
   // Resolve only the unambiguous pairs: one field wanted by one fragment, and
   // that fragment wanting only that field. Everything else is dropped.
