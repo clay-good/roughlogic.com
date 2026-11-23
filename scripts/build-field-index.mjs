@@ -87,7 +87,7 @@ const SHARD_GZIP_CAP = 24 * 1024;
 // next day. Bump it deliberately when the descriptor shape changes.
 const EDITION_DATE = "2026-08-20";
 
-const { describe, run, inputLabels } = await import(resolve(ROOT, "mcp", "catalog.mjs"));
+const { describe, run, inputLabels, inputDefaults } = await import(resolve(ROOT, "mcp", "catalog.mjs"));
 const { TOOLS } = await import(resolve(ROOT, "tools-data.js"));
 const { unitFromLabel, labelLead } = await import(resolve(ROOT, "field-units.js"));
 const { bucketFor } = await import(resolve(ROOT, "field-bucket.js"));
@@ -138,6 +138,7 @@ async function requiredKeys(id, rows, blank = 0) {
   if (!example || typeof example !== "object") return out;
   let base;
   try { base = await run({ id, inputs: { ...example } }); } catch { return out; }
+  const defaults = blank === null ? await inputDefaults(id) : new Map();
   for (const row of rows) {
     if (!(row.d in example)) continue;
     // An example that passes `R: null` is DECLARING the field absent -- that is
@@ -152,7 +153,10 @@ async function requiredKeys(id, rows, blank = 0) {
     // instead let asphalt-tonnage fall back to its 145 pcf default and look
     // optional, while the real page showed "Density must be positive."
     const trimmed = { ...example };
-    if (row.k === "number" || row.k === undefined) trimmed[row.d] = blank;
+    // The door omits an unfilled field whose compute declares a non-null
+    // default (mcp/catalog.mjs coerceForCompute), so the null simulation does too.
+    if (blank === null && (row.k === "number" || row.k === undefined) && defaults.has(row.d)) delete trimmed[row.d];
+    else if (row.k === "number" || row.k === undefined) trimmed[row.d] = blank;
     else if (row.k === "text" || row.k === "textarea") trimmed[row.d] = "";
     else delete trimmed[row.d];
     try {

@@ -40,14 +40,17 @@ test("spec-v1344: values are coerced the way the browser coerces them", async ()
 
 test("spec-v1344: a partial question returns what it worked out, not a refusal", async () => {
   const { answerQuery } = await import("../../mcp/catalog.mjs");
-  const out = await answerQuery({ query: "asphalt tonnage 2400 sq ft 3 in deep 12 ft wide" });
+  // Asphalt tonnage used to be the example here, missing its density; since
+  // 2026-11-23 an unfilled box with a declared default takes it, as the page
+  // does (145 pcf), so a question missing a box with NO default stands in.
+  const out = await answerQuery({ query: "voltage drop 120v 150 ft 20a" });
   assert.equal(out.status, "MISSING_INPUTS");
-  assert.equal(out.id, "asphalt-tonnage");
+  assert.equal(out.id, "voltage-drop");
   // What it recovered, so the caller does not re-type it...
-  assert.equal(out.inputs.area_ft2, "2400");
-  assert.equal(out.inputs.depth_in, "3");
+  assert.equal(out.inputs.length_ft, "150");
+  assert.equal(out.inputs.current_A, "20");
   // ...and what it still needs, by human label.
-  assert.ok(out.missing.some((m) => m.key === "density_pcf"), JSON.stringify(out.missing));
+  assert.ok(out.missing.some((m) => m.key === "awg"), JSON.stringify(out.missing));
 });
 
 test("spec-v1344: naming a calculator without values is NO_VALUES, not a guess", async () => {
@@ -804,10 +807,12 @@ test("answer_query: joists for a deck and siding for a wall reach their calculat
   const { answerQuery } = await import("../../mcp/catalog.mjs");
   const j = await answerQuery({ query: "how many joists for a 16 ft deck 16 inches on center" });
   assert.equal(j.id, "joist-hanger-count");
-  assert.deepEqual([j.inputs.run_width_ft, j.inputs.spacing_in], ["16", "16"]);
+  assert.deepEqual([Number(j.inputs.run_width_ft), Number(j.inputs.spacing_in)], [16, 16]);
+  // The hanger ends and nails take their declared defaults: it answers.
+  assert.equal(j.result.joists, 13);
   const s = await answerQuery({ query: "how many square feet of siding 40 ft wall 10 ft tall" });
   assert.equal(s.id, "siding-takeoff");
-  assert.equal(s.inputs.wall_area_sf, "400");
+  assert.equal(Number(s.inputs.wall_area_sf), 400);
 });
 
 test("answer_query: fuel cost for a trip answers outright", async () => {
@@ -830,7 +835,7 @@ test("answer_query: gas load in btu, natural gas, and service size by square fee
   const { answerQuery } = await import("../../mcp/catalog.mjs");
   const g = await answerQuery({ query: "gas pipe size 100 ft 150000 btu natural gas" });
   assert.equal(g.id, "gas-pipe-sizing");
-  assert.deepEqual([g.inputs.btu_load, g.inputs.gas], ["150000", "natural_gas"]);
+  assert.deepEqual([Number(g.inputs.btu_load), g.inputs.gas], [150000, "natural_gas"]);
   const s = await answerQuery({ query: "service size for 2500 sq ft house" });
   assert.equal(s.id, "service-load");
   // The door's unfilled counts are the NEC 220.52 minimums, not zero.

@@ -208,10 +208,14 @@ exist for 2,249 calculators. For the other 38 it projects the descriptors from
 `describe_calculator` instead, naming each input with the caption the
 calculator itself prints. A field whose verified
 example holds something a numeric extractor must not guess at -- a list, a
-date, a coded token like `wingwall_30_75` -- is named but never filled, and a
-field the example sets is treated as required. So a question that covers only
-part of a calculator comes back as `MISSING_INPUTS` naming the rest, rather
-than an answer computed partly from defaults.
+date, a coded token like `wingwall_30_75` -- is named but never filled. A field
+the question leaves blank takes the calculator's own declared default where it
+has one, exactly as a blank box on the page does (a slab's 10% waste, a 145 pcf
+asphalt mix); a field with no default that the calculator cannot answer without
+is named instead. So a question that covers only part of a calculator comes back
+as `MISSING_INPUTS` naming what it still needs. A question that is only the
+calculator's name carries no values and returns `NO_VALUES`, even where the name
+holds a number.
 
 It will not answer from a weak match, so a question has to corroborate the
 calculator it reached: by carrying values, by naming it, or by matching a phrase

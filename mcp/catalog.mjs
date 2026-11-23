@@ -1557,11 +1557,17 @@ function queryNamesTile(query, name) {
 // Selects are left alone: their values ARE strings, and validateSelects
 // already normalizes a number-shaped option back to the string the compute
 // expects.
-function coerceForCompute(filled, rows) {
+function coerceForCompute(filled, rows, defaults) {
   const out = {};
   for (const row of rows) {
     const has = Object.prototype.hasOwnProperty.call(filled, row.d);
     if (!has) {
+      // ...unless the field declares a default of its own, which is what the
+      // page's blank box gets: the browser passes `undefined` and the
+      // compute's default applies. A null instead read as 0 and changed the
+      // answer silently on 334 calculators (a 50 F growing-degree base became
+      // 0, a 6% selling cost 0%), 2026-11-23.
+      if (defaults && defaults.has(row.d)) continue;
       // An unfilled NUMERIC field is passed as an explicit null, which is how
       // this catalog spells "absent" -- ohms-law derives the values it was not
       // given by testing `out.V === null`, so an undefined key derives
@@ -1580,6 +1586,19 @@ function coerceForCompute(filled, rows) {
     out[row.d] = Number.isFinite(n) ? n : value;
   }
   return out;
+}
+
+// The compute parameters that declare a default other than null: omitting one
+// is exactly what gives the compute that default. A parameter defaulting to
+// null keeps its explicit null (ohms-law's "solve for this").
+export async function inputDefaults(id) {
+  try {
+    const { COMPUTE_MAP, modCache } = await load();
+    const reg = COMPUTE_MAP[id];
+    if (!reg) return new Map();
+    const fn = await importCompute(reg, modCache);
+    return new Map(introspectInputs(fn).filter((p) => p.hasDefault && p.default !== null).map((p) => [p.name, true]));
+  } catch { return new Map(); }
 }
 
 // Does this tile take any inputs at all? Read from the tile's own describe()
@@ -1773,7 +1792,10 @@ export async function answerQuery({ query } = {}) {
       // field index failed to project, which is what NO_VALUES already says.
     }
   }
-  if (!recovered.length) {
+  // A question that is only the calculator's name gives no values, even where
+  // the name holds a number ("4-20 mA", "NEC 705.6") that fills a box; with
+  // every other box at its default that read as an answer (2026-11-23).
+  if (!recovered.length || (exactName && top === exactName)) {
     return {
       status: "NO_VALUES", query: q, id: top.id, name: top.name,
       message: `"${top.name}" looks like the calculator, but the question carried no values to compute with. Call describe_calculator for its inputs.`,
@@ -1795,7 +1817,7 @@ export async function answerQuery({ query } = {}) {
     || rows.some((r) => /^or\b/i.test(r.l || "") && r.d in filled);
   if (missingRequired.length && choseMode) {
     try {
-      const trial = await run({ id: top.id, inputs: coerceForCompute(filled, rows) });
+      const trial = await run({ id: top.id, inputs: coerceForCompute(filled, rows, await inputDefaults(top.id)) });
       if (trial && trial.result && !trial.result.error && !(trial.warnings || []).some((w) => w && (w.rule === "min" || w.rule === "max") && w.key in filled)) {
         return { ...trial, status: "OK", query: q, name: top.name, via: "registry" };
       }
@@ -1810,7 +1832,7 @@ export async function answerQuery({ query } = {}) {
   }
 
   try {
-    const out = await run({ id: top.id, inputs: coerceForCompute(filled, rows) });
+    const out = await run({ id: top.id, inputs: coerceForCompute(filled, rows, await inputDefaults(top.id)) });
     // A hard bound the tile itself declares is the extractor's own error
     // report. `run_calculator` keeps such a warning ADVISORY and still answers,
     // and that is right there: the caller chose the value deliberately. Here
