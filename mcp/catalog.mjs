@@ -1831,6 +1831,21 @@ export async function answerQuery({ query } = {}) {
     // An "Or ..." field is the other way in: "paint for a 12 by 14 room" fills
     // the room, and the Area it replaces was measured as required (2026-11-23).
     || rows.some((r) => /^or\b/i.test(r.l || "") && r.d in filled);
+  // Any other question missing a "required" box gets the same trial, held to
+  // the field index's own test of an answer: no refusal, and no output that
+  // comes back zero, empty or non-finite. "Breaker size for a 5000 watt heater
+  // 240 volts" has no load current, and the calculator derives it from the
+  // watts and volts it was given (2026-11-23).
+  const answers = (r) => r && !r.error && Object.values(r).every((v) => v !== null && v !== undefined && (typeof v !== "number" || (Number.isFinite(v) && v !== 0)));
+  const numericKey = (k) => rows.some((r) => r.d === k && (r.k === "number" || r.k === undefined));
+  if (missingRequired.length && !choseMode) {
+    try {
+      const trial = await run({ id: top.id, inputs: coerceForCompute(filled, rows, await inputDefaults(top.id)) });
+      if (trial && answers(trial.result) && !(trial.warnings || []).some((w) => w && (w.rule === "min" || w.rule === "max" || (w.rule === "missing" && numericKey(w.key))))) {
+        return { ...trial, status: "OK", query: q, name: top.name, via: "registry", ...(await disclose()) };
+      }
+    } catch { /* fall through to naming what is missing */ }
+  }
   if (missingRequired.length && choseMode) {
     try {
       const trial = await run({ id: top.id, inputs: coerceForCompute(filled, rows, await inputDefaults(top.id)) });

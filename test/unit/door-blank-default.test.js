@@ -40,3 +40,13 @@ test("door: an OK answer names what it did not read and what it defaulted", asyn
   assert.equal(n.id, "nam-sizing");
   assert.ok(Math.abs(n.result.required_cfm - 115.2) < 1e-9);
 });
+
+test("door: a missing 'required' box is tried, and answers only if nothing vanishes", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  // The breaker tile derives the current from watts and volts.
+  const b = await answerQuery({ query: "what size breaker for a 5000 watt heater 240 volts" });
+  assert.equal(b.status, "OK");
+  assert.ok(Math.abs(b.result.derived_load_A - 5000 / 240) < 1e-9);
+  // A tons question with no density still asks: tons would come back null.
+  assert.equal((await answerQuery({ query: "gravel tons for 10 by 20 by 4 inches" })).status, "MISSING_INPUTS");
+});
