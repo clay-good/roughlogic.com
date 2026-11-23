@@ -108,7 +108,7 @@ const REWRITES = [
   // Slab thickness field and the reader's four inches went unused. A slab, a
   // room and a floor are written in feet; only the lumber is in inches.
   // ...and not when a surface follows: "a 4x4 slab" is four feet by four.
-  [/\b(\d+)\s*x\s*(\d+)\b(?!\s+(?:slab|patio|pad|deck|floor|room|area|shed|porch|landing)s?\b)/g, (m, w, d) =>
+  [/\b(\d+)\s*x\s*(\d+)\b(?!\s+(?:slab|patio|pad|deck|floor|room|area|shed|porch|landing|paver|tile|brick)s?\b)/g, (m, w, d) =>
     (Number(w) <= NOMINAL_LUMBER_MAX_IN && Number(d) <= NOMINAL_LUMBER_MAX_IN
       ? `nominal width ${w} in nominal depth ${d} in`
       : m)],
@@ -514,9 +514,14 @@ export function queryFill(query, rows, opts) {
         let done = false;
         if (len.length === 1 && wid.length === 1 && len[0].d !== wid[0].d) {
           filled[len[0].d] = String(a); filled[wid[0].d] = String(b); done = true;
-        } else if (!len.length && !wid.length && areas.length === 1 && m[4] &&
+        // A width with no length beside it ("Carpet roll width") is not a
+        // plan side and does not stop the area filling (2026-11-23).
+        } else if (!len.length && areas.length === 1 && m[4] &&
                    (/^\s+(floor|slab|patio|deck|yard|driveway|lawn|garden|pad|area|lot|walkway|sidewalk)s?$/.test(m[4]) ||
-                    termsByRow.get(areas[0].d).has(m[4].trim().replace(/s$/, ""))) &&
+                    termsByRow.get(areas[0].d).has(m[4].trim().replace(/s$/, "")) ||
+                    // ...and so is a room's, when the question is about what
+                    // covers its floor ("carpet for a 12 by 15 room", 2026-11-23).
+                    (/^\s+rooms?$/.test(m[4]) && /\b(carpet|flooring|floor|laminate|vinyl|hardwood|underlayment)\b/.test(text))) &&
                    !/\b(walls?|ceilings?|paint|primer)\b/.test(text)) {
           // A room's plan is its floor, but a question about a room may be about
           // its walls ("paint for a 12 by 12 room"): only a work surface fills
@@ -543,6 +548,21 @@ export function queryFill(query, rows, opts) {
         if (done) for (const i of inPair) { suppressed.add(i); claimed.add(i); }
       }
     }
+  }
+
+  // --- An item's two sides: "4 by 8 pavers", "6x24 tile" -------------------
+  // A size pair followed by the name of an item whose two sides the tile asks
+  // for in inches (length or height, and width) fills both, the larger as the
+  // length (2026-11-23).
+  for (const m of text.matchAll(/(^|[^\d.])(\d+(?:\.\d+)?)\s*(?:by|x)\s*(\d+(?:\.\d+)?)\s*(?:in\b|inch(?:es)?\b|")?\s+([a-z]+)/g)) {
+    const noun = m[4].replace(/s$/, "");
+    const side = (ws) => numberRows.filter((r) => rowUnit(r) === "in" && termsByRow.get(r.d).has(noun) && ws.some((w) => termsByRow.get(r.d).has(w)));
+    const L = side(["length", "height"]), W = side(["width"]);
+    const a = Number(m[2]), b = Number(m[3]);
+    if (L.length !== 1 || W.length !== 1 || L[0].d === W[0].d || !(a > 0 && b > 0) || L[0].d in filled || W[0].d in filled) continue;
+    filled[L[0].d] = String(Math.max(a, b)); filled[W[0].d] = String(Math.min(a, b));
+    const start = m.index + m[1].length, end = start + m[0].length - m[1].length;
+    quantities.forEach((q, i) => { if (q.index >= start && q.index < end) { suppressed.add(i); claimed.add(i); } });
   }
 
   // --- Nominal lumber on a tile that asks for thickness and width -----------

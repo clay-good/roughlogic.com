@@ -679,3 +679,15 @@ test("query-fill: names written after their numbers, and a tie the post-word win
   assert.deepEqual(queryFill("fence posts for 150 ft fence 8 ft apart", fence, { name: "Fence Material Takeoff" }).filled,
     { length_ft: "150", post_spacing_ft: "8" });
 });
+
+test("query-fill: an item's two sides, and a room's floor for a floor covering", () => {
+  const pav = [num("area_sqft", "Patio area", "ft2"), num("paver_length_in", "Paver length", "in"), num("paver_width_in", "Paver width", "in")];
+  assert.deepEqual(queryFill("how many pavers for 200 sq ft 4 by 8 pavers", pav).filled, { area_sqft: "200", paver_length_in: "8", paver_width_in: "4" });
+  assert.equal(queryFill("200 sq ft 4x8 pavers", pav).filled.paver_length_in, "8");
+  const tile = [num("area_ft2", "Area", "ft2"), num("tile_width_in", "Tile width", "in"), num("tile_height_in", "Tile height", "in")];
+  assert.deepEqual(queryFill("how many tiles for a 10 by 12 floor 6x24 tile", tile).filled, { area_ft2: "120", tile_height_in: "24", tile_width_in: "6" });
+  const carpet = [num("area_sf", "Area to carpet", "ft2"), num("roll_width_ft", "Carpet roll width", "ft")];
+  assert.equal(queryFill("carpet for a 12 by 15 room", carpet).filled.area_sf, "180");
+  // A room's plan is still not a paint area.
+  assert.equal(queryFill("paint for a 12 by 15 room", [num("area_ft2", "Area", "ft2")]).filled.area_ft2, undefined);
+});

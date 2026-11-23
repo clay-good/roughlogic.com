@@ -6517,6 +6517,9 @@
     {"term":"drywall screws for","target":"drywall-fastener-takeoff","kind":"question"},
     {"term":"acres in","target":"square-footage","kind":"question"},
     {"term":"how many acres","target":"square-footage","kind":"question"},
-    {"term":"how much paint","target":"paint-coverage","kind":"question"}
+    {"term":"how much paint","target":"paint-coverage","kind":"question"},
+    {"term":"carpet for","target":"carpet-takeoff","kind":"question"},
+    {"term":"how many pavers","target":"paver-patio","kind":"question"},
+    {"term":"pavers for square feet","target":"paver-patio","kind":"question"}
   ]
 }
