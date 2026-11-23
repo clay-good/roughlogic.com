@@ -4,8 +4,8 @@
   "agency": "BLS PPI",
   "series_id": "WPU102502",
   "units": "Index 1982=100",
-  "built": "2026-11-16",
-  "fetched": "2026-11-16",
+  "built": "2026-11-23",
+  "fetched": "2026-11-23",
   "cadence": "monthly",
   "points": [
     {

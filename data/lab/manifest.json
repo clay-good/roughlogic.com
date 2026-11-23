@@ -1,9 +1,9 @@
 {
   "name": "lab",
-  "version": "2026-11-16",
-  "fetched": "2026-11-16",
+  "version": "2026-11-23",
+  "fetched": "2026-11-23",
   "edition": "IUPAC/CIAAW Abridged Standard Atomic Weights 2024. Common laboratory buffer pKa values, Good 1966 / PanReac AppliChem IP-022EN / CRC 95th (Good named the buffers and tabulates at 20 C; the bundled 25 C values are IP-022EN, and Tris, phosphate, acetate and bicarbonate are CRC). Manufacturer rotor specifications, current manufacturer catalogs (Eppendorf, Beckman Coulter, Thermo Fisher). Verified 2026-09-09.",
-  "asOf": "2026-11-16",
+  "asOf": "2026-11-23",
   "refresh_cadence": "annual",
   "shards": [
     {
@@ -23,8 +23,8 @@
     }
   ],
   "hashes": {
-    "iupac-atomic-weights.json": "7ee44e3252ff5bc7bae080cd2d2507bd7453ae5d0fb04d9749c9fad070883857",
-    "buffer-pka.json": "1ffe40d7d9401e3ad5eb47aba7186c8c7fc08a54b75d195e7ebdcbf762ab3d77",
-    "centrifuge-rotors.json": "782ef6ce5acd9b354f56d86837924dc3fae8dd64cd3727d2dcff4d71b482a57a"
+    "iupac-atomic-weights.json": "bb6d2fe3a8d04e5485b2a8fdc887800248e53f7cf8ed7ce49a18343f14749e22",
+    "buffer-pka.json": "49081e60bec1438fa68e5bc44c5c353816c3d3b07123aea9edc5a6aae3b2c36b",
+    "centrifuge-rotors.json": "dd6edd36dd9458866051ed76d4b9e0e6e4ca27aeecf45c8290ef276622fce499"
   }
 }

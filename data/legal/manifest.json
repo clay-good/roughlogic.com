@@ -1,15 +1,15 @@
 {
   "name": "legal",
-  "version": "2026-11-16",
-  "fetched": "2026-11-16",
+  "version": "2026-11-23",
+  "fetched": "2026-11-23",
   "edition": "Post-Wayfair sales-tax-nexus thresholds from each state's department of revenue. Verified 2026-09-03.",
-  "asOf": "2026-11-16",
+  "asOf": "2026-11-23",
   "refresh_cadence": "quarterly",
   "shards": [
     {
       "file": "sales-tax-nexus.json",
       "name": "Per-state post-Wayfair economic-nexus thresholds",
-      "gzip_size_bytes": 2805
+      "gzip_size_bytes": 2804
     },
     {
       "file": "code-adoption.json",
@@ -18,8 +18,8 @@
     }
   ],
   "hashes": {
-    "sales-tax-nexus.json": "7e8e69ad6c97be649ec6a049156557f641fb5dbef903d92a0298c0ec041e6af9",
-    "code-adoption.json": "4705c8e5b286ed27e38a84dd731b0f9970987d489323b9418743e7463ad003a6"
+    "sales-tax-nexus.json": "748019f2b12cd972ebc2060675147038c4eae9ee4d51327cd9b11e0834d5fcc7",
+    "code-adoption.json": "ed470c8d4916703c4934305a008705821e2905abe90378bf7df0ed6001185434"
   },
   "staleness_note": "14 of 47 rows still carry verified_on 2026-09-03; the 33 re-verified since then run to 2026-09-09. States change these by legislation, not on a calendar, so each recheck is a per-state lookup against that department of revenue and is maintainer work, not a build step. The tile prints every row's citation and verified_on date and tells the reader to confirm with the state before filing. Recheck oldest-first; this note is generated from the stamps and goes away when they are current."
 }
