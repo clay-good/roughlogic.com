@@ -1472,7 +1472,34 @@ export function queryFill(query, rows, opts) {
   // kcmil "250") as a second reading beside "12 awg", so the gauge filled neither
   // way until 2026-11-15. Options are searched with the thousands commas closed up.
   const optText = text.replace(/(^|[^\d.,])(\d{1,3}(?:,\d{3})+)(?![\d,])/g, (m, pre, n) => pre + n.replace(/,/g, ""));
+  // The strongest evidence a dropdown can have, and the number path's own rule:
+  // the field's WHOLE LABEL written as a phrase immediately before one of its
+  // options. "Refrigerant A R-410A, Refrigerant B R-32" filled NEITHER, because
+  // both fields offer both refrigerants and both options are written, so each
+  // read two ways and burned (2026-11-24). Two words at least, so a one-word
+  // label cannot claim an option it merely sits near.
+  {
+    const flat = (t) => String(t).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean).join(" ");
+    const said = " " + flat(optText) + " ";
+    for (const row of selectRows) {
+      if (row.d in filled) continue;
+      const lab = flat(row.l);
+      if (lab.split(" ").length < 2) continue;
+      // Longest option first: one option's words can open another's. The
+      // trowel offers `quarter` and `quarter_three_eighths`, which flattens to
+      // "quarter three eighths", so the short one matched as its prefix and
+      // filled a 1/4 in notch where the reader wrote 1/4 x 3/8 (2026-11-24).
+      const byLength = [...row.o].sort((x, y) => flat(y).length - flat(x).length);
+      for (const opt of byLength) {
+        const tok = flat(opt);
+        if (!tok) continue;
+        if (said.includes(" " + lab + " " + tok + " ")) { filled[row.d] = String(opt); break; }
+      }
+    }
+  }
+
   for (const row of selectRows) {
+    if (row.d in filled) continue;
     const terms = termsByRow.get(row.d);
     const nameNear = [...terms].some((t) => text.includes(t));
     const matches = [];

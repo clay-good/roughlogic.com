@@ -975,3 +975,20 @@ test("query-fill: a rival never written whole does not break a sibling group", (
   assert.deepEqual(queryFill("House to outside 50, That zone to outside 4, That zone to outside 12", zonal).filled,
     { za: "4", zb: "12" });
 });
+
+test("query-fill: a dropdown's whole label written before an option takes it", () => {
+  // Both fields offer both refrigerants and both are written, so each read two
+  // ways and burned, leaving the tile with nothing (2026-11-24).
+  const refrig = [sel("refrigerant_a", "Refrigerant A", ["R-410A", "R-32", "R-22"]),
+    sel("refrigerant_b", "Refrigerant B", ["R-410A", "R-32", "R-22"])];
+  assert.deepEqual(queryFill("Compare Two Refrigerants Refrigerant A R-410A, Refrigerant B R-32", refrig,
+    { name: "Compare Two Refrigerants" }).filled, { refrigerant_a: "R-410A", refrigerant_b: "R-32" });
+  // Longest option first: one option's words can open another's, and the short
+  // one matched as a prefix ("quarter" inside "quarter_three_eighths").
+  const trowel = [sel("trowel", "Square-notch trowel", ["quarter", "quarter_three_eighths", "half"])];
+  assert.equal(queryFill("thinset Square-notch trowel quarter three eighths", trowel).filled.trowel,
+    "quarter_three_eighths");
+  // Two words at least: a one-word label cannot claim an option it sits near.
+  const one = [sel("mode", "Mode", ["fast", "slow"])];
+  assert.equal(queryFill("Mode fast", one).filled.mode, "fast");
+});
