@@ -32,12 +32,15 @@
 // arrives `undefined` while its compute declares a non-zero default. That is
 // the page as it opens.
 //
-// Measured 2026-11-24: 785 fields on 375 tiles. 773 are disclosed -- the field
-// carries `whenBlank` and the steps panel prints it as "60 (default, box left
-// blank)" -- and 12 are not, on ten hand-written renderers that pass the panel
-// a list of key NAMES and read the values back off the page, where a blank box
-// has nothing to read. scripts/check-blank-defaults.mjs holds every published
-// value to its compute's own signature.
+// Measured 2026-11-24: 768 fields on 360 tiles, and EVERY ONE IS DISCLOSED --
+// the field carries `whenBlank` and the steps panel prints it as "60 (default,
+// box left blank)". The last six lived on hand-written renderers that pass the
+// panel a list of key NAMES and read values back off the page, where a blank
+// box has nothing to read; each one's label already stated the number, so the
+// box is prefilled instead. Hold this at zero: a new field that computes with
+// a number the reader cannot see should fail review, not be counted.
+// scripts/check-blank-defaults.mjs holds every published value to its compute's
+// own signature, and test/unit/steps-panel-guard.test.js holds it to the page.
 //
 // About two minutes. Zero dependencies, no network.
 //

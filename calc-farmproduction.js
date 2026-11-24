@@ -129,8 +129,8 @@ function renderMulchTopsoilVolume(inputRegion, outputRegion, citationEl) {
   const area = makeNumber("Area (ft²)", "mtv-area", { step: "any", min: "0" });
   const depth = makeNumber("Depth (in)", "mtv-depth", { step: "any", min: "0" });
   const dens = makeNumber("Bulk density (ton/yd³: mulch 0.5, topsoil 1.1, gravel 1.4)", "mtv-dens", { step: "any", min: "0" });
-  const bag = makeNumber("Bag size (ft³, default 2)", "mtv-bag", { step: "any", min: "0" });
-  const load = makeNumber("Truck load (yd³, default 10)", "mtv-load", { step: "any", min: "0" });
+  const bag = makeNumber("Bag size (ft³, default 2)", "mtv-bag", { step: "any", min: "0", value: "2" });
+  const load = makeNumber("Truck load (yd³, default 10)", "mtv-load", { step: "any", min: "0", value: "10" });
   const waste = makeNumber("Waste/compaction allowance (%)", "mtv-waste", { step: "any", min: "0" });
   for (const f of [area, depth, dens, bag, load, waste]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { area.input.value = "1000"; depth.input.value = "3"; dens.input.value = "1.1"; bag.input.value = "2"; load.input.value = "10"; waste.input.value = "0"; update(); });
@@ -182,7 +182,7 @@ function renderGrainDryingEnergy(inputRegion, outputRegion, citationEl) {
   const lbbu = makeNumber("Test weight (lb/bu: corn 56, wheat/soy 60)", "gde-lb", { step: "any", min: "0" });
   const mi = makeNumber("Initial moisture (%)", "gde-mi", { step: "any", min: "0" });
   const mf = makeNumber("Final moisture (%)", "gde-mf", { step: "any", min: "0" });
-  const btu = makeNumber("Drying energy (Btu/lb water, default 1500)", "gde-btu", { step: "any", min: "0" });
+  const btu = makeNumber("Drying energy (Btu/lb water, default 1500)", "gde-btu", { step: "any", min: "0", value: "1500" });
   const price = makeNumber("Propane price ($/gal, optional)", "gde-price", { step: "any", min: "0" });
   for (const f of [bu, lbbu, mi, mf, btu, price]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { bu.input.value = "1000"; lbbu.input.value = "56"; mi.input.value = "20"; mf.input.value = "15"; btu.input.value = "1500"; price.input.value = ""; update(); });

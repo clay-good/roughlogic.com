@@ -1312,7 +1312,7 @@ function _v409renderCoilFaceVelocity(inputRegion, outputRegion, citationEl) {
   const cfm = makeNumber("Airflow (cfm)", "cfv-cfm", { step: "any", min: "0" });
   const w = makeNumber("Coil face width (in)", "cfv-w", { step: "any", min: "0" });
   const h = makeNumber("Coil face height (in)", "cfv-h", { step: "any", min: "0" });
-  const thr = makeNumber("Carryover threshold (fpm, default 500)", "cfv-thr", { step: "any", min: "0" });
+  const thr = makeNumber("Carryover threshold (fpm, default 500)", "cfv-thr", { step: "any", min: "0", value: "500" });
   for (const f of [cfm, w, h, thr]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cfm.input.value = "2000"; w.input.value = "24"; h.input.value = "18"; thr.input.value = "500"; update(); });
   const oV = makeOutputLine(outputRegion, "Face velocity", "cfv-out-v");
@@ -1353,7 +1353,7 @@ export const coilFaceAreaExample = { inputs: { cfm: 2000, target_fpm: 500 } };
 function _v701renderCoilFaceArea(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Required coil face area = CFM / target face velocity (the inverse of face velocity = CFM / area), sized to the ~500 fpm wet-coil moisture-carryover limit (ASHRAE / coil-selection practice). A selection aid; the coil manufacturer's rated face velocity governs.";
   const cfm = makeNumber("Airflow (cfm)", "cfa-cfm", { step: "any", min: "0" });
-  const v = makeNumber("Target face velocity (fpm, default 500)", "cfa-v", { step: "any", min: "0" });
+  const v = makeNumber("Target face velocity (fpm, default 500)", "cfa-v", { step: "any", min: "0", value: "500" });
   for (const f of [cfm, v]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { cfm.input.value = "2000"; v.input.value = "500"; update(); });
   const oA = makeOutputLine(outputRegion, "Required face area", "cfa-out-a");

@@ -929,7 +929,7 @@ function _v432renderWalkInCoolerLoad(inputRegion, outputRegion, citationEl) {
   const infil = makeNumber("Infiltration/door load (Btu/hr)", "wic-inf", { step: "any", min: "0" });
   const prod = makeNumber("Product load (Btu/hr)", "wic-prod", { step: "any", min: "0" });
   const internal = makeNumber("Internal load: lights/motors/people (Btu/hr)", "wic-int", { step: "any", min: "0" });
-  const sf = makeNumber("Safety factor (default 1.10)", "wic-sf", { step: "any", min: "0" });
+  const sf = makeNumber("Safety factor (default 1.10)", "wic-sf", { step: "any", min: "0", value: "1.1" });
   const rh = makeNumber("Equipment run time (hr/day; 16 no defrost timer, 18 with)", "wic-rh", { step: "any", min: "0" }); rh.input.value = "16";
   for (const f of [u, area, dt, infil, prod, internal, sf, rh]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { u.input.value = "0.05"; area.input.value = "800"; dt.input.value = "60"; infil.input.value = "3000"; prod.input.value = "5000"; internal.input.value = "1500"; sf.input.value = "1.10"; update(); });
