@@ -351,10 +351,27 @@ it. Two fields whose labels share a word used to cancel each other out, so
 nameplate". Where no label is written exactly, `query-fill.js` now prefers the
 one written WHOLE, with three guards the lenses forced: a word pointing at the
 rival still refuses, a fragment of a hyphenated option is not a word the reader
-wrote, and a half-written label names nothing. Field recovery went from 8,751 to
-9,911 of 10,678 and the door's own answers from 1,625 to 1,944, with 0 wrong in
-either lens. The refusal above is what remains for the values nothing can read:
-a date, a list, a rate whose label declares no unit.
+wrote, and a half-written label names nothing.
+
+Three more rules followed from the same two lenses, each one aimed at a shape
+that had been recovering nothing at all:
+
+| The shape | The rule |
+| --- | --- |
+| "Line A voltage, Line B voltage, Line C voltage" -- labels differing by one letter, which the term floor drops | The whole label, written as a contiguous phrase, names its field outright (two words at least, so "principal" does not claim the short field) |
+| "Span 1", "Span 2", "Span 3" -- one name and a counter | Indexed siblings take their values in the order written, but only when the question accounts for every one of them |
+| `8.5663516e-8` -- the number pattern stops at the "e" | Scientific notation is written out in the query rewrites, before the scanner |
+
+Field recovery went from **8,751 to 10,212 of 10,678** (82.0% to 95.6%), tiles
+with every value recovered from 1,513 to 2,024, and the door's own answers from
+1,625 to 2,050 -- with 0 wrong in either lens throughout. The refusal above is
+what remains for the values nothing can read: a date, a list, a rate whose label
+declares no unit.
+
+A **partial** sibling list resists positional filling and was measured, not
+reasoned about. Allowing it -- bailing only when some other value also named a
+sibling -- cost six fields and introduced one wrong value, so the exact-count
+rule stands.
 
 `scripts/measure-alias-door.mjs` sweeps the whole corpus through the door, about
 six minutes; it sits with the other `measure-*` harnesses rather than in the
