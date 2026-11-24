@@ -1655,7 +1655,7 @@ ACCESSIBILITY_RENDERERS["substantial-improvement-check"] = _simpleRenderer({
     { key: "improvement_cost", label: "Cost of the improvement ($)", kind: "number" },
     { key: "excluded_code_cost", label: "Of that, code-correction work identified by the official ($)", kind: "number" },
     { key: "prior_costs", label: "Prior improvements counted by a cumulative local rule ($)", kind: "number" },
-    { key: "threshold_pct", label: "Threshold percent (50 federal; communities may adopt lower)", kind: "number" },
+    { key: "threshold_pct", label: "Threshold percent (50 federal; communities may adopt lower)", kind: "number", default: 50 },
     { key: "land_value", label: "Land value, for comparison only ($; 0 = skip)", kind: "number" },
     { key: "historic_structure", label: "Historic structure?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
   ],
@@ -1760,7 +1760,7 @@ ACCESSIBILITY_RENDERERS["accessible-parking-geometry"] = _simpleRenderer({
     { key: "angled", label: "Angled space?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
     { key: "aisle_side", label: "Aisle side", kind: "select", options: [{ value: "passenger", label: "Passenger side", selected: true }, { value: "driver", label: "Driver side" }] },
     { key: "vertical_clearance_in", label: "Vertical clearance at the space, aisle, and route (in)", kind: "number" },
-    { key: "surface_slope_ratio", label: "Surface slope, run per unit rise (48 = 1:48 maximum)", kind: "number" },
+    { key: "surface_slope_ratio", label: "Surface slope, run per unit rise (48 = 1:48 maximum)", kind: "number", default: 48 },
   ],
   outputs: [
     { key: "w", id: "apg-out-w", label: "Widths", value: (r) => r.width_ok ? "comply" + (r.wide_aisle_path && !r.wide_van_path ? " - on the wide-aisle path only" : "") : "space needs " + r.required_space_width_in + " in at this aisle width" + (r.space_deficit_in > 0 ? " (short " + fmt(r.space_deficit_in, 1) + ")" : "") + (r.aisle_deficit_in > 0 ? ", aisle short " + fmt(r.aisle_deficit_in, 1) : "") },
@@ -2041,7 +2041,7 @@ ACCESSIBILITY_RENDERERS["ramp-detail-check"] = _simpleRenderer({
   citation: "Citation: 2010 ADA Standards for Accessible Design, 405.3, 405.5, 405.7.2, 405.7.3, 405.7.4, and 405.9. A US federal standard in the public domain. 405.3: cross slope of ramp runs shall not be steeper than 1:48. 405.5: the clear width of a ramp run and, where handrails are provided, the clear width between handrails shall be 36 in minimum. 405.7.2: the landing clear width shall be at least as wide as the widest ramp run leading to the landing. 405.7.3: the landing clear length shall be 60 in long minimum. 405.7.4: ramps that change direction between runs at landings shall have a clear landing 60 in minimum by 60 in minimum. 405.9: edge protection complying with 405.9.1 or 405.9.2 shall be provided on each side of ramp runs and at each side of ramp landings - either the surface of the ramp run or landing extending 12 in minimum beyond the inside face of a handrail, or a curb or barrier constructed so that the curb or barrier prevents the passage of a 4 in diameter sphere where any portion of the sphere is within 4 in of the finish floor or ground surface. Not checked: running slope, the number of runs, the 30 in maximum rise, and total length, which are a separate tile; handrail height, grip, clearance, and extensions, which are their own tile; the surface and changes in level; doors opening onto landings; drainage; curb ramps, which are section 406; or state and local law. A ramp detail screen, not a ramp design.",
   example: rampDetailCheckExample.inputs,
   fields: [
-    { key: "cross_slope_ratio", label: "Cross slope, run per unit rise (48 = the 1:48 maximum)", kind: "number" },
+    { key: "cross_slope_ratio", label: "Cross slope, run per unit rise (48 = the 1:48 maximum)", kind: "number", default: 48 },
     { key: "clear_width_in", label: "Clear width of the ramp run (in)", kind: "number" },
     { key: "handrails", label: "Handrails provided?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
     { key: "handrail_intrusion_in", label: "Total width the handrails take from the run (in)", kind: "number" },

@@ -2206,7 +2206,7 @@ FIRE_RENDERERS["ppv-fan-sizing"] = _simpleRenderer({
     { key: "volume_cf", label: "Structure volume (cubic ft)", kind: "number" },
     { key: "fan_cfm", label: "Fan rated flow (cfm, free air)", kind: "number" },
     { key: "entrainment_efficiency", label: "Entrainment efficiency (0-1)", kind: "number" },
-    { key: "remaining_fraction", label: "Target remaining fraction (0.10 = 90% clear)", kind: "number" },
+    { key: "remaining_fraction", label: "Target remaining fraction (0.10 = 90% clear)", kind: "number", default: 0.1 },
     { key: "target_time_min", label: "Target clearing time (min, 0 to skip)", kind: "number" },
   ],
   outputs: [

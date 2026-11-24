@@ -2354,7 +2354,7 @@ MECHANIC_RENDERERS["injector-max-hp"] = _simpleRenderer({
     { key: "flow_unit", label: "Flow unit", kind: "select", options: [{ value: "lbh", label: "lb/h" }, { value: "ccmin", label: "cc/min" }], default: "lbh" },
     { key: "n_cyl", label: "Number of injectors", kind: "number", attrs: { step: "1", min: "1" } },
     { key: "duty", label: "Maximum duty cycle (0-1)", kind: "number" },
-    { key: "bsfc", label: "BSFC (lb/hp-h; 0.50 NA, 0.55-0.65 boost)", kind: "number" },
+    { key: "bsfc", label: "BSFC (lb/hp-h; 0.50 NA, 0.55-0.65 boost)", kind: "number", default: 0.5 },
   ],
   outputs: [
     { key: "hp", id: "imh-out-hp", label: "Maximum supported horsepower", value: (r) => fmt(r.hp_max, 0) + " hp" },
@@ -3046,7 +3046,7 @@ MECHANIC_RENDERERS["waterline-for-hull-speed"] = _simpleRenderer({
   example: waterlineForHullSpeedExample.inputs,
   fields: [
     { key: "target_hull_speed_kn", label: "Target hull speed (kn)", kind: "number" },
-    { key: "coefficient", label: "Speed-length coefficient (~1.34)", kind: "number" },
+    { key: "coefficient", label: "Speed-length coefficient (~1.34)", kind: "number", default: 1.34 },
   ],
   outputs: [
     { key: "lwl", id: "wlh-out-lwl", label: "Required waterline length", value: (r) => fmt(r.waterline_length_ft, 1) + " ft" },
@@ -3086,7 +3086,7 @@ MECHANIC_RENDERERS["anchor-rode-scope"] = _simpleRenderer({
   fields: [
     { key: "water_depth_ft", label: "Water depth at high tide (ft)", kind: "number" },
     { key: "bow_height_ft", label: "Bow-roller height above water (ft)", kind: "number" },
-    { key: "scope_ratio", label: "Desired scope (7 for rope with chain, 5 for all-chain; 3 is a calm-weather lunch stop)", kind: "number" },
+    { key: "scope_ratio", label: "Desired scope (7 for rope with chain, 5 for all-chain; 3 is a calm-weather lunch stop)", kind: "number", default: 7 },
     { key: "boat_loa_ft", label: "Boat length overall (ft, for swing radius)", kind: "number" },
   ],
   outputs: [
@@ -3136,7 +3136,7 @@ MECHANIC_RENDERERS["turbo-pressure-ratio"] = _simpleRenderer({
   example: turboPressureRatioExample.inputs,
   fields: [
     { key: "boost_psi", label: "Target boost (psi, gauge)", kind: "number" },
-    { key: "ambient_psia", label: "Ambient pressure (psia, 14.7 at sea level)", kind: "number" },
+    { key: "ambient_psia", label: "Ambient pressure (psia, 14.7 at sea level)", kind: "number", default: 14.7 },
     { key: "inlet_temp_f", label: "Compressor inlet air temp (°F)", kind: "number" },
     { key: "compressor_eff_pct", label: "Compressor isentropic efficiency (%)", kind: "number" },
   ],
@@ -3187,7 +3187,7 @@ MECHANIC_RENDERERS["turbo-max-boost-for-charge-temp"] = _simpleRenderer({
     { key: "max_charge_temp_f", label: "Charge-air temperature limit (°F)", kind: "number" },
     { key: "inlet_temp_f", required: true, label: "Compressor inlet air temp (°F)", kind: "number" },
     { key: "compressor_eff_pct", label: "Compressor isentropic efficiency (%)", kind: "number" },
-    { key: "ambient_psia", label: "Ambient pressure (psia, 14.7 at sea level)", kind: "number" },
+    { key: "ambient_psia", label: "Ambient pressure (psia, 14.7 at sea level)", kind: "number", default: 14.7 },
   ],
   outputs: [
     { key: "b", id: "tmb-out-b", label: "Max boost (gauge)", value: (r) => fmt(r.max_boost_psi, 1) + " psi" },
@@ -3224,7 +3224,7 @@ MECHANIC_RENDERERS["crouch-planing-speed"] = _simpleRenderer({
   fields: [
     { key: "displacement_lb", label: "Loaded displacement (lb)", kind: "number" },
     { key: "shaft_hp", label: "Shaft / propeller horsepower (hp)", kind: "number" },
-    { key: "hull_constant", label: "Hull constant C (150 cruiser / 190 runabout / 210 race)", kind: "number" },
+    { key: "hull_constant", label: "Hull constant C (150 cruiser / 190 runabout / 210 race)", kind: "number", default: 190 },
   ],
   outputs: [
     { key: "sp", id: "cps-out-sp", label: "Planing speed", value: (r) => fmt(r.speed_mph, 1) + " mph (" + fmt(r.speed_mph * 0.868976, 1) + " kn)" },
@@ -3262,7 +3262,7 @@ MECHANIC_RENDERERS["crouch-hp-for-speed"] = _simpleRenderer({
   fields: [
     { key: "target_speed_mph", label: "Target planing speed (mph)", kind: "number" },
     { key: "displacement_lb", label: "Loaded displacement (lb)", kind: "number" },
-    { key: "hull_constant", label: "Hull constant C (150 cruiser / 190 runabout / 210 race)", kind: "number" },
+    { key: "hull_constant", label: "Hull constant C (150 cruiser / 190 runabout / 210 race)", kind: "number", default: 190 },
   ],
   outputs: [
     { key: "hp", id: "chfs-out-hp", label: "Required shaft horsepower", value: (r) => fmt(r.required_hp, 0) + " hp" },
@@ -3358,7 +3358,7 @@ MECHANIC_RENDERERS["brake-pedal-hydraulic"] = _simpleRenderer({
   fields: [
     { key: "pedal_force_lb", label: "Pedal force (lb)", kind: "number" },
     { key: "pedal_ratio", label: "Pedal ratio", kind: "number" },
-    { key: "booster_factor", label: "Booster factor (1.0 = manual)", kind: "number" },
+    { key: "booster_factor", label: "Booster factor (1.0 = manual)", kind: "number", default: 1 },
     { key: "mc_bore_in", label: "Master-cylinder bore (in)", kind: "number" },
     { key: "caliper_area_in2", label: "Caliper piston area, ONE side (in²; the torque doubles it for two pad faces)", kind: "number" },
     { key: "pad_friction", label: "Pad friction coefficient (~0.4)", kind: "number", default: 0.4 },
@@ -3539,7 +3539,7 @@ MECHANIC_RENDERERS["abyc-dc-wire"] = _simpleRenderer({
     { key: "current_a", label: "Load current (A)", kind: "number" },
     { key: "run_length_ft", label: "One-way run length (ft, tile doubles it)", kind: "number" },
     { key: "system_voltage_v", label: "System voltage (V, 12 / 24 / 32)", kind: "number" },
-    { key: "drop_pct", label: "Allowable drop (%, 3 critical / 10 non-critical)", kind: "number" },
+    { key: "drop_pct", label: "Allowable drop (%, 3 critical / 10 non-critical)", kind: "number", default: 3 },
   ],
   outputs: [
     { key: "vd", id: "adw-out-vd", label: "Allowable voltage drop", value: (r) => fmt(r.v_drop_v, 2) + " V" },
@@ -3620,7 +3620,7 @@ MECHANIC_RENDERERS["sacrificial-anode-life"] = _simpleRenderer({
     { key: "anode_material", label: "Anode material", kind: "select", options: [{ value: "zinc", label: "Zinc (~354 A-h/lb)" }, { value: "aluminum", label: "Aluminum Al-Zn-In (~907 A-h/lb)" }, { value: "magnesium", label: "Magnesium (~500 A-h/lb)" }] },
     { key: "anode_mass_lb", label: "Anode net mass (lb)", kind: "number" },
     { key: "current_draw_a", label: "Protective current draw (A)", kind: "number" },
-    { key: "utilization_factor", label: "Utilization factor (0-1, ~0.85)", kind: "number" },
+    { key: "utilization_factor", label: "Utilization factor (0-1, ~0.85)", kind: "number", default: 0.85 },
   ],
   outputs: [
     { key: "y", id: "anode-out-y", label: "Estimated life", value: (r) => fmt(r.life_years, 2) + " yr (" + fmt(r.life_months, 1) + " months)" },
@@ -3951,7 +3951,7 @@ MECHANIC_RENDERERS["hull-displacement"] = _simpleRenderer({
     { key: "bwl_ft", label: "Waterline beam BWL (ft)", kind: "number" },
     { key: "draft_ft", label: "Canoe-body draft (ft; hull only, not the keel or skeg)", kind: "number" },
     { key: "block_coefficient", label: "Block coefficient Cb (~0.35-0.60)", kind: "number" },
-    { key: "water_density_pcf", label: "Water density (pcf: 64 sea, 62.4 fresh)", kind: "number" },
+    { key: "water_density_pcf", label: "Water density (pcf: 64 sea, 62.4 fresh)", kind: "number", default: 64 },
   ],
   outputs: [
     { key: "v", id: "hdp-out-v", label: "Displacement volume", value: (r) => fmt(r.displacement_ft3, 1) + " ft^3" },
@@ -4154,7 +4154,7 @@ MECHANIC_RENDERERS["injector-flow-at-pressure"] = _simpleRenderer({
   example: injectorFlowAtPressureExample.inputs,
   fields: [
     { key: "rated_flow_ccmin", label: "Rated injector flow (cc/min)", kind: "number" },
-    { key: "rated_pressure_psi", label: "Rated at pressure (psi; 43.5 = 3 bar)", kind: "number" },
+    { key: "rated_pressure_psi", label: "Rated at pressure (psi; 43.5 = 3 bar)", kind: "number", default: 43.5 },
     { key: "rail_pressure_psi", label: "Actual rail pressure (psi)", kind: "number" },
     { key: "manifold_pressure_psig", label: "Manifold pressure (psig; + boost, - vacuum)", kind: "number", default: 0 },
     { key: "system_type", label: "Fuel system", kind: "select", options: [{ value: "returnless", label: "Returnless (fixed rail pressure)", selected: true }, { value: "return", label: "Return (manifold-referenced regulator)" }] },

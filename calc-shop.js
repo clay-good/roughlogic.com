@@ -2636,7 +2636,7 @@ SHOP_RENDERERS["rotor-balance-grade"] = _simpleRenderer({
   citation: "Citation: ISO 1940-1 permissible residual unbalance -- the balance grade G is the permissible eccentricity times the angular velocity in mm/s, so e = G x 1000 / omega in g-mm per kg -- cited by name and not reproduced. The grade ladder (G6.3 general machinery, G2.5 machine tools and turbines, G1 and finer for precision spindles) is named, and the grade is entered rather than looked up here. ISO 1940 in full, the machine's vibration criteria, and the balancing machine's readout govern.",
   example: rotorBalanceGradeExample.inputs,
   fields: [
-    { key: "balance_grade", label: "Balance grade G (6.3 general, 2.5 machine tool)", kind: "number" },
+    { key: "balance_grade", label: "Balance grade G (6.3 general, 2.5 machine tool)", kind: "number", default: 6.3 },
     { key: "rpm", label: "Operating speed (rpm)", kind: "number" },
     { key: "rotor_mass_kg", label: "Rotor mass (kg)", kind: "number" },
     { key: "planes", label: "Correction planes", kind: "number" },
@@ -2697,7 +2697,7 @@ SHOP_RENDERERS["bearing-regrease"] = _simpleRenderer({
     { key: "width_mm", label: "Bearing width (mm)", kind: "number" },
     { key: "bore_mm", label: "Bearing bore (mm)", kind: "number" },
     { key: "rpm", label: "Operating speed (rpm)", kind: "number" },
-    { key: "correction_factor", label: "Correction factor (1.0 base; 0.5 vertical or hot, 0.25 both)", kind: "number" },
+    { key: "correction_factor", label: "Correction factor (1.0 base; 0.5 vertical or hot, 0.25 both)", kind: "number", default: 1 },
     { key: "duty_hours_per_day", label: "Operating hours per day", kind: "number" },
     { key: "bearing_type", label: "Bearing type (interval factor K)", kind: "select", options: [{ value: "ball", label: "Radial ball (K 10)" }, { value: "cylindrical", label: "Cylindrical / needle roller (K 5)" }, { value: "spherical", label: "Spherical / tapered roller (K 1)" }], default: "ball" },
   ],
@@ -2817,7 +2817,7 @@ SHOP_RENDERERS["hydraulic-reservoir-cooler"] = _simpleRenderer({
     { key: "pressure_psi", label: "System pressure (psi)", kind: "number" },
     { key: "pump_efficiency", label: "Pump and drive efficiency (0-1)", kind: "number" },
     { key: "heat_fraction", label: "Fraction of input that becomes heat (0.25 typical)", kind: "number", default: 0.25 },
-    { key: "reservoir_multiplier", label: "Reservoir multiplier (3 industrial, 1-2 mobile)", kind: "number" },
+    { key: "reservoir_multiplier", label: "Reservoir multiplier (3 industrial, 1-2 mobile)", kind: "number", default: 3 },
     { key: "reservoir_dissipation_btu_hr", label: "Reservoir dissipation at design oil temp (BTU/hr)", kind: "number" },
   ],
   outputs: [
@@ -3018,7 +3018,7 @@ SHOP_RENDERERS["bucket-elevator-capacity"] = _simpleRenderer({
     { key: "bulk_density_pcf", label: "Material bulk density (lb/cubic ft)", kind: "number" },
     { key: "lift_ft", label: "Lift height (ft)", kind: "number" },
     { key: "drive_efficiency", label: "Drive efficiency (0 to 1)", kind: "number" },
-    { key: "friction_allowance", label: "Scoop and friction allowance (1.2 = +20%)", kind: "number" },
+    { key: "friction_allowance", label: "Scoop and friction allowance (1.2 = +20%)", kind: "number", default: 1.2 },
   ],
   outputs: [
     { key: "c", id: "bec-out-c", label: "Capacity", value: (r) => fmt(r.capacity_ft3_hr, 0) + " cubic ft/hr at " + fmt(r.buckets_per_ft, 2) + " buckets per foot" },

@@ -795,7 +795,7 @@ FARMPRODUCTION_RENDERERS["corn-yield-estimate"] = _r({
     { key: "ears_per_thousandth_acre", label: "Ears in 1/1000 acre (17.5 ft of 30-in row)", kind: "number" },
     { key: "kernel_rows_around", label: "Kernel rows around the ear", kind: "number" },
     { key: "kernels_per_row", label: "Kernels per row", kind: "number" },
-    { key: "kernel_factor", label: "Kernel factor (1000s kernels/bu, ~90)", kind: "number" },
+    { key: "kernel_factor", label: "Kernel factor (1000s kernels/bu, ~90)", kind: "number", default: 90 },
   ],
   outputs: [
     { key: "k", id: "cye-out-k", label: "Kernels per ear", value: (r) => fmt(r.kernels_per_ear, 0) },

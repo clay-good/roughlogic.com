@@ -298,7 +298,7 @@ FIRESPRINKLER_RENDERERS["sprinkler-pressure-demand"] = _simpleRenderer({
     { key: "k_factor", label: "Sprinkler K-factor (gpm/psi^0.5)", kind: "number" },
     { key: "q_total_gpm", label: "Total flow through governing run (gpm)", kind: "number" },
     { key: "pipe_id_in", label: "Pipe internal diameter (in)", kind: "number" },
-    { key: "c_factor", label: "Hazen-Williams C (steel 120 wet / 100 dry or preaction; 150 CPVC; 100 CI)", kind: "number" },
+    { key: "c_factor", label: "Hazen-Williams C (steel 120 wet / 100 dry or preaction; 150 CPVC; 100 CI)", kind: "number", default: 120 },
     { key: "equiv_length_ft", label: "Equivalent length: pipe + fittings (ft)", kind: "number" },
     { key: "elevation_ft", label: "Elevation of remote head above base of riser (ft)", kind: "number", attrs: { step: "any" } },
   ],

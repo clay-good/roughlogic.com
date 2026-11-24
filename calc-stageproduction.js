@@ -475,7 +475,7 @@ STAGEPRODUCTION_RENDERERS["chain-hoist-lift-time"] = _r({
     { key: "lift_height_ft", label: "Lift height / trim (ft)", kind: "number" },
     { key: "hoist_speed_fpm", label: "Hoist speed (ft/min)", kind: "number" },
     { key: "load_lb", label: "Load per hoist (lb)", kind: "number" },
-    { key: "duty_cycle", label: "Duty-cycle fraction (0.40 = 40%)", kind: "number" },
+    { key: "duty_cycle", label: "Duty-cycle fraction (0.40 = 40%)", kind: "number", default: 0.4 },
     { key: "rating_period_min", label: "Rating period (min)", kind: "number" },
     { key: "hoists", label: "Number of hoists", kind: "number" },
   ],

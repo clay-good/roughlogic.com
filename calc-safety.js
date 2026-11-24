@@ -165,7 +165,7 @@ SAFETY_RENDERERS["portable-ladder-setup"] = _simpleRendererG({
     { key: "secured_with_grasping_device", label: "Secured at the top with a grasping device?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes - the 3 ft alternative" }] },
     { key: "rung_spacing_in", label: "Rung spacing, centre to centre (in)", kind: "number" },
     { key: "clear_width_in", label: "Clear width between side rails (in)", kind: "number" },
-    { key: "base_ratio", label: "Setup ratio (4 for the 4:1 rule)", kind: "number" },
+    { key: "base_ratio", label: "Setup ratio (4 for the 4:1 rule)", kind: "number", default: 4 },
   ],
   outputs: [
     { key: "e", id: "pls-out-e", label: "Extension above the landing", value: (r) => r.extension_ok ? (r.extension_by_alternative ? "short, but carried by the secured-and-grasping-device alternative" : "3 ft satisfied") : "SHORT by " + fmt(r.extension_shortfall_ft, 1) + " ft" },
@@ -494,7 +494,7 @@ SAFETY_RENDERERS["lifeline-tension"] = _simpleRendererG({
     { key: "sag_ft", label: "Midspan sag under load (ft)", kind: "number" },
     { key: "arrest_force_lb", label: "Arrest force applied at midspan (lb)", kind: "number" },
     { key: "workers", label: "Workers attached", kind: "number" },
-    { key: "safety_factor", label: "Safety factor (2 is the OSHA minimum)", kind: "number" },
+    { key: "safety_factor", label: "Safety factor (2 is the OSHA minimum)", kind: "number", default: 2 },
     { key: "anchorage_capacity_lb", label: "Anchorage capacity available (lb; 0 = not checked)", kind: "number" },
     { key: "target_tension_lb", label: "Target cable tension, to solve for sag (lb; 0 = skip)", kind: "number" },
   ],

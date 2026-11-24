@@ -413,7 +413,7 @@ FINISH_RENDERERS["deck-board-takeoff"] = _simpleRenderer({
   fields: [
     { key: "deck_width_ft", label: "Deck width across the boards (ft)", kind: "number" },
     { key: "deck_length_ft", label: "Board run length (ft)", kind: "number" },
-    { key: "board_face_width_in", label: "Board face width (in, 5.5 for 5/4x6 or 2x6)", kind: "number" },
+    { key: "board_face_width_in", label: "Board face width (in, 5.5 for 5/4x6 or 2x6)", kind: "number", default: 5.5 },
     { key: "gap_in", label: "Gap between boards (in)", kind: "number", default: 0.25 },
     { key: "joist_spacing_in", label: "Joist spacing on center (in)", kind: "number" },
     { key: "waste_pct", label: "Waste (%)", kind: "number", default: 10 },
@@ -462,7 +462,7 @@ FINISH_RENDERERS["glass-weight"] = _simpleRenderer({
     { key: "width_in", label: "Width (in)", kind: "number" },
     { key: "height_in", label: "Height (in)", kind: "number" },
     { key: "thickness_in", label: "Actual thickness (in; 1/4\" nominal float is 6 mm = 0.236 in)", kind: "number" },
-    { key: "panes", label: "Identical panes (1 lite; 2 for an equal IGU)", kind: "number" },
+    { key: "panes", label: "Identical panes (1 lite; 2 for an equal IGU)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "a", id: "glw-out-a", label: "Area", value: (r) => fmt(r.area_ft2, 2) + " ft^2" },
@@ -620,7 +620,7 @@ FINISH_RENDERERS["step-flashing-count"] = _simpleRenderer({
   example: stepFlashingCountExample.inputs,
   fields: [
     { key: "wall_run_ft", label: "Sloped wall / chimney sidewall run (ft)", kind: "number" },
-    { key: "shingle_exposure_in", label: "Shingle exposure (in, ~5)", kind: "number" },
+    { key: "shingle_exposure_in", label: "Shingle exposure (in, ~5)", kind: "number", default: 5 },
     { key: "waste_pct", label: "Waste (percent)", kind: "number", default: 5 },
   ],
   outputs: [
@@ -1189,7 +1189,7 @@ FINISH_RENDERERS["crawl-space-ventilation"] = _simpleRenderer({
   example: crawlSpaceVentilationExample.inputs,
   fields: [
     { key: "floor_area_sf", label: "Under-floor (crawl space) area (sq ft)", kind: "number" },
-    { key: "base_ratio_denominator", label: "Base ratio 1 per N sq ft (IRC 150; WA 300)", kind: "number" },
+    { key: "base_ratio_denominator", label: "Base ratio 1 per N sq ft (IRC 150; WA 300)", kind: "number", default: 150 },
     { key: "vapor_retarder", label: "Class I vapor retarder over the ground", kind: "select", options: [{ value: "no", label: "No - use the base ratio", selected: true }, { value: "yes", label: "Yes - the 1/1500 reduction applies" }] },
     { key: "cross_ventilated", label: "Openings placed for cross ventilation (with the retarder, lifts the corner rule)", kind: "select", options: [{ value: "no", label: "No - one opening within 3 ft of each corner", selected: true }, { value: "yes", label: "Yes - cross ventilated" }] },
     { key: "vent_net_free_sqin", label: "Net free area per vent (sq in, off the product)", kind: "number" },

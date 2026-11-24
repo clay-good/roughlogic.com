@@ -186,7 +186,7 @@ STEEL_RENDERERS["shear-flow-connector-spacing"] = _simpleRenderer({
     { key: "ybar_in", label: "Connected element centroid distance from NA, y_bar (in)", kind: "number" },
     { key: "inertia_in4", label: "Moment of inertia of whole section I (in⁴)", kind: "number" },
     { key: "connector_kip", label: "Capacity per connector R (kip)", kind: "number" },
-    { key: "connectors_per_row", label: "Connectors per row n (2 = a pair of lines)", kind: "number" },
+    { key: "connectors_per_row", label: "Connectors per row n (2 = a pair of lines)", kind: "number", default: 2 },
   ],
   outputs: [
     { key: "s", id: "sfc-out-s", label: "Maximum connector spacing s", value: (r) => fmt(r.spacing_in, 2) + " in" },
@@ -243,8 +243,8 @@ STEEL_RENDERERS["steel-beam-shear"] = _simpleRenderer({
     { key: "fy", label: "Yield stress Fy (ksi)", kind: "number" },
     { key: "d", label: "Section depth d (in)", kind: "number" },
     { key: "tw", label: "Web thickness tw (in)", kind: "number" },
-    { key: "cv1", label: "Web shear coefficient Cv1", kind: "number" },
-    { key: "omega_v", label: "ASD safety factor Omega_v (1.50 or 1.67)", kind: "number" },
+    { key: "cv1", label: "Web shear coefficient Cv1", kind: "number", default: 1 },
+    { key: "omega_v", label: "ASD safety factor Omega_v (1.50 or 1.67)", kind: "number", default: 1.5 },
     { key: "vu", label: "Required shear Vu (kips, 0 to skip)", kind: "number" },
   ],
   outputs: [
@@ -402,7 +402,7 @@ STEEL_RENDERERS["bolt-shear-bearing"] = _simpleRenderer({
     { key: "d_in", label: "Bolt diameter d (in)", kind: "number" },
     { key: "ab_in2", label: "Bolt area Ab (in²)", kind: "number" },
     { key: "fnv_ksi", label: "Bolt shear stress Fnv (ksi)", kind: "number" },
-    { key: "nplanes", label: "Shear planes (1 single, 2 double)", kind: "number" },
+    { key: "nplanes", label: "Shear planes (1 single, 2 double)", kind: "number", default: 1 },
     { key: "t_in", label: "Connected ply thickness t (in)", kind: "number" },
     { key: "fu_ksi", label: "Material tensile strength Fu (ksi)", kind: "number" },
     { key: "le_in", label: "Edge distance le (in)", kind: "number", default: 1.5 },
@@ -626,7 +626,7 @@ STEEL_RENDERERS["steel-block-shear"] = _simpleRenderer({
     { key: "end_in", label: "End distance (in)", kind: "number" },
     { key: "edge_in", label: "Tension edge distance (in)", kind: "number" },
     { key: "dh_in", label: "Hole diameter (in, bolt + 1/8)", kind: "number" },
-    { key: "ubs", label: "Ubs (1.0 uniform, 0.5 nonuniform)", kind: "number" },
+    { key: "ubs", label: "Ubs (1.0 uniform, 0.5 nonuniform)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "areas", id: "sbs-out-areas", label: "Agv / Anv / Ant", value: (r) => fmt(r.agv, 3) + " / " + fmt(r.anv, 3) + " / " + fmt(r.ant, 3) + " in^2" },
@@ -800,7 +800,7 @@ STEEL_RENDERERS["steel-bolt-slip-critical"] = _simpleRenderer({
   citation: "Citation: AISC 360-22 J3.9 slip-critical resistance Rn = mu Du hf Tb ns (mu 0.30 Class A / 0.50 Class B, Du = 1.13, Tb per Table J3.1), phi = 1.00 / Omega = 1.50 standard holes, by name. Bolt shear/bearing must also be checked. A design aid, not a substitute for the engineer of record.",
   example: steelBoltSlipCriticalExample.inputs,
   fields: [
-    { key: "mu", label: "Slip coefficient mu (0.30 A / 0.50 B)", kind: "number" },
+    { key: "mu", label: "Slip coefficient mu (0.30 A / 0.50 B)", kind: "number", default: 0.3 },
     { key: "tb_kip", label: "Minimum pretension Tb (kip, Table J3.1)", kind: "number" },
     { key: "ns", label: "Slip planes ns (1 single, 2 double)", kind: "number", attrs: { step: "1", min: "1" } },
     { key: "n", label: "Number of bolts", kind: "number", attrs: { step: "1", min: "1" }, default: 1 },
@@ -1203,8 +1203,8 @@ STEEL_RENDERERS["steel-bolt-tension-shear"] = _simpleRenderer({
   citation: "Citation: AISC 360-22 J3.8 combined tension and shear F'nt = 1.3 Fnt - (Fnt/(phi Fnv)) frv <= Fnt (LRFD) / 1.3 Fnt - (Omega Fnt/Fnv) frv <= Fnt (ASD), available tension phi F'nt Ab, Table J3.2 Fnt/Fnv, by name. Bearing-type; slip-critical is J3.10. A design aid, not a substitute for the engineer of record.",
   example: steelBoltTensionShearExample.inputs,
   fields: [
-    { key: "fnt_ksi", label: "Nominal tensile stress Fnt (ksi, 90 A325)", kind: "number" },
-    { key: "fnv_ksi", label: "Nominal shear stress Fnv (ksi, 54 N / 68 X)", kind: "number" },
+    { key: "fnt_ksi", label: "Nominal tensile stress Fnt (ksi, 90 A325)", kind: "number", default: 90 },
+    { key: "fnv_ksi", label: "Nominal shear stress Fnv (ksi, 54 N / 68 X)", kind: "number", default: 54 },
     { key: "ab_in2", label: "Nominal bolt area Ab (in²)", kind: "number" },
     { key: "frv_ksi", label: "Required shear stress frv (ksi = V/Ab)", kind: "number" },
     { key: "method", label: "Method", kind: "select", options: [
@@ -1509,7 +1509,7 @@ STEEL_RENDERERS["slip-critical-with-tension"] = _simpleRenderer({
   citation: "Citation: AISC 360 Section J3.9, slip-critical connections subject to combined tension and shear. The slip resistance is multiplied by ksc = 1 - Tu/(Du Tb nb) (Eq. J3-5a, LRFD) or ksc = 1 - 1.5 Ta/(Du Tb nb) (Eq. J3-5b, ASD, with Omega = 1.50), where Du = 1.13 is the mean-to-specified pretension multiplier, Tb is the Table J3.1 minimum pretension, and nb is the number of bolts carrying the applied tension. The unreduced resistance Rn = mu Du hf Tb ns comes from this catalog's landed slip-critical tile rather than being recomputed. Slip is a SERVICEABILITY limit: the strength-level shear and bearing check and the J3.7 combined tension-shear rupture check are separate and must also pass. Prying action is not modeled here (bolt-prying-action computes it). Standard holes. AISC 360 and the engineer of record govern.",
   example: slipCriticalWithTensionExample.inputs,
   fields: [
-    { key: "mu", label: "Slip coefficient mu (0.30 A / 0.50 B)", kind: "number" },
+    { key: "mu", label: "Slip coefficient mu (0.30 A / 0.50 B)", kind: "number", default: 0.3 },
     { key: "tb_kip", label: "Minimum pretension Tb (kip, Table J3.1)", kind: "number" },
     { key: "applied_tension_kip", label: "Applied tension on the connection Tu (kip)", kind: "number" },
     { key: "n", label: "Number of bolts", kind: "number", attrs: { step: "1", min: "1" }, default: 1 },

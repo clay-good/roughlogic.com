@@ -1348,7 +1348,7 @@ FIELD_RENDERERS["map-scale-conversion"] = _r({
   citation: "Citation: representative fraction to ground units -- ft per map inch = RF / 12, with area scaling as the SQUARE of that -- by name; public map arithmetic. The 1:24,000 USGS 7.5-minute quadrangle at 2,000 ft per inch is named as the familiar case, not reproduced from any table. The map's own scale bar, its datum, and a GIS measurement govern anything that matters.",
   example: mapScaleConversionExample.inputs,
   fields: [
-    { key: "representative_fraction", label: "Representative fraction denominator (24000 for 1:24,000)", kind: "number" },
+    { key: "representative_fraction", label: "Representative fraction denominator (24000 for 1:24,000)", kind: "number", default: 24000 },
     { key: "map_distance_in", label: "Measured map distance (in, 0 to skip)", kind: "number" },
     { key: "map_area_sqin", label: "Measured map area (sq in, 0 to skip)", kind: "number" },
   ],
@@ -1463,12 +1463,12 @@ FIELD_RENDERERS["helicopter-lz-sizing"] = _r({
   example: helicopterLzSizingExample.inputs,
   fields: [
     { key: "rotor_diameter_ft", label: "Rotor diameter (ft)", kind: "number" },
-    { key: "size_factor", label: "Size factor (2 for routine daytime)", kind: "number" },
+    { key: "size_factor", label: "Size factor (2 for routine daytime)", kind: "number", default: 2 },
     { key: "measured_clear_ft", label: "Measured clear area, side (ft)", kind: "number" },
     { key: "ground_slope_deg", label: "Ground slope (deg)", kind: "number" },
     { key: "slope_limit_deg", label: "Aircraft slope limit (deg)", kind: "number" },
     { key: "obstacle_height_ft", label: "Tallest obstacle on the approach (ft)", kind: "number" },
-    { key: "approach_ratio", label: "Approach ratio (10 for 10:1)", kind: "number" },
+    { key: "approach_ratio", label: "Approach ratio (10 for 10:1)", kind: "number", default: 10 },
   ],
   outputs: [
     { key: "a", id: "hlz-out-a", label: "Required clear area", value: (r) => fmt(r.required_side_ft, 0) + " x " + fmt(r.required_side_ft, 0) + " ft -- " + (r.area_ok ? "measured area clears it" : "measured area is short") },
@@ -1524,7 +1524,7 @@ FIELD_RENDERERS["litter-carry-team"] = _r({
     { key: "distance_mi", label: "Carry distance (mi)", kind: "number" },
     { key: "pace_mph", label: "Sustained pace (mph)", kind: "number" },
     { key: "carriers_per_litter", label: "Carriers per litter", kind: "number" },
-    { key: "duty_fraction", label: "Duty fraction per team (0.5 = half the time carrying)", kind: "number" },
+    { key: "duty_fraction", label: "Duty fraction per team (0.5 = half the time carrying)", kind: "number", default: 0.5 },
     { key: "rotation_interval_min", label: "Rotation interval (min)", kind: "number" },
     { key: "support_personnel", label: "Attendants and support personnel", kind: "number" },
   ],

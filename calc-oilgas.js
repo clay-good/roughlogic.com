@@ -1593,7 +1593,7 @@ OILGAS_RENDERERS["tank-vent-api-2000"] = _simpleRenderer({
   fields: [
     { key: "pump_in_bph", label: "Maximum pump-in rate (bbl/h)" },
     { key: "pump_out_bph", label: "Maximum pump-out rate (bbl/h)" },
-    { key: "volatile_factor", label: "Volatile allowance on out-breathing (1.0 on the API 2000 normative basis; the Annex A basis is ~1.07 at flash point 100 F and up, ~2.14 below)" },
+    { key: "volatile_factor", label: "Volatile allowance on out-breathing (1.0 on the API 2000 normative basis; the Annex A basis is ~1.07 at flash point 100 F and up, ~2.14 below)", default: 1 },
     { key: "thermal_out_ft3h", label: "Thermal out-breathing from the table (cu ft/h)" },
     { key: "thermal_in_ft3h", label: "Thermal in-breathing from the table (cu ft/h)" },
     { key: "fire_case_ft3h", label: "Fire case from the table (cu ft/h, 0 to skip)" },

@@ -1145,7 +1145,7 @@ SURVEY_RENDERERS["slope-staking"] = _simpleRenderer({
   fields: [
     { key: "half_width_ft", label: "Roadway or pad half-width (ft)", kind: "number" },
     { key: "depth_ft", label: "Cut or fill depth at the hinge (ft)", kind: "number" },
-    { key: "side_slope_ratio", label: "Side-slope ratio (run per unit rise, so 2 for 2:1)", kind: "number" },
+    { key: "side_slope_ratio", label: "Side-slope ratio (run per unit rise, so 2 for 2:1)", kind: "number", default: 2 },
     { key: "ground_cross_slope", label: "Ground cross slope (0.10 = 10% rising away)", kind: "number", attrs: { step: "any" } },
     { key: "section", label: "Section", kind: "select", options: [{ value: "cut", label: "Cut" }, { value: "fill", label: "Fill" }] },
   ],

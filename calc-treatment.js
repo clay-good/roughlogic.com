@@ -401,7 +401,7 @@ TREATMENT_RENDERERS["pool-heater-btu"] = _rPool({
     { key: "gallons", label: "Pool volume (gallons)" },
     { key: "dT_F", label: "Temperature rise (°F)" },
     { key: "output", label: "Heater nameplate INPUT (Btu/h; a heat pump: its heat output, with efficiency 1.0)" },
-    { key: "eff", label: "Efficiency as a fraction (0.80 gas; 1.0 for a heat pump entered at its heat output)" },
+    { key: "eff", label: "Efficiency as a fraction (0.80 gas; 1.0 for a heat pump entered at its heat output)", default: 0.8 },
   ],
   outputs: [
     { key: "q", id: "phb-out-q", label: "Heat-up energy", value: (r) => fmt(r.Q_btu, 0) + " Btu" },
@@ -442,7 +442,7 @@ TREATMENT_RENDERERS["pool-heater-size"] = _rPool({
     { key: "gallons", label: "Pool volume (gallons)" },
     { key: "dT_F", label: "Temperature rise (°F)" },
     { key: "target_hours", label: "Target heat-up time (h)", default: 5.2 },
-    { key: "eff", label: "Efficiency as a fraction (0.80 gas; 1.0 for a heat pump entered at its heat output)" },
+    { key: "eff", label: "Efficiency as a fraction (0.80 gas; 1.0 for a heat pump entered at its heat output)", default: 0.8 },
   ],
   outputs: [
     { key: "o", id: "phs-out-o", label: "Required heater input rating", value: (r) => fmt(r.required_output_btu, 0) + " Btu/h" },
@@ -1442,7 +1442,7 @@ TREATMENT_RENDERERS["pool-calcium-hardness-dose"] = _rPool({
   fields: [
     { key: "gallons", label: "Pool volume (gal)" },
     { key: "ppm_increase", label: "Calcium hardness increase (ppm)" },
-    { key: "product_purity_pct", label: "Calcium chloride content (percent: ~77 flake, ~94 anhydrous)" },
+    { key: "product_purity_pct", label: "Calcium chloride content (percent: ~77 flake, ~94 anhydrous)", default: 77 },
   ],
   outputs: [
     { key: "lb", id: "pchd-out-lb", label: "Calcium chloride", value: (r) => fmt(r.calcium_chloride_lb, 2) + " lb" },

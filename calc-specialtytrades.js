@@ -224,7 +224,7 @@ SPECIALTYTRADES_RENDERERS["glass-thickness-wind"] = _simpleRenderer({
     { key: "height_ft", label: "Lite height (ft)", kind: "number" },
     { key: "design_pressure_psf", label: "Design wind pressure (psf)", kind: "number" },
     { key: "glass_type", label: "Glass type", kind: "select", options: Object.keys(GLASS_TYPE_FACTOR).map((k) => ({ value: k, label: GLASS_TYPE_FACTOR[k].label })) },
-    { key: "deflection_divisor", label: "Deflection limit divisor (175 = L/175)", kind: "number" },
+    { key: "deflection_divisor", label: "Deflection limit divisor (175 = L/175)", kind: "number", default: 175 },
     { key: "thickness_in", label: "Thickness of one lite (in)", kind: "number" },
     { key: "lites", label: "Number of lites in the unit", kind: "number" },
     { key: "spacer_allowance_psf", label: "Spacer and sealant allowance (psf of unit)", kind: "number" },
@@ -517,7 +517,7 @@ SPECIALTYTRADES_RENDERERS["escalator-capacity"] = _simpleRenderer({
   fields: [
     { key: "speed_fpm", label: "Rated speed (fpm)", kind: "number" },
     { key: "step_depth_in", label: "Step depth (in)", kind: "number" },
-    { key: "persons_per_step", label: "Persons per step (1 for a 24 in step, 1.5 to 2 for a 40 in step)", kind: "number" },
+    { key: "persons_per_step", label: "Persons per step (1 for a 24 in step, 1.5 to 2 for a 40 in step)", kind: "number", default: 1 },
     { key: "loading_factor", label: "Loading factor (0 to 1)", kind: "number" },
     { key: "weight_per_person_lb", label: "Weight per person (lb)", kind: "number" },
     { key: "design_flow_pph", label: "Design peak flow to serve (persons/hr)", kind: "number" },

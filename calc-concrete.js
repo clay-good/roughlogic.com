@@ -206,7 +206,7 @@ CONCRETE_RENDERERS["rc-beam-shear"] = _simpleRenderer({
     { key: "d", label: "Effective depth d (in)", kind: "number" },
     { key: "av_in2", label: "Stirrup area Av, both legs (in²)", kind: "number" },
     { key: "vu", label: "Factored shear Vu (kip, 0 = capacity only)", kind: "number", default: 0, attrs: { step: "any" } },
-    { key: "lambda", label: "Lightweight factor lambda (1.0 normalweight)", kind: "number" },
+    { key: "lambda", label: "Lightweight factor lambda (1.0 normalweight)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "vc", id: "rbs-out-vc", label: "Concrete shear Vc", value: (r) => fmt(r.vc_kip, 1) + " kip" },
@@ -261,12 +261,12 @@ CONCRETE_RENDERERS["rc-development-length"] = _simpleRenderer({
     { key: "fc", label: "Concrete strength f'c (psi)", kind: "number" },
     { key: "fy", label: "Bar yield fy (psi)", kind: "number" },
     { key: "db", label: "Bar diameter db (in, #8 = 1.00)", kind: "number" },
-    { key: "psi_t", label: "Casting position psi_t (1.3 top bar, 1.0 other)", kind: "number" },
-    { key: "psi_e", label: "Coating psi_e (1.5 / 1.2 epoxy, 1.0 uncoated)", kind: "number" },
-    { key: "psi_s", label: "Bar size psi_s (0.8 for #6 and smaller, else 1.0)", kind: "number" },
+    { key: "psi_t", label: "Casting position psi_t (1.3 top bar, 1.0 other)", kind: "number", default: 1 },
+    { key: "psi_e", label: "Coating psi_e (1.5 / 1.2 epoxy, 1.0 uncoated)", kind: "number", default: 1 },
+    { key: "psi_s", label: "Bar size psi_s (0.8 for #6 and smaller, else 1.0)", kind: "number", default: 1 },
     { key: "psi_g", label: "Grade psi_g (raised to 1.15 Gr 80 / 1.3 Gr 100 from fy)", kind: "number" },
-    { key: "lambda", label: "Lightweight factor lambda (1.0 normalweight)", kind: "number" },
-    { key: "conf", label: "Confinement (cb + Ktr)/db (max 2.5)", kind: "number" },
+    { key: "lambda", label: "Lightweight factor lambda (1.0 normalweight)", kind: "number", default: 1 },
+    { key: "conf", label: "Confinement (cb + Ktr)/db (max 2.5)", kind: "number", default: 2.5 },
   ],
   outputs: [
     { key: "te", id: "rdl-out-te", label: "psi_t x psi_e (capped 1.7)", value: (r) => fmt(r.te, 2) },
@@ -480,7 +480,7 @@ CONCRETE_RENDERERS["rc-one-way-shear"] = _simpleRenderer({
     { key: "d_in", label: "Effective depth d (in)", kind: "number" },
     { key: "as_in2", label: "Tension steel As (in²)", kind: "number" },
     { key: "vu_kip", label: "Factored shear Vu (kip, 0 = capacity only)", kind: "number" },
-    { key: "lambda", label: "Lightweight factor lambda (1.0 normalweight)", kind: "number" },
+    { key: "lambda", label: "Lightweight factor lambda (1.0 normalweight)", kind: "number", default: 1 },
     { key: "nu_kip", label: "Factored axial load Nu (kip, + compression, - tension; 0 if none)", kind: "number", attrs: { step: "any" } },
     { key: "ag_in2", label: "Gross section area Ag (in², needed with Nu)", kind: "number" },
   ],
@@ -557,7 +557,7 @@ CONCRETE_RENDERERS["rc-min-shear-reinforcement"] = _simpleRenderer({
     { key: "d_in", label: "Effective depth d (in)", kind: "number" },
     { key: "av_in2", label: "Stirrup area Av, both legs (in²)", kind: "number" },
     { key: "vu_kip", label: "Factored shear Vu (kip, 0 = detailing only)", kind: "number", default: 0, attrs: { step: "any" } },
-    { key: "lambda", label: "Lightweight factor lambda (1.0 normalweight)", kind: "number" },
+    { key: "lambda", label: "Lightweight factor lambda (1.0 normalweight)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "am", id: "rmsr-out-am", label: "Minimum Av/s required", value: (r) => fmt(r.av_min_per_s, 4) + " in^2/in" },
@@ -955,7 +955,7 @@ CONCRETE_RENDERERS["concrete-elastic-modulus"] = _simpleRenderer({
   example: concreteElasticModulusExample.inputs,
   fields: [
     { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
-    { key: "wc_pcf", label: "Unit weight wc (pcf, 145 normalweight)", kind: "number" },
+    { key: "wc_pcf", label: "Unit weight wc (pcf, 145 normalweight)", kind: "number", default: 145 },
   ],
   outputs: [
     { key: "ec", id: "cem-out-ec", label: "Modulus Ec = wc^1.5 x 33 x sqrt(f'c)", value: (r) => fmt(r.ec_psi, 0) + " psi (" + fmt(r.ec_ksi, 0) + " ksi)" },
@@ -991,7 +991,7 @@ CONCRETE_RENDERERS["concrete-strength-from-modulus"] = _simpleRenderer({
   example: concreteStrengthFromModulusExample.inputs,
   fields: [
     { key: "ec_psi", label: "Elastic modulus Ec (psi)", kind: "number" },
-    { key: "wc_pcf", label: "Unit weight wc (pcf, 145 normalweight)", kind: "number" },
+    { key: "wc_pcf", label: "Unit weight wc (pcf, 145 normalweight)", kind: "number", default: 145 },
   ],
   outputs: [
     { key: "fc", id: "csm-out-fc", label: "Equivalent strength f'c", value: (r) => fmt(r.fc_psi, 0) + " psi (" + fmt(r.fc_ksi, 2) + " ksi)" },
@@ -1021,7 +1021,7 @@ CONCRETE_RENDERERS["concrete-modulus-of-rupture"] = _simpleRenderer({
   example: concreteModulusOfRuptureExample.inputs,
   fields: [
     { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
-    { key: "lambda", label: "Lightweight factor lambda (1.0 NW, 0.75 LW)", kind: "number" },
+    { key: "lambda", label: "Lightweight factor lambda (1.0 NW, 0.75 LW)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "fr", id: "cmr-out-fr", label: "Modulus of rupture fr = 7.5 lambda sqrt(f'c)", value: (r) => fmt(r.fr_psi, 0) + " psi" },
@@ -1059,7 +1059,7 @@ CONCRETE_RENDERERS["concrete-strength-from-rupture"] = _simpleRenderer({
   example: concreteStrengthFromRuptureExample.inputs,
   fields: [
     { key: "fr_psi", label: "Modulus of rupture fr (psi)", kind: "number" },
-    { key: "lambda", label: "Lightweight factor lambda (1.0 NW, 0.75 LW)", kind: "number" },
+    { key: "lambda", label: "Lightweight factor lambda (1.0 NW, 0.75 LW)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "fc", id: "csr-out-fc", label: "Equivalent strength f'c", value: (r) => fmt(r.fc_psi, 0) + " psi (" + fmt(r.fc_ksi, 2) + " ksi)" },
@@ -1095,7 +1095,7 @@ CONCRETE_RENDERERS["concrete-cracking-moment"] = _simpleRenderer({
     { key: "b_in", label: "Section width b (in)", kind: "number" },
     { key: "h_in", label: "Section total depth h (in)", kind: "number" },
     { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
-    { key: "lambda", label: "Lightweight factor lambda (1.0 NW, 0.75 LW)", kind: "number" },
+    { key: "lambda", label: "Lightweight factor lambda (1.0 NW, 0.75 LW)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "mcr", id: "ccm-out-mcr", label: "Cracking moment Mcr", value: (r) => fmt(r.mcr_kipft, 2) + " kip-ft (" + fmt(r.mcr_lbin, 0) + " lb-in)" },
@@ -1141,7 +1141,7 @@ CONCRETE_RENDERERS["concrete-depth-for-cracking-moment"] = _simpleRenderer({
     { key: "target_mcr_kipft", label: "Target cracking moment Mcr (kip-ft)", kind: "number" },
     { key: "b_in", label: "Section width b (in)", kind: "number" },
     { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
-    { key: "lambda", label: "Lightweight factor lambda (1.0 NW, 0.75 LW)", kind: "number" },
+    { key: "lambda", label: "Lightweight factor lambda (1.0 NW, 0.75 LW)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "h", id: "cdcm-out-h", label: "Required total depth h", value: (r) => fmt(r.h_in, 2) + " in" },
@@ -1358,7 +1358,7 @@ CONCRETE_RENDERERS["concrete-torsion-threshold"] = _simpleRenderer({
     { key: "fc_psi", label: "Specified strength f'c (psi)", kind: "number" },
     { key: "b_in", label: "Section width b (in)", kind: "number" },
     { key: "h_in", label: "Section height h (in)", kind: "number" },
-    { key: "lambda", label: "Lightweight factor lambda (1.0 normal)", kind: "number" },
+    { key: "lambda", label: "Lightweight factor lambda (1.0 normal)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "tth", id: "ctt-out-tth", label: "Threshold torsion Tth", value: (r) => fmt(r.tth_inlb, 0) + " in-lb (" + fmt(r.tth_inlb / 12000, 2) + " ft-kip)" },
@@ -1446,8 +1446,8 @@ CONCRETE_RENDERERS["rc-compression-dev-length"] = _simpleRenderer({
     { key: "bar_diameter_in", label: "Bar diameter db (in, #8 = 1.00)", kind: "number" },
     { key: "fy_psi", label: "Bar yield fy (psi)", kind: "number" },
     { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
-    { key: "lambda", label: "Lightweight factor lambda (1.0 normalweight, 0.75 lightweight)", kind: "number" },
-    { key: "psi_r", label: "Confinement factor psi_r (0.75 with ties/spiral, else 1.0)", kind: "number" },
+    { key: "lambda", label: "Lightweight factor lambda (1.0 normalweight, 0.75 lightweight)", kind: "number", default: 1 },
+    { key: "psi_r", label: "Confinement factor psi_r (0.75 with ties/spiral, else 1.0)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "t1", id: "rcd-out-t1", label: "Term 1: fy / (50 lambda sqrt(f'c)) x db", value: (r) => fmt(r.term1_in, 2) + " in" },
@@ -1520,7 +1520,7 @@ CONCRETE_RENDERERS["concrete-effective-inertia"] = _simpleRenderer({
     { key: "as_in2", label: "Tension steel area As (in²)", kind: "number" },
     { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
     { key: "ma_kipft", label: "Service moment Ma (kip-ft)", kind: "number" },
-    { key: "lambda", label: "Lightweight factor lambda (1.0 NW, 0.75 LW)", kind: "number" },
+    { key: "lambda", label: "Lightweight factor lambda (1.0 NW, 0.75 LW)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "ie", id: "cei-out-ie", label: "Effective inertia Ie", value: (r) => fmt(r.ie_in4, 0) + " in^4 (" + fmt(r.ie_ratio * 100, 0) + "% of Ig" + (r.cracked ? ", cracked" : ", uncracked -> Ig") + ")" },
@@ -2074,7 +2074,7 @@ CONCRETE_RENDERERS["concrete-anchor-blowout"] = _simpleRenderer({
     { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
     { key: "embedment_in", label: "Embedment hef (in)", kind: "number" },
     { key: "perp_edge_in", label: "Perpendicular edge c_a2 (in, 0 = none)", kind: "number" },
-    { key: "lambda", label: "Lightweight factor lambda_a (1.0 normal weight)", kind: "number" },
+    { key: "lambda", label: "Lightweight factor lambda_a (1.0 normal weight)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "nsb", id: "cab-out-nsb", label: "Basic blowout Nsb", value: (r) => fmt(r.nsb_lb, 0) + " lb (" + fmt(r.nsb_lb / 1000, 1) + " kip)" },
@@ -2155,7 +2155,7 @@ CONCRETE_RENDERERS["concrete-anchor-shear-breakout"] = _simpleRenderer({
     { key: "perp_edge_in", label: "Perpendicular edge c_a2 (in, 0 = none)", kind: "number" },
     { key: "member_thickness_in", label: "Member thickness ha (in, 0 = thick)", kind: "number" },
     { key: "cracking", label: "Concrete condition at service", kind: "select", options: [{ value: "cracked", label: "Cracked (psi_cV = 1.0)", selected: true }, { value: "uncracked", label: "Uncracked (psi_cV = 1.4)" }] },
-    { key: "lambda", label: "Lightweight factor lambda_a (1.0 normal weight)", kind: "number" },
+    { key: "lambda", label: "Lightweight factor lambda_a (1.0 normal weight)", kind: "number", default: 1 },
     { key: "direction", label: "Shear direction", kind: "select", options: [{ value: "toward", label: "Toward the edge", selected: true }, { value: "parallel", label: "Parallel to the edge (x2, psi_edV = 1.0)" }] },
   ],
   outputs: [
@@ -2197,7 +2197,7 @@ CONCRETE_RENDERERS["concrete-anchor-pryout"] = _simpleRenderer({
     { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
     { key: "edge_distance_in", label: "Nearest edge distance ca1 (in, large = away)", kind: "number" },
     { key: "anchor_type", label: "Anchor type", kind: "select", options: [{ value: "cast-in", label: "Cast-in (kc = 24)" }, { value: "post-installed", label: "Post-installed, Category 1 (kc = 17)" }, { value: "post-installed-cat2", label: "Post-installed, Category 2 (kc = 17)" }, { value: "post-installed-cat3", label: "Post-installed, Category 3 (kc = 17)" }] },
-    { key: "lambda", label: "Lightweight factor lambda_a (1.0 normal weight)", kind: "number" },
+    { key: "lambda", label: "Lightweight factor lambda_a (1.0 normal weight)", kind: "number", default: 1 },
     { key: "cracking", label: "Concrete at service loads", kind: "select", options: [{ value: "cracked", label: "Cracked (psi_c,N 1.0)" }, { value: "uncracked", label: "Uncracked by analysis (psi_c,N 1.25 cast-in, 1.4 post-installed)" }] },
     { key: "rows_toward_edge", label: "Group: anchor rows toward the edge (1 for a single anchor)", kind: "number", default: 1, attrs: { step: "1", min: "1", value: "1" } },
     { key: "spacing_toward_edge_in", label: "Group: spacing between those rows (in)", kind: "number" },
@@ -2593,7 +2593,7 @@ CONCRETE_RENDERERS["concrete-premix-bags"] = _simpleRenderer({
     { key: "length_ft", label: "Length (ft)", kind: "number" },
     { key: "width_ft", label: "Width (ft)", kind: "number" },
     { key: "thickness_in", label: "Thickness (in)", kind: "number" },
-    { key: "bag_yield_ft3", label: "Bag yield (ft³): 80lb 0.60, 60lb 0.45, 50lb 0.375, 40lb 0.30", kind: "number" },
+    { key: "bag_yield_ft3", label: "Bag yield (ft³): 80lb 0.60, 60lb 0.45, 50lb 0.375, 40lb 0.30", kind: "number", default: 0.6 },
     { key: "waste_pct", label: "Waste (percent)", kind: "number", default: 10 },
   ],
   outputs: [

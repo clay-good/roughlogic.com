@@ -474,7 +474,7 @@ GEOTECH_RENDERERS["soil-settlement-elastic"] = _simpleRenderer({
     { key: "b_ft", label: "Footing width B (ft)", kind: "number" },
     { key: "es_ksf", label: "Soil elastic modulus Es (ksf)", kind: "number" },
     { key: "nu", label: "Poisson's ratio nu (0.3 sand)", kind: "number", default: 0.3 },
-    { key: "is_f", label: "Influence factor Is (0.82 rigid square)", kind: "number" },
+    { key: "is_f", label: "Influence factor Is (0.82 rigid square)", kind: "number", default: 0.82 },
   ],
   outputs: [
     { key: "se", id: "sse-out-se", label: "Elastic settlement Se", value: (r) => fmt(r.se_in, 2) + " in (" + fmt(r.se_ft, 4) + " ft)" },
@@ -519,7 +519,7 @@ GEOTECH_RENDERERS["elastic-settlement-allowable-pressure"] = _simpleRenderer({
     { key: "b_ft", label: "Footing width B (ft)", kind: "number" },
     { key: "es_ksf", label: "Soil elastic modulus Es (ksf)", kind: "number" },
     { key: "nu", label: "Poisson's ratio nu (0.3 sand)", kind: "number", default: 0.3 },
-    { key: "is_f", label: "Influence factor Is (0.82 rigid square)", kind: "number" },
+    { key: "is_f", label: "Influence factor Is (0.82 rigid square)", kind: "number", default: 0.82 },
   ],
   outputs: [
     { key: "q", id: "esap-out-q", label: "Allowable pressure (settlement limit)", value: (r) => fmt(r.allowable_pressure_ksf, 2) + " ksf (" + fmt(r.allowable_pressure_psf, 0) + " psf)" },
@@ -560,7 +560,7 @@ GEOTECH_RENDERERS["pile-axial-capacity"] = _simpleRenderer({
     { key: "d_ft", label: "Pile diameter D (ft)", kind: "number" },
     { key: "l_ft", label: "Embedded length L (ft)", kind: "number" },
     { key: "cu_ksf", label: "Undrained shear strength cu (ksf)", kind: "number" },
-    { key: "alpha", label: "Adhesion factor alpha (~0.55 medium stiff)", kind: "number" },
+    { key: "alpha", label: "Adhesion factor alpha (~0.55 medium stiff)", kind: "number", default: 0.55 },
     { key: "fs", label: "Factor of safety FS", kind: "number" },
   ],
   outputs: [
@@ -611,7 +611,7 @@ GEOTECH_RENDERERS["pile-length-for-capacity"] = _simpleRenderer({
     { key: "qall_target_kip", label: "Target allowable capacity Qall (kip)", kind: "number" },
     { key: "d_ft", label: "Pile diameter D (ft)", kind: "number" },
     { key: "cu_ksf", label: "Undrained shear strength cu (ksf)", kind: "number" },
-    { key: "alpha", label: "Adhesion factor alpha (~0.55 medium stiff)", kind: "number" },
+    { key: "alpha", label: "Adhesion factor alpha (~0.55 medium stiff)", kind: "number", default: 0.55 },
     { key: "fs", label: "Factor of safety FS", kind: "number" },
   ],
   outputs: [
@@ -1073,7 +1073,7 @@ GEOTECH_RENDERERS["frost-depth-berggren"] = _simpleRenderer({
     { key: "frozen_conductivity_btu", label: "Frozen conductivity kf (BTU/hr-ft-F)", kind: "number" },
     { key: "dry_density_pcf", label: "Dry density (pcf)", kind: "number" },
     { key: "water_content_pct", label: "Water content (percent)", kind: "number" },
-    { key: "berggren_lambda", label: "Berggren lambda (0-1, ~0.8)", kind: "number" },
+    { key: "berggren_lambda", label: "Berggren lambda (0-1, ~0.8)", kind: "number", default: 0.8 },
   ],
   outputs: [
     { key: "l", id: "frb-out-l", label: "Volumetric latent heat", value: (r) => fmt(r.volumetric_latent_heat_btu_ft3, 0) + " BTU/ft^3" },

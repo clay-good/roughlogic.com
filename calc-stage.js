@@ -1307,9 +1307,9 @@ const renderProjectorMaxScreenSize = _r({
   fields: [
     { key: "available_lumens", label: "Projector brightness (ANSI lumens)", kind: "number" },
     { key: "screen_gain", label: "Screen gain", kind: "number" },
-    { key: "target_foot_lamberts", label: "Target foot-lamberts (16 dark, 30-50 lit)", kind: "number" },
-    { key: "aspect_w", label: "Aspect ratio width (e.g. 16)", kind: "number" },
-    { key: "aspect_h", label: "Aspect ratio height (e.g. 9)", kind: "number" },
+    { key: "target_foot_lamberts", label: "Target foot-lamberts (16 dark, 30-50 lit)", kind: "number", default: 16 },
+    { key: "aspect_w", label: "Aspect ratio width (e.g. 16)", kind: "number", default: 16 },
+    { key: "aspect_h", label: "Aspect ratio height (e.g. 9)", kind: "number", default: 9 },
   ],
   outputs: [
     { key: "d", id: "pms-out-d", label: "Max screen diagonal", value: (r) => fmt(r.max_diagonal_ft, 1) + " ft (" + fmt(r.max_diagonal_ft * 12, 0) + " in)" },

@@ -3296,10 +3296,10 @@ CROSS_RENDERERS["radiant-heat-exchange"] = _simpleRendererG({
   example: radiantHeatExchangeExample.inputs,
   fields: [
     { key: "area_ft2", label: "Radiating surface area (ft²)", kind: "number" },
-    { key: "emissivity", label: "Surface emissivity (shiny metal ~0.05, paint/nonmetal ~0.9)", kind: "number" },
+    { key: "emissivity", label: "Surface emissivity (shiny metal ~0.05, paint/nonmetal ~0.9)", kind: "number", default: 0.9 },
     { key: "surface_temp_f", required: true, label: "Surface temperature (°F)", kind: "number" },
     { key: "surroundings_temp_f", required: true, label: "Surroundings / facing-surface temperature (°F)", kind: "number" },
-    { key: "view_factor", label: "View factor to surroundings (1 = fully surrounded)", kind: "number" },
+    { key: "view_factor", label: "View factor to surroundings (1 = fully surrounded)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "q", id: "rhx-out-q", label: "Net radiant heat", value: (r) => fmt(r.heat_rate_btu_hr, 0) + " BTU/hr (" + fmt(r.heat_rate_w, 0) + " W) - " + r.direction },

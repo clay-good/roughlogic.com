@@ -289,7 +289,7 @@ MASONRY_RENDERERS["masonry-wall-weight"] = _simpleRenderer({
   fields: [
     { key: "hollow_psf", label: "Hollow wall weight (psf, NCMA)", kind: "number" },
     { key: "grout_adder", label: "Full-grout weight adder (psf, NCMA)", kind: "number" },
-    { key: "cell_spacing", label: "Grouted-cell spacing at full grout (in; 8 CMU)", kind: "number" },
+    { key: "cell_spacing", label: "Grouted-cell spacing at full grout (in; 8 CMU)", kind: "number", default: 8 },
     { key: "grout_spacing", label: "Grout/rebar spacing (in; 0 = ungrouted)", kind: "number", default: 0 },
     { key: "height_ft", label: "Wall height (ft, for line load)", kind: "number" },
     { key: "area_ft2", label: "Wall area (ft², optional, for total)", kind: "number" },
@@ -337,7 +337,7 @@ MASONRY_RENDERERS["brick-veneer-anchor-spacing"] = _simpleRenderer({
   example: brickVeneerAnchorSpacingExample.inputs,
   fields: [
     { key: "area_ft2", label: "Veneer wall area (ft²)", kind: "number" },
-    { key: "area_per", label: "Max area per anchor (ft²; 2.67, 2.0 high-demand)", kind: "number" },
+    { key: "area_per", label: "Max area per anchor (ft²; 2.67, 2.0 high-demand)", kind: "number", default: 2.67 },
     { key: "max_horiz_in", label: "Max horizontal spacing (in)", kind: "number" },
     { key: "max_vert_in", label: "Max vertical spacing (in)", kind: "number" },
   ],
@@ -638,7 +638,7 @@ MASONRY_RENDERERS["brick-veneer-weep-count"] = _simpleRenderer({
   example: brickVeneerWeepCountExample.inputs,
   fields: [
     { key: "wall_length_ft", label: "Wall / flashing length (ft)", kind: "number" },
-    { key: "max_spacing_in", label: "Max weep spacing (in, code cap 33)", kind: "number" },
+    { key: "max_spacing_in", label: "Max weep spacing (in, code cap 33)", kind: "number", default: 33 },
     { key: "flashing_lines", label: "Flashing lines (base + lintels)", kind: "number" },
   ],
   outputs: [
@@ -681,7 +681,7 @@ MASONRY_RENDERERS["masonry-joint-reinforcement"] = _simpleRenderer({
   fields: [
     { key: "wall_length_ft", label: "Wall length (ft)", kind: "number" },
     { key: "wall_height_ft", label: "Wall height (ft)", kind: "number" },
-    { key: "vertical_spacing_in", label: "Vertical spacing (in, code cap 16)", kind: "number" },
+    { key: "vertical_spacing_in", label: "Vertical spacing (in, code cap 16)", kind: "number", default: 16 },
     { key: "piece_length_ft", label: "Wire piece length (ft)", kind: "number" },
     { key: "lap_in", label: "Lap between pieces (in, 6 min; 9 for 3/16 in wire)", kind: "number", default: 6, required: true },
   ],

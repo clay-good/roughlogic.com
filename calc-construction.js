@@ -2374,7 +2374,7 @@ const renderSpeedsAndFeeds = _simpleRenderer({
     { key: "tool", label: "Tool", kind: "select", options: [{ value: "drill", label: "Drill" }, { value: "end_mill", label: "End mill" }, { value: "lathe", label: "Lathe" }] },
     { key: "material", label: "Material", kind: "select", options: ["steel", "stainless", "aluminum", "brass", "hardwood", "softwood", "plastic"].map((v) => ({ value: v, label: v })) },
     { key: "diameter_in", label: "Diameter (in)", kind: "number" },
-    { key: "flutes", label: "Flutes (blank: 2 for a drill or end mill, 1 for a lathe tool)", kind: "number", blankUndefined: true },
+    { key: "flutes", label: "Flutes (blank: 2 for a drill or end mill, 1 for a lathe tool)", kind: "number", blankUndefined: true, default: 2 },
   ],
   outputs: [
     { key: "rpm", id: "sf-out-rpm", label: "RPM", value: (r) => _fmtC(r.rpm, 0) },
@@ -2391,7 +2391,7 @@ const renderWeldUsage = _simpleRenderer({
     { key: "process", label: "Process", kind: "select", options: ["SMAW", "GMAW", "FCAW", "GTAW"].map((v) => ({ value: v, label: v })) },
     { key: "weld_cross_section_in2", label: "Weld cross-section (in²)", kind: "number" },
     { key: "weld_length_in", label: "Weld length (in)", kind: "number" },
-    { key: "deposition_rate_lb_per_min", label: "Deposition rate (lb per MINUTE; blank: 0.12 GMAW, 0.06 SMAW, 0.20 FCAW, 0.03 GTAW)", kind: "number", blankUndefined: true },
+    { key: "deposition_rate_lb_per_min", label: "Deposition rate (lb per MINUTE; blank: 0.12 GMAW, 0.06 SMAW, 0.20 FCAW, 0.03 GTAW)", kind: "number", blankUndefined: true, default: 0.12 },
   ],
   outputs: [
     { key: "d", id: "wu-out-d", label: "Deposit (lb)", value: (r) => _fmtC(r.deposit_lb, 2) },
@@ -5159,7 +5159,7 @@ const renderCmuGroutVolume = _simpleRenderer({
     { key: "wall_len_ft", label: "Wall length (ft)", kind: "number" },
     { key: "wall_ht_ft", label: "Wall height (ft)", kind: "number" },
     { key: "core_spacing_in", label: "Grouted-core spacing oc (in)", kind: "number" },
-    { key: "core_area_in2", label: "Core cross-section (in², ~24 for 8 in)", kind: "number" },
+    { key: "core_area_in2", label: "Core cross-section (in², ~24 for 8 in)", kind: "number", default: 24 },
     { key: "bond_area_in2", label: "Bond-beam cross-section (in², 0 = none)", kind: "number" },
   ],
   outputs: [
@@ -5196,7 +5196,7 @@ const renderMasonryCoursing = _simpleRenderer({
   example: masonryCoursingExample.inputs,
   fields: [
     { key: "target_in", label: "Height to reach (in)", kind: "number" },
-    { key: "unit_in", label: "Unit height (in, CMU 7.625 / brick 2.25)", kind: "number" },
+    { key: "unit_in", label: "Unit height (in, CMU 7.625 / brick 2.25)", kind: "number", default: 7.625 },
     { key: "joint_in", label: "Bed joint (in, typ 0.375 / brick 0.4167)", kind: "number", default: 0.375 },
   ],
   outputs: [
@@ -5399,7 +5399,7 @@ const renderRidgeCapFasteners = _simpleRenderer({
     { key: "cap_exposure_in", label: "Cap exposure (in)", kind: "number" },
     { key: "squares", label: "Field squares", kind: "number" },
     { key: "shingles_per_sq", label: "Field shingles per square", kind: "number" },
-    { key: "nails_per_shingle", label: "Nails per shingle (4 / 6 high-wind)", kind: "number" },
+    { key: "nails_per_shingle", label: "Nails per shingle (4 / 6 high-wind)", kind: "number", default: 4 },
     { key: "nails_per_lb", label: "Roofing nails per pound", kind: "number" },
   ],
   outputs: [
@@ -5543,7 +5543,7 @@ CONSTRUCTION_RENDERERS["seismic-base-shear"] = _simpleRenderer({
     { key: "sds", label: "SDS, short-period (g)", kind: "number" },
     { key: "sd1", label: "SD1, 1-second (g)", kind: "number" },
     { key: "r_factor", label: "Response-modification factor R", kind: "number" },
-    { key: "ie", label: "Importance factor Ie (1.0-1.5)", kind: "number" },
+    { key: "ie", label: "Importance factor Ie (1.0-1.5)", kind: "number", default: 1 },
     { key: "period_s", label: "Fundamental period Ta (s)", kind: "number" },
     { key: "s1", label: "Mapped S1 (g) -- 0.6 or more adds the Eq. 12.8-6 minimum; 0 to skip", kind: "number", default: 0 },
   ],
@@ -8886,7 +8886,7 @@ const _v448renderGlulamVolumeFactor = _simpleRenderer({
     { key: "depth_in", label: "Beam depth d (in)", kind: "number" },
     { key: "width_in", label: "Beam width b (in)", kind: "number" },
     { key: "x", label: "Species exponent x", kind: "select", default: "10", options: [{ value: "10", label: "10 (softwood, DF/SPF)" }, { value: "20", label: "20 (Southern Pine)" }] },
-    { key: "kl", label: "Legacy NDS 1997 loading factor KL (1.0 = current NDS)", kind: "number" },
+    { key: "kl", label: "Legacy NDS 1997 loading factor KL (1.0 = current NDS)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "cv", id: "gvf-out-cv", label: "Volume factor Cv", value: (r) => fmt(r.cv, 3) + (r.capped ? " (capped at 1.0)" : "") },
@@ -9161,7 +9161,7 @@ const _v474renderAdaRampSlope = _simpleRenderer({
   example: adaRampSlopeExample.inputs,
   fields: [
     { key: "rise_in", label: "Total vertical rise (in)", kind: "number" },
-    { key: "slope_ratio", label: "Slope ratio run:rise (12 = 1:12 max)", kind: "number" },
+    { key: "slope_ratio", label: "Slope ratio run:rise (12 = 1:12 max)", kind: "number", default: 12 },
     { key: "landing_in", label: "Landing length between runs (in)", kind: "number" },
   ],
   outputs: [
@@ -9490,7 +9490,7 @@ const _v850renderShingleNails = _simpleRenderer({
   example: shingleNailsExample.inputs,
   fields: [
     { key: "squares", label: "Roof area (squares)", kind: "number" },
-    { key: "shingles_per_square", label: "Shingles per square (~80 three-tab, ~64 architectural)", kind: "number" },
+    { key: "shingles_per_square", label: "Shingles per square (~80 three-tab, ~64 architectural)", kind: "number", default: 80 },
     { key: "nails_per_shingle", label: "Nails per shingle (4 standard, 6 high-wind)", kind: "number", default: 4 },
     { key: "nails_per_lb", label: "Nails per pound", kind: "number" },
   ],
@@ -9726,7 +9726,7 @@ const _v862renderRoofUnderlaymentRolls = _simpleRenderer({
   example: roofUnderlaymentRollsExample.inputs,
   fields: [
     { key: "roof_area_sf", label: "Roof deck area (ft²)", kind: "number" },
-    { key: "roll_coverage_sf", label: "Coverage per roll (ft², ~1000 synthetic, ~400 felt)", kind: "number" },
+    { key: "roll_coverage_sf", label: "Coverage per roll (ft², ~1000 synthetic, ~400 felt)", kind: "number", default: 1000 },
     { key: "lap_waste_pct", label: "Lap + waste allowance (percent)", kind: "number" },
   ],
   outputs: [
@@ -9863,7 +9863,7 @@ const _v865renderSheathingTakeoff = _simpleRenderer({
   fields: [
     { key: "area_sf", label: "Area to sheathe (ft²)", kind: "number" },
     { key: "waste_pct", label: "Waste allowance (percent)", kind: "number", default: 8 },
-    { key: "sheet_sf", label: "Panel area (ft², 32 for a 4x8)", kind: "number" },
+    { key: "sheet_sf", label: "Panel area (ft², 32 for a 4x8)", kind: "number", default: 32 },
     { key: "nails_per_sheet", label: "Nails per panel from the schedule", kind: "number" },
   ],
   outputs: [
@@ -9907,7 +9907,7 @@ const _v866renderConstructionAdhesiveTubes = _simpleRenderer({
   example: constructionAdhesiveTubesExample.inputs,
   fields: [
     { key: "total_lf", label: "Total bead length (ft)", kind: "number" },
-    { key: "tube_volume_in3", label: "Cartridge volume (in³, ~50.6 for 28 oz)", kind: "number" },
+    { key: "tube_volume_in3", label: "Cartridge volume (in³, ~50.6 for 28 oz)", kind: "number", default: 50.6 },
     { key: "bead_dia_in", label: "Bead diameter (in)", kind: "number" },
   ],
   outputs: [
@@ -10256,7 +10256,7 @@ const _v872renderSealantJointYield = _simpleRenderer({
   example: sealantJointYieldExample.inputs,
   fields: [
     { key: "joint_lf", label: "Joint length (ft)", kind: "number" },
-    { key: "cartridge_in3", label: "Cartridge volume (in³; 18.23 for 10.1 fl oz, 36.1 for a 20 oz sausage)", kind: "number" },
+    { key: "cartridge_in3", label: "Cartridge volume (in³; 18.23 for 10.1 fl oz, 36.1 for a 20 oz sausage)", kind: "number", default: 18.23 },
     { key: "joint_width_in", label: "Joint width (in)", kind: "number" },
     { key: "joint_depth_in", label: "Joint depth (in)", kind: "number" },
   ],
@@ -10433,7 +10433,7 @@ const _v876renderSprayFoamBoardFeet = _simpleRenderer({
   fields: [
     { key: "area_sf", label: "Area to spray (ft²)", kind: "number" },
     { key: "thickness_in", label: "Applied thickness (in)", kind: "number" },
-    { key: "yield_bd_ft_per_set", label: "Board-feet per set (~4800 closed-cell)", kind: "number" },
+    { key: "yield_bd_ft_per_set", label: "Board-feet per set (~4800 closed-cell)", kind: "number", default: 4800 },
     { key: "waste_pct", label: "Waste allowance (percent)", kind: "number" },
   ],
   outputs: [
@@ -10533,7 +10533,7 @@ const _v878renderRebarTieWire = _simpleRenderer({
     { key: "spacing_in", label: "Bar spacing each way (in)", kind: "number" },
     { key: "tie_fraction", label: "Fraction of intersections tied (0-1)", kind: "number", default: 0.5 },
     { key: "tie_length_in", label: "Wire per tie (in)", kind: "number" },
-    { key: "wire_lb_per_ft", label: "Tie wire weight (lb/ft; 16 ga annealed, 0.0625 in, is 0.0104)", kind: "number" },
+    { key: "wire_lb_per_ft", label: "Tie wire weight (lb/ft; 16 ga annealed, 0.0625 in, is 0.0104)", kind: "number", default: 0.0104 },
   ],
   outputs: [
     { key: "w", id: "rtw-out-w", label: "Tie wire", value: (r) => _fmtC(r.wire_lb, 1) + " lb (" + _fmtC(r.wire_ft, 0) + " ft)" },
@@ -11898,7 +11898,7 @@ CONSTRUCTION_RENDERERS["advance-warning-sign-spacing"] = _simpleRenderer({
   example: advanceWarningSignSpacingExample.inputs,
   fields: [
     { key: "road_type", label: "Road type", kind: "select", options: [{ value: "rural", label: "Rural (500/500/500)", selected: true }, { value: "urban-low", label: "Urban low speed (100/100/100)" }, { value: "urban-high", label: "Urban high speed (350/350/350)" }, { value: "expressway", label: "Expressway / Freeway (1000/1500/2640)" }] },
-    { key: "sign_count", label: "Signs in the series (1-3)", kind: "number" },
+    { key: "sign_count", label: "Signs in the series (1-3)", kind: "number", default: 3 },
     { key: "speed_mph", label: "Speed limit (mph, 0 = skip the 8-12x check)", kind: "number", default: 0 },
     { key: "approach_volume_vph", label: "Approach volume (vehicles/hour, 0 = skip the flagger queue)", kind: "number", default: 0 },
     { key: "flagger_cycle_min", label: "Flagger cycle time (min, 0 = skip the queue)", kind: "number", default: 0 },
@@ -11971,7 +11971,7 @@ CONSTRUCTION_RENDERERS["formwork-member-spacing"] = _simpleRenderer({
     { key: "fb_psi", label: "Allowable bending Fb (psi, duration-adjusted)", kind: "number" },
     { key: "fv_psi", label: "Allowable shear Fv (psi)", kind: "number" },
     { key: "e_psi", label: "Modulus E (psi)", kind: "number" },
-    { key: "deflection_denominator", label: "Deflection limit denominator (360 = L/360)", kind: "number" },
+    { key: "deflection_denominator", label: "Deflection limit denominator (360 = L/360)", kind: "number", default: 360 },
   ],
   outputs: [
     { key: "w", id: "fms-out-w", label: "Line load on the member", value: (r) => fmt(r.w_plf, 0) + " lb/ft (" + fmt(r.w_lb_per_in, 2) + " lb/in)" },
@@ -12050,11 +12050,11 @@ CONSTRUCTION_RENDERERS["chip-seal-mcleod"] = _simpleRenderer({
     { key: "flakiness_index_pct", label: "Flakiness index FI (%)", kind: "number" },
     { key: "loose_unit_weight_pcf", label: "Dry loose unit weight W (pcf)", kind: "number" },
     { key: "bulk_specific_gravity", label: "Bulk specific gravity G", kind: "number" },
-    { key: "wastage_factor", label: "Wastage factor E (whip-off, ~1.05-1.10)", kind: "number" },
+    { key: "wastage_factor", label: "Wastage factor E (whip-off, ~1.05-1.10)", kind: "number", default: 1.05 },
     { key: "traffic_factor", label: "Traffic factor T (0.85 light to 0.60 heavy)", kind: "number" },
     { key: "surface_factor_gal_sy", label: "Surface condition factor S (gal/SY)", kind: "number", default: 0.02 },
     { key: "absorption_gal_sy", label: "Aggregate absorption A (gal/SY)", kind: "number" },
-    { key: "residual_asphalt", label: "Residual asphalt R (0.67 emulsion, 1.0 AC)", kind: "number" },
+    { key: "residual_asphalt", label: "Residual asphalt R (0.67 emulsion, 1.0 AC)", kind: "number", default: 0.67 },
     { key: "project_area_sy", label: "Project area (SY, 0 to skip the totals)", kind: "number", default: 0 },
   ],
   outputs: [
@@ -12418,7 +12418,7 @@ CONSTRUCTION_RENDERERS["guard-post-load"] = _simpleRenderer({
   fields: [
     { key: "post_height_in", label: "Top of guard above the connection (in)", kind: "number" },
     { key: "post_spacing_ft", label: "Post spacing (ft)", kind: "number" },
-    { key: "concentrated_lb", label: "Concentrated load (lb; IBC 200)", kind: "number" },
+    { key: "concentrated_lb", label: "Concentrated load (lb; IBC 200)", kind: "number", default: 200 },
     { key: "uniform_plf", label: "Uniform load (plf; IBC 50)", kind: "number", default: 50 },
     { key: "post_b_in", label: "Post width, actual (in)", kind: "number" },
     { key: "post_d_in", label: "Post depth in the load direction, actual (in)", kind: "number" },
@@ -12576,7 +12576,7 @@ CONSTRUCTION_RENDERERS["landing-check"] = _simpleRenderer({
     { key: "landing_width_in", label: "Landing width (in)", kind: "number" },
     { key: "flight_width_in", label: "Width of the flight or door served (in)", kind: "number" },
     { key: "threshold_drop_in", label: "Landing below the threshold (in; doors only)", kind: "number", default: 0 },
-    { key: "min_depth_in", label: "Minimum landing depth (in; IRC 36)", kind: "number" },
+    { key: "min_depth_in", label: "Minimum landing depth (in; IRC 36)", kind: "number", default: 36 },
     { key: "max_threshold_drop_in", label: "Maximum threshold drop (in; IRC 1.5)", kind: "number", default: 1.5 },
   ],
   outputs: [
@@ -12659,9 +12659,9 @@ CONSTRUCTION_RENDERERS["door-maneuvering-clearance"] = _simpleRenderer({
     { key: "clear_perpendicular_in", label: "Clear depth perpendicular to the doorway (in)", kind: "number" },
     { key: "clear_latch_side_in", label: "Clear width beyond the latch side (in)", kind: "number" },
     { key: "door_clear_width_in", label: "Door clear width (in)", kind: "number" },
-    { key: "min_pull_perpendicular_in", label: "Pull-side depth minimum (in; ADA 60)", kind: "number" },
-    { key: "min_pull_latch_in", label: "Pull-side latch-side minimum (in; ADA 18)", kind: "number" },
-    { key: "min_push_perpendicular_in", label: "Push-side depth minimum (in; ADA 48)", kind: "number" },
+    { key: "min_pull_perpendicular_in", label: "Pull-side depth minimum (in; ADA 60)", kind: "number", default: 60 },
+    { key: "min_pull_latch_in", label: "Pull-side latch-side minimum (in; ADA 18)", kind: "number", default: 18 },
+    { key: "min_push_perpendicular_in", label: "Push-side depth minimum (in; ADA 48)", kind: "number", default: 48 },
   ],
   outputs: [
     { key: "v", id: "dmc-out-v", label: "Verdict", value: (r) => r.passes ? "PASSES the front-approach clearance for this face" : "FAILS: " + [!r.perp_ok ? "depth short " + fmt(r.perpendicular_deficit_in, 1) + " in" : null, !r.latch_ok ? "latch side short " + fmt(r.latch_deficit_in, 1) + " in" : null].filter(Boolean).join(", ") },
@@ -12740,7 +12740,7 @@ CONSTRUCTION_RENDERERS["dryer-duct-length"] = _simpleRenderer({
     { key: "elbow_45_count", label: "Number of 45-degree elbows", kind: "number" },
     { key: "eq_len_90_ft", label: "Equivalent length per 90 (ft; from the dryer maker or the code table)", kind: "number" },
     { key: "eq_len_45_ft", label: "Equivalent length per 45 (ft)", kind: "number" },
-    { key: "max_length_ft", label: "Maximum allowable length (ft; IRC 35 absent maker data)", kind: "number" },
+    { key: "max_length_ft", label: "Maximum allowable length (ft; IRC 35 absent maker data)", kind: "number", default: 35 },
     { key: "transition_duct_ft", label: "Transition duct length (ft; not counted, 8 ft limit)", kind: "number", default: 0 },
   ],
   outputs: [
@@ -13612,7 +13612,7 @@ CONSTRUCTION_RENDERERS["curtain-wall-mullion-deflection"] = _simpleRenderer({
     { key: "span_in", label: "Mullion span, floor to floor (in)", kind: "number" },
     { key: "tributary_width_ft", label: "Tributary width (ft, half a bay each way)", kind: "number" },
     { key: "wind_pressure_psf", label: "Design wind pressure (psf)", kind: "number" },
-    { key: "modulus_psi", label: "Elastic modulus (psi, 10,000,000 for aluminum)", kind: "number" },
+    { key: "modulus_psi", label: "Elastic modulus (psi, 10,000,000 for aluminum)", kind: "number", default: 10000000 },
     { key: "allowable_stress_psi", label: "Allowable bending stress (psi, 0 to skip)", kind: "number" },
   ],
   outputs: [

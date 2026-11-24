@@ -1226,7 +1226,7 @@ HVACSERVICE_RENDERERS["oil-burner-firing-rate"] = _simpleRenderer({
   fields: [
     { key: "output_btu_hr", label: "Design heat output (BTU/hr)", kind: "number" },
     { key: "steady_state_efficiency_pct", label: "Steady-state efficiency (%)", kind: "number" },
-    { key: "heating_value_btu_gal", label: "Oil heating value (BTU/gal, #2 ~138,500)", kind: "number" },
+    { key: "heating_value_btu_gal", label: "Oil heating value (BTU/gal, #2 ~138,500)", kind: "number", default: 138500 },
   ],
   outputs: [
     { key: "i", id: "obf-out-i", label: "Fuel input", value: (r) => fmt(r.input_btu_hr, 0) + " BTU/hr" },
@@ -1299,8 +1299,8 @@ HVACSERVICE_RENDERERS["condensing-flue-condensate"] = _simpleRenderer({
   example: condensingFlueCondensateExample.inputs,
   fields: [
     { key: "input_btu_hr", label: "Fuel input (BTU/hr)", kind: "number" },
-    { key: "water_lb_per_therm", label: "Water produced per therm (lb, ~9.4 nat gas)", kind: "number" },
-    { key: "condensing_fraction", label: "Condensing fraction (0-1, ~0.85)", kind: "number" },
+    { key: "water_lb_per_therm", label: "Water produced per therm (lb, ~9.4 nat gas)", kind: "number", default: 9.4 },
+    { key: "condensing_fraction", label: "Condensing fraction (0-1, ~0.85)", kind: "number", default: 0.85 },
   ],
   outputs: [
     { key: "w", id: "cfc-out-w", label: "Water produced", value: (r) => fmt(r.water_produced_lb_hr, 1) + " lb/hr" },

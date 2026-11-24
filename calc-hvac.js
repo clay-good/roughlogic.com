@@ -4302,7 +4302,7 @@ HVAC_RENDERERS["hydronic-gpm-deltat"] = _rEnv({
     { key: "load", label: "Load (Btu/h, or tons if unit set to 1)", kind: "number" },
     { key: "unit_tons", label: "Load unit (0 = Btu/h, 1 = tons)", kind: "number", default: 0 },
     { key: "dt_f", label: "Design delta-T (degF)", kind: "number" },
-    { key: "factor", label: "Fluid factor (500 water, about 470 for 30% PG)", kind: "number" },
+    { key: "factor", label: "Fluid factor (500 water, about 470 for 30% PG)", kind: "number", default: 500 },
   ],
   outputs: [
     { key: "q", id: "hgd-out-q", label: "Load", value: (r) => fmt(r.q_btuh, 0) + " Btu/h" },

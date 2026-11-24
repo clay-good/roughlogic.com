@@ -526,7 +526,7 @@ const renderPumpEff = _r({
     { key: "tdh_ft",     label: "Total dynamic head (ft)", kind: "number" },
     { key: "motor_kW",   label: "Motor input (kW)", kind: "number" },
     { key: "motor_eff",  label: "Motor efficiency (0-1)", kind: "number" },
-    { key: "drive_eff",  label: "Drive efficiency (0-1)", kind: "number" },
+    { key: "drive_eff",  label: "Drive efficiency (0-1)", kind: "number", default: 1 },
   ],
   outputs: [
     { key: "w", id: "pe-out-w", label: "Water HP",         value: (r) => fmt(r.whp, 2) + " hp" },
