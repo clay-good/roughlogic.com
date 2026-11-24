@@ -312,6 +312,39 @@ said it needed the Area -- the one box the room size deliberately replaces. It
 now returns the calculator's own sentence, *"Enter the room length, width and
 wall height, or the area"*, with `wall_height_ft` among the missing fields.
 
+An **answer must read the question.** `OK` carries `unread`, the numbers the fill
+could not place, and that disclosure was honest and useless: the agent got a
+confident number with a footnote saying one of its own values had been ignored,
+and no way to tell whether the footnote mattered. Measured 2026-11-23 by
+phrasing every tile's worked example as a question, 106 of 1,625 answers left a
+supplied number unread -- and **36 returned a number that disagreed with the
+calculator's own worked example**. *"Household Clothes Dryer Demand Load (NEC
+220.54), number of dryers 4, each dryer nameplate 4500 w"* answered 5,000 W for
+one dryer instead of 20,000 W for four; a compound sales tax of 6.25% and 1.5%
+came back as no tax at all; 7,920 tons of rock came back as 198; *"Solar Times
+... date 2026-06-21"* answered for today.
+
+The door now says what it could not read instead of answering around it. Three
+things have to hold before it does, because a question carries words that are
+not values:
+
+| Set aside | Why |
+| --- | --- |
+| A digit in the calculator's own **name** | "NEC 250.122(F)", "4-20 mA", "Lee 1982" are how the reader addressed the tile |
+| The numeric **value of a dropdown** the fill placed | "Phase 3", "AWG 10", "Horsepower 5" were read, under another spelling |
+| A number whose **unit no empty box declares** | "for 3 people" is a household; "0.08 in per 100 ft" is a rate written against a label that declares no unit |
+
+What is left is a value with nowhere it was read and a box it could have gone
+in, so the answer was computed from a default instead. A box nothing could fill
+counts as empty -- a date, or a list the field index marks unfillable -- which is
+how the solar-times case was caught. With every box filled, a stray number is
+chatter and the answer stands.
+
+`scripts/measure-unread-answers.mjs` is the sweep, about four minutes, beside the
+other `measure-*` harnesses. It also checks that a question opening with a
+calculator's own name is never answered by a different calculator: 0 of 1,625,
+and cheap to keep asking.
+
 `scripts/measure-alias-door.mjs` sweeps the whole corpus through the door, about
 six minutes; it sits with the other `measure-*` harnesses rather than in the
 lint chain. The six regressions and a deterministic slice are standing tests.

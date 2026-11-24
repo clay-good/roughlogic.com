@@ -865,8 +865,29 @@ test("answer_query: a curated phrase the question contains is resolved from the 
   assert.equal(paint.status, "OK");
   assert.ok(Math.abs(paint.result.total_paint_gallons - 1200 * 2 / 350) < 1e-9);
   const duct = await answerQuery({ query: "duct size for 800 cfm at 0.08 in per 100 ft" });
-  assert.equal(duct.status, "OK");
   assert.equal(duct.id, "duct-sizing");
+  // The friction rate's label states a RATE ("in w.c. / 100 ft"), which is no
+  // unit, so the 0.08 goes unread and the door says so rather than answering
+  // from the default that happens to be the same number.
+  assert.deepEqual(duct.unread, ["0.08 in", "100 ft"]);
+});
+
+test("answer_query: a value the question gave and nothing read is not answered around", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  // Measured by phrasing every tile's worked example as a question: 106 OK
+  // answers left a supplied number unread and 36 returned a number that
+  // disagreed with the calculator's own worked example.
+  const dryer = await answerQuery({ query: "Household Clothes Dryer Demand Load (NEC 220.54) Number of dryers 4, Each dryer nameplate 4500 w, Service voltage 240 v" });
+  assert.equal(dryer.status, "MISSING_INPUTS");
+  assert.equal(dryer.id, "dryer-demand-220-54");
+  assert.deepEqual(dryer.unread, ["4"]);
+  // A date nothing can fill is an empty box too: this answered for today.
+  const sun = await answerQuery({ query: "Solar Times latitude 40 deg, longitude -105 deg, date 2026-06-21, timezone offset -6 hr" });
+  assert.notEqual(sun.status, "OK", JSON.stringify(sun.result || {}).slice(0, 80));
+  // With every box filled, a stray number is chatter and still answers.
+  const vd = await answerQuery({ query: "voltage drop phase single, material copper, awg 10, length one-way 150 ft, current 20 a, source voltage 240 v" });
+  assert.equal(vd.status, "OK");
+  assert.equal(vd.id, "voltage-drop");
 });
 
 test("answer_query: a calculator that refuses says so, and names every empty box", async () => {

@@ -1814,6 +1814,65 @@ export async function answerQuery({ query } = {}) {
     const defaulted = rows.filter((r) => !(r.d in filled) && dflt.has(r.d)).map((r) => r.d);
     return { ...(unmatched.length ? { unread: unmatched } : {}), ...(defaulted.length ? { defaulted } : {}) };
   };
+  // A number the question carried that NOTHING read, once the ones already
+  // accounted for are set aside: a digit inside the calculator's own name
+  // ("NEC 250.122(F)", "4-20 mA", "Lee 1982") and the numeric value of a
+  // dropdown the fill placed correctly ("Phase 3", "AWG 10") both come back
+  // in `unmatched` without being values the answer ignored.
+  const unplaced = () => {
+    const nameNums = new Set(String(top.name || "").match(/\d+(?:\.\d+)?/g) || []);
+    const placed = new Set(Object.values(filled).map(String));
+    return unmatched.filter((u) => {
+      const num = (String(u).match(/-?\d+(?:\.\d+)?/) || [])[0];
+      return num !== undefined && !nameNums.has(num) && !placed.has(num);
+    });
+  };
+  // ...and a box still empty for it to have belonged in. With every box filled,
+  // an extra number is chatter ("voltage drop 12 awg 100 ft 20 a for the
+  // garage"); with one empty, this answer was computed WITHOUT a value the
+  // question gave, from a default instead. Measured 2026-11-23 by phrasing
+  // every tile's worked example as a question: 106 answers left such a number
+  // unread, and 36 of them returned a NUMBER THAT DISAGREED with the
+  // calculator's own worked example -- "Household Clothes Dryer Demand Load,
+  // number of dryers 4, each dryer nameplate 4500 w" answered 5,000 W for one
+  // dryer instead of 20,000 W for four, and a compound sales tax of 6.25% and
+  // 1.5% came back as no tax at all. The governing rule here is that a wrong
+  // answer is worse than no answer, so the door now says what it could not
+  // read rather than answering around it.
+  // ...and only where an empty box could have held it. A box nothing could
+  // have filled counts: a date, or a list the field index marks unfillable (a
+  // `select` carrying no options). "Solar times, latitude 40 deg, longitude
+  // -105 deg, date 2026-06-21" read the latitude and longitude, left the date
+  // empty, and answered for TODAY -- 583 minutes of daylight instead of 901
+  // (2026-11-23). A dropdown that does carry options is an ordinary ask and is
+  // not evidence about a stray number.
+  //
+  // The UNIT decides whether an empty box could have held it, because a
+  // question carries words that are not values: "for 3 people" is a household,
+  // not a box, and "0.08 in per 100 ft" is a friction rate written against a
+  // label that states a rate and therefore declares no unit. A number with a
+  // unit no empty box declares is chatter; one with no unit at all is a value
+  // whenever a unitless box is empty, which is where every count that went
+  // wrong lived (4 dryers, 3 cassettes, 30 turbines, a 2026 date).
+  const emptyBoxes = () => rows.filter((r) => !(r.d in filled) &&
+    (r.k === "number" || r.k === undefined || r.k === "text" || (r.k === "select" && !(r.o || []).length)));
+  const ignoredValue = () => {
+    const empty = emptyBoxes();
+    if (!empty.length) return [];
+    const units = new Set(empty.map((r) => r.u).filter(Boolean));
+    const unitless = empty.some((r) => !r.u);
+    return unplaced().filter((u) => {
+      const tail = String(u).replace(/^-?\d+(?:\.\d+)?\s*/, "").trim();
+      return tail ? units.has(tail) : unitless;
+    });
+  };
+  const unreadRefusal = (left) => ({
+    status: "MISSING_INPUTS", query: q, id: top.id, name: top.name,
+    inputs: filled, unread: left,
+    missing: rows.filter((r) => !(r.d in filled)).map((r) => ({ key: r.d, label: r.l, unit: r.u || null })),
+    message: `"${top.name}" did not read ${left.join(", ")} from the question, and a box this answer would have left at its default is still empty. ` +
+      "Send the values to run_calculator directly, or name the field each one belongs to.",
+  });
   const recovered = Object.keys(filled);
   // A fill that is only a unit conversion nobody named does not corroborate
   // the route: "how many studs for a 40 ft wall..." reached siding-takeoff on
@@ -1906,7 +1965,9 @@ export async function answerQuery({ query } = {}) {
     try {
       const trial = await run({ id: top.id, inputs: coerceForCompute(filled, rows, await inputDefaults(top.id)) });
       if (trial && answers(trial.result) && !(trial.warnings || []).some((w) => w && (w.rule === "min" || w.rule === "max" || (w.rule === "missing" && numericKey(w.key))))) {
-        return { ...trial, status: "OK", query: q, name: top.name, via: "registry", ...(await disclose()) };
+        const left = ignoredValue();
+        return left.length ? unreadRefusal(left)
+          : { ...trial, status: "OK", query: q, name: top.name, via: "registry", ...(await disclose()) };
       }
       if (trial && trial.result && trial.result.error) refusal = trial.result.error;
     } catch { /* fall through to naming what is missing */ }
@@ -1915,7 +1976,9 @@ export async function answerQuery({ query } = {}) {
     try {
       const trial = await run({ id: top.id, inputs: coerceForCompute(filled, rows, await inputDefaults(top.id)) });
       if (trial && trial.result && !trial.result.error && !(trial.warnings || []).some((w) => w && (w.rule === "min" || w.rule === "max") && w.key in filled)) {
-        return { ...trial, status: "OK", query: q, name: top.name, via: "registry", ...(await disclose()) };
+        const left = ignoredValue();
+        return left.length ? unreadRefusal(left)
+          : { ...trial, status: "OK", query: q, name: top.name, via: "registry", ...(await disclose()) };
       }
       if (trial && trial.result && trial.result.error) refusal = trial.result.error;
     } catch { /* fall through to naming what is missing */ }
@@ -1983,6 +2046,8 @@ export async function answerQuery({ query } = {}) {
         message: `"${top.name}" did not answer from the values read from the question: ${out.result.error}`,
       };
     }
+    const left = ignoredValue();
+    if (left.length) return unreadRefusal(left);
     return { ...out, status: "OK", query: q, name: top.name, via: "registry", ...(await disclose()) };
   } catch (e) {
     return {
