@@ -87,3 +87,17 @@ test("a platform spec marked PROPOSED or BLOCKED fails once a test cites it", ()
   }
   assert.deepEqual(specStatusErrors({ word: "LANDED", span: "" }, [], new Set(), false, true), []);
 });
+
+test("CUT as a duplicate must name the live tile that does the work, in backticks", () => {
+  // A cut-as-duplicate spec is a claim that the work is already done
+  // elsewhere, and the claim is only checkable if a tool can read the id.
+  // Nine replacements were named in plain prose, so nothing could tell the
+  // claim from a dead pointer (2026-11-24).
+  assert.equal(errors(spec("CUT 2026-08-26: a duplicate of haversine, which already computes it.", "great-circle-distance")).length, 1);
+  assert.deepEqual(errors(spec("CUT 2026-08-26: a duplicate of `haversine`, which already computes it.", "great-circle-distance")), []);
+  // The replacement may be named in the blockquote lines that continue the
+  // status rather than inside the bold span: 25 specs do exactly that.
+  assert.deepEqual(errors("# Spec\n\n> **Status: CUT 2026-09-08 -- DUPLICATE. Not built.** The screen found it\n> already answered by `haversine` in `calc-survey.js`.\n\n## 1. The tile: `great-circle-distance`\n"), []);
+  // A cut for any other reason has no replacement to name.
+  assert.deepEqual(errors(spec("CUT 2026-10-05 (superseded; design never executed).", "great-circle-distance")), []);
+});

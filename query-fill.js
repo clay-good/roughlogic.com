@@ -246,7 +246,14 @@ export function labelTerms(labelLead) {
   // would be erased entirely by the 4-character floor below, leaving the field
   // with no terms and therefore unfillable by name. Keep it whole.
   const whole = cleaned.trim();
-  if (whole && whole.length >= 2 && whole.length <= 5 && !/\s/.test(whole)) out.add(whole);
+  // A label that IS one character -- "a", "b", "c" on the quadratic, "K", "E",
+  // "I", "G" on the span and wind screens -- was erased too, leaving 17 fields
+  // on 6 tiles with no terms at all and nothing able to name them
+  // (2026-11-24). Admitting the term is safe on its own: the MATCHING side
+  // still only lets a single letter through where the reader wrote it as a
+  // name, standing alone immediately before its own number, and the bare
+  // article "a" needs a second such letter beside it.
+  if (whole && whole.length >= 1 && whole.length <= 5 && !/\s/.test(whole)) out.add(whole);
   for (const raw of cleaned.split(/[^a-z]+/)) {
     // "Horizontal run" lost its "run" to the floor, so "14 ft run" had no
     // field to name (2026-11-23). The one three-letter dimension word stays.
@@ -433,6 +440,26 @@ export function queryFill(query, rows, opts) {
   // field name the reader typed from a unit it cannot read.
   const labelWords = new Set();
   for (const terms of termsByRow.values()) for (const w of terms) labelWords.add(w);
+
+  // ONE-CHARACTER labels: "a", "b", "c" on the quadratic, "K", "E", "I", "G"
+  // on the span and wind screens. Every term floor drops a single character,
+  // so those tiles recovered nothing at all (2026-11-24). A single letter is
+  // admitted only where the reader clearly wrote it as a name -- the letter
+  // stands alone immediately before its own number -- and the bare article
+  // "a" needs a second such letter to prove the question is in that shape at
+  // all, since "a 40 ft wall" is English, not a coefficient.
+  const soloLetters = new Set();
+  {
+    const named = new Set();
+    for (const r of numberRows) {
+      const l = String(r.l || "").toLowerCase();
+      if (/^[a-z]$/.test(l)) named.add(l);
+    }
+    for (const l of named) {
+      if (new RegExp("(?:^|[\\s,;(])" + l + "\\s*[-=:]?\\s*-?\\d").test(text)) soloLetters.add(l);
+    }
+    if (soloLetters.size < 2) soloLetters.delete("a");
+  }
 
   // Words from the tile's OWN NAME are not field names, and reading them as
   // field names loses the reader's first value: "joist hanger 20 ft 16 in"
@@ -890,6 +917,7 @@ export function queryFill(query, rows, opts) {
     // connectives everywhere else.
     for (const raw of String(window).toLowerCase().split(/[^a-z]+/)) {
       if (raw.length >= 2 && raw.length < 4 && labelWords.has(raw)) wanted.add(raw);
+      if (raw.length === 1 && soloLetters.has(raw)) wanted.add(raw);
     }
     // A name word is the calculator's name only as many times as the name spells it, and
     // only in the first window, where the name is written. "ceiling speaker coverage,

@@ -921,3 +921,20 @@ test("query-fill: a nominal lumber size never fills a box that asks for the dres
   assert.deepEqual(queryFill("board feet in 100 2x4 8 ft", bf).filled,
     { thickness_in: "2", width_in: "4", count: "100", length_ft: "8" });
 });
+
+test("query-fill: a one-character label is a name where the reader wrote it as one", () => {
+  // Every term floor drops a single character, so "a", "b", "c" on the
+  // quadratic and "E", "I" on the joist screen could never be named at all.
+  const quad = [num("a", "a"), num("b", "b"), num("c", "c")];
+  assert.deepEqual(queryFill("quadratic formula a 1, b -3, c 2", quad, { name: "Quadratic Formula" }).filled,
+    { a: "1", b: "-3", c: "2" });
+  const joist = [num("E_psi", "E", "psi"), num("I_in4", "I"), num("span_ft", "Span", "ft")];
+  assert.deepEqual(queryFill("joist deflection E 1600000 psi, I 98 in4, span 14 ft", joist).filled,
+    { E_psi: "1600000", I_in4: "98", span_ft: "14" });
+  // The hazard the guard exists for: "a" is the English article. A lone "a"
+  // before a number fills nothing unless a second solo letter proves the
+  // question is written in that shape.
+  const hazard = [num("a", "a"), num("len_ft", "Length", "ft")];
+  assert.deepEqual(queryFill("area of a 40 ft wall", hazard).filled, { len_ft: "40" });
+  assert.equal(queryFill("a 12 by 14 room needs how much", hazard).filled.a, undefined);
+});

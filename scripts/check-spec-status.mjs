@@ -36,10 +36,24 @@ import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
+// The whole leading blockquote the status lives in -- the bold span plus the
+// `>` lines that continue it, which is what a reader reads as "the status".
+// A CUT-as-duplicate spec often names its replacement in those continuation
+// lines rather than inside the bold part (2026-11-24).
+function statusBlock(text, at) {
+  const lines = text.slice(at).split("\n");
+  const out = [];
+  for (const l of lines) {
+    if (out.length && !/^>/.test(l)) break;
+    out.push(l);
+  }
+  return out.join("\n");
+}
+
 // The status word and the whole bold status span, which may wrap lines.
 export function parseStatus(text) {
   const canonical = text.match(/\*\*Status:\s*([A-Z]+)[\s\S]*?\*\*/);
-  if (canonical) return { word: canonical[1], span: canonical[0] };
+  if (canonical) return { word: canonical[1], span: canonical[0], block: statusBlock(text, canonical.index) };
 
   const alternate = text.match(/^>\s*Status:\s*\*\*([A-Z]+)[\s\S]*?\*\*/m);
   if (alternate) return { word: normalizeLegacyStatus(alternate[1]), span: alternate[0] };
@@ -68,7 +82,7 @@ const names = (span, id) => new RegExp("(^|[^a-z0-9-])" + id + "($|[^a-z0-9-])")
 
 // Errors for one spec. `catalog` is a Set of live tile ids; `built` is true
 // when a calc module carries this spec's section header.
-export function specStatusErrors({ word, span }, ids, catalog, built = false, tested = false) {
+export function specStatusErrors({ word, span, block }, ids, catalog, built = false, tested = false) {
   const live = ids.filter((id) => catalog.has(id));
   const missing = ids.filter((id) => !catalog.has(id));
   if (ids.length === 0) {
@@ -101,8 +115,27 @@ export function specStatusErrors({ word, span }, ids, catalog, built = false, te
   }
   if (word === "CUT") {
     const undisclosed = live.filter((id) => !names(span, id));
-    return undisclosed.length > 0
-      ? ["says CUT but " + undisclosed.map((i) => "`" + i + "`").join(", ") + " is in the catalog; name the collision in the status"]
+    if (undisclosed.length > 0) {
+      return ["says CUT but " + undisclosed.map((i) => "`" + i + "`").join(", ") + " is in the catalog; name the collision in the status"];
+    }
+    // A spec cut as a DUPLICATE is a claim that the work is already done
+    // elsewhere, and the claim is only checkable if it names the live tile
+    // that does it -- in backticks, so a tool can read it. Four such specs
+    // named their replacement in plain prose (`flood-cut-quantity`,
+    // `ev-charger-load`, `pv-interconnection-busbar` and six others), so
+    // nothing could tell the claim from a dead pointer; if one of those tiles
+    // were ever retired, the spec would go on asserting a capability the
+    // catalog had lost (2026-11-24). A cut for any other reason -- superseded,
+    // a design never executed -- is exempt, since there is no replacement to
+    // name.
+    // Only where the work landed under a DIFFERENT id. When one of the spec's
+    // own ids is itself live, the collision rule above has already made the
+    // spec name it, and the live tile IS the replacement.
+    const duplicate = live.length === 0
+      && /\b(duplicate|dupe|duplicates|overlapping|overlaps|collision|covered by)\b/i.test(span);
+    const namesLive = [...String(block || span).matchAll(/`([a-z0-9][a-z0-9-]*)`/g)].some((m) => catalog.has(m[1]));
+    return duplicate && !namesLive
+      ? ["says CUT as a duplicate but names no live tile in backticks; name the tile that already computes it, e.g. \"a duplicate of `live-id`\""]
       : [];
   }
   return [];
