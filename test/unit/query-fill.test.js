@@ -864,3 +864,27 @@ test("query-fill: a label written WHOLE beats one that only shares a word", () =
   const pv = [num("module_voc_V", "Module Voc", "v"), num("inverter_mppt_max_V", "Inverter MPPT max", "v"), num("inverter_vdc_max_V", "Inverter Vdc max", "v")];
   assert.deepEqual(queryFill("inverter 49", pv).filled, {});
 });
+
+test("query-fill: a whole label written as a phrase beats labels that differ by a letter", () => {
+  // Three labels differing by one letter: the term floor drops a one-character
+  // word and "voltage" names all three, so the tile recovered nothing.
+  const vi = [num("va", "Line A voltage", "v"), num("vb", "Line B voltage", "v"), num("vc", "Line C voltage", "v")];
+  assert.deepEqual(queryFill("Voltage Imbalance Line A voltage 480 v, Line B voltage 475 v, Line C voltage 470 v", vi,
+    { name: "Voltage Imbalance" }).filled, { va: "480", vb: "475", vc: "470" });
+  // Two words at least: a one-word label is a word the reader may have
+  // written for any reason, and the short field must not take it.
+  const pr = [num("p", "Principal", "usd"), num("x", "Extra principal per month", "usd")];
+  assert.deepEqual(queryFill("loan extra principal 100", pr).filled, {});
+});
+
+test("query-fill: scientific notation is written out before the number is read", async () => {
+  const { rewriteQuery } = await import("../../query-fill.js");
+  assert.equal(rewriteQuery("coefficient c 8.5663516e-8"), "coefficient c 0.000000085663516");
+  assert.equal(rewriteQuery("a 1.2e3 load"), "a 1200 load");
+  assert.equal(rewriteQuery("value 5e-3 and 2e+2"), "value 0.005 and 200");
+  // Past what the expansion can write exactly, the number is left as written.
+  assert.equal(rewriteQuery("x 3e-40"), "x 3e-40");
+  assert.equal(rewriteQuery("awg 12 e"), "awg 12 e");
+  const sh = [num("coeff_c", "Coefficient C"), num("r_ohm", "Measured resistance", "ohm")];
+  assert.equal(queryFill("Coefficient C 8.5663516e-8, Measured resistance 10000 ohm", sh).filled.coeff_c, "0.000000085663516");
+});

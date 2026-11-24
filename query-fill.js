@@ -41,6 +41,24 @@ import { verifyShard } from "./integrity.js";
 // Each entry is a real spelling people type. Order matters: the more specific
 // patterns run first so `8'6"` is not first mangled by the `3/4"` rule.
 const REWRITES = [
+  // Scientific notation, written out. `extractQuantities` stops the number at
+  // the "e" and reads the exponent as a unit, so a Steinhart-Hart coefficient
+  // of 8.5663516e-8 filled as 8.5663516 -- a value eight orders of magnitude
+  // wrong, and the only wrong value in the named lens once the whole-label
+  // rule made that field reachable at all (2026-11-23). Expanded here, before
+  // the scanner, rather than by widening the catalog's one number pattern:
+  // that pattern also feeds search, where a trailing "e" is a word.
+  //
+  // Bounded to exponents the expansion can write exactly. Past that the
+  // number is left as it was and goes unread, which the door now reports.
+  [/\b(\d+(?:\.\d+)?)e([+-]?\d{1,2})\b/g, (m, n, e) => {
+    const exp = Number(e);
+    if (!Number.isFinite(exp) || exp > 15 || exp < -15) return m;
+    const v = Number(n) * Math.pow(10, exp);
+    if (!Number.isFinite(v) || v === 0) return m;
+    const out = Math.abs(exp) > 6 ? v.toFixed(20).replace(/0+$/, "") : String(v);
+    return /e/i.test(out) ? m : out;
+  }],
   // A rainfall or infiltration rate: "3 in per hour" is 3 in/hr (2026-11-23).
   [/\b(\d+(?:\.\d+)?)\s*(?:in|inch|inches)\s*(?:per|an|a|\/)\s*(?:hour|hr|h)\b/g, (m, n) => `${n} in/hr`],
   // An electricity price is quoted in cents: "$0.15 per kwh" is 15 cents
@@ -967,6 +985,27 @@ export function queryFill(query, rows, opts) {
     // per month". The longer label's other words were not written, and every
     // word that was belongs to the short one, so it is that field (2026-11-15).
     // "extra principal 100" names neither exactly, and stays ambiguous.
+    // The strongest name evidence there is: the field's WHOLE LABEL, written
+    // as a phrase, right where the number is. "Line A voltage 480 v, Line B
+    // voltage 475 v, Line C voltage 470 v" filled nothing -- the three labels
+    // differ only by a single letter, the term floor drops a one-character
+    // word, and "voltage" names all three (2026-11-23: 15 tiles recovered
+    // NOTHING for this reason, among them the phase-imbalance,
+    // neutral-current and ruling-span screens).
+    //
+    // Two words at least. A one-word label is a word the reader may have
+    // written for any reason: "loan extra principal 100" holds "principal"
+    // and means the extra one, and this rule must not hand it the short
+    // field -- which is what the tie-break below already refuses.
+    if (hits.length > 1) {
+      const flat = (t) => String(t).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean).join(" ");
+      const said = ` ${flat(window)} `;
+      const spelled = hits.filter((k) => {
+        const l = flat((rows.find((r) => r.d === k) || {}).l || "");
+        return l.split(" ").length > 1 && said.includes(` ${l} `);
+      });
+      if (spelled.length === 1) hits.splice(0, hits.length, spelled[0]);
+    }
     if (hits.length > 1) {
       // Literal words only: shorthand ("w" -> power) is a unit, not a name the reader wrote,
       // and a word inside a select option written in the query ("power-ratio") is that
