@@ -161,10 +161,10 @@ FIRESPRINKLER_RENDERERS["sprinkler-system-demand"] = _simpleRenderer({
   citation: "Citation: NFPA 13 (Standard for the Installation of Sprinkler Systems), 2022: sprinkler demand = density x design area, total demand = sprinkler demand + inside/outside hose-stream allowance, stored volume = total demand x duration. Hazard-class defaults are editable: Light 0.10 gpm/ft^2 over 1,500 ft^2 with 100 gpm hose for 30 min; Ordinary Group 1 0.15 / 1,500 / 250 / 60-90; Ordinary Group 2 0.20 / 1,500 / 250 / 60-90. This is the area/density screening demand (not the NFPA 13 pipe-schedule method, which has its own supply table) -- a full hydraulic calculation to the most-remote area including friction and elevation yields the governing demand and is a separate analysis. The density / area / duration come from the applicable NFPA 13 density-area curve for the actual commodity and storage arrangement; storage and special occupancies (ESFR, high-piled, in-rack) use their own criteria. A design aid, not a stamped hydraulic submittal -- a qualified fire-protection engineer and the AHJ govern.",
   example: sprinklerSystemDemandExample.inputs,
   fields: [
-    { key: "density", label: "Design density (gpm/ft²)", kind: "number" },
-    { key: "design_area", label: "Hydraulic design area (ft²)", kind: "number" },
+    { key: "density", label: "Design density (gpm/ft²)", kind: "number", whenBlank: 0.2 },
+    { key: "design_area", label: "Hydraulic design area (ft²)", kind: "number", whenBlank: 1500 },
     { key: "hose_gpm", label: "Hose-stream allowance (gpm)", kind: "number", default: 250 },
-    { key: "duration_min", label: "Required supply duration (min)", kind: "number" },
+    { key: "duration_min", label: "Required supply duration (min)", kind: "number", whenBlank: 90 },
   ],
   outputs: [
     { key: "sg", id: "ssd-out-sg", label: "Sprinkler demand", value: (r) => fmt(r.sprinkler_gpm, 0) + " gpm" },
@@ -206,7 +206,7 @@ FIRESPRINKLER_RENDERERS["sprinkler-protection-area-for-supply"] = _simpleRendere
   example: sprinklerProtectionAreaForSupplyExample.inputs,
   fields: [
     { key: "available_supply_gpm", label: "Available water supply (gpm)", kind: "number" },
-    { key: "density", label: "Design density (gpm/ft²)", kind: "number" },
+    { key: "density", label: "Design density (gpm/ft²)", kind: "number", whenBlank: 0.2 },
     { key: "hose_gpm", label: "Hose-stream allowance (gpm)", kind: "number", default: 250 },
   ],
   outputs: [
@@ -254,8 +254,8 @@ FIRESPRINKLER_RENDERERS["sprinkler-head-layout"] = _simpleRenderer({
   fields: [
     { key: "room_length", label: "Room length (ft)", kind: "number" },
     { key: "room_width", label: "Room width (ft)", kind: "number" },
-    { key: "area_per_head", label: "Max protection area per head (ft²)", kind: "number" },
-    { key: "max_spacing", label: "Max spacing between heads (ft)", kind: "number" },
+    { key: "area_per_head", label: "Max protection area per head (ft²)", kind: "number", whenBlank: 130 },
+    { key: "max_spacing", label: "Max spacing between heads (ft)", kind: "number", whenBlank: 15 },
   ],
   outputs: [
     { key: "sp", id: "shl-out-sp", label: "Governing spacing", value: (r) => fmt(r.spacing, 2) + " ft" },
@@ -295,7 +295,7 @@ FIRESPRINKLER_RENDERERS["sprinkler-pressure-demand"] = _simpleRenderer({
   example: sprinklerPressureDemandExample.inputs,
   fields: [
     { key: "q_head_gpm", label: "Flow at most remote head (gpm)", kind: "number" },
-    { key: "k_factor", label: "Sprinkler K-factor (gpm/psi^0.5)", kind: "number" },
+    { key: "k_factor", label: "Sprinkler K-factor (gpm/psi^0.5)", kind: "number", whenBlank: 5.6 },
     { key: "q_total_gpm", label: "Total flow through governing run (gpm)", kind: "number" },
     { key: "pipe_id_in", label: "Pipe internal diameter (in)", kind: "number" },
     { key: "c_factor", label: "Hazen-Williams C (steel 120 wet / 100 dry or preaction; 150 CPVC; 100 CI)", kind: "number", default: 120 },
@@ -355,7 +355,7 @@ FIRESPRINKLER_RENDERERS["smoke-detector-spacing-count"] = _simpleRenderer({
   fields: [
     { key: "room_length_ft", label: "Room length (ft)", kind: "number" },
     { key: "room_width_ft", label: "Room width (ft)", kind: "number" },
-    { key: "listed_spacing_ft", label: "Device listed spacing (ft)", kind: "number" },
+    { key: "listed_spacing_ft", label: "Device listed spacing (ft)", kind: "number", whenBlank: 30 },
   ],
   outputs: [
     { key: "d", id: "sds-out-d", label: "Detectors", value: (r) => fmt(r.detectors, 0) + " " + (fmt(r.detectors, 0) === "1" ? "detector" : "detectors") + " (" + fmt(r.rows, 0) + " x " + fmt(r.cols, 0) + " grid)" },
@@ -390,8 +390,8 @@ FIRESPRINKLER_RENDERERS["drypipe-air-compressor"] = _simpleRenderer({
   citation: "Citation: dry-pipe air compressor free-air CFM by name (NFPA 13 restore-time rule). free air = (system gal / 7.48) x (normal psig / 14.7) / restore minutes; restore within 30 min (60 for some systems). A listed air-maintenance device is required; the compressor rating at pressure and the AHJ govern.",
   example: drypipeAirCompressorExample.inputs,
   fields: [
-    { key: "dry_volume_gal", label: "Dry system volume (gal, from pipe schedule)", kind: "number" },
-    { key: "normal_pressure_psig", label: "Normal air pressure (psig)", kind: "number" },
+    { key: "dry_volume_gal", label: "Dry system volume (gal, from pipe schedule)", kind: "number", whenBlank: 400 },
+    { key: "normal_pressure_psig", label: "Normal air pressure (psig)", kind: "number", whenBlank: 40 },
     { key: "restore_minutes", label: "Restore time (min, NFPA 13 <= 30)", kind: "number", default: 30 },
   ],
   outputs: [
@@ -432,8 +432,8 @@ FIRESPRINKLER_RENDERERS["jockey-pump-sizing"] = _simpleRenderer({
   citation: "Citation: jockey (pressure-maintenance) pump sizing by name (NFPA 20). jockey flow ~1% of the fire pump (>= 1 gpm); jockey stop = churn + min static; jockey start = stop - 10; fire-pump start = jockey start - 5 (staggered). A settings guide; NFPA 20 and the AHJ govern.",
   example: jockeyPumpSizingExample.inputs,
   fields: [
-    { key: "fire_pump_gpm", label: "Fire pump rated flow (gpm)", kind: "number" },
-    { key: "churn_psi", label: "Fire pump churn / shutoff pressure (psi)", kind: "number" },
+    { key: "fire_pump_gpm", label: "Fire pump rated flow (gpm)", kind: "number", whenBlank: 750 },
+    { key: "churn_psi", label: "Fire pump churn / shutoff pressure (psi)", kind: "number", whenBlank: 120 },
     { key: "min_static_psi", label: "Minimum static supply pressure (psi)", kind: "number", default: 50 },
   ],
   outputs: [
@@ -494,12 +494,12 @@ FIRESPRINKLER_RENDERERS["stairwell-pressurization"] = _simpleRenderer({
   example: stairwellPressurizationExample.inputs,
   fields: [
     { key: "leakage_area_sqft", label: "Total effective leakage area (sq ft)", kind: "number" },
-    { key: "pressure_inwg", label: "Design pressure difference (in. w.g.)", kind: "number" },
+    { key: "pressure_inwg", label: "Design pressure difference (in. w.g.)", kind: "number", whenBlank: 0.15 },
     { key: "door_width_ft", label: "Door width (ft)", kind: "number" },
     { key: "door_height_ft", label: "Door height (ft)", kind: "number" },
-    { key: "knob_setback_in", label: "Knob setback from the latch edge (in)", kind: "number" },
+    { key: "knob_setback_in", label: "Knob setback from the latch edge (in)", kind: "number", whenBlank: 3 },
     { key: "closer_force_lbf", label: "Door closer force (lbf)", kind: "number", default: 10 },
-    { key: "force_limit_lbf", label: "Opening-force limit (lbf)", kind: "number" },
+    { key: "force_limit_lbf", label: "Opening-force limit (lbf)", kind: "number", whenBlank: 30 },
   ],
   outputs: [
     { key: "q", id: "stpr-out-q", label: "Required pressurization airflow", value: (r) => fmt(r.airflow_cfm, 0) + " cfm" },
@@ -548,7 +548,7 @@ FIRESPRINKLER_RENDERERS["fire-tank-sizing"] = _simpleRenderer({
   fields: [
     { key: "sprinkler_demand_gpm", label: "Sprinkler demand at the point of connection (gpm)", kind: "number" },
     { key: "hose_allowance_gpm", label: "Hose stream allowance (gpm)", kind: "number" },
-    { key: "duration_min", label: "Required duration (min)", kind: "number" },
+    { key: "duration_min", label: "Required duration (min)", kind: "number", whenBlank: 60 },
     { key: "unusable_fraction", label: "Unusable fraction of tank volume (0-1)", kind: "number", default: 0.08 },
     { key: "refill_gpm", label: "Refill rate (gpm)", kind: "number" },
   ],

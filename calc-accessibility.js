@@ -175,7 +175,7 @@ ACCESSIBILITY_RENDERERS["accessible-parking-count"] = _simpleRenderer({
   example: accessibleParkingCountExample.inputs,
   fields: [
     { key: "total_spaces", label: "Parking spaces in ONE parking facility", kind: "number" },
-    { key: "facility_count", label: "Number of such facilities (separate lots) on the site", kind: "number" },
+    { key: "facility_count", label: "Number of such facilities (separate lots) on the site", kind: "number", whenBlank: 1 },
     { key: "provided_accessible", label: "Accessible spaces provided (site total)", kind: "number" },
     { key: "provided_van", label: "Of those, van spaces provided", kind: "number" },
   ],
@@ -442,8 +442,8 @@ ACCESSIBILITY_RENDERERS["protruding-object-check"] = _simpleRenderer({
     { key: "leading_edge_height_in", label: "Leading edge height above the finish floor (in)", kind: "number" },
     { key: "projection_in", label: "Horizontal projection into the path (in)", kind: "number" },
     { key: "corridor_width_in", label: "Circulation path width before the object (in)", kind: "number" },
-    { key: "required_route_width_in", label: "Clear width the route requires (in)", kind: "number" },
-    { key: "vertical_clearance_in", label: "Vertical clearance (headroom) along the path (in)", kind: "number" },
+    { key: "required_route_width_in", label: "Clear width the route requires (in)", kind: "number", whenBlank: 36 },
+    { key: "vertical_clearance_in", label: "Vertical clearance (headroom) along the path (in)", kind: "number", whenBlank: 80 },
     { key: "barrier_edge_height_in", label: "Barrier leading edge height, if headroom is under 80 in (in; 0 = none)", kind: "number" },
   ],
   outputs: [
@@ -651,9 +651,9 @@ ACCESSIBILITY_RENDERERS["door-clear-width"] = _simpleRenderer({
   example: doorClearWidthExample.inputs,
   fields: [
     { key: "leaf_width_in", label: "Door leaf width (in)", kind: "number" },
-    { key: "door_thickness_in", label: "Door thickness (in)", kind: "number" },
+    { key: "door_thickness_in", label: "Door thickness (in)", kind: "number", whenBlank: 1.75 },
     { key: "measured_clear_width_in", label: "MEASURED clear opening at 90 degrees (in; 0 = use the estimate)", kind: "number" },
-    { key: "opening_depth_in", label: "Depth of the opening (in)", kind: "number" },
+    { key: "opening_depth_in", label: "Depth of the opening (in)", kind: "number", whenBlank: 5 },
     { key: "is_alteration", label: "Alteration to an existing building?", kind: "select", options: [{ value: "no", label: "No - new construction", selected: true }, { value: "yes", label: "Yes" }] },
     { key: "latch_stop_projection_in", label: "Latch-side stop projection into the opening (in)", kind: "number" },
     { key: "threshold_height_in", label: "Threshold height (in)", kind: "number" },
@@ -755,7 +755,7 @@ ACCESSIBILITY_RENDERERS["floor-level-change"] = _simpleRenderer({
   fields: [
     { key: "level_change_in", label: "Change in level (in)", kind: "number" },
     { key: "bevel_run_in", label: "Horizontal run of the transition provided (in)", kind: "number" },
-    { key: "ramp_run_per_rise", label: "Ramp run per unit rise, where a ramp is required (12 = 1:12)", kind: "number" },
+    { key: "ramp_run_per_rise", label: "Ramp run per unit rise, where a ramp is required (12 = 1:12)", kind: "number", whenBlank: 12 },
     { key: "carpet_pile_in", label: "Carpet pile height (in; 0 = no carpet)", kind: "number" },
     { key: "opening_size_in", label: "Largest opening in the surface (in; 0 = none)", kind: "number" },
     { key: "opening_elongated", label: "Is the opening elongated?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },

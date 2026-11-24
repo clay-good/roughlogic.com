@@ -2353,7 +2353,7 @@ MECHANIC_RENDERERS["injector-max-hp"] = _simpleRenderer({
     { key: "inj_flow", label: "Injector static flow", kind: "number" },
     { key: "flow_unit", label: "Flow unit", kind: "select", options: [{ value: "lbh", label: "lb/h" }, { value: "ccmin", label: "cc/min" }], default: "lbh" },
     { key: "n_cyl", label: "Number of injectors", kind: "number", attrs: { step: "1", min: "1" } },
-    { key: "duty", label: "Maximum duty cycle (0-1)", kind: "number" },
+    { key: "duty", label: "Maximum duty cycle (0-1)", kind: "number", whenBlank: 0.8 },
     { key: "bsfc", label: "BSFC (lb/hp-h; 0.50 NA, 0.55-0.65 boost)", kind: "number", default: 0.5 },
   ],
   outputs: [
@@ -2418,7 +2418,7 @@ MECHANIC_RENDERERS["max-rpm-from-piston-speed"] = _simpleRenderer({
   example: maxRpmFromPistonSpeedExample.inputs,
   fields: [
     { key: "stroke_in", label: "Crankshaft stroke (in)", kind: "number" },
-    { key: "mps_limit_fpm", label: "Mean-piston-speed limit (ft/min)", kind: "number" },
+    { key: "mps_limit_fpm", label: "Mean-piston-speed limit (ft/min)", kind: "number", whenBlank: 4000 },
   ],
   outputs: [
     { key: "r", id: "mrps-out-r", label: "Maximum safe RPM", value: (r) => fmt(r.rpm_max, 0) + " rpm" },
@@ -2515,7 +2515,7 @@ MECHANIC_RENDERERS["hydraulic-pump-horsepower"] = _simpleRenderer({
   fields: [
     { key: "gpm", label: "Pump flow (gpm)", kind: "number" },
     { key: "psi", label: "Working pressure (psi)", kind: "number" },
-    { key: "efficiency", label: "Overall pump efficiency (0-1)", kind: "number" },
+    { key: "efficiency", label: "Overall pump efficiency (0-1)", kind: "number", whenBlank: 0.85 },
   ],
   outputs: [
     { key: "fh", id: "hph-out-fh", label: "Fluid horsepower", value: (r) => fmt(r.fluid_hp, 1) + " HP" },
@@ -2550,7 +2550,7 @@ MECHANIC_RENDERERS["hydraulic-drive-flow-limit"] = _simpleRenderer({
   fields: [
     { key: "drive_hp", label: "Available drive horsepower (HP)", kind: "number" },
     { key: "psi", label: "Working pressure (psi)", kind: "number" },
-    { key: "efficiency", label: "Overall pump efficiency (0-1)", kind: "number" },
+    { key: "efficiency", label: "Overall pump efficiency (0-1)", kind: "number", whenBlank: 0.85 },
   ],
   outputs: [
     { key: "q", id: "hdfl-out-q", label: "Max flow", value: (r) => fmt(r.max_gpm, 1) + " gpm" },
@@ -2589,8 +2589,8 @@ MECHANIC_RENDERERS["hydraulic-motor-torque-speed"] = _simpleRenderer({
     { key: "psi", label: "Pressure differential (psi)", kind: "number" },
     { key: "disp_in3", label: "Motor displacement (in³/rev)", kind: "number" },
     { key: "gpm", label: "Supply flow (gpm)", kind: "number" },
-    { key: "mech_eff", label: "Mechanical efficiency (0-1)", kind: "number" },
-    { key: "vol_eff", label: "Volumetric efficiency (0-1)", kind: "number" },
+    { key: "mech_eff", label: "Mechanical efficiency (0-1)", kind: "number", whenBlank: 0.9 },
+    { key: "vol_eff", label: "Volumetric efficiency (0-1)", kind: "number", whenBlank: 0.95 },
   ],
   outputs: [
     { key: "t", id: "hmt-out-t", label: "Output torque", value: (r) => fmt(r.torque_inlb, 0) + " in-lb" },
@@ -2625,7 +2625,7 @@ MECHANIC_RENDERERS["hydraulic-pump-flow"] = _simpleRenderer({
   fields: [
     { key: "disp_in3", label: "Pump displacement (in³/rev)", kind: "number" },
     { key: "rpm", label: "Drive speed (rpm)", kind: "number" },
-    { key: "vol_eff", label: "Volumetric efficiency (0-1)", kind: "number" },
+    { key: "vol_eff", label: "Volumetric efficiency (0-1)", kind: "number", whenBlank: 0.95 },
   ],
   outputs: [
     { key: "qa", id: "hpf-out-qa", label: "Delivered flow", value: (r) => fmt(r.q_actual_gpm, 2) + " gpm" },
@@ -2698,7 +2698,7 @@ MECHANIC_RENDERERS["prop-pitch-selection"] = _simpleRenderer({
     { key: "current_pitch_in", label: "Current prop pitch (in)", kind: "number" },
     { key: "current_wot_rpm", label: "Measured WOT RPM now", kind: "number" },
     { key: "target_wot_rpm", label: "Target WOT RPM (rated band)", kind: "number" },
-    { key: "rpm_per_inch", label: "RPM change per inch of pitch", kind: "number" },
+    { key: "rpm_per_inch", label: "RPM change per inch of pitch", kind: "number", whenBlank: 200 },
   ],
   outputs: [
     { key: "np", id: "pps-out-np", label: "New pitch", value: (r) => fmt(r.new_pitch_in, 1) + " in (" + (r.pitch_change_in === 0 ? "keep this pitch, WOT RPM is on target" : r.lower ? "lower pitch, engine was under-revving" : "higher pitch, engine was over-revving") + ")" },
@@ -2775,8 +2775,8 @@ MECHANIC_RENDERERS["alternator-charging-load"] = _simpleRenderer({
   fields: [
     { key: "total_load_a", label: "Total continuous electrical load (A)", kind: "number" },
     { key: "alternator_a", label: "Alternator rated output (A)", kind: "number" },
-    { key: "idle_frac", label: "Output fraction at idle (0-1)", kind: "number" },
-    { key: "cruise_frac", label: "Output fraction at cruise (0-1)", kind: "number" },
+    { key: "idle_frac", label: "Output fraction at idle (0-1)", kind: "number", whenBlank: 0.5 },
+    { key: "cruise_frac", label: "Output fraction at cruise (0-1)", kind: "number", whenBlank: 0.9 },
   ],
   outputs: [
     { key: "idle", id: "acl-out-idle", label: "Idle: output / balance", value: (r) => fmt(r.idle_out_a, 0) + " A / " + (r.idle_ok ? "+" : "") + fmt(r.idle_balance_a, 0) + " A " + (r.idle_ok ? "(surplus)" : "(DEFICIT -- drains at idle)") },
@@ -2877,7 +2877,7 @@ MECHANIC_RENDERERS["density-altitude"] = _simpleRenderer({
   example: densityAltitudeExample.inputs,
   fields: [
     { key: "field_elevation_ft", label: "Field / station elevation (ft)", kind: "number" },
-    { key: "altimeter_in_hg", label: "Altimeter setting (in Hg)", kind: "number" },
+    { key: "altimeter_in_hg", label: "Altimeter setting (in Hg)", kind: "number", whenBlank: 29.92 },
     { key: "oat_f", required: true, label: "Outside air temperature (°F)", kind: "number", default: 59 },
     { key: "relative_humidity_pct", label: "Relative humidity (%, blank for dry air)", kind: "number", attrs: { step: "any", min: "0", max: "100" } },
   ],
@@ -3138,7 +3138,7 @@ MECHANIC_RENDERERS["turbo-pressure-ratio"] = _simpleRenderer({
     { key: "boost_psi", label: "Target boost (psi, gauge)", kind: "number" },
     { key: "ambient_psia", label: "Ambient pressure (psia, 14.7 at sea level)", kind: "number", default: 14.7 },
     { key: "inlet_temp_f", label: "Compressor inlet air temp (°F)", kind: "number" },
-    { key: "compressor_eff_pct", label: "Compressor isentropic efficiency (%)", kind: "number" },
+    { key: "compressor_eff_pct", label: "Compressor isentropic efficiency (%)", kind: "number", whenBlank: 70 },
   ],
   outputs: [
     { key: "pr", id: "tpr-out-pr", label: "Pressure ratio", value: (r) => fmt(r.pr, 2) },
@@ -3186,7 +3186,7 @@ MECHANIC_RENDERERS["turbo-max-boost-for-charge-temp"] = _simpleRenderer({
   fields: [
     { key: "max_charge_temp_f", label: "Charge-air temperature limit (°F)", kind: "number" },
     { key: "inlet_temp_f", required: true, label: "Compressor inlet air temp (°F)", kind: "number" },
-    { key: "compressor_eff_pct", label: "Compressor isentropic efficiency (%)", kind: "number" },
+    { key: "compressor_eff_pct", label: "Compressor isentropic efficiency (%)", kind: "number", whenBlank: 70 },
     { key: "ambient_psia", label: "Ambient pressure (psia, 14.7 at sea level)", kind: "number", default: 14.7 },
   ],
   outputs: [
@@ -3859,9 +3859,9 @@ MECHANIC_RENDERERS["dynamic-compression-ratio"] = _simpleRenderer({
   fields: [
     { key: "bore_in", label: "Bore (in)", kind: "number" },
     { key: "stroke_in", label: "Stroke (in)", kind: "number" },
-    { key: "rod_length_in", label: "Rod length (in, center-to-center)", kind: "number" },
-    { key: "static_cr", label: "Static compression ratio", kind: "number" },
-    { key: "ivc_abdc_deg", label: "Intake valve closing (deg ABDC, at checking lash)", kind: "number" },
+    { key: "rod_length_in", label: "Rod length (in, center-to-center)", kind: "number", whenBlank: 6 },
+    { key: "static_cr", label: "Static compression ratio", kind: "number", whenBlank: 10.5 },
+    { key: "ivc_abdc_deg", label: "Intake valve closing (deg ABDC, at checking lash)", kind: "number", whenBlank: 60 },
   ],
   outputs: [
     { key: "d", id: "dcr-out-d", label: "Dynamic compression ratio", value: (r) => fmt(r.dynamic_cr, 2) + " : 1" },
@@ -3947,10 +3947,10 @@ MECHANIC_RENDERERS["hull-displacement"] = _simpleRenderer({
   citation: "Citation: hull displacement by Archimedes and the block coefficient, by name. Displacement volume = LWL x BWL x draft x Cb; weight = volume x water density (64.0 lb/ft^3 seawater, 62.4 fresh); long tons = weight/2240. Cb ~0.35-0.60 by hull form. A first-order block estimate; the lines drawing (Simpson's rule) and loaded trim govern, and the naval architect's hydrostatics rule.",
   example: hullDisplacementExample.inputs,
   fields: [
-    { key: "lwl_ft", label: "Waterline length LWL (ft)", kind: "number" },
-    { key: "bwl_ft", label: "Waterline beam BWL (ft)", kind: "number" },
-    { key: "draft_ft", label: "Canoe-body draft (ft; hull only, not the keel or skeg)", kind: "number" },
-    { key: "block_coefficient", label: "Block coefficient Cb (~0.35-0.60)", kind: "number" },
+    { key: "lwl_ft", label: "Waterline length LWL (ft)", kind: "number", whenBlank: 30 },
+    { key: "bwl_ft", label: "Waterline beam BWL (ft)", kind: "number", whenBlank: 10 },
+    { key: "draft_ft", label: "Canoe-body draft (ft; hull only, not the keel or skeg)", kind: "number", whenBlank: 4 },
+    { key: "block_coefficient", label: "Block coefficient Cb (~0.35-0.60)", kind: "number", whenBlank: 0.5 },
     { key: "water_density_pcf", label: "Water density (pcf: 64 sea, 62.4 fresh)", kind: "number", default: 64 },
   ],
   outputs: [
@@ -3991,9 +3991,9 @@ MECHANIC_RENDERERS["sailboat-performance-ratios"] = _simpleRenderer({
   citation: "Citation: sailboat performance ratios (sail area-to-displacement and displacement-to-length), by name. SA/D = sail area / (displacement/64)^(2/3); DLR = (displacement/2240) / (0.01 x LWL)^3. SA/D: <16 heavy, 16-20 moderate, >20 performance; DLR: <100 ultralight, 100-200 light, 200-300 moderate, >300 heavy. Comparative screens; the loaded displacement, measured sail/waterline, and a VPP analysis govern real performance.",
   example: sailboatPerformanceRatiosExample.inputs,
   fields: [
-    { key: "sail_area_sqft", label: "Sail area (sq ft)", kind: "number" },
+    { key: "sail_area_sqft", label: "Sail area (sq ft)", kind: "number", whenBlank: 500 },
     { key: "displacement_lb", label: "Displacement (lb)", kind: "number" },
-    { key: "lwl_ft", label: "Waterline length LWL (decimal ft: 26 ft 7 in is 26.58)", kind: "number" },
+    { key: "lwl_ft", label: "Waterline length LWL (decimal ft: 26 ft 7 in is 26.58)", kind: "number", whenBlank: 30 },
   ],
   outputs: [
     { key: "s", id: "spr-out-s", label: "Sail area / displacement", value: (r) => fmt(r.sa_d_ratio, 1) + " (" + r.sa_d_class + ")" },
@@ -4032,9 +4032,9 @@ MECHANIC_RENDERERS["flywheel-energy"] = _simpleRenderer({
   citation: "Citation: flywheel stored kinetic energy and speed fluctuation, by name. I = (W/g) k^2; omega = rpm x pi/30; KE = 1/2 I omega^2; coefficient of fluctuation Cs = energy pulse / (I omega^2) = pulse / (2 KE). Radius of gyration k: disk = radius/sqrt(2), rim ~ radius. Target Cs ~0.002 (generators) to 0.2 (punches/shears). The actual inertia, the load's energy profile, and the drive govern.",
   example: flywheelEnergyExample.inputs,
   fields: [
-    { key: "weight_lb", label: "Flywheel weight (lb)", kind: "number" },
-    { key: "radius_of_gyration_ft", label: "Radius of gyration k (ft): disk r/1.414, rim ~r", kind: "number" },
-    { key: "rpm", label: "Speed (rpm)", kind: "number" },
+    { key: "weight_lb", label: "Flywheel weight (lb)", kind: "number", whenBlank: 100 },
+    { key: "radius_of_gyration_ft", label: "Radius of gyration k (ft): disk r/1.414, rim ~r", kind: "number", whenBlank: 1 },
+    { key: "rpm", label: "Speed (rpm)", kind: "number", whenBlank: 1000 },
     { key: "energy_fluctuation_ftlb", label: "Energy pulse per cycle (ft-lb, 0 to skip)", kind: "number", default: 0 },
   ],
   outputs: [
@@ -4155,7 +4155,7 @@ MECHANIC_RENDERERS["injector-flow-at-pressure"] = _simpleRenderer({
   fields: [
     { key: "rated_flow_ccmin", label: "Rated injector flow (cc/min)", kind: "number" },
     { key: "rated_pressure_psi", label: "Rated at pressure (psi; 43.5 = 3 bar)", kind: "number", default: 43.5 },
-    { key: "rail_pressure_psi", label: "Actual rail pressure (psi)", kind: "number" },
+    { key: "rail_pressure_psi", label: "Actual rail pressure (psi)", kind: "number", whenBlank: 43.5 },
     { key: "manifold_pressure_psig", label: "Manifold pressure (psig; + boost, - vacuum)", kind: "number", default: 0 },
     { key: "system_type", label: "Fuel system", kind: "select", options: [{ value: "returnless", label: "Returnless (fixed rail pressure)", selected: true }, { value: "return", label: "Return (manifold-referenced regulator)" }] },
   ],
@@ -4248,8 +4248,8 @@ MECHANIC_RENDERERS["belt-deflection-tension"] = _simpleRenderer({
     { key: "rec_min_force_lb", label: "Maker's recommended min force (lb)", kind: "number" },
     { key: "rec_max_force_lb", label: "Maker's recommended max force (lb)", kind: "number" },
     { key: "belt_condition", label: "Belt condition", kind: "select", options: [{ value: "used", label: "Run-in (used) belt", selected: true }, { value: "new", label: "New belt (not yet seated)" }] },
-    { key: "new_belt_factor", label: "New-belt factor", kind: "number" },
-    { key: "belt_count", label: "Number of belts", kind: "number" },
+    { key: "new_belt_factor", label: "New-belt factor", kind: "number", whenBlank: 1.3 },
+    { key: "belt_count", label: "Number of belts", kind: "number", whenBlank: 1 },
   ],
   outputs: [
     { key: "s", id: "bdt-out-s", label: "Belt span", value: (r) => fmt(r.span_in, 2) + " in" },
@@ -4424,7 +4424,7 @@ MECHANIC_RENDERERS["carburetor-altitude-jetting"] = _simpleRenderer({
   citation: "Citation: the air-density ratio from the absolute pressure ratio times the inverse absolute-temperature ratio, and the carburetor jet-scaling relation in which fuel flow follows jet area times the square root of the venturi depression while required fuel follows air density -- so jet area scales as the square root of the density ratio and jet diameter as its fourth root, by name. A first-order correction for the MAIN circuit only. Altitude-compensating carburetors, forced induction, and closed-loop electronic control invalidate it. The engine manufacturer's altitude kit and specifications govern.",
   example: carburetorAltitudeJettingExample.inputs,
   fields: [
-    { key: "baseline_pressure_inhg", label: "Baseline absolute pressure (in Hg)", kind: "number" },
+    { key: "baseline_pressure_inhg", label: "Baseline absolute pressure (in Hg)", kind: "number", whenBlank: 29.92 },
     { key: "baseline_temp_f", required: true, label: "Baseline temperature (F)", kind: "number", default: 59, attrs: { step: "any" } },
     { key: "actual_pressure_inhg", label: "Actual absolute pressure (in Hg)", kind: "number" },
     { key: "actual_temp_f", required: true, label: "Actual temperature (F)", kind: "number", attrs: { step: "any" } },

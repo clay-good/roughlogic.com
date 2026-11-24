@@ -1248,7 +1248,7 @@ GAS_RENDERERS["propane-fill-outage"] = _simpleRenderer({
   citation: "Citation: maximum fill = water capacity x the filling limit; outage = the remainder; the expansion headroom uses liquid propane's roughly 1.5% per 10 degF. The applicable filling limit is temperature-corrected and differs between aboveground and underground containers. NFPA 58, the adopted fuel gas code, and the AHJ govern.",
   fields: [
     { key: "water_capacity_gal", label: "Water capacity (gal)" },
-    { key: "fill_limit_pct", label: "Filling limit (%)" },
+    { key: "fill_limit_pct", label: "Filling limit (%)", whenBlank: 80 },
     { key: "current_gauge_pct", label: "Current gauge reading (%)" },
     { key: "btu_per_gal", label: "Energy content (BTU/gal)" },
     { key: "liquid_temperature_f", label: "Liquid temperature (degF)", required: true, attrs: { step: "any" } },
@@ -1276,7 +1276,7 @@ GAS_RENDERERS["propane-regulator-sizing"] = _simpleRenderer({
   citation: "Citation: required flow = connected load / the fuel's energy content per cubic foot, compared against regulator capacities ENTERED from the manufacturer's table at each inlet pressure. Capacity is a function of the pressure across the regulator, so the first stage is sized at the minimum expected tank pressure. NFPA 58, the adopted fuel gas code, the regulator manufacturer, and the AHJ govern.",
   fields: [
     { key: "connected_load_btuh", label: "Connected load (BTU/h)" },
-    { key: "btu_per_ft3", label: "Energy content (BTU/cu ft)" },
+    { key: "btu_per_ft3", label: "Energy content (BTU/cu ft)", whenBlank: 2500 },
     { key: "capacity_at_min_inlet_cfh", label: "First stage capacity at the MINIMUM tank pressure (CFH)" },
     { key: "capacity_at_max_inlet_cfh", label: "First stage capacity at the maximum tank pressure (CFH, 0 to skip)" },
     { key: "second_stage_capacity_cfh", label: "Second stage capacity (CFH, 0 to skip)" },
@@ -1339,7 +1339,7 @@ GAS_RENDERERS["propane-run-time"] = _simpleRenderer({
   citation: "Citation: energy = gallons x the fuel's heat content; continuous run time = energy / connected load; the realistic figure divides by the duty cycle, and the schedule runs to the delivery trigger rather than to empty. The degree-day estimate uses the customer's own gallons-per-degree-day history. NFPA 58, the supplier's delivery practice, and the appliance manufacturers govern.",
   fields: [
     { key: "water_capacity_gal", label: "Water capacity (gal)" },
-    { key: "fill_limit_pct", label: "Filling limit (%)" },
+    { key: "fill_limit_pct", label: "Filling limit (%)", whenBlank: 80 },
     { key: "current_gauge_pct", label: "Current gauge reading (%)" },
     { key: "trigger_pct", label: "Delivery trigger (%)" },
     { key: "connected_load_btuh", label: "Connected load (BTU/h)" },

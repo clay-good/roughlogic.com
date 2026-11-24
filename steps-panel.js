@@ -25,14 +25,29 @@ export function stepRows(fields, params, r, humanize) {
   const inputKeys = new Set();
   for (const f of fields || []) {
     inputKeys.add(f.key);
-    const v = params ? params[f.key] : undefined;
+    let v = params ? params[f.key] : undefined;
+    // A BLANK box the calculator still computes with. The declarative factories
+    // read an empty, non-required number box as `undefined`, which is exactly
+    // what a destructuring default is for -- so the compute applies its own
+    // signature default, and this panel used to skip the row, leaving the
+    // number on no surface at all. A reader looking at an empty "Corner height
+    // (ft)" and a finished answer had no way to learn that 8 ft was used
+    // (2026-11-23; scripts/measure-phantom-defaults.mjs counts them, and
+    // scripts/check-blank-defaults.mjs holds each `whenBlank` to the value its
+    // compute actually declares). The box stays empty and the answer is
+    // unchanged -- only the disclosure is new, which is what this panel is for.
+    let applied = false;
+    if ((v === undefined || v === null || v === "") && typeof f.whenBlank === "number" && Number.isFinite(f.whenBlank)) {
+      v = f.whenBlank;
+      applied = true;
+    }
     if (v === undefined || v === null || v === "") continue;
     // A select's value is a code ("chlorine_gas", "B"); the reader chose the
     // option's text ("Chlorine gas (Cl2)", "Type B"), so print that.
     const opt = Array.isArray(f.options) ? f.options.find((o) => o && String(o.value) === String(v)) : null;
     const shown = opt && opt.label != null ? String(opt.label)
       : typeof v === "number" ? (Number.isFinite(v) ? stepNum(v) : null) : String(v);
-    if (shown !== null) rows.push({ section: "in", label: String(f.label), value: shown });
+    if (shown !== null) rows.push({ section: "in", label: String(f.label), value: applied ? shown + " (default, box left blank)" : shown });
   }
   for (const [k, v] of Object.entries(r)) {
     if (inputKeys.has(k) || typeof v !== "number" || !Number.isFinite(v)) continue;

@@ -123,7 +123,7 @@ STEELPANELZONE_RENDERERS["steel-panel-zone-shear"] = _simpleRenderer({
   citation: "Citation: AISC 360-16 Section J10.6 panel-zone shear: basic Rn = 0.60 Fy dc tw (Eq. J10-9); with panel-zone deformation in the analysis Rn = 0.60 Fy dc tw [1 + 3 bcf tcf^2/(db dc tw)] (Eq. J10-11); phiRn = 0.90 Rn; demand Vpz = sum(Mf)/(db - tf) - Vcol. The flange bonus is permitted only when the panel-zone deformation is modeled. A high column axial load (Pr > 0.4 Pc) reduces the strength further. A doubler plate is the fix. AISC 360 and the engineer of record govern.",
   example: steelPanelZoneShearExample.inputs,
   fields: [
-    { key: "fy_ksi", label: "Column yield Fy (ksi)", kind: "number" },
+    { key: "fy_ksi", label: "Column yield Fy (ksi)", kind: "number", whenBlank: 50 },
     { key: "col_depth_dc_in", label: "Column depth dc (in)", kind: "number" },
     { key: "col_web_tw_in", label: "Column web tw (in)", kind: "number" },
     { key: "col_flange_bcf_in", label: "Column flange width bcf (in)", kind: "number" },
@@ -183,7 +183,7 @@ STEELPANELZONE_RENDERERS["steel-doubler-plate"] = _simpleRenderer({
   example: steelDoublerPlateExample.inputs,
   fields: [
     { key: "required_shear_kip", label: "Panel-zone shear demand Vu (kip)", kind: "number" },
-    { key: "fy_ksi", label: "Column yield Fy (ksi)", kind: "number" },
+    { key: "fy_ksi", label: "Column yield Fy (ksi)", kind: "number", whenBlank: 50 },
     { key: "col_depth_dc_in", label: "Column depth dc (in)", kind: "number" },
     { key: "col_web_tw_in", label: "Existing column web tw (in)", kind: "number" },
     { key: "pz_depth_dz_in", label: "Panel-zone depth dz (in, ~ beam depth between flanges)", kind: "number" },
@@ -248,7 +248,7 @@ STEELPANELZONE_RENDERERS["steel-panel-zone-axial"] = _simpleRenderer({
   citation: "Citation: AISC 360-16 Section J10.6 panel-zone shear with column axial load: Pr <= 0.4 Pc -> Rn = 0.60 Fy dc tw (Eq. J10-9); Pr > 0.4 Pc -> x (1.4 - Pr/Pc) (Eq. J10-10); deformation-modeled: Pr <= 0.75 Pc -> Rn = 0.60 Fy dc tw [1 + 3 bcf tcf^2/(db dc tw)] (Eq. J10-11); Pr > 0.75 Pc -> x (1.9 - 1.2 Pr/Pc) (Eq. J10-12). Pc = Py = Fy Ag (LRFD); phiRn = 0.90 Rn. The flange bonus is permitted only when the panel-zone deformation is modeled. AISC 360 and the engineer of record govern.",
   example: steelPanelZoneAxialExample.inputs,
   fields: [
-    { key: "fy_ksi", label: "Column yield Fy (ksi)", kind: "number" },
+    { key: "fy_ksi", label: "Column yield Fy (ksi)", kind: "number", whenBlank: 50 },
     { key: "col_depth_dc_in", label: "Column depth dc (in)", kind: "number" },
     { key: "col_web_tw_in", label: "Column web tw (in)", kind: "number" },
     { key: "col_area_ag_in2", label: "Column gross area Ag (in²)", kind: "number" },

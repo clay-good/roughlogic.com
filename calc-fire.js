@@ -2205,7 +2205,7 @@ FIRE_RENDERERS["ppv-fan-sizing"] = _simpleRenderer({
   fields: [
     { key: "volume_cf", label: "Structure volume (cubic ft)", kind: "number" },
     { key: "fan_cfm", label: "Fan rated flow (cfm, free air)", kind: "number" },
-    { key: "entrainment_efficiency", label: "Entrainment efficiency (0-1)", kind: "number" },
+    { key: "entrainment_efficiency", label: "Entrainment efficiency (0-1)", kind: "number", whenBlank: 0.6 },
     { key: "remaining_fraction", label: "Target remaining fraction (0.10 = 90% clear)", kind: "number", default: 0.1 },
     { key: "target_time_min", label: "Target clearing time (min, 0 to skip)", kind: "number" },
   ],
@@ -2262,7 +2262,7 @@ FIRE_RENDERERS["hose-lay-section-count"] = _simpleRenderer({
   fields: [
     { key: "map_distance_ft", label: "Map distance to the objective (ft)", kind: "number" },
     { key: "slack_fraction", label: "Slack allowance (0.20 = 20%)", kind: "number", default: 0.2 },
-    { key: "section_length_ft", label: "Section length (ft)", kind: "number" },
+    { key: "section_length_ft", label: "Section length (ft)", kind: "number", whenBlank: 50 },
     { key: "hose_id_in", label: "Hose inside diameter (in)", kind: "number" },
     { key: "dry_weight_per_section_lb", label: "Dry weight per section (lb)", kind: "number" },
   ],
@@ -2320,9 +2320,9 @@ FIRE_RENDERERS["fdc-supply-check"] = _simpleRenderer({
   fields: [
     { key: "fdc_pressure_psi", label: "Pressure required at the connection (psi)", kind: "number" },
     { key: "total_flow_gpm", label: "Total flow (gpm)", kind: "number" },
-    { key: "lines", label: "Supply lines", kind: "number" },
+    { key: "lines", label: "Supply lines", kind: "number", whenBlank: 2 },
     { key: "line_length_ft", label: "Line length (ft)", kind: "number" },
-    { key: "friction_coefficient", label: "Friction coefficient C for the hose in use", kind: "number" },
+    { key: "friction_coefficient", label: "Friction coefficient C for the hose in use", kind: "number", whenBlank: 0.677 },
     { key: "elevation_ft", label: "Connection above the pump (ft, negative if below)", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [
@@ -2371,8 +2371,8 @@ FIRE_RENDERERS["radiant-exposure-separation"] = _simpleRenderer({
   example: radiantExposureSeparationExample.inputs,
   fields: [
     { key: "heat_release_kw", label: "Fire heat release rate (kW)", kind: "number" },
-    { key: "radiative_fraction", label: "Radiative fraction (0-1)", kind: "number" },
-    { key: "target_flux_kwm2", label: "Target radiant flux (kW/m2)", kind: "number" },
+    { key: "radiative_fraction", label: "Radiative fraction (0-1)", kind: "number", whenBlank: 0.3 },
+    { key: "target_flux_kwm2", label: "Target radiant flux (kW/m2)", kind: "number", whenBlank: 12.6 },
     { key: "evaluate_distance_ft", label: "Distance from the fire's CENTER to the target (ft, 0 to skip; NUREG-1805 R = edge gap + fire diameter / 2)", kind: "number" },
   ],
   outputs: [

@@ -218,8 +218,8 @@ TRUCKINGFIELD_RENDERERS["kingpin-to-axle"] = _simpleRenderer({
   example: kingpinToAxleExample.inputs,
   fields: [
     { key: "kpra_ft", label: "Measured kingpin to rear-axle center (ft)", kind: "number" },
-    { key: "state_limit_ft", label: "Governing state limit (ft)", kind: "number" },
-    { key: "hole_spacing_in", label: "Tandem hole spacing (in)", kind: "number" },
+    { key: "state_limit_ft", label: "Governing state limit (ft)", kind: "number", whenBlank: 40 },
+    { key: "hole_spacing_in", label: "Tandem hole spacing (in)", kind: "number", whenBlank: 6 },
   ],
   outputs: [
     { key: "e", id: "kpra-out-e", label: "Over the limit by", value: (r) => (r.excess_ft > 0 ? fmt(r.excess_ft, 2) + " ft (" + fmt(r.excess_ft * 12, 1) + " in)" : "not over") },
@@ -326,10 +326,10 @@ TRUCKINGFIELD_RENDERERS["air-brake-pushrod-stroke"] = _simpleRenderer({
   citation: "Citation: pushrod stroke against the chamber's published readjustment limit (entered, not bundled: a standard type 30 clamp chamber is 2 in and a long-stroke type 30 is 2.5 in), and the 20%-of-brakes-defective out-of-service threshold of the CVSA out-of-service criteria, cited by name and not reproduced. At the limit counts as defective. The chamber manufacturer's limit, the criteria in full, and the inspector govern.",
   example: airBrakePushrodStrokeExample.inputs,
   fields: [
-    { key: "readjustment_limit_in", label: "Chamber readjustment limit (in)", kind: "number" },
+    { key: "readjustment_limit_in", label: "Chamber readjustment limit (in)", kind: "number", whenBlank: 2 },
     { key: "measured_stroke_in", label: "Measured stroke on this brake (in)", kind: "number" },
     { key: "defective_brakes", label: "Brakes at or past their limit", kind: "number" },
-    { key: "total_brakes", label: "Total brakes on the combination", kind: "number" },
+    { key: "total_brakes", label: "Total brakes on the combination", kind: "number", whenBlank: 10 },
   ],
   outputs: [
     { key: "m", id: "abps-out-m", label: "Margin on this brake", value: (r) => fmt(r.margin_in, 3) + " in " + (r.this_brake_defective ? "-- AT OR PAST the limit, defective" : "under the limit") },
@@ -387,10 +387,10 @@ TRUCKINGFIELD_RENDERERS["oversize-permit-screen"] = _simpleRenderer({
     { key: "height_ft", label: "Load height (ft)", kind: "number" },
     { key: "length_ft", label: "Overall length (ft)", kind: "number" },
     { key: "weight_lb", label: "Gross weight (lb)", kind: "number" },
-    { key: "width_limit_ft", label: "Route width limit (ft)", kind: "number" },
-    { key: "height_limit_ft", label: "Route height limit (ft)", kind: "number" },
-    { key: "length_limit_ft", label: "Route length limit (ft)", kind: "number" },
-    { key: "weight_limit_lb", label: "Route weight limit (lb)", kind: "number" },
+    { key: "width_limit_ft", label: "Route width limit (ft)", kind: "number", whenBlank: 8.5 },
+    { key: "height_limit_ft", label: "Route height limit (ft)", kind: "number", whenBlank: 13.5 },
+    { key: "length_limit_ft", label: "Route length limit (ft)", kind: "number", whenBlank: 75 },
+    { key: "weight_limit_lb", label: "Route weight limit (lb)", kind: "number", whenBlank: 80000 },
   ],
   outputs: [
     { key: "w", id: "ospm-out-w", label: "Width", value: (r) => (r.width_excess_ft > 0 ? "+" + fmt(r.width_excess_ft, 2) + " ft OVER" : fmt(-r.width_excess_ft, 2) + " ft under") },
@@ -554,10 +554,10 @@ TRUCKINGFIELD_RENDERERS["idle-fuel-cost"] = _simpleRenderer({
   fields: [
     { key: "idle_hours_per_day", label: "Idle hours per day", kind: "number" },
     { key: "operating_days", label: "Operating days per year", kind: "number" },
-    { key: "idle_gph", label: "Idle fuel rate (gal/hr)", kind: "number" },
+    { key: "idle_gph", label: "Idle fuel rate (gal/hr)", kind: "number", whenBlank: 0.8 },
     { key: "fuel_price", label: "Fuel price ($/gal)", kind: "number" },
-    { key: "trucks", label: "Trucks in the fleet", kind: "number" },
-    { key: "miles_per_engine_hour", label: "Road miles of wear per idle hour", kind: "number" },
+    { key: "trucks", label: "Trucks in the fleet", kind: "number", whenBlank: 1 },
+    { key: "miles_per_engine_hour", label: "Road miles of wear per idle hour", kind: "number", whenBlank: 7 },
     { key: "fleet_annual_miles", label: "Fleet annual miles (0 to skip the per-mile line)", kind: "number" },
   ],
   outputs: [
@@ -678,7 +678,7 @@ TRUCKINGFIELD_RENDERERS["deck-point-load-dunnage"] = _simpleRenderer({
   example: deckPointLoadDunnageExample.inputs,
   fields: [
     { key: "load_lb", label: "Concentrated load (lb)", kind: "number" },
-    { key: "feet_count", label: "Number of bearing feet", kind: "number" },
+    { key: "feet_count", label: "Number of bearing feet", kind: "number", whenBlank: 4 },
     { key: "foot_area_sqin", label: "Area of each bearing foot (sq in, 0 to skip)", kind: "number" },
     { key: "dunnage_bearing_ft", label: "Dunnage bearing length along the trailer (ft)", kind: "number" },
     { key: "deck_rating_plf", label: "Deck rating (lb per linear ft)", kind: "number" },

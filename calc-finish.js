@@ -183,7 +183,7 @@ FINISH_RENDERERS["flooring-takeoff"] = _simpleRenderer({
   fields: [
     { key: "room_length_ft", label: "Room length (ft)", kind: "number" },
     { key: "room_width_ft", label: "Room width (ft)", kind: "number" },
-    { key: "box_coverage_sqft", label: "Coverage per box (sq ft)", kind: "number" },
+    { key: "box_coverage_sqft", label: "Coverage per box (sq ft)", kind: "number", whenBlank: 20 },
     { key: "pattern", label: "Install pattern", kind: "select", options: [
       { value: "straight", label: "Straight (10%)" },
       { value: "diagonal", label: "45-degree diagonal (15%)" },
@@ -228,8 +228,8 @@ FINISH_RENDERERS["paver-patio"] = _simpleRenderer({
     { key: "area_sqft", label: "Patio area (sq ft)", kind: "number" },
     { key: "paver_length_in", label: "Paver length (in)", kind: "number" },
     { key: "paver_width_in", label: "Paver width (in)", kind: "number" },
-    { key: "base_depth_in", label: "Base depth (in)", kind: "number" },
-    { key: "sand_depth_in", label: "Bedding sand (in)", kind: "number" },
+    { key: "base_depth_in", label: "Base depth (in)", kind: "number", whenBlank: 6 },
+    { key: "sand_depth_in", label: "Bedding sand (in)", kind: "number", whenBlank: 1 },
     { key: "waste_pct", label: "Cut allowance (%)", kind: "number", default: 5 },
   ],
   outputs: [
@@ -269,8 +269,8 @@ FINISH_RENDERERS["retaining-wall-block"] = _simpleRenderer({
   fields: [
     { key: "wall_length_ft", label: "Wall length (ft)", kind: "number" },
     { key: "exposed_height_ft", label: "Exposed height (ft)", kind: "number" },
-    { key: "block_length_in", label: "Block face length (in)", kind: "number" },
-    { key: "block_height_in", label: "Block face height (in)", kind: "number" },
+    { key: "block_length_in", label: "Block face length (in)", kind: "number", whenBlank: 18 },
+    { key: "block_height_in", label: "Block face height (in)", kind: "number", whenBlank: 8 },
   ],
   outputs: [
     { key: "r", id: "rwb-out-r", label: "Blocks per course", value: (r) => String(r.blocks_per_row) },
@@ -314,8 +314,8 @@ FINISH_RENDERERS["attic-ventilation"] = _simpleRenderer({
       { value: "150", label: "1/150 (standard)" },
       { value: "300", label: "1/300 (balanced + vapor retarder)" },
     ] },
-    { key: "intake_vent_nfa_sqin", label: "Soffit vent NFA (sq in)", kind: "number" },
-    { key: "ridge_nfa_per_lf_sqin", label: "Ridge vent NFA (sq in/ft)", kind: "number" },
+    { key: "intake_vent_nfa_sqin", label: "Soffit vent NFA (sq in)", kind: "number", whenBlank: 9 },
+    { key: "ridge_nfa_per_lf_sqin", label: "Ridge vent NFA (sq in/ft)", kind: "number", whenBlank: 18 },
   ],
   outputs: [
     { key: "a", id: "av-out-a", label: "Required net free area", value: (r) => fmt(r.nfa_sqft, 2) + " sq ft (" + fmt(r.nfa_sqin, 0) + " sq in)" },
@@ -364,8 +364,8 @@ FINISH_RENDERERS["gutter-downspout"] = _simpleRenderer({
       { value: "1.20", label: "9-11/12 (1.20)" },
       { value: "1.30", label: "12/12+ (1.30)" },
     ] },
-    { key: "rainfall_in_hr", label: "Rainfall (in/hr)", kind: "number" },
-    { key: "downspout_sqin", label: "Downspout (sq in)", kind: "number" },
+    { key: "rainfall_in_hr", label: "Rainfall (in/hr)", kind: "number", whenBlank: 5 },
+    { key: "downspout_sqin", label: "Downspout (sq in)", kind: "number", whenBlank: 12 },
   ],
   outputs: [
     { key: "a", id: "gd-out-a", label: "Adjusted roof area", value: (r) => fmt(r.adjusted_area, 0) + " sq ft" },
@@ -415,7 +415,7 @@ FINISH_RENDERERS["deck-board-takeoff"] = _simpleRenderer({
     { key: "deck_length_ft", label: "Board run length (ft)", kind: "number" },
     { key: "board_face_width_in", label: "Board face width (in, 5.5 for 5/4x6 or 2x6)", kind: "number", default: 5.5 },
     { key: "gap_in", label: "Gap between boards (in)", kind: "number", default: 0.25 },
-    { key: "joist_spacing_in", label: "Joist spacing on center (in)", kind: "number" },
+    { key: "joist_spacing_in", label: "Joist spacing on center (in)", kind: "number", whenBlank: 16 },
     { key: "waste_pct", label: "Waste (%)", kind: "number", default: 10 },
   ],
   outputs: [
@@ -501,11 +501,11 @@ FINISH_RENDERERS["gutter-downspout-takeoff"] = _simpleRenderer({
   citation: "Citation: takeoff identity by name. gutter = eave; downspouts = ceil(roof area / max area per downspout); pipe = downspouts x wall height; hangers = ceil(eave / spacing). The area per downspout comes from gutter-downspout.",
   example: gutterDownspoutTakeoffExample.inputs,
   fields: [
-    { key: "eave_length_ft", label: "Total eave / gutter length (ft)", kind: "number" },
-    { key: "roof_area_sf", label: "Tributary roof area (ft²)", kind: "number" },
-    { key: "max_area_per_downspout_sf", label: "Max area per downspout (ft²)", kind: "number" },
-    { key: "wall_height_ft", label: "Downspout drop height (ft)", kind: "number" },
-    { key: "hanger_spacing_ft", label: "Gutter hanger spacing (ft)", kind: "number" },
+    { key: "eave_length_ft", label: "Total eave / gutter length (ft)", kind: "number", whenBlank: 140 },
+    { key: "roof_area_sf", label: "Tributary roof area (ft²)", kind: "number", whenBlank: 2400 },
+    { key: "max_area_per_downspout_sf", label: "Max area per downspout (ft²)", kind: "number", whenBlank: 800 },
+    { key: "wall_height_ft", label: "Downspout drop height (ft)", kind: "number", whenBlank: 10 },
+    { key: "hanger_spacing_ft", label: "Gutter hanger spacing (ft)", kind: "number", whenBlank: 2 },
   ],
   outputs: [
     { key: "g", id: "gdt-out-g", label: "Gutter footage", value: (r) => fmt(r.gutter_lf, 0) + " LF" },
@@ -545,10 +545,10 @@ FINISH_RENDERERS["soffit-ridge-vent-count"] = _simpleRenderer({
   citation: "Citation: vent-count identity by name. total NFA = attic area / ratio x 144; intake = exhaust = total / 2; soffit vents = ceil(intake / per-vent NFA); ridge = ceil(exhaust / ridge NFA per ft). The ratio comes from the IRC; the product NFA from the manufacturer.",
   example: soffitRidgeVentCountExample.inputs,
   fields: [
-    { key: "attic_area_sf", label: "Attic floor area (ft²)", kind: "number" },
-    { key: "vent_ratio", label: "NFA ratio denominator (1/N)", kind: "number" },
-    { key: "soffit_vent_nfa_in2", label: "NFA per soffit vent (in²)", kind: "number" },
-    { key: "ridge_nfa_per_ft_in2", label: "NFA per foot of ridge vent (in²/ft)", kind: "number" },
+    { key: "attic_area_sf", label: "Attic floor area (ft²)", kind: "number", whenBlank: 1500 },
+    { key: "vent_ratio", label: "NFA ratio denominator (1/N)", kind: "number", whenBlank: 300 },
+    { key: "soffit_vent_nfa_in2", label: "NFA per soffit vent (in²)", kind: "number", whenBlank: 26 },
+    { key: "ridge_nfa_per_ft_in2", label: "NFA per foot of ridge vent (in²/ft)", kind: "number", whenBlank: 18 },
   ],
   outputs: [
     { key: "n", id: "srv-out-n", label: "Total net free area", value: (r) => fmt(r.total_nfa_in2, 0) + " in^2 (" + fmt(r.intake_nfa_in2, 0) + " each way)" },
@@ -582,10 +582,10 @@ FINISH_RENDERERS["cement-board-takeoff"] = _simpleRenderer({
   citation: "Citation: cement-board takeoff by name. sheets = ceil(area x (1 + waste) / sheet area); screws = sheets x per-sheet (~30-40 at 8 in o.c.). Plus mesh tape and thin-set at joints (not counted). ANSI A108 / TCNA Handbook and the board maker govern the fastener schedule and wet-area assembly.",
   example: cementBoardTakeoffExample.inputs,
   fields: [
-    { key: "area_sf", label: "Backer area (sf)", kind: "number" },
+    { key: "area_sf", label: "Backer area (sf)", kind: "number", whenBlank: 120 },
     { key: "sheet_area_sf", label: "Sheet area (sf, 3x5 = 15)", kind: "number", default: 15 },
     { key: "waste_pct", label: "Waste / cuts (%)", kind: "number", default: 10 },
-    { key: "screws_per_sheet", label: "Screws per sheet (~30-40)", kind: "number" },
+    { key: "screws_per_sheet", label: "Screws per sheet (~30-40)", kind: "number", whenBlank: 35 },
   ],
   outputs: [
     { key: "s", id: "cbt-out-s", label: "Cement board sheets", value: (r) => fmt(r.sheets, 0) + " " + (fmt(r.sheets, 0) === "1" ? "sheet" : "sheets") },
@@ -619,7 +619,7 @@ FINISH_RENDERERS["step-flashing-count"] = _simpleRenderer({
   citation: "Citation: roof step-flashing piece count, by name. One piece per shingle course plus one: pieces = ceil(wall run x 12 / shingle exposure) + 1. Woven course-by-course (not a continuous piece); IRC R905.2.8.3 and the shingle/flashing manufacturer's details govern the install.",
   example: stepFlashingCountExample.inputs,
   fields: [
-    { key: "wall_run_ft", label: "Sloped wall / chimney sidewall run (ft)", kind: "number" },
+    { key: "wall_run_ft", label: "Sloped wall / chimney sidewall run (ft)", kind: "number", whenBlank: 20 },
     { key: "shingle_exposure_in", label: "Shingle exposure (in, ~5)", kind: "number", default: 5 },
     { key: "waste_pct", label: "Waste (percent)", kind: "number", default: 5 },
   ],
@@ -734,8 +734,8 @@ FINISH_RENDERERS["closet-shelf-takeoff"] = _simpleRenderer({
     { key: "single_hang_ft", label: "Single-hang wall length (ft)", kind: "number" },
     { key: "double_hang_ft", label: "Double-hang wall length (ft)", kind: "number", default: 0 },
     { key: "linen_wall_ft", label: "Linen wall length (ft)", kind: "number", default: 0 },
-    { key: "linen_shelf_count", label: "Linen shelves (count)", kind: "number" },
-    { key: "bracket_spacing_in", label: "Support spacing (in)", kind: "number" },
+    { key: "linen_shelf_count", label: "Linen shelves (count)", kind: "number", whenBlank: 4 },
+    { key: "bracket_spacing_in", label: "Support spacing (in)", kind: "number", whenBlank: 32 },
     { key: "stock_length_ft", label: "Stock length (ft)", kind: "number" },
   ],
   outputs: [
@@ -801,8 +801,8 @@ FINISH_RENDERERS["countertop-overhang-support"] = _simpleRenderer({
     { key: "total_depth_in", label: "Total countertop depth (in)", kind: "number", default: 25.5 },
     { key: "thickness_cm", label: "Slab thickness", kind: "select", options: [{ value: "3", label: "3 cm (limit 10 in)", selected: true }, { value: "2", label: "2 cm (limit 6 in)" }] },
     { key: "run_length_ft", label: "Length of the overhang run (ft)", kind: "number" },
-    { key: "bracket_spacing_in", label: "Bracket spacing (in)", kind: "number" },
-    { key: "density_pcf", label: "Stone density (pcf)", kind: "number" },
+    { key: "bracket_spacing_in", label: "Bracket spacing (in)", kind: "number", whenBlank: 24 },
+    { key: "density_pcf", label: "Stone density (pcf)", kind: "number", whenBlank: 170 },
     { key: "unsupported_limit_override_in", label: "Limit override (in, 0 = thickness rule)", kind: "number" },
   ],
   outputs: [
@@ -869,9 +869,9 @@ FINISH_RENDERERS["cabinet-linear-feet"] = _simpleRenderer({
     { key: "tall_ft", label: "Tall / pantry run (ft)", kind: "number", default: 0 },
     { key: "appliance_openings_ft", label: "Appliance openings in the base run (ft)", kind: "number", default: 0 },
     { key: "corners", label: "Inside corners (count)", kind: "number", default: 0 },
-    { key: "cabinet_depth_in", label: "Base cabinet depth (in)", kind: "number" },
+    { key: "cabinet_depth_in", label: "Base cabinet depth (in)", kind: "number", whenBlank: 24 },
     { key: "filler_per_corner_in", label: "Filler per corner (in)", kind: "number", default: 3 },
-    { key: "standard_width_in", label: "Standard cabinet width (in)", kind: "number" },
+    { key: "standard_width_in", label: "Standard cabinet width (in)", kind: "number", whenBlank: 24 },
     { key: "toe_kick_height_in", label: "Toe-kick height (in)", kind: "number", default: 4 },
   ],
   outputs: [
@@ -1005,7 +1005,7 @@ FINISH_RENDERERS["valley-flashing-takeoff"] = _simpleRenderer({
     { key: "valley_run_ft", label: "Plan run of ONE valley (ft)", kind: "number" },
     { key: "valley_count", label: "Number of valleys", kind: "number", default: 1 },
     { key: "pitch_rise_per_12", label: "Roof pitch (rise per 12)", kind: "number" },
-    { key: "metal_width_in", label: "Valley metal width (in)", kind: "number" },
+    { key: "metal_width_in", label: "Valley metal width (in)", kind: "number", whenBlank: 24 },
     { key: "stock_length_ft", label: "Stock length (ft)", kind: "number" },
     { key: "lap_in", label: "Lap at each joint (in)", kind: "number", default: 6 },
     { key: "waste_pct", label: "Waste (%)", kind: "number", default: 10 },
@@ -1105,10 +1105,10 @@ FINISH_RENDERERS["srw-geogrid-spacing"] = _simpleRenderer({
   fields: [
     { key: "wall_height_ft", label: "Total wall height, including buried course (ft)", kind: "number" },
     { key: "block_depth_in", label: "Block depth, front face to back face (in)", kind: "number", default: 12 },
-    { key: "block_height_in", label: "Block height (in)", kind: "number" },
+    { key: "block_height_in", label: "Block height (in)", kind: "number", whenBlank: 8 },
     { key: "base_course_buried_in", label: "Base course buried (in)", kind: "number", default: 6 },
-    { key: "ncma_suggested_max_in", label: "Suggested maximum spacing (in)", kind: "number" },
-    { key: "grid_length_basis", label: "Grid length as a fraction of wall height", kind: "number" },
+    { key: "ncma_suggested_max_in", label: "Suggested maximum spacing (in)", kind: "number", whenBlank: 24 },
+    { key: "grid_length_basis", label: "Grid length as a fraction of wall height", kind: "number", whenBlank: 0.6 },
   ],
   outputs: [
     { key: "l", id: "srwg-out-l", label: "Governing spacing limit", value: (r) => fmt(r.spacing_limit_in, 1) + " in - " + r.governing_rule },
@@ -1192,8 +1192,8 @@ FINISH_RENDERERS["crawl-space-ventilation"] = _simpleRenderer({
     { key: "base_ratio_denominator", label: "Base ratio 1 per N sq ft (IRC 150; WA 300)", kind: "number", default: 150 },
     { key: "vapor_retarder", label: "Class I vapor retarder over the ground", kind: "select", options: [{ value: "no", label: "No - use the base ratio", selected: true }, { value: "yes", label: "Yes - the 1/1500 reduction applies" }] },
     { key: "cross_ventilated", label: "Openings placed for cross ventilation (with the retarder, lifts the corner rule)", kind: "select", options: [{ value: "no", label: "No - one opening within 3 ft of each corner", selected: true }, { value: "yes", label: "Yes - cross ventilated" }] },
-    { key: "vent_net_free_sqin", label: "Net free area per vent (sq in, off the product)", kind: "number" },
-    { key: "corner_count", label: "Building corners needing an opening within 3 ft", kind: "number" },
+    { key: "vent_net_free_sqin", label: "Net free area per vent (sq in, off the product)", kind: "number", whenBlank: 50 },
+    { key: "corner_count", label: "Building corners needing an opening within 3 ft", kind: "number", whenBlank: 4 },
   ],
   outputs: [
     { key: "q", id: "csv-out-q", label: "Required net free area", value: (r) => fmt(r.required_sqin, 0) + " sq in (" + fmt(r.required_sf, 2) + " sq ft) at 1/" + r.ratio_used },
@@ -1265,9 +1265,9 @@ FINISH_RENDERERS["spray-tip-selection"] = _simpleRenderer({
     { key: "tip_number", label: "Tip number (three digits, e.g. 517)", kind: "number", attrs: { step: "1", min: "100" } },
     { key: "pressure_psi", label: "Spray pressure (psi)", kind: "number" },
     { key: "wet_film_mils", label: "Target wet film thickness (mils)", kind: "number" },
-    { key: "ref_orifice_in", label: "Calibration tip orifice (in)", kind: "number" },
-    { key: "ref_flow_gpm", label: "Calibration tip flow (gpm)", kind: "number" },
-    { key: "ref_pressure_psi", label: "Calibration pressure (psi)", kind: "number" },
+    { key: "ref_orifice_in", label: "Calibration tip orifice (in)", kind: "number", whenBlank: 0.015 },
+    { key: "ref_flow_gpm", label: "Calibration tip flow (gpm)", kind: "number", whenBlank: 0.24 },
+    { key: "ref_pressure_psi", label: "Calibration pressure (psi)", kind: "number", whenBlank: 2000 },
   ],
   outputs: [
     { key: "t", id: "sts-out-t", label: "What the tip number says", value: (r) => fmt(r.fan_width_in, 0) + " in fan at 12 in, " + fmt(r.orifice_in, 3) + " in orifice" },

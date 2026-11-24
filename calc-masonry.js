@@ -135,8 +135,8 @@ MASONRY_RENDERERS["cmu-wall-flexure"] = _simpleRenderer({
     { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
     { key: "as_in2", label: "Steel area As over the strip (in²)", kind: "number" },
     { key: "d_in", label: "Effective depth d (in)", kind: "number" },
-    { key: "b_in", label: "Strip width b (in)", kind: "number" },
-    { key: "fs_psi", label: "Allowable steel stress Fs (psi)", kind: "number" },
+    { key: "b_in", label: "Strip width b (in)", kind: "number", whenBlank: 12 },
+    { key: "fs_psi", label: "Allowable steel stress Fs (psi)", kind: "number", whenBlank: 32000 },
   ],
   outputs: [
     { key: "nk", id: "cwf-out-nk", label: "n / k / j", value: (r) => fmt(r.n_ratio, 2) + " / " + fmt(r.k, 3) + " / " + fmt(r.j, 3) },
@@ -196,8 +196,8 @@ MASONRY_RENDERERS["cmu-shear-wall"] = _simpleRenderer({
     { key: "p_lb", label: "Sustained axial load P (lb)", kind: "number", default: 0 },
     { key: "mvd", label: "Shear-span ratio M/(V dv)", kind: "number", default: 0.5, required: true },
     { key: "av_in2", label: "Horizontal bar area Av (in², 0 = none)", kind: "number", default: 0 },
-    { key: "s_in", label: "Horizontal bar spacing s (in)", kind: "number" },
-    { key: "fs_psi", label: "Allowable steel stress Fs (psi)", kind: "number" },
+    { key: "s_in", label: "Horizontal bar spacing s (in)", kind: "number", whenBlank: 48 },
+    { key: "fs_psi", label: "Allowable steel stress Fs (psi)", kind: "number", whenBlank: 32000 },
     { key: "grouting", label: "Grouting", kind: "select", options: [{ value: "full", label: "Fully grouted (gamma_g 1.0)", selected: true }, { value: "partial", label: "Partially grouted (gamma_g 0.75)" }] },
     { key: "special", label: "Special reinforced masonry shear wall?", kind: "select", options: [{ value: "no", label: "No (Fvm uses 1/2)", selected: true }, { value: "yes", label: "Yes (Fvm uses 1/4)" }] },
   ],
@@ -240,7 +240,7 @@ MASONRY_RENDERERS["cmu-wall-axial"] = _simpleRenderer({
     { key: "ast_in2", label: "Vertical steel Ast, tied (in², 0 = untied)", kind: "number", default: 0 },
     { key: "h_in", label: "Effective height h (in)", kind: "number" },
     { key: "r_in", label: "Radius of gyration r (in)", kind: "number" },
-    { key: "fs_psi", label: "Allowable steel stress Fs (psi)", kind: "number" },
+    { key: "fs_psi", label: "Allowable steel stress Fs (psi)", kind: "number", whenBlank: 32000 },
   ],
   outputs: [
     { key: "hr", id: "cwa-out-hr", label: "Slenderness h/r", value: (r) => fmt(r.hr, 1) + (r.slender ? " (slender branch, h/r > 99)" : " (short/intermediate branch)") },
@@ -338,8 +338,8 @@ MASONRY_RENDERERS["brick-veneer-anchor-spacing"] = _simpleRenderer({
   fields: [
     { key: "area_ft2", label: "Veneer wall area (ft²)", kind: "number" },
     { key: "area_per", label: "Max area per anchor (ft²; 2.67, 2.0 high-demand)", kind: "number", default: 2.67 },
-    { key: "max_horiz_in", label: "Max horizontal spacing (in)", kind: "number" },
-    { key: "max_vert_in", label: "Max vertical spacing (in)", kind: "number" },
+    { key: "max_horiz_in", label: "Max horizontal spacing (in)", kind: "number", whenBlank: 32 },
+    { key: "max_vert_in", label: "Max vertical spacing (in)", kind: "number", whenBlank: 25 },
   ],
   outputs: [
     { key: "a", id: "bva-out-a", label: "Anchors required", value: (r) => String(r.anchors) },
@@ -528,8 +528,8 @@ MASONRY_RENDERERS["masonry-anchor-shear"] = _simpleRenderer({
   example: masonryAnchorShearExample.inputs,
   fields: [
     { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
-    { key: "lb_in", label: "Effective embedment lb (in)", kind: "number" },
-    { key: "lbe_in", label: "Edge distance lbe (in)", kind: "number" },
+    { key: "lb_in", label: "Effective embedment lb (in)", kind: "number", whenBlank: 5 },
+    { key: "lbe_in", label: "Edge distance lbe (in)", kind: "number", whenBlank: 4 },
     { key: "ab_in2", label: "Bolt effective tensile area Ab (in², net: 1/2 in 0.142, 3/4 in 0.334)", kind: "number" },
     { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number", default: 36000 },
   ],
@@ -603,7 +603,7 @@ MASONRY_RENDERERS["masonry-prism-fm"] = _simpleRenderer({
   example: masonryPrismFmExample.inputs,
   fields: [
     { key: "unit_type", label: "Unit type", kind: "select", default: "concrete", options: [{ value: "concrete", label: "Concrete (CMU)" }, { value: "clay", label: "Clay (not yet supported)" }] },
-    { key: "unit_strength_psi", label: "Net-area unit strength (psi)", kind: "number" },
+    { key: "unit_strength_psi", label: "Net-area unit strength (psi)", kind: "number", whenBlank: 2000 },
     { key: "mortar_type", label: "Mortar type", kind: "select", default: "ms", options: [{ value: "ms", label: "Type M or S" }, { value: "n", label: "Type N" }] },
   ],
   outputs: [
@@ -637,9 +637,9 @@ MASONRY_RENDERERS["brick-veneer-weep-count"] = _simpleRenderer({
   citation: "Citation: brick veneer weep spacing by name (IRC R703.8.6 / TMS 402). weeps per line = ceil(wall length in / max spacing) + 1; weeps <= 33 in o.c., >= 3/16 in dia, directly above each through-wall flashing line. The AHJ-adopted code and the wall detail govern.",
   example: brickVeneerWeepCountExample.inputs,
   fields: [
-    { key: "wall_length_ft", label: "Wall / flashing length (ft)", kind: "number" },
+    { key: "wall_length_ft", label: "Wall / flashing length (ft)", kind: "number", whenBlank: 30 },
     { key: "max_spacing_in", label: "Max weep spacing (in, code cap 33)", kind: "number", default: 33 },
-    { key: "flashing_lines", label: "Flashing lines (base + lintels)", kind: "number" },
+    { key: "flashing_lines", label: "Flashing lines (base + lintels)", kind: "number", whenBlank: 1 },
   ],
   outputs: [
     { key: "wpl", id: "bvw-out-wpl", label: "Weeps per flashing line", value: (r) => fmt(r.weeps_per_line, 0) },
@@ -682,7 +682,7 @@ MASONRY_RENDERERS["masonry-joint-reinforcement"] = _simpleRenderer({
     { key: "wall_length_ft", label: "Wall length (ft)", kind: "number" },
     { key: "wall_height_ft", label: "Wall height (ft)", kind: "number" },
     { key: "vertical_spacing_in", label: "Vertical spacing (in, code cap 16)", kind: "number", default: 16 },
-    { key: "piece_length_ft", label: "Wire piece length (ft)", kind: "number" },
+    { key: "piece_length_ft", label: "Wire piece length (ft)", kind: "number", whenBlank: 10 },
     { key: "lap_in", label: "Lap between pieces (in, 6 min; 9 for 3/16 in wire)", kind: "number", default: 6, required: true },
   ],
   outputs: [
@@ -742,10 +742,10 @@ MASONRY_RENDERERS["masonry-lintel-bearing"] = _simpleRenderer({
   example: masonryLintelBearingExample.inputs,
   fields: [
     { key: "clear_span_ft", label: "Clear span of opening (ft)", kind: "number" },
-    { key: "lintel_depth_in", label: "Lintel depth (in)", kind: "number" },
+    { key: "lintel_depth_in", label: "Lintel depth (in)", kind: "number", whenBlank: 8 },
     { key: "support_center_ft", label: "Distance between support centers (ft, 0 = use span + depth)", kind: "number" },
     { key: "udl_plf", label: "Uniform load on lintel (lb/ft)", kind: "number" },
-    { key: "bearing_width_in", label: "Bearing width (in, wall thickness at the end)", kind: "number" },
+    { key: "bearing_width_in", label: "Bearing width (in, wall thickness at the end)", kind: "number", whenBlank: 7.625 },
     { key: "allowable_bearing_psi", label: "Allowable bearing stress (psi, from your code edition)", kind: "number" },
   ],
   outputs: [

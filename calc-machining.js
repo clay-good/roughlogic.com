@@ -2698,8 +2698,8 @@ MACHINING_RENDERERS["drill-feed-thrust"] = _simpleRenderer({
     { key: "diameter_in", label: "Drill diameter (in)", kind: "number" },
     { key: "sfm", label: "Surface speed (SFM)", kind: "number" },
     { key: "feed_ipr", label: "Feed per revolution (in)", kind: "number" },
-    { key: "unit_power", label: "Unit power for the material (hp per cubic in/min)", kind: "number" },
-    { key: "spindle_efficiency", label: "Spindle efficiency (0-1)", kind: "number" },
+    { key: "unit_power", label: "Unit power for the material (hp per cubic in/min)", kind: "number", whenBlank: 1 },
+    { key: "spindle_efficiency", label: "Spindle efficiency (0-1)", kind: "number", whenBlank: 0.8 },
   ],
   outputs: [
     { key: "r", id: "drft-out-r", label: "Spindle speed", value: (r) => fmt(r.rpm, 0) + " rpm" },

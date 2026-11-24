@@ -2136,7 +2136,7 @@ KITCHEN_RENDERERS["steam-kettle-heatup"] = _r({
     { key: "gallons", label: "Kettle working volume (gal)", kind: "number" },
     { key: "specific_gravity", label: "Product specific gravity", kind: "number" },
     { key: "specific_heat", label: "Product specific heat (BTU/lb-F)", kind: "number" },
-    { key: "start_temp_f", label: "Starting temperature (F)", kind: "number", required: true },
+    { key: "start_temp_f", label: "Starting temperature (F)", kind: "number", required: true, whenBlank: 70 },
     { key: "final_temp_f", label: "Final temperature (F)", kind: "number" },
     { key: "rated_input_btuh", label: "Rated heat input (BTU/hr)", kind: "number" },
     { key: "jacket_efficiency", label: "Jacket efficiency (0-1)", kind: "number" },

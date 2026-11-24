@@ -1566,7 +1566,7 @@ OILGAS_RENDERERS["tank-strapping-volume"] = _simpleRenderer({
     { key: "gauge_in", label: "Opening gauge (in)" },
     { key: "closing_gauge_ft", label: "Closing gauge (ft, 0 to skip)" },
     { key: "closing_gauge_in", label: "Closing gauge (in)" },
-    { key: "volume_correction_factor", label: "Volume correction factor to 60 degF" },
+    { key: "volume_correction_factor", label: "Volume correction factor to 60 degF", whenBlank: 1 },
     { key: "sediment_water_pct", label: "Sediment and water (%)" },
   ],
   outputs: [
@@ -1630,10 +1630,10 @@ OILGAS_RENDERERS["separator-retention-sizing"] = _simpleRenderer({
     { key: "pressure_psig", label: "Operating pressure (psig)" },
     { key: "temperature_f", label: "Operating temperature (degF)", attrs: { step: "any" } },
     { key: "z_mode", label: "Compressibility Z", kind: "select", default: "entered", options: [{ value: "entered", label: "Entered below" }, { value: "computed", label: "Computed from gravity at the operating pressure (Sutton + DAK)" }] },
-    { key: "z_factor", label: "Compressibility factor Z (when entered)" },
-    { key: "gas_gravity", label: "Gas specific gravity (air = 1)" },
+    { key: "z_factor", label: "Compressibility factor Z (when entered)", whenBlank: 0.9 },
+    { key: "gas_gravity", label: "Gas specific gravity (air = 1)", whenBlank: 0.7 },
     { key: "liquid_density_lb_ft3", label: "Liquid density (lb/cu ft)" },
-    { key: "k_factor", label: "Souders-Brown K factor" },
+    { key: "k_factor", label: "Souders-Brown K factor", whenBlank: 0.35 },
   ],
   outputs: [
     { key: "actual_retention_min", label: "Retention achieved", unit: "min", value: (r) => fmt(r.actual_retention_min, 1) + " min -- " + (r.liquid_ok ? "meets" : "SHORT of") + " the requirement (the required liquid volume is " + fmt(r.liquid_pct_of_required, 0) + "% of what the vessel holds)" },

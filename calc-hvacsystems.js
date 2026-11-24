@@ -2710,7 +2710,7 @@ HVACSYSTEMS_RENDERERS["refractory-shell-temperature"] = _simpleRenderer({
     { key: "hot_face_f", required: true, label: "Hot face temperature (°F)" },
     { key: "ambient_f", required: true, label: "Ambient temperature (°F)", attrs: { step: "any" } },
     { key: "film_mode", label: "Outer film coefficient", kind: "select", default: "entered", options: [{ value: "entered", label: "Entered below" }, { value: "computed", label: "Computed: still-air convection on a vertical wall + radiation" }] },
-    { key: "film_coeff_btu_hr_ft2_f", label: "Outer film coefficient (BTU/hr/sq ft/°F, when entered)" },
+    { key: "film_coeff_btu_hr_ft2_f", label: "Outer film coefficient (BTU/hr/sq ft/°F, when entered)", whenBlank: 2 },
     { key: "shell_emissivity", label: "Shell emissivity (computed film; 0.8 oxidized or painted steel)", default: 0.8, attrs: { step: "any", min: "0", max: "1" } },
     { key: "wall_height_ft", label: "Wall height (ft, computed film)", default: 10 },
     { key: "layer1_thickness_in", label: "Layer 1 (hot face) thickness (in)" },

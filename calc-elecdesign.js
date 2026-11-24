@@ -163,7 +163,7 @@ ELECDESIGN_RENDERERS["lumen-method"] = _simpleRenderer({
     { key: "target_fc", label: "Target maintained (footcandles)", kind: "number" },
     { key: "area_sqft", label: "Room area (sq ft)", kind: "number" },
     { key: "lumens_per_lum", label: "Lumens per luminaire", kind: "number" },
-    { key: "cu", label: "Coefficient of utilization (CU)", kind: "number" },
+    { key: "cu", label: "Coefficient of utilization (CU)", kind: "number", whenBlank: 0.7 },
     { key: "llf", label: "Light-loss factor (LLF)", kind: "number" },
   ],
   outputs: [
@@ -728,7 +728,7 @@ ELECDESIGN_RENDERERS["room-cavity-ratio"] = _simpleRenderer({
   fields: [
     { key: "room_length_ft", label: "Room length (ft)", kind: "number" },
     { key: "room_width_ft", label: "Room width (ft)", kind: "number" },
-    { key: "cavity_height_ft", label: "Cavity height: luminaire to work plane (ft)", kind: "number" },
+    { key: "cavity_height_ft", label: "Cavity height: luminaire to work plane (ft)", kind: "number", whenBlank: 8 },
   ],
   outputs: [
     { key: "r", id: "rcr-out-r", label: "Room cavity ratio (RCR)", value: (r) => fmt(r.room_cavity_ratio, 2) },
@@ -765,9 +765,9 @@ ELECDESIGN_RENDERERS["luminaire-spacing-mh-ratio"] = _simpleRenderer({
   citation: "Citation: luminaire spacing criterion (SC), historically the spacing-to-mounting-height ratio (S/MH), IES, by name. Max center-to-center spacing = SMH x mounting height above the WORK plane. The fixture's photometric distribution, the room reflectances, and the target uniformity govern the final layout.",
   example: luminaireSpacingMhExample.inputs,
   fields: [
-    { key: "smh_ratio", label: "Spacing-to-mounting-height ratio (from the photometric report)", kind: "number" },
-    { key: "mounting_height_ft", label: "Mounting height above the work plane (ft)", kind: "number" },
-    { key: "actual_spacing_ft", label: "Proposed center-to-center spacing (ft)", kind: "number" },
+    { key: "smh_ratio", label: "Spacing-to-mounting-height ratio (from the photometric report)", kind: "number", whenBlank: 1.3 },
+    { key: "mounting_height_ft", label: "Mounting height above the work plane (ft)", kind: "number", whenBlank: 8 },
+    { key: "actual_spacing_ft", label: "Proposed center-to-center spacing (ft)", kind: "number", whenBlank: 9 },
   ],
   outputs: [
     { key: "s", id: "smh-out-s", label: "Max spacing (ft)", value: (r) => fmt(r.max_spacing_ft, 2) },
@@ -920,8 +920,8 @@ ELECDESIGN_RENDERERS["selective-coordination-screen"] = _simpleRenderer({
     { key: "device_type", label: "Device type", kind: "select", options: [{ value: "fuse", label: "Fuses (ratio method)" }, { value: "breaker", label: "Circuit breakers (instantaneous pickup)" }] },
     { key: "upstream_rating_a", label: "Upstream device rating (A)", kind: "number" },
     { key: "downstream_rating_a", label: "Downstream device rating (A)", kind: "number" },
-    { key: "published_ratio", label: "Published fuse ratio for the family (fuses only)", kind: "number" },
-    { key: "instantaneous_multiplier", label: "Upstream instantaneous pickup, x rating (breakers only)", kind: "number" },
+    { key: "published_ratio", label: "Published fuse ratio for the family (fuses only)", kind: "number", whenBlank: 2 },
+    { key: "instantaneous_multiplier", label: "Upstream instantaneous pickup, x rating (breakers only)", kind: "number", whenBlank: 10 },
     { key: "pickup_tolerance_pct", label: "Instantaneous pickup tolerance, +/- % (breakers only; Bussmann's example uses 25)", kind: "number", default: 25 },
     { key: "available_fault_a", label: "Available fault current at the downstream device (A)", kind: "number" },
   ],
@@ -982,8 +982,8 @@ ELECDESIGN_RENDERERS["fuse-let-through"] = _simpleRenderer({
   fields: [
     { key: "conductor_cmil", label: "Conductor area (circular mils)", kind: "number" },
     { key: "initial_temp_c", label: "Initial conductor temperature (deg C)", kind: "number", default: 75, attrs: { step: "any" }, required: true },
-    { key: "damage_temp_c", label: "Insulation damage temperature (deg C)", kind: "number" },
-    { key: "duration_s", label: "Fault duration basis (s)", kind: "number" },
+    { key: "damage_temp_c", label: "Insulation damage temperature (deg C)", kind: "number", whenBlank: 250 },
+    { key: "duration_s", label: "Fault duration basis (s)", kind: "number", whenBlank: 0.01 },
     { key: "let_through_i2t", label: "Device let-through I-squared-t (A2s, from the curve)", kind: "number" },
     { key: "let_through_peak_a", label: "Device peak let-through current (A, 0 to skip)", kind: "number" },
     { key: "equipment_peak_withstand_a", label: "Equipment peak withstand (A, 0 to skip)", kind: "number" },

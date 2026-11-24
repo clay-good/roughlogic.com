@@ -3190,7 +3190,7 @@ RESTORATION_RENDERERS["water-extraction-rate"] = _simpleRenderer({
     { key: "absorption_gal_per_sqft", label: "Absorbed water (gal per sq ft of assembly)", kind: "number" },
     { key: "extraction_rate_gpm", label: "Effective extraction rate (gpm at the wand)", kind: "number" },
     { key: "waste_tank_gal", label: "Waste tank capacity (gal)", kind: "number" },
-    { key: "dehu_gal_per_day", label: "Dehumidifier removal, real-world (gal per day)", kind: "number" },
+    { key: "dehu_gal_per_day", label: "Dehumidifier removal, real-world (gal per day)", kind: "number", whenBlank: 15 },
   ],
   outputs: [
     { key: "v", id: "wer-out-v", label: "Water to extract", value: (r) => fmt(r.total_gal, 0) + " gal = " + fmt(r.standing_gal, 0) + " standing + " + fmt(r.absorbed_gal, 0) + " absorbed (" + fmt(r.water_weight_lb, 0) + " lb)" },
@@ -3245,9 +3245,9 @@ RESTORATION_RENDERERS["sewage-loss-disposal"] = _simpleRenderer({
     { key: "soft_thickness_in", label: "Carpet and pad thickness (in)", kind: "number" },
     { key: "board_area_sqft", label: "Drywall or board removed (sq ft)", kind: "number" },
     { key: "board_thickness_in", label: "Board thickness (in)", kind: "number" },
-    { key: "bulking_factor", label: "Bulking factor once cut and rolled", kind: "number" },
-    { key: "bag_capacity_gal", label: "Disposal bag capacity (gal)", kind: "number" },
-    { key: "container_cy", label: "Roll-off container size (cubic yards)", kind: "number" },
+    { key: "bulking_factor", label: "Bulking factor once cut and rolled", kind: "number", whenBlank: 3 },
+    { key: "bag_capacity_gal", label: "Disposal bag capacity (gal)", kind: "number", whenBlank: 33 },
+    { key: "container_cy", label: "Roll-off container size (cubic yards)", kind: "number", whenBlank: 10 },
     { key: "extracted_gal", label: "Extracted liquid (gal)", kind: "number" },
   ],
   outputs: [

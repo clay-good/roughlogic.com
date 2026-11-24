@@ -477,7 +477,7 @@ HVACSERVICE_RENDERERS["gas-meter-clock-target"] = _simpleRenderer({
   fields: [
     { key: "target_input_btuh", label: "Target / nameplate firing rate (BTU/hr)", kind: "number" },
     { key: "dial_size_cf", label: "Test-dial size (ft³; cubic feet per revolution)", kind: "number" },
-    { key: "heating_value_btu_cf", label: "Heating value (BTU/cf)", kind: "number" },
+    { key: "heating_value_btu_cf", label: "Heating value (BTU/cf)", kind: "number", whenBlank: 1030 },
   ],
   outputs: [
     { key: "s", id: "gmct-out-s", label: "On-rate seconds per revolution", value: (r) => fmt(r.sec_per_rev, 1) + " s" },
@@ -579,7 +579,7 @@ HVACSERVICE_RENDERERS["furnace-airflow-to-rise"] = _simpleRenderer({
   example: furnaceAirflowToRiseExample.inputs,
   fields: [
     { key: "input_btuh", label: "Furnace input (BTU/hr)", kind: "number" },
-    { key: "efficiency_pct", label: "Efficiency (%)", kind: "number" },
+    { key: "efficiency_pct", label: "Efficiency (%)", kind: "number", whenBlank: 80 },
     { key: "cfm", label: "Blower airflow (CFM)", kind: "number" },
     { key: "return_air_F", required: true, label: "Return-air temp (°F)", kind: "number", default: 70, attrs: { step: "any" } },
     { key: "rise_min_F", label: "Plate min rise (°F)", kind: "number", default: 40 },
@@ -648,8 +648,8 @@ HVACSERVICE_RENDERERS["blower-door-ach50"] = _simpleRenderer({
   fields: [
     { key: "cfm50", label: "Blower-door reading CFM50 (cfm)", kind: "number" },
     { key: "volume_ft3", label: "Conditioned volume (ft³)", kind: "number" },
-    { key: "n_factor", label: "LBL N-factor (ACH50 -> natural)", kind: "number" },
-    { key: "target_ach50", label: "Target ACH50 (IECC limit)", kind: "number" },
+    { key: "n_factor", label: "LBL N-factor (ACH50 -> natural)", kind: "number", whenBlank: 17 },
+    { key: "target_ach50", label: "Target ACH50 (IECC limit)", kind: "number", whenBlank: 3 },
     { key: "n_factor_low", label: "Low N-factor for the range (0 to skip)", kind: "number", attrs: { step: "any" } },
     { key: "n_factor_high", label: "High N-factor for the range (0 to skip)", kind: "number", attrs: { step: "any" } },
     { key: "heating_degree_days", label: "Heating degree days (0 to skip the energy)", kind: "number", attrs: { step: "any" } },
@@ -841,7 +841,7 @@ HVACSERVICE_RENDERERS["duct-leakage-cfm25"] = _simpleRenderer({
     { key: "configuration", label: "Test configuration", kind: "select", options: [{ value: "installed", label: "All components installed", selected: true }, { value: "custom", label: "Custom limit (enter below)" }, { value: "rough-in", label: "Rough-in, equipment not installed" }, { value: "installed-inside", label: "Installed, ducts entirely in conditioned space" }, { value: "rough-in-inside", label: "Rough-in, ducts entirely in conditioned space" }] },
     { key: "ducted_returns", label: "Ducted returns", kind: "select", options: [{ value: "fewer-than-3", label: "Fewer than 3", selected: true }, { value: "3-or-more", label: "3 or more" }] },
     { key: "code_edition", label: "IECC edition", kind: "select", options: [{ value: "2024", label: "IECC 2024", selected: true }, { value: "2021", label: "IECC 2021" }] },
-    { key: "limit", label: "Custom limit (CFM25 per 100 ft², Custom configuration only)", kind: "number" },
+    { key: "limit", label: "Custom limit (CFM25 per 100 ft², Custom configuration only)", kind: "number", whenBlank: 4 },
   ],
   outputs: [
     { key: "norm", id: "dlc-out-norm", label: "Normalized leakage", value: (r) => fmt(r.normalized, 2) + " CFM25 / 100 ft^2" },
@@ -1224,8 +1224,8 @@ HVACSERVICE_RENDERERS["oil-burner-firing-rate"] = _simpleRenderer({
   citation: "Citation: oil burner nozzle firing rate (GPH), by name. input = output / (steady-state efficiency); GPH = input / heating value. No. 2 fuel oil ~138,500 BTU/gal (editable). Nozzles come in fixed GPH steps; actual flow shifts with pump pressure (rated at 100 psi, flow ~ sqrt of pressure ratio). The rating plate, nozzle chart, pump pressure, and a combustion analysis govern.",
   example: oilBurnerFiringRateExample.inputs,
   fields: [
-    { key: "output_btu_hr", label: "Design heat output (BTU/hr)", kind: "number" },
-    { key: "steady_state_efficiency_pct", label: "Steady-state efficiency (%)", kind: "number" },
+    { key: "output_btu_hr", label: "Design heat output (BTU/hr)", kind: "number", whenBlank: 88000 },
+    { key: "steady_state_efficiency_pct", label: "Steady-state efficiency (%)", kind: "number", whenBlank: 85 },
     { key: "heating_value_btu_gal", label: "Oil heating value (BTU/gal, #2 ~138,500)", kind: "number", default: 138500 },
   ],
   outputs: [
@@ -1298,7 +1298,7 @@ HVACSERVICE_RENDERERS["condensing-flue-condensate"] = _simpleRenderer({
   citation: "Citation: condensing appliance flue condensate rate, by name. Natural gas makes ~9.4 lb water per therm; condensate = (input/100,000) x water/therm x condensing fraction / 8.34 lb/gal. ~0.96 gph per 100,000 BTU/hr at an 0.85 fraction. The condensate is mildly acidic (pH ~3-5) -- codes may require a neutralizer. The rated condensate output, the plumbing code (drain/trap/neutralizer), and the manufacturer govern.",
   example: condensingFlueCondensateExample.inputs,
   fields: [
-    { key: "input_btu_hr", label: "Fuel input (BTU/hr)", kind: "number" },
+    { key: "input_btu_hr", label: "Fuel input (BTU/hr)", kind: "number", whenBlank: 100000 },
     { key: "water_lb_per_therm", label: "Water produced per therm (lb, ~9.4 nat gas)", kind: "number", default: 9.4 },
     { key: "condensing_fraction", label: "Condensing fraction (0-1, ~0.85)", kind: "number", default: 0.85 },
   ],
@@ -1347,7 +1347,7 @@ HVACSERVICE_RENDERERS["condensate-trap-depth"] = _simpleRenderer({
   fields: [
     { key: "configuration", label: "Unit configuration", kind: "select", options: [{ value: "draw-through", label: "Draw-through (negative at pan)", selected: true }, { value: "blow-through", label: "Blow-through (positive at pan)" }] },
     { key: "static_pressure_in_wc", label: "Max static pressure, worst case (in w.c.)", kind: "number" },
-    { key: "pipe_diameter_in", label: "Drain pipe diameter (in)", kind: "number" },
+    { key: "pipe_diameter_in", label: "Drain pipe diameter (in)", kind: "number", whenBlank: 1 },
     { key: "insulation_in", label: "Insulation thickness (in)", kind: "number", default: 0 },
   ],
   outputs: [

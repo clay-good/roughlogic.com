@@ -189,3 +189,19 @@ test("every declarative factory that calls spec.compute feeds the steps panel", 
   assert.ok(fed >= 90, `only ${fed} factories feed the panel`);
   assert.deepEqual(missing, [], "a declarative factory calls spec.compute but does not feed the steps panel");
 });
+
+test("stepRows: a blank box the calculator still computes with says so", () => {
+  // The declarative factories read an empty, non-required number box as
+  // `undefined`, so the compute applies its own signature default and this
+  // panel used to skip the row -- leaving the number on no surface at all.
+  const fields = [{ key: "area_ft2", label: "Area (ft²)" }, { key: "corner_height_ft", label: "Corner height (ft)", whenBlank: 8 }];
+  const rows = stepRows(fields, { area_ft2: 100 }, { total_lf: 800 }, (k) => k);
+  const h = rows.find((r) => r.label === "Corner height (ft)");
+  assert.ok(h, JSON.stringify(rows));
+  assert.equal(h.value, "8 (default, box left blank)");
+  // A value the reader DID type is printed plainly, with no note.
+  const typed = stepRows(fields, { area_ft2: 100, corner_height_ft: 9 }, { total_lf: 900 }, (k) => k);
+  assert.equal(typed.find((r) => r.label === "Corner height (ft)").value, "9");
+  // A field with no whenBlank is still skipped when blank, as before.
+  assert.equal(stepRows([{ key: "x", label: "X" }], {}, { y: 1 }, (k) => k).filter((r) => r.section === "in").length, 0);
+});

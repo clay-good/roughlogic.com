@@ -2047,8 +2047,8 @@ FAB_RENDERERS["weld-cooling-rate-t85"] = _simpleRenderer({
     { key: "heat_input_kj_mm", label: "Heat input Q (kJ/mm, after process efficiency)", kind: "number" },
     { key: "preheat_c", label: "Preheat / interpass temperature (deg C)", kind: "number", default: 20, required: true, attrs: { step: "any" } },
     { key: "thickness_mm", label: "Plate thickness (mm, the t8/5 model is metric)", kind: "number" },
-    { key: "f2", label: "Two-dimensional joint shape factor F2", kind: "number" },
-    { key: "f3", label: "Three-dimensional joint shape factor F3", kind: "number" },
+    { key: "f2", label: "Two-dimensional joint shape factor F2", kind: "number", whenBlank: 1 },
+    { key: "f3", label: "Three-dimensional joint shape factor F3", kind: "number", whenBlank: 1 },
   ],
   outputs: [
     { key: "g", id: "wt85-out-g", label: "Governing cooling time", value: (r) => fmt(r.governing_s, 2) + " s" },

@@ -138,7 +138,7 @@ GEOTECH_RENDERERS["soil-bearing-capacity"] = _simpleRenderer({
   fields: [
     { key: "c", label: "Soil cohesion c (psf, 0 for clean sand)", kind: "number" },
     { key: "phi", label: "Friction angle phi (deg, 0 for undrained clay)", kind: "number" },
-    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number" },
+    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number", whenBlank: 120 },
     { key: "b_ft", label: "Footing width B (ft)", kind: "number" },
     { key: "df_ft", label: "Embedment depth Df (ft)", kind: "number", default: 0 },
     { key: "shape", label: "Footing shape", kind: "select", options: [{ value: "strip", label: "Strip (continuous)" }, { value: "square", label: "Square" }, { value: "circular", label: "Circular" }], default: "strip" },
@@ -181,7 +181,7 @@ GEOTECH_RENDERERS["lateral-earth-pressure"] = _simpleRenderer({
   example: lateralEarthPressureExample.inputs,
   fields: [
     { key: "phi", label: "Friction angle phi (deg)", kind: "number" },
-    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number" },
+    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number", whenBlank: 120 },
     { key: "h_ft", label: "Retained height H (ft)", kind: "number" },
     { key: "q", label: "Uniform surcharge q (psf)", kind: "number" },
   ],
@@ -221,7 +221,7 @@ GEOTECH_RENDERERS["at-rest-earth-pressure"] = _simpleRenderer({
   example: atRestEarthPressureExample.inputs,
   fields: [
     { key: "phi", label: "Friction angle phi (deg)", kind: "number" },
-    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number" },
+    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number", whenBlank: 120 },
     { key: "h_ft", label: "Retained height H (ft)", kind: "number" },
     { key: "q", label: "Uniform surcharge q (psf)", kind: "number" },
   ],
@@ -262,7 +262,7 @@ GEOTECH_RENDERERS["submerged-earth-pressure"] = _simpleRenderer({
   example: submergedEarthPressureExample.inputs,
   fields: [
     { key: "phi", label: "Friction angle phi (deg)", kind: "number" },
-    { key: "gamma_sat", label: "Saturated unit weight (pcf)", kind: "number" },
+    { key: "gamma_sat", label: "Saturated unit weight (pcf)", kind: "number", whenBlank: 125 },
     { key: "h_ft", label: "Submerged retained height H (ft)", kind: "number" },
     { key: "q", label: "Uniform surcharge q (psf)", kind: "number" },
   ],
@@ -307,7 +307,7 @@ GEOTECH_RENDERERS["sloped-backfill-earth-pressure"] = _simpleRenderer({
   fields: [
     { key: "phi", label: "Friction angle phi (deg)", kind: "number" },
     { key: "beta", label: "Backfill slope beta (deg, above horizontal)", kind: "number", default: 0 },
-    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number" },
+    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number", whenBlank: 120 },
     { key: "h_ft", label: "Retained height H (ft)", kind: "number" },
   ],
   outputs: [
@@ -352,7 +352,7 @@ GEOTECH_RENDERERS["coulomb-earth-pressure"] = _simpleRenderer({
     { key: "delta", label: "Wall friction delta (deg, ~2/3 phi, 0 smooth)", kind: "number", default: 0 },
     { key: "theta", label: "Wall batter theta (deg from vertical, 0 vertical)", kind: "number" },
     { key: "alpha", label: "Backfill slope alpha (deg, 0 level)", kind: "number" },
-    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number" },
+    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number", whenBlank: 120 },
     { key: "h_ft", label: "Retained height H (ft)", kind: "number" },
   ],
   outputs: [
@@ -425,10 +425,10 @@ GEOTECH_RENDERERS["retaining-wall-stability"] = _simpleRenderer({
     { key: "t_base", label: "Base slab thickness (ft)", kind: "number" },
     { key: "t_stem", label: "Stem thickness (ft)", kind: "number" },
     { key: "toe_ft", label: "Toe length (ft)", kind: "number" },
-    { key: "gamma_s", label: "Soil unit weight (pcf)", kind: "number" },
-    { key: "gamma_c", label: "Concrete unit weight (pcf)", kind: "number" },
+    { key: "gamma_s", label: "Soil unit weight (pcf)", kind: "number", whenBlank: 110 },
+    { key: "gamma_c", label: "Concrete unit weight (pcf)", kind: "number", whenBlank: 150 },
     { key: "phi", label: "Backfill friction angle phi (deg)", kind: "number" },
-    { key: "mu", label: "Base friction coefficient mu", kind: "number" },
+    { key: "mu", label: "Base friction coefficient mu", kind: "number", whenBlank: 0.5 },
     { key: "q", label: "Backfill surcharge q (psf)", kind: "number" },
   ],
   outputs: [
@@ -515,7 +515,7 @@ GEOTECH_RENDERERS["elastic-settlement-allowable-pressure"] = _simpleRenderer({
   citation: "Citation: theory-of-elasticity immediate settlement Se = q B (1 - nu^2) Is / Es solved for the pressure, q = Se Es / (B (1 - nu^2) Is), with the shape/rigidity influence factor Is (Bowles), by name. A settlement (serviceability) limit, not the bearing-capacity strength check. A design aid, not a substitute for the geotechnical engineer's report.",
   example: elasticSettlementAllowablePressureExample.inputs,
   fields: [
-    { key: "settlement_limit_in", label: "Settlement limit Se (in)", kind: "number" },
+    { key: "settlement_limit_in", label: "Settlement limit Se (in)", kind: "number", whenBlank: 1 },
     { key: "b_ft", label: "Footing width B (ft)", kind: "number" },
     { key: "es_ksf", label: "Soil elastic modulus Es (ksf)", kind: "number" },
     { key: "nu", label: "Poisson's ratio nu (0.3 sand)", kind: "number", default: 0.3 },
@@ -654,7 +654,7 @@ GEOTECH_RENDERERS["slope-stability-infinite"] = _simpleRenderer({
     { key: "beta_deg", label: "Slope angle beta (deg)", kind: "number" },
     { key: "phi_deg", label: "Effective friction angle phi' (deg)", kind: "number" },
     { key: "c_psf", label: "Effective cohesion c' (psf, 0 cohesionless)", kind: "number", default: 0 },
-    { key: "gamma_pcf", label: "Soil unit weight (pcf)", kind: "number" },
+    { key: "gamma_pcf", label: "Soil unit weight (pcf)", kind: "number", whenBlank: 120 },
     { key: "h_ft", label: "Depth to failure plane H (ft)", kind: "number" },
   ],
   outputs: [
@@ -698,7 +698,7 @@ GEOTECH_RENDERERS["slope-stability-seepage"] = _simpleRenderer({
     { key: "beta_deg", label: "Slope angle beta (deg)", kind: "number" },
     { key: "phi_deg", label: "Effective friction angle phi' (deg)", kind: "number" },
     { key: "c_psf", label: "Effective cohesion c' (psf, 0 cohesionless)", kind: "number" },
-    { key: "gamma_sat", label: "Saturated unit weight (pcf)", kind: "number" },
+    { key: "gamma_sat", label: "Saturated unit weight (pcf)", kind: "number", whenBlank: 125 },
     { key: "h_ft", label: "Depth to failure plane H (ft)", kind: "number" },
   ],
   outputs: [
@@ -823,8 +823,8 @@ GEOTECH_RENDERERS["soil-vertical-effective-stress"] = _simpleRenderer({
   citation: "Citation: Terzaghi's effective-stress principle sigma' = sigma - u with a hydrostatic pore pressure u = gamma_w x (depth below the water table), gamma_w = 62.4 pcf, and the total vertical stress accumulated from the moist unit weight above the table and the saturated unit weight below it, plus any surface surcharge -- as compiled in Das, Principles of Foundation Engineering, and NAVFAC DM-7.01, by name. Equivalent to stacking the buoyant unit weight (gamma_sat - gamma_w) below the table. Hydrostatic conditions, level ground, uniform layers, no capillary rise. A design aid, not a substitute for the geotechnical engineer of record's report.",
   example: soilVerticalEffectiveStressExample.inputs,
   fields: [
-    { key: "gamma_moist_pcf", label: "Moist unit weight above water table (pcf)", kind: "number" },
-    { key: "gamma_sat_pcf", label: "Saturated unit weight below water table (pcf)", kind: "number" },
+    { key: "gamma_moist_pcf", label: "Moist unit weight above water table (pcf)", kind: "number", whenBlank: 120 },
+    { key: "gamma_sat_pcf", label: "Saturated unit weight below water table (pcf)", kind: "number", whenBlank: 125 },
     { key: "depth_ft", label: "Depth of interest (ft)", kind: "number" },
     { key: "water_table_depth_ft", label: "Depth to water table (ft, >= depth = dry)", kind: "number" },
     { key: "surcharge_psf", label: "Surface surcharge (psf, 0 = none)", kind: "number" },
@@ -1029,7 +1029,7 @@ GEOTECH_RENDERERS["slope-failure-depth-for-fs"] = _simpleRenderer({
     { key: "beta_deg", label: "Slope angle beta (deg)", kind: "number" },
     { key: "phi_deg", label: "Effective friction angle phi' (deg)", kind: "number" },
     { key: "c_psf", label: "Effective cohesion c' (psf, must be > 0)", kind: "number" },
-    { key: "gamma_pcf", label: "Soil unit weight (pcf)", kind: "number" },
+    { key: "gamma_pcf", label: "Soil unit weight (pcf)", kind: "number", whenBlank: 120 },
     { key: "target_fs", label: "Target factor of safety (e.g. 1.5)", kind: "number" },
   ],
   outputs: [
@@ -1069,10 +1069,10 @@ GEOTECH_RENDERERS["frost-depth-berggren"] = _simpleRenderer({
   citation: "Citation: Stefan / modified-Berggren frost penetration (US Army Corps / FHWA), by name. Stefan X = sqrt(48 kf FI / L); L = 144 x dry density x water content/100 (latent heat of fusion); modified Berggren X_MB = lambda x X_Stefan, lambda ~0.6-0.9 from the Berggren nomograph. Computes the physics, not the code frost line -- the locally adopted frost depth (IRC Table R301.2 / amendment), the geotech report, and the AHJ govern the footing depth.",
   example: frostDepthBerggrenExample.inputs,
   fields: [
-    { key: "freezing_index_f_days", label: "Surface freezing index nF = n-factor x air-freezing index (F-days; TM 5-852-6)", kind: "number" },
-    { key: "frozen_conductivity_btu", label: "Frozen conductivity kf (BTU/hr-ft-F)", kind: "number" },
-    { key: "dry_density_pcf", label: "Dry density (pcf)", kind: "number" },
-    { key: "water_content_pct", label: "Water content (percent)", kind: "number" },
+    { key: "freezing_index_f_days", label: "Surface freezing index nF = n-factor x air-freezing index (F-days; TM 5-852-6)", kind: "number", whenBlank: 2000 },
+    { key: "frozen_conductivity_btu", label: "Frozen conductivity kf (BTU/hr-ft-F)", kind: "number", whenBlank: 1 },
+    { key: "dry_density_pcf", label: "Dry density (pcf)", kind: "number", whenBlank: 100 },
+    { key: "water_content_pct", label: "Water content (percent)", kind: "number", whenBlank: 15 },
     { key: "berggren_lambda", label: "Berggren lambda (0-1, ~0.8)", kind: "number", default: 0.8 },
   ],
   outputs: [
@@ -1147,7 +1147,7 @@ GEOTECH_RENDERERS["seismic-earth-pressure"] = _simpleRenderer({
     { key: "delta", label: "Wall friction delta (deg, ~2/3 phi, 0 smooth)", kind: "number", default: 0 },
     { key: "theta", label: "Wall batter theta (deg from vertical, 0 vertical)", kind: "number" },
     { key: "alpha", label: "Backfill slope alpha (deg, 0 level)", kind: "number" },
-    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number" },
+    { key: "gamma", label: "Soil unit weight (pcf)", kind: "number", whenBlank: 120 },
     { key: "h_ft", label: "Retained height H (ft)", kind: "number" },
     { key: "kh", label: "Horizontal seismic coefficient kh", kind: "number", default: 0 },
     { key: "kv", label: "Vertical seismic coefficient kv (+ up)", kind: "number" },
@@ -1308,7 +1308,7 @@ GEOTECH_RENDERERS["pole-embedment-depth"] = _simpleRenderer({
     { key: "lateral_force_lb", label: "Applied lateral force P (lb)", kind: "number" },
     { key: "force_height_ft", label: "Height of force above grade h (ft)", kind: "number" },
     { key: "post_width_ft", label: "Post/footing width b (ft; round dia or square diagonal)", kind: "number" },
-    { key: "lateral_bearing_psf_per_ft", label: "Lateral bearing (psf per ft depth, local code)", kind: "number" },
+    { key: "lateral_bearing_psf_per_ft", label: "Lateral bearing (psf per ft depth, local code)", kind: "number", whenBlank: 150 },
     { key: "constraint", label: "Restraint at grade", kind: "select", options: [{ value: "nonconstrained", label: "Nonconstrained (soil only)", selected: true }, { value: "constrained", label: "Constrained (rigid slab/pavement at grade)" }] },
     { key: "isolated", label: "Isolated pole (1/2-in movement OK, 2x bearing)", kind: "select", options: [{ value: "yes", label: "Yes (flagpole/sign/fence, 1806.3.4)", selected: true }, { value: "no", label: "No (movement-sensitive)" }] },
   ],
