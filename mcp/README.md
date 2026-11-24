@@ -362,9 +362,9 @@ that had been recovering nothing at all:
 | "Span 1", "Span 2", "Span 3" -- one name and a counter | Indexed siblings take their values in the order written, but only when the question accounts for every one of them |
 | `8.5663516e-8` -- the number pattern stops at the "e" | Scientific notation is written out in the query rewrites, before the scanner |
 
-Field recovery went from **8,751 to 10,212 of 10,678** (82.0% to 95.6%), tiles
-with every value recovered from 1,513 to 2,024, and the door's own answers from
-1,625 to 2,050 -- with 0 wrong in either lens throughout. The refusal above is
+Field recovery went from **8,751 to 10,273 of 10,684** (82.0% to 96.2%), tiles
+with every value recovered from 1,513 to 2,035, and the door's own answers from
+1,625 to 2,061 -- with 0 wrong in either lens throughout. The refusal above is
 what remains for the values nothing can read: a date, a list, a rate whose label
 declares no unit.
 

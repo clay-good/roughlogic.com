@@ -254,6 +254,12 @@ export function labelTerms(labelLead) {
   // name, standing alone immediately before its own number, and the bare
   // article "a" needs a second such letter beside it.
   if (whole && whole.length >= 1 && whole.length <= 5 && !/\s/.test(whole)) out.add(whole);
+  // A single-word label that IS a stopword -- "Number" on the scientific-
+  // notation screen -- was dropped by the floor below and left the row with no
+  // terms at all, so nothing could ever name it (2026-11-24). The word is
+  // admitted only as a last resort, and only for a one-word label: the
+  // matching side still has to see it written in the window.
+  if (/^[a-z]+$/.test(whole) && TERM_STOPWORDS.has(whole)) out.add(whole);
   for (const raw of cleaned.split(/[^a-z]+/)) {
     // "Horizontal run" lost its "run" to the floor, so "14 ft run" had no
     // field to name (2026-11-23). The one three-letter dimension word stays.
@@ -1134,11 +1140,23 @@ export function queryFill(query, rows, opts) {
       return r ? String(r.l || "").toLowerCase().replace(/\d+/g, "").replace(/[^a-z]+/g, " ").trim() : "";
     };
     const byHitSet = new Map();      // "a|b|c" -> [quantity index, ...]
+    const wordsOf = (k) => sigOf(k).split(" ").filter(Boolean).length;
     for (const [qi, hits] of rowsFor) {
       if (!hits || hits.length < 2 || suppressed.has(qi)) continue;
-      const sig = sigOf(hits[0]);
-      if (!sig || !hits.every((k) => sigOf(k) === sig)) continue;
-      const tag = [...hits].sort().join("|");
+      // One field whose label merely CONTAINS the siblings' word is not one of
+      // them: "Sag at the ruling span" joined all eight "Span N" fields and
+      // broke the group, so a ruling span recovered nothing (2026-11-24). The
+      // siblings are the signature the hits agree on; a hit carrying strictly
+      // more label words than that is a different field, by the same rule that
+      // prefers a label written whole.
+      const tally = new Map();
+      for (const k of hits) tally.set(sigOf(k), (tally.get(sigOf(k)) || 0) + 1);
+      let sig = null, best = 0;
+      for (const [g, n] of tally) if (n > best) { best = n; sig = g; }
+      if (!sig || best < 2) continue;
+      const group = hits.filter((k) => sigOf(k) === sig);
+      if (!hits.every((k) => sigOf(k) === sig || wordsOf(k) > sig.split(" ").filter(Boolean).length)) continue;
+      const tag = [...group].sort().join("|");
       if (!byHitSet.has(tag)) byHitSet.set(tag, []);
       byHitSet.get(tag).push(qi);
     }
@@ -1147,13 +1165,29 @@ export function queryFill(query, rows, opts) {
       // Declared order, not sorted-by-key order: "Layer 10" must not precede
       // "Layer 2", and the row list is the order the page shows.
       const ordered = rows.filter((r) => keys.includes(r.d)).map((r) => r.d);
-      // As MANY values as there are siblings, exactly. A short list cannot be
+      // INDEX-NUMBERED siblings may take a short list. "Span 1".."Span 8" are
+      // numbered by the calculator itself, so the k-th value written is the
+      // k-th span whether or not the reader fills all eight -- a ruling span
+      // is five spans on a five-span line. Labels that are all IDENTICAL carry
+      // no such order, and there a short list is exactly what went wrong
+      // below, so they still need every sibling accounted for.
+      const indexed = (() => {
+        const tails = ordered.map((k) => {
+          const l = String((rows.find((r) => r.d === k) || {}).l || "");
+          const m = l.match(/(\d+)\s*$/) || l.match(/(\d+)/);
+          return m ? m[1] : null;
+        });
+        return tails.every(Boolean) && new Set(tails).size === tails.length;
+      })();
+      // As MANY values as there are siblings, exactly -- unless they are
+      // index-numbered. A short list cannot be
       // placed by position: `caz-depressurization-limit` carries four boxes all
       // labelled "Its limit", one of its four values reached this rule naming
       // something else as well, and the remaining three slid up a place -- the
       // furnace limit took the induced-draft figure (2026-11-23). Positional
       // reading is only sound when the question accounts for every sibling.
-      if (ordered.length !== keys.length || qis.length !== ordered.length) continue;
+      if (ordered.length !== keys.length) continue;
+      if (indexed ? qis.length > ordered.length : qis.length !== ordered.length) continue;
       if (ordered.some((k) => k in filled)) continue;
       qis.sort((x, y) => x - y);
       let ok = true;

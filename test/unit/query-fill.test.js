@@ -898,9 +898,11 @@ test("query-fill: indexed siblings take their values in the order they are writt
   const valves = [num("v1", "Valve 1 set pressure", "psi"), num("v2", "Valve 2 set pressure", "psi")];
   assert.deepEqual(queryFill("Valve set pressure 150 psi, Valve set pressure 175 psi", valves).filled,
     { v1: "150", v2: "175" });
-  // As many values as siblings, exactly: a short list cannot be placed by
-  // position, because the values would slide up a place.
-  assert.deepEqual(queryFill("Ruling Span Span 300 ft, Span 450 ft", spans, { name: "Ruling Span" }).filled, {});
+  // A short list is placed by position only where the labels are INDEX-NUMBERED
+  // and so carry the calculator's own order; see the index-numbered test below
+  // for the identically-labelled case, which still needs every sibling.
+  assert.deepEqual(queryFill("Ruling Span Span 300 ft, Span 450 ft", spans, { name: "Ruling Span" }).filled,
+    { s1: "300", s2: "450" });
   // ...and a tie between fields that are NOT siblings is still refused.
   const pr = [num("p", "Principal", "usd"), num("x", "Extra principal per month", "usd")];
   assert.deepEqual(queryFill("loan extra principal 100", pr).filled, {});
@@ -937,4 +939,30 @@ test("query-fill: a one-character label is a name where the reader wrote it as o
   const hazard = [num("a", "a"), num("len_ft", "Length", "ft")];
   assert.deepEqual(queryFill("area of a 40 ft wall", hazard).filled, { len_ft: "40" });
   assert.equal(queryFill("a 12 by 14 room needs how much", hazard).filled.a, undefined);
+});
+
+test("query-fill: index-numbered siblings take a short list; identical ones do not", () => {
+  // "Span 1".."Span 5" are numbered by the calculator, so three values written
+  // in order are the first three spans -- a ruling span is five spans on a
+  // five-span line. And one field whose label merely CONTAINS the siblings'
+  // word is not one of them.
+  const spans = [num("s1", "Span 1", "ft"), num("s2", "Span 2", "ft"), num("s3", "Span 3", "ft"),
+    num("s4", "Span 4", "ft"), num("s5", "Span 5", "ft"), num("sag", "Sag at the ruling span", "ft")];
+  assert.deepEqual(queryFill("Span 300 ft, Span 450 ft, Span 380 ft", spans).filled,
+    { s1: "300", s2: "450", s3: "380" });
+  // Identically labelled siblings carry no order, so a short list there would
+  // slide the values up a place: four boxes all called "Its limit" need every
+  // one accounted for.
+  const limits = [num("a", "Its limit", "pa"), num("b", "Its limit", "pa"), num("c", "Its limit", "pa"), num("d", "Its limit", "pa")];
+  assert.deepEqual(queryFill("Its limit 2 pa, Its limit 3 pa, Its limit 5 pa", limits).filled, {});
+});
+
+test("query-fill: a one-word label that is a stopword still names its field", () => {
+  // "Number" was dropped by the term floor, leaving the row nameless.
+  assert.deepEqual(queryFill("Scientific Notation Number 0.00347", [num("value", "Number")],
+    { name: "Scientific Notation" }).filled, { value: "0.00347" });
+  // It is a last resort, not a licence: "Number of dryers" still wins on its
+  // own distinguishing word.
+  const dryer = [num("num_dryers", "Number of dryers"), num("nameplate_w", "Each dryer nameplate", "w")];
+  assert.equal(queryFill("Number of dryers 4, Each dryer nameplate 4500 w", dryer).filled.num_dryers, "4");
 });
