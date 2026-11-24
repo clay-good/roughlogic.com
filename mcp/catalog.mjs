@@ -149,7 +149,20 @@ async function load() {
     else aliasExact.set(term, new Set([row.target]));
   }
 
-  _state = { TOOLS, COMPUTE_MAP, RENDERER_MAP, examples, byId, modCache, aliases, aliasExact };
+  // The curated phrases a reader's QUESTION can contain, longest first: the
+  // ones `answerQuery` resolves from the corpus when the ranker did not surface
+  // their tile. Built once with `aliasExact`, because the test is the same one
+  // an exact term gets -- the term must name exactly one tile -- and scanning
+  // all ~23,600 rows per call turned a 7-minute corpus sweep into 20.
+  const aliasPhrases = [];
+  for (const [term, set] of aliasExact) {
+    if (set.size !== 1 || term.length < 8 || !term.includes(" ")) continue;
+    const id = [...set][0];
+    if (byId.has(id)) aliasPhrases.push({ term, target: id });
+  }
+  aliasPhrases.sort((a, b) => b.term.length - a.term.length || (a.term < b.term ? -1 : 1));
+
+  _state = { TOOLS, COMPUTE_MAP, RENDERER_MAP, examples, byId, modCache, aliases, aliasExact, aliasPhrases };
   return _state;
 }
 
@@ -1639,7 +1652,7 @@ export async function answerQuery({ query } = {}) {
   const q = String(query || "").trim();
   if (!q) return { status: "NO_MATCH", query: q, message: "Pass a plain-language question." };
 
-  const { byId, aliases: aliasRows, aliasExact } = await load();
+  const { byId, aliases: aliasRows, aliasExact, aliasPhrases } = await load();
   const ranked = await search({ query: q, limit: 3 });
   const results = (ranked && ranked.results) || [];
   // Corroboration is only ever asked of ONE tile, so which one it asks about
@@ -1731,11 +1744,55 @@ export async function answerQuery({ query } = {}) {
     || soleAliasTarget;
   const exactName = results.find((r) => sameTokens(q, byId.get(r.id)));
   const namedWithFields = exactAlias || exactName ? null : await nameThenOwnFields(q, byId);
+  // 3b. A curated phrase the question CONTAINS, resolved from the corpus
+  //     rather than from the ranked top 3 -- the same correction `soleAliasTarget`
+  //     made for an exact term, applied to the form a reader actually types.
+  //     A question is a curated phrase plus the job's own numbers: "how many
+  //     joists" is written against joist-hanger-count, and "how many joists for
+  //     a 16 ft wide floor at 16 in on center" is that phrase with the floor in
+  //     it. The containment branch below could only promote a target the ranker
+  //     had already placed in the top 3, so both of those came back NO_MATCH
+  //     with the mapped calculator sitting at rank 5 (2026-11-23: the same for
+  //     "how many bricks for a 200 sq ft wall" -> masonry-count and "concrete
+  //     for a 10 by 12 slab 4 in thick", which ranked a minimum-thickness
+  //     check above the volume tile a human mapped "concrete needed for a 4
+  //     inch thick slab" to).
+  //
+  //     The LONGEST contained term wins, and only when it names one tile. A
+  //     short term is inside many questions -- "duct size" is in every duct
+  //     question there is -- so taking the longest is taking the most specific
+  //     thing a maintainer wrote, and a tie between targets states no
+  //     preference, which leaves the ranker as arbiter exactly as a shared
+  //     term does above. Multi-word and at a token boundary: a single curated
+  //     word ("sheave", "concrete") is a search term, not a reader's phrasing
+  //     of a job, and one inside a longer word is a coincidence.
+  const containedAliasTarget = literalId || exactAlias || exactName || namedWithFields
+    ? null
+    : (() => {
+      const lower = q.toLowerCase();
+      const whole = ({ term }) => {
+        const at = lower.indexOf(term);
+        if (at < 0) return false;
+        if (at > 0 && /[a-z0-9]/.test(lower[at - 1])) return false;
+        const after = lower[at + term.length];
+        return after === undefined || !/[a-z0-9]/.test(after);
+      };
+      const hit = aliasPhrases.findIndex(whole);
+      if (hit < 0) return null;
+      const { term, target } = aliasPhrases[hit];
+      // A term of the same length pointing elsewhere is the same standoff two
+      // tiles sharing one term are, and the ranker arbitrates it.
+      for (let i = hit + 1; i < aliasPhrases.length && aliasPhrases[i].term.length === term.length; i += 1) {
+        if (aliasPhrases[i].target !== target && whole(aliasPhrases[i])) return null;
+      }
+      return { id: target };
+    })();
   const top = literalId
     || exactAlias
     || exactName
     || namedWithFields
     || results.find((r) => queryIsCuratedAliasFor(q, r.id, aliasRows))
+    || containedAliasTarget
     || results[0];
   if (!top) return { status: "NO_MATCH", query: q, message: "No calculator matched." };
 
@@ -1838,12 +1895,20 @@ export async function answerQuery({ query } = {}) {
   // watts and volts it was given (2026-11-23).
   const answers = (r) => r && !r.error && Object.values(r).every((v) => v !== null && v !== undefined && (typeof v !== "number" || (Number.isFinite(v) && v !== 0)));
   const numericKey = (k) => rows.some((r) => r.d === k && (r.k === "number" || r.k === undefined));
+  // What the trial said when it did not answer. A calculator that refuses in
+  // its own words has told the agent more than the field index can: "Enter the
+  // room length, width and wall height, or the area" names the one box that is
+  // actually missing, while `missingRequired` -- measured in the tile's default
+  // mode -- named the Area the question deliberately replaced (2026-11-23,
+  // "paint for a 12 by 14 room" came back "needs Area" with the room filled).
+  let refusal = null;
   if (missingRequired.length && !choseMode) {
     try {
       const trial = await run({ id: top.id, inputs: coerceForCompute(filled, rows, await inputDefaults(top.id)) });
       if (trial && answers(trial.result) && !(trial.warnings || []).some((w) => w && (w.rule === "min" || w.rule === "max" || (w.rule === "missing" && numericKey(w.key))))) {
         return { ...trial, status: "OK", query: q, name: top.name, via: "registry", ...(await disclose()) };
       }
+      if (trial && trial.result && trial.result.error) refusal = trial.result.error;
     } catch { /* fall through to naming what is missing */ }
   }
   if (missingRequired.length && choseMode) {
@@ -1852,13 +1917,21 @@ export async function answerQuery({ query } = {}) {
       if (trial && trial.result && !trial.result.error && !(trial.warnings || []).some((w) => w && (w.rule === "min" || w.rule === "max") && w.key in filled)) {
         return { ...trial, status: "OK", query: q, name: top.name, via: "registry", ...(await disclose()) };
       }
+      if (trial && trial.result && trial.result.error) refusal = trial.result.error;
     } catch { /* fall through to naming what is missing */ }
   }
   if (missingRequired.length) {
+    // Every unfilled box, once the calculator itself has refused: the field the
+    // default mode called required may not be the one this question needs.
+    const unfilled = refusal
+      ? rows.filter((r) => !(r.d in filled)).map((r) => ({ key: r.d, label: r.l, unit: r.u || null }))
+      : missingRequired;
     return {
       status: "MISSING_INPUTS", query: q, id: top.id, name: top.name,
-      inputs: filled, missing: missingRequired,
-      message: `"${top.name}" needs ${missingRequired.map((m) => m.label).join(", ")}.`,
+      inputs: filled, missing: unfilled, ...(refusal ? { error: refusal } : {}),
+      message: refusal
+        ? `"${top.name}" did not answer from the values read from the question: ${refusal}`
+        : `"${top.name}" needs ${missingRequired.map((m) => m.label).join(", ")}.`,
     };
   }
 

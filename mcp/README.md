@@ -292,6 +292,26 @@ An exact term is now resolved from the corpus itself, and all 22,534 reach their
 tile. A term two tiles share states no preference, so the ranker still
 arbitrates those.
 
+The same correction applies to the form a reader actually types. A question is a
+curated phrase plus the job's own numbers: *"how many joists"* is written against
+`joist-hanger-count`, and *"how many joists for a 16 ft wide floor at 16 in on
+center"* is that phrase with the floor in it. Containment was still searched over
+the ranked top 3 only, so that question came back `NO_MATCH` with the mapped
+calculator at rank 5 -- as did *"how many bricks for a 200 sq ft wall"*, while
+*"concrete for a 10 by 12 slab 4 in thick"* answered as a minimum-thickness
+deflection check. A contained phrase is now resolved from the corpus too: the
+**longest** contained term wins, and only when it names one tile, so the most
+specific thing a maintainer wrote decides and a tie leaves the ranker as arbiter.
+Multi-word and matched at a token boundary -- a single curated word is a search
+term, not a reader's phrasing of a job.
+
+When a calculator **refuses** in its own words, the door passes that refusal
+through and lists every empty box, rather than naming the fields the field index
+measured as required in the tile's default mode. *"Paint for a 12 by 14 room"*
+said it needed the Area -- the one box the room size deliberately replaces. It
+now returns the calculator's own sentence, *"Enter the room length, width and
+wall height, or the area"*, with `wall_height_ft` among the missing fields.
+
 `scripts/measure-alias-door.mjs` sweeps the whole corpus through the door, about
 six minutes; it sits with the other `measure-*` harnesses rather than in the
 lint chain. The six regressions and a deterministic slice are standing tests.

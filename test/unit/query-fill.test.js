@@ -822,3 +822,21 @@ test("query-fill: the word after a number can name the field its unit points awa
   const lf = [num("n_lb_per_1000", "Nitrogen rate"), num("bag_weight_lb", "Bag weight", "lb")];
   assert.equal(queryFill("fertilizer 150 lb nitrogen", lf).filled.bag_weight_lb, undefined);
 });
+
+test("query-fill: a planting bed is a surface, so its plan is an area", () => {
+  const mulch = [num("area_ft2", "Area", "ft2"), num("depth_in", "Depth", "in"), num("bulk_density", "Bulk density")];
+  assert.deepEqual(queryFill("mulch for a 4 by 10 bed 3 in deep", mulch).filled, { area_ft2: "40", depth_in: "3" });
+  assert.deepEqual(queryFill("how much topsoil for a raised bed 4 by 8 by 12 in", mulch).filled, { area_ft2: "32", depth_in: "12" });
+  // "bedroom" is still the room it is, not a bed.
+  const paint = [num("area_ft2", "Area", "ft2"), num("room_length_ft", "Or room length", "ft"), num("room_width_ft", "Room width", "ft")];
+  assert.deepEqual(queryFill("paint for a 12 by 14 bedroom", paint).filled, { room_length_ft: "12", room_width_ft: "14" });
+});
+
+test("query-fill: a surface by its length and width in words, and a piece's area is not the plan's", () => {
+  const mulch = [num("area_ft2", "Area", "ft2"), num("depth_in", "Depth", "in")];
+  assert.deepEqual(queryFill("how much gravel for a 30 ft driveway 10 ft wide 4 in deep", mulch).filled,
+    { area_ft2: "300", depth_in: "4" });
+  // "Panel area" is the sheet a plan is divided into, not the plan.
+  const sheath = [num("area_sf", "Area to sheathe", "ft2"), num("sheet_sf", "Panel area", "ft2")];
+  assert.deepEqual(queryFill("how many sheets of plywood for a 24 by 40 floor", sheath).filled, { area_sf: "960" });
+});

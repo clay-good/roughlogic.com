@@ -117909,6 +117909,21 @@
   "kind": "question"
  },
  {
+  "term": "paint for",
+  "target": "paint-coverage",
+  "kind": "question"
+ },
+ {
+  "term": "how many sheets of plywood",
+  "target": "sheathing-takeoff",
+  "kind": "question"
+ },
+ {
+  "term": "concrete for a",
+  "target": "concrete",
+  "kind": "question"
+ },
+ {
   "term": "how many gallons in my pool",
   "target": "pool-volume",
   "kind": "question"

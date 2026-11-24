@@ -532,15 +532,23 @@ export function queryFill(query, rows, opts) {
   // that pair, its one plan-area field with the product. An area labelled as
   // a sloped surface, a wall or a ceiling is not a plan area and is left alone
   // (2026-11-16: these questions filled nothing, or filled the wrong field).
+  // An area that is one PIECE's, not the surface's: "Panel area (ft2, 32 for a
+  // 4x8)" is the sheet a plan is divided into, and it sat beside "Area to
+  // sheathe" so neither could be the plan's one area field (2026-11-23,
+  // "how many sheets of plywood for a 24 by 40 floor" filled nothing).
+  const ITEM_AREA = /\b(panel|sheet|board|tile|block|brick|paver|piece|unit|bag|roll|module|plank|course|mat)s?\b/i;
   {
     const PLAN = /(^|[^\d.])(\d+(?:\.\d+)?)\s*(?:by|x)\s*(\d+(?:\.\d+)?)(?![\d.]|\s*(?:in\b|inch|"|'|cm\b|mm\b|m\b))(?:\s*(?:ft|feet|foot)\b)?(\s+[a-z]+)?/;
-    const SURFACES = /^\s+(floor|room|slab|patio|deck|yard|driveway|kitchen|bathroom|bedroom|garage|basement|lawn|garden|pad|area|space|lot|walkway|sidewalk|shed|porch)s?$/;
+    const SURFACES = /^\s+(floor|room|slab|patio|deck|yard|driveway|kitchen|bathroom|bedroom|garage|basement|lawn|garden|bed|pad|area|space|lot|walkway|sidewalk|shed|porch)s?$/;
     const m = text.match(PLAN);
     if (m) {
       const a = Number(m[2]), b = Number(m[3]);
       // ...or one just before it: "room 12 by 12" (2026-11-23).
       const surface = Boolean(m[4] && SURFACES.test(m[4])) ||
-        /\b(?:floor|room|slab|patio|deck|kitchen|bathroom|bedroom|garage|basement|space)s?\s*$/.test(text.slice(0, m.index + m[1].length));
+        // A planting bed is a surface too: "a raised bed 4 by 8 by 12 in" is
+      // 32 ft2 of garden a yard of topsoil has to fill (2026-11-23). Matched
+      // at a word boundary, so "bedroom" still reads as the room it is.
+      /\b(?:floor|room|slab|patio|deck|kitchen|bathroom|bedroom|garage|basement|space|bed)s?\s*$/.test(text.slice(0, m.index + m[1].length));
       if (a > 0 && b > 0 && (surface || Math.max(a, b) > NOMINAL_LUMBER_MAX_IN)) {
         const start = m.index + m[1].length, end = start + m[0].length - m[1].length - (m[4] || "").length;
         const inPair = quantities.map((q, i) => (q.index >= start && q.index < end ? i : -1)).filter((i) => i >= 0);
@@ -551,14 +559,14 @@ export function queryFill(query, rows, opts) {
         const ft = (word) => numberRows.filter((r) => rowUnit(r) === "ft" && termsByRow.get(r.d).has(word) &&
           String(r.l || "").toLowerCase().split(/[^a-z]+/).filter((w) => w.length > 2 && !TERM_STOPWORDS.has(w)).every((w) => PLAN_NOUNS.has(w) || PLAN_NOUNS.has(w.replace(/s$/, ""))));
         const len = ft("length"), wid = ft("width");
-        const areas = numberRows.filter((r) => rowUnit(r) === "ft2" && !/slop|surface|wall|ceiling/i.test(r.l));
+        const areas = numberRows.filter((r) => rowUnit(r) === "ft2" && !/slop|surface|wall|ceiling/i.test(r.l) && !ITEM_AREA.test(r.l));
         let done = false;
         if (len.length === 1 && wid.length === 1 && len[0].d !== wid[0].d) {
           filled[len[0].d] = String(a); filled[wid[0].d] = String(b); done = true;
         // A width with no length beside it ("Carpet roll width") is not a
         // plan side and does not stop the area filling (2026-11-23).
         } else if (!len.length && areas.length === 1 && m[4] &&
-                   (/^\s+(floor|slab|patio|deck|yard|driveway|lawn|garden|pad|area|lot|walkway|sidewalk)s?$/.test(m[4]) ||
+                   (/^\s+(floor|slab|patio|deck|yard|driveway|lawn|garden|bed|pad|area|lot|walkway|sidewalk)s?$/.test(m[4]) ||
                     termsByRow.get(areas[0].d).has(m[4].trim().replace(/s$/, "")) ||
                     // ...and so is a room's, when the question is about what
                     // covers its floor ("carpet for a 12 by 15 room", 2026-11-23).
@@ -623,6 +631,23 @@ export function queryFill(query, rows, opts) {
     const sides = numberRows.filter((r) => rowUnit(r) && unitFamily(rowUnit(r)) === "length" && ["length", "height"].some((w) => termsByRow.get(r.d).has(w)));
     if (m && wallArea.length === 1 && !sides.length && !(wallArea[0].d in filled)) {
       filled[wallArea[0].d] = String(Math.round(Number(m[1]) * Number(m[2]) * 1e6) / 1e6);
+      quantities.forEach((q, i) => { if (q.index >= m.index && q.index < m.index + m[0].length) { suppressed.add(i); claimed.add(i); } });
+    }
+  }
+
+  // --- A surface by its length and width in words: "30 ft driveway 10 ft wide"
+  // The same shape as the wall above, for a plan rather than an elevation. On
+  // a tile that takes the plan as one area and asks for no length or width,
+  // the two sides are that area (2026-11-23: "how much gravel for a 30 ft
+  // driveway 10 ft wide 4 in deep" read only the depth, and the calculator
+  // refused on a zero area).
+  {
+    const m = text.match(/(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)\s+(?:long\s+)?(?:floor|room|slab|patio|deck|yard|driveway|lawn|garden|bed|pad|lot|walkway|sidewalk|shed|porch)s?\s+(\d+(?:\.\d+)?)\s*(?:ft|feet|foot)\s+wide\b/);
+    const plan = numberRows.filter((r) => rowUnit(r) === "ft2" && !/slop|surface|wall|ceiling/i.test(r.l) && !ITEM_AREA.test(r.l));
+    const sides = numberRows.filter((r) => rowUnit(r) && unitFamily(rowUnit(r)) === "length" &&
+      ["length", "width"].some((w) => termsByRow.get(r.d).has(w)));
+    if (m && plan.length === 1 && !sides.length && !(plan[0].d in filled)) {
+      filled[plan[0].d] = String(Math.round(Number(m[1]) * Number(m[2]) * 1e6) / 1e6);
       quantities.forEach((q, i) => { if (q.index >= m.index && q.index < m.index + m[0].length) { suppressed.add(i); claimed.add(i); } });
     }
   }

@@ -847,3 +847,35 @@ test("answer_query: a default only the compute holds is not an answer", async ()
   const out = await answerQuery({ query: "siding 3 in exposure" });
   assert.notEqual(out.status, "OK", JSON.stringify(out.result || {}).slice(0, 80));
 });
+
+test("answer_query: a curated phrase the question contains is resolved from the corpus", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  // Each of these is a curated phrase plus the job's own numbers, and in each
+  // the mapped tile ranked below the top 3, so containment over the ranked
+  // results could not reach it (2026-11-23: all four came back NO_MATCH or
+  // named a different calculator).
+  assert.equal((await answerQuery({ query: "how many joists for a 16 ft wide floor at 16 in on center" })).id, "joist-hanger-count");
+  assert.equal((await answerQuery({ query: "how many bricks for a 200 sq ft wall" })).id, "masonry-count");
+  const slab = await answerQuery({ query: "concrete for a 10 by 12 slab 4 in thick" });
+  assert.equal(slab.id, "concrete");
+  assert.equal(slab.status, "OK");
+  assert.equal(slab.result.cubic_feet, 40);
+  const paint = await answerQuery({ query: "paint for 1200 sq ft of wall with 2 coats" });
+  assert.equal(paint.id, "paint-coverage");
+  assert.equal(paint.status, "OK");
+  assert.ok(Math.abs(paint.result.total_paint_gallons - 1200 * 2 / 350) < 1e-9);
+  const duct = await answerQuery({ query: "duct size for 800 cfm at 0.08 in per 100 ft" });
+  assert.equal(duct.status, "OK");
+  assert.equal(duct.id, "duct-sizing");
+});
+
+test("answer_query: a calculator that refuses says so, and names every empty box", async () => {
+  const { answerQuery } = await import("../../mcp/catalog.mjs");
+  // The room replaces the Area, so "needs Area" named the one field the
+  // question deliberately left out; the wall height is what is missing.
+  const out = await answerQuery({ query: "paint for a 12 by 14 room" });
+  assert.equal(out.status, "MISSING_INPUTS");
+  assert.equal(out.id, "paint-coverage");
+  assert.match(out.error || "", /wall height/i);
+  assert.ok(out.missing.some((m) => m.key === "wall_height_ft"), JSON.stringify(out.missing));
+});
