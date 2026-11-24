@@ -206,7 +206,11 @@ test("a numeric-select tile publishes its enum as numbers, and run honors both f
 });
 
 test("a bespoke-renderer tile degrades to compute introspection, no crash", async () => {
-  const d = await describe({ id: "anchor-embedment" }); // bespoke, options do not resolve statically
+  // A bespoke renderer whose only inputs are LISTS: nothing static can project
+  // a list-valued field, so this tile keeps degrading. (anchor-embedment stood
+  // here until 2026-11-23, when the extractor learned to read a yes/no select
+  // the renderer turns into a boolean itself, and it gained a real schema.)
+  const d = await describe({ id: "panel-rebalance" });
   assert.equal(d.inputs_source, "compute");
   assert.ok(Array.isArray(d.inputs) && d.inputs.length > 0);
   assert.ok(d.inputs.every((i) => typeof i.name === "string"));

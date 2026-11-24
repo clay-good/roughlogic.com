@@ -479,8 +479,10 @@ function parseComputeCall(body) {
   // (`const key = Number(fieldvar.input.value)` then `{ ..., key }`) -- the `[:=]`
   // covers both. Spurious matches to non-params are ignored (only real compute
   // params are looked up).
-  for (const m of body.matchAll(/([A-Za-z_$][\w$]*)\s*[:=]\s*(Number\(\s*)?([A-Za-z_$][\w$]*)\.(select|input)\.value/g)) {
-    if (!map.has(m[1])) map.set(m[1], { var: m[3], coerced: Boolean(m[2]), accessor: m[4] });
+  for (const m of body.matchAll(/([A-Za-z_$][\w$]*)\s*[:=]\s*(Number\(\s*)?([A-Za-z_$][\w$]*)\.(select|input)\.value(\s*===\s*"[^"]*")?/g)) {
+    if (!map.has(m[1])) {
+      map.set(m[1], { var: m[3], coerced: Boolean(m[2]), accessor: m[4], boolEq: Boolean(m[5]) });
+    }
   }
   return map;
 }
@@ -662,6 +664,20 @@ async function main() {
       let field = fields.get(ref.var);
       if (!field) { anyUnmapped = true; continue; }
       if (field.kind === "select") {
+        // A yes/no dropdown the renderer turns into a boolean itself:
+        // `secondary_protection: sp.select.value === "both"`. The PAGE is
+        // right -- it is the extractor that could not see the conversion, so
+        // 11 tiles kept no schema at all and the agent door could not reach
+        // them (2026-11-23). Published as a CHECKBOX, not as the string enum:
+        // a compute that reads `rated_100 ? 1.00 : 1.25` finds "no" truthy
+        // just as it finds "yes" truthy, so advertising the option strings
+        // would hand run() a confidently wrong answer. A checkbox gives it
+        // the boolean the renderer computes, and query-fill already reads a
+        // boolean word ("no", "off", "0") into one.
+        if (defType === "boolean" && ref.boolEq) {
+          inputs.push({ key, label: field.label, kind: "checkbox", options: null, default: defValue ?? false, attrs: null });
+          continue;
+        }
         if (defType === "boolean") { typeMismatch = true; break; }
         if (!field.options || field.options.length === 0) { anyUnmapped = true; continue; } // dynamic options — omit
         if (ref.coerced) {
