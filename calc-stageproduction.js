@@ -141,10 +141,10 @@ STAGEPRODUCTION_RENDERERS["line-array-splay"] = _r({
   example: lineArraySplayExample.inputs,
   fields: [
     { key: "trim_height_ft", label: "Trim height to the top of the array (ft)", kind: "number" },
-    { key: "ear_height_ft", label: "Listener ear height (ft)", kind: "number" },
+    { key: "ear_height_ft", label: "Listener ear height (ft)", kind: "number", whenBlank: 4 },
     { key: "near_throw_ft", label: "Near throw, array to first row (ft)", kind: "number" },
     { key: "far_throw_ft", label: "Far throw, array to last row (ft)", kind: "number" },
-    { key: "cabinets", label: "Number of cabinets", kind: "number" },
+    { key: "cabinets", label: "Number of cabinets", kind: "number", whenBlank: 1 },
   ],
   outputs: [
     { key: "n", id: "lasp-out-n", label: "Down-tilt to the first row", value: (r) => fmt(r.angle_near_deg, 2) + " deg below horizontal" },
@@ -254,7 +254,7 @@ STAGEPRODUCTION_RENDERERS["cardioid-sub-array"] = _r({
   example: cardioidSubArrayExample.inputs,
   fields: [
     { key: "spacing_ft", label: "Element spacing, front to back (ft)", kind: "number" },
-    { key: "elements", label: "Number of elements", kind: "number" },
+    { key: "elements", label: "Number of elements", kind: "number", whenBlank: 4 },
     { key: "temp_f", label: "Air temperature (F)", kind: "number", default: 70, required: true },
     { key: "target_freq_hz", label: "Target rejection frequency (Hz, 0 to skip)", kind: "number" },
   ],
@@ -423,7 +423,7 @@ STAGEPRODUCTION_RENDERERS["rf-antenna-cable-loss"] = _r({
     { key: "length_ft", label: "Cable length (ft)", kind: "number" },
     { key: "loss_per_100ft_db", label: "Cable loss per 100 ft at the operating frequency (dB)", kind: "number" },
     { key: "connectors", label: "Number of connectors", kind: "number" },
-    { key: "loss_per_connector_db", label: "Loss per connector (dB)", kind: "number" },
+    { key: "loss_per_connector_db", label: "Loss per connector (dB)", kind: "number", whenBlank: 0.25 },
     { key: "splitter_loss_db", label: "Splitter or distribution insertion loss (dB)", kind: "number" },
     { key: "amplifier_gain_db", label: "Inline amplifier gain (dB)", kind: "number" },
   ],
@@ -480,11 +480,11 @@ STAGEPRODUCTION_RENDERERS["chain-hoist-lift-time"] = _r({
   example: chainHoistLiftTimeExample.inputs,
   fields: [
     { key: "lift_height_ft", label: "Lift height / trim (ft)", kind: "number" },
-    { key: "hoist_speed_fpm", label: "Hoist speed (ft/min)", kind: "number" },
+    { key: "hoist_speed_fpm", label: "Hoist speed (ft/min)", kind: "number", whenBlank: 16 },
     { key: "load_lb", label: "Load per hoist (lb)", kind: "number" },
     { key: "duty_cycle", label: "Duty-cycle fraction (0.40 = 40%)", kind: "number", default: 0.4 },
-    { key: "rating_period_min", label: "Rating period (min)", kind: "number" },
-    { key: "hoists", label: "Number of hoists", kind: "number" },
+    { key: "rating_period_min", label: "Rating period (min)", kind: "number", whenBlank: 10 },
+    { key: "hoists", label: "Number of hoists", kind: "number", whenBlank: 1 },
   ],
   outputs: [
     { key: "t", id: "chlt-out-t", label: "Lift time", value: (r) => fmt(r.lift_time_min, 2) + " min" },
@@ -617,8 +617,8 @@ STAGEPRODUCTION_RENDERERS["mired-gel-shift"] = _r({
   citation: "Citation: reciprocal color temperature (mireds = 1,000,000 / kelvin) and the mired-shift specification of correction filters, by name. The full/half/quarter/eighth CTB and CTO shift values are Rosco's published figures (Full CTB -131, Full CTO +167, 3/4 CTO +131); other makers' sheets differ (Lee Full CTO +159); the filter manufacturer's published mired shift for the specific sheet, and a color meter, govern a critical match.",
   example: miredGelShiftExample.inputs,
   fields: [
-    { key: "source_k", label: "Source color temperature (K)", kind: "number" },
-    { key: "target_k", label: "Target color temperature (K)", kind: "number" },
+    { key: "source_k", label: "Source color temperature (K)", kind: "number", whenBlank: 3200 },
+    { key: "target_k", label: "Target color temperature (K)", kind: "number", whenBlank: 5600 },
     { key: "applied_shift", label: "Applied mired shift (0 to use the nearest standard sheet)", kind: "number" },
   ],
   outputs: [
@@ -667,9 +667,9 @@ STAGEPRODUCTION_RENDERERS["haze-machine-sizing"] = _r({
   fields: [
     { key: "volume_cf", label: "Venue volume (cubic ft)", kind: "number" },
     { key: "ach", label: "Air changes per hour", kind: "number" },
-    { key: "ref_volume_cf", label: "Reference volume (cubic ft)", kind: "number" },
-    { key: "ref_ach", label: "Reference air changes per hour", kind: "number" },
-    { key: "ref_output", label: "Reference machine output (fluid per hour)", kind: "number" },
+    { key: "ref_volume_cf", label: "Reference volume (cubic ft)", kind: "number", whenBlank: 100000 },
+    { key: "ref_ach", label: "Reference air changes per hour", kind: "number", whenBlank: 2 },
+    { key: "ref_output", label: "Reference machine output (fluid per hour)", kind: "number", whenBlank: 1 },
   ],
   outputs: [
     { key: "v", id: "haze-out-v", label: "Ventilation rate", value: (r) => fmt(r.ventilation_cfm, 0) + " cfm" },
@@ -737,8 +737,8 @@ STAGEPRODUCTION_RENDERERS["stage-deck-live-load"] = _r({
   fields: [
     { key: "length_ft", label: "Deck length (ft)", kind: "number" },
     { key: "width_ft", label: "Deck width (ft)", kind: "number" },
-    { key: "legs", label: "Number of legs", kind: "number" },
-    { key: "design_psf", label: "Design live load (psf)", kind: "number" },
+    { key: "legs", label: "Number of legs", kind: "number", whenBlank: 4 },
+    { key: "design_psf", label: "Design live load (psf)", kind: "number", whenBlank: 150 },
     { key: "deck_dead_lb", label: "Deck dead weight (lb)", kind: "number" },
     { key: "leg_rating_lb", label: "Leg rating (lb)", kind: "number" },
     { key: "point_load_lb", label: "Concentrated load to check (lb, 0 to skip)", kind: "number" },
@@ -792,9 +792,9 @@ STAGEPRODUCTION_RENDERERS["video-wall-data-rate"] = _r({
   fields: [
     { key: "width_px", label: "Wall width (pixels)", kind: "number" },
     { key: "height_px", label: "Wall height (pixels)", kind: "number" },
-    { key: "bit_depth", label: "Bit depth per channel", kind: "number" },
-    { key: "refresh_hz", label: "Refresh rate (Hz)", kind: "number" },
-    { key: "pixels_per_port", label: "Pixels per processor port", kind: "number" },
+    { key: "bit_depth", label: "Bit depth per channel", kind: "number", whenBlank: 8 },
+    { key: "refresh_hz", label: "Refresh rate (Hz)", kind: "number", whenBlank: 60 },
+    { key: "pixels_per_port", label: "Pixels per processor port", kind: "number", whenBlank: 650000 },
   ],
   outputs: [
     { key: "p", id: "vwdr-out-p", label: "Total pixels", value: (r) => fmt(r.total_pixels, 0) },
@@ -853,9 +853,9 @@ STAGEPRODUCTION_RENDERERS["outdoor-stage-wind"] = _r({
     { key: "banner_width_ft", label: "Banner or scrim width (ft)", kind: "number" },
     { key: "centroid_height_ft", label: "Centroid height above the base (ft)", kind: "number" },
     { key: "wind_speed_mph", label: "Design wind speed (mph)", kind: "number" },
-    { key: "drag_coefficient", label: "Drag coefficient", kind: "number" },
+    { key: "drag_coefficient", label: "Drag coefficient", kind: "number", whenBlank: 1.3 },
     { key: "base_width_ft", label: "Base width between ballast points (ft)", kind: "number" },
-    { key: "safety_factor", label: "Safety factor", kind: "number" },
+    { key: "safety_factor", label: "Safety factor", kind: "number", whenBlank: 1.5 },
     { key: "available_ballast_lb", label: "Ballast on hand (lb, 0 to skip)", kind: "number" },
   ],
   outputs: [

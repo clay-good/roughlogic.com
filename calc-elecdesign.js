@@ -733,9 +733,9 @@ ELECDESIGN_RENDERERS["room-cavity-ratio"] = _simpleRenderer({
   citation: "Citation: room cavity ratio, IES zonal-cavity method, by name. RCR = 5 x cavity height x (L + W) / (L x W); cavity height = luminaire plane to the WORK plane (not floor to ceiling). The RCR (with the surface reflectances) reads the CU off the fixture's photometric report, which feeds the lumen method. The IES photometric file and the actual reflectances govern the CU.",
   example: roomCavityRatioExample.inputs,
   fields: [
-    { key: "room_length_ft", label: "Room length (ft)", kind: "number", whenBlank: 40 },
-    { key: "room_width_ft", label: "Room width (ft)", kind: "number", whenBlank: 30 },
-    { key: "cavity_height_ft", label: "Cavity height: luminaire to work plane (ft)", kind: "number", whenBlank: 8 },
+    { key: "room_length_ft", label: "Room length (ft)", kind: "number" },
+    { key: "room_width_ft", label: "Room width (ft)", kind: "number" },
+    { key: "cavity_height_ft", label: "Cavity height: luminaire to work plane (ft)", kind: "number" },
   ],
   outputs: [
     { key: "r", id: "rcr-out-r", label: "Room cavity ratio (RCR)", value: (r) => fmt(r.room_cavity_ratio, 2) },

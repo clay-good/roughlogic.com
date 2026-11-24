@@ -539,7 +539,7 @@ const renderPumpEff = _r({
     { key: "flow_gpm",   label: "Flow (GPM)", kind: "number" },
     { key: "tdh_ft",     label: "Total dynamic head (ft)", kind: "number" },
     { key: "motor_kW",   label: "Motor input (kW)", kind: "number" },
-    { key: "motor_eff",  label: "Motor efficiency (0-1)", kind: "number" },
+    { key: "motor_eff",  label: "Motor efficiency (0-1)", kind: "number", whenBlank: 0.92 },
     { key: "drive_eff",  label: "Drive efficiency (0-1)", kind: "number", default: 1 },
   ],
   outputs: [
@@ -1722,7 +1722,7 @@ const renderUvDose = _v23SimpleRenderer({
   fields: [
     { key: "intensity_mw_cm2", label: "UV intensity (mW/cm²)", kind: "number" },
     { key: "exposure_time_s", label: "Exposure time (s)", kind: "number" },
-    { key: "target_dose_mj_cm2", label: "Target dose (mJ/cm²)", kind: "number" },
+    { key: "target_dose_mj_cm2", label: "Target dose (mJ/cm²)", kind: "number", whenBlank: 40 },
   ],
   outputs: [
     { key: "d", id: "uvd-out-d", label: "Delivered dose", value: (r) => fmt(r.dose_mj_cm2, 1) + " mJ/cm^2" },
@@ -1756,7 +1756,7 @@ const renderUvRequiredExposure = _v23SimpleRenderer({
   citation: "Citation: USEPA UV Disinfection Guidance Manual (by name, not reproduced). Dose = intensity x time (mW.s/cm^2 = mJ/cm^2) solved for the missing operand: required time = dose / intensity, or required intensity = dose / time; common validated target 40 mJ/cm^2 (editable). The validated reactor dose and the state primacy agency govern.",
   example: uvRequiredExposureExample.inputs,
   fields: [
-    { key: "target_dose_mj_cm2", label: "Target dose (mJ/cm²)", kind: "number" },
+    { key: "target_dose_mj_cm2", label: "Target dose (mJ/cm²)", kind: "number", whenBlank: 40 },
     { key: "intensity_mw_cm2", label: "UV intensity (mW/cm², 0 = solve for it)", kind: "number" },
     { key: "exposure_time_s", label: "Exposure time (s, 0 = solve for it)", kind: "number" },
   ],

@@ -230,6 +230,35 @@ test("every whenBlank a renderer declares is published on its schema and nowhere
       assert.equal(inp.default, null, id + "." + key + " leaked whenBlank into describe()'s default");
     }
   }
-  assert.ok(tiles > 250, "tiles carrying a blank default: " + tiles);
-  assert.ok(fields > 600, "fields carrying a blank default: " + fields);
+  assert.ok(tiles > 350, "tiles carrying a blank default: " + tiles);
+  assert.ok(fields > 750, "fields carrying a blank default: " + fields);
+});
+
+test("a whenBlank is only ever claimed where the page really sends undefined", async () => {
+  // The claim is about the PAGE, so it is checked against the page: the
+  // fake-DOM sweep records every argument an untouched tile sends as
+  // `undefined`, which is the only shape a destructuring default can fill. A
+  // whenBlank on a field the renderer fills (a prefilled box) or passes as
+  // null (a `required` one) would print a number the calculator never used --
+  // two such claims existed when this landed (2026-11-24).
+  const { execFileSync } = await import("node:child_process");
+  const { fileURLToPath } = await import("node:url");
+  const { resolve, dirname } = await import("node:path");
+  const here = dirname(fileURLToPath(import.meta.url));
+  const sweepPath = resolve(here, "..", "fixtures", "render-blank-arg-sweep.js");
+  const sweep = JSON.parse(execFileSync(process.execPath, [sweepPath],
+    { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "ignore"] }));
+  const { RENDERER_MAP } = await import("../fixtures/renderer-map.js");
+  const bad = [];
+  for (const [id, reg] of Object.entries(RENDERER_MAP)) {
+    if (!reg || !reg.module || !reg.exportName) continue;
+    let mod;
+    try { mod = await import("../fixtures/" + reg.module.replace(/^\.\.\/\.\.\//, "../../")); } catch { continue; }
+    const fn = (mod[reg.exportName] || {})[id];
+    const blanks = (fn && fn.schema && fn.schema.blankDefaults) || {};
+    if (!Object.keys(blanks).length) continue;
+    const sends = new Set(sweep.undefinedArgs[id] || []);
+    for (const key of Object.keys(blanks)) if (!sends.has(key)) bad.push(id + "." + key);
+  }
+  assert.deepEqual(bad, [], "whenBlank claimed where the page does not send undefined: " + bad.join(", "));
 });

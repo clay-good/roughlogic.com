@@ -360,9 +360,9 @@ FIRESPRINKLER_RENDERERS["smoke-detector-spacing-count"] = _simpleRenderer({
   citation: "Citation: NFPA 72 spot-detector grid by name. detectors = the fewest grid cells that each fit the listed S x S square or keep every point within 0.7 S (NFPA 72 17.7.4.2.3.1); wall maximum = spacing / 2.",
   example: smokeDetectorSpacingCountExample.inputs,
   fields: [
-    { key: "room_length_ft", label: "Room length (ft)", kind: "number", whenBlank: 60 },
-    { key: "room_width_ft", label: "Room width (ft)", kind: "number", whenBlank: 40 },
-    { key: "listed_spacing_ft", label: "Device listed spacing (ft)", kind: "number", whenBlank: 30 },
+    { key: "room_length_ft", label: "Room length (ft)", kind: "number" },
+    { key: "room_width_ft", label: "Room width (ft)", kind: "number" },
+    { key: "listed_spacing_ft", label: "Device listed spacing (ft)", kind: "number" },
   ],
   outputs: [
     { key: "d", id: "sds-out-d", label: "Detectors", value: (r) => fmt(r.detectors, 0) + " " + (fmt(r.detectors, 0) === "1" ? "detector" : "detectors") + " (" + fmt(r.rows, 0) + " x " + fmt(r.cols, 0) + " grid)" },

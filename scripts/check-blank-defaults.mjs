@@ -14,10 +14,18 @@
 // saying 8, which is worse than saying nothing. This reads the signature and
 // compares, so the claim cannot drift without turning the build red.
 //
-// Reads the renderer source rather than the schema, because `whenBlank` is
-// deliberately NOT part of the MCP input contract: `describe_calculator` still
-// reports `default: null` for these fields, so the agent door keeps refusing a
-// default the page does not show (the rule commit c970d044 established).
+// Reads every tile's PUBLISHED map (`schema.blankDefaults`) through the
+// renderer registry, not the module source. A source scan has to know which
+// factory built the spec, and the modules use six aliases for it
+// (_simpleRenderer, _simpleRendererG, _v23SimpleRenderer, _r, _rEnv, _rPool):
+// scanning for one of them silently skipped a false claim on a `required`
+// field in calc-kitchen.js, which is exactly what this gate exists to catch
+// (2026-11-24). The registry is factory-agnostic and exact per tile.
+//
+// `blankDefaults` is deliberately NOT part of the MCP input contract:
+// `describe_calculator` still reports `default: null` for these fields, so the
+// agent door keeps refusing a default the page does not show (the rule commit
+// c970d044 established). test/unit/steps-panel-guard.test.js pins that.
 //
 // Zero dependencies, no network. `node scripts/check-blank-defaults.mjs`.
 import { readFileSync, readdirSync } from "node:fs";
@@ -57,48 +65,39 @@ function sigDefaults(fn) {
   return map;
 }
 
-// Brace-match forward from `at` (which must sit on an opening brace).
-function block(src, at) {
-  let depth = 0;
-  for (let i = at; i < src.length; i += 1) {
-    if (src[i] === "{") depth += 1;
-    else if (src[i] === "}") { depth -= 1; if (!depth) return src.slice(at, i + 1); }
-  }
-  return "";
-}
-
 const errors = [];
-let checked = 0, specs = 0;
+let checked = 0, tiles = 0;
 
-for (const name of readdirSync(ROOT).filter((f) => /^calc-.*\.js$/.test(f))) {
-  const src = readFileSync(resolve(ROOT, name), "utf8");
-  if (!src.includes("whenBlank:")) continue;
-  const mod = await import(pathToFileURL(resolve(ROOT, name)).href);
+const { RENDERER_MAP } = await import(resolve(ROOT, "test", "fixtures", "renderer-map.js"));
+const { COMPUTE_MAP } = await import(resolve(ROOT, "test", "fixtures", "compute-map.js"));
 
-  // Each `_simpleRenderer({ ... })` spec: the compute it names, and every
-  // field in it that declares a whenBlank.
-  for (const m of src.matchAll(/_simpleRenderer\(\s*(\{)/g)) {
-    const spec = block(src, m.index + m[0].length - 1);
-    if (!spec || !spec.includes("whenBlank:")) continue;
-    specs += 1;
-    const cm = spec.match(/\bcompute:\s*([A-Za-z_$][\w$]*)/);
-    if (!cm) { errors.push(`${name}: a spec declares whenBlank but names no compute`); continue; }
-    const fn = mod[cm[1]];
-    if (typeof fn !== "function") { errors.push(`${name}: ${cm[1]} is not an exported function`); continue; }
-    const defs = sigDefaults(fn);
-    if (!defs) { errors.push(`${name}: ${cm[1]} has no destructured parameter to read`); continue; }
+for (const [id, reg] of Object.entries(RENDERER_MAP)) {
+  if (!reg || !reg.module || !reg.exportName) continue;
+  let rmod;
+  try { rmod = await import(pathToFileURL(resolve(ROOT, "test", "fixtures", reg.module)).href); } catch { continue; }
+  const fn = (rmod[reg.exportName] || {})[id];
+  const blanks = fn && fn.schema && fn.schema.blankDefaults;
+  if (!blanks || !Object.keys(blanks).length) continue;
+  tiles += 1;
 
-    for (const f of spec.matchAll(/\{[^{}\n]*\bkey:\s*"([^"]+)"[^{}\n]*\bwhenBlank:\s*(-?[\d.]+)[^{}\n]*\}/g)) {
-      const [, key, claimed] = f;
-      checked += 1;
-      if (!defs.has(key)) {
-        errors.push(`${name}: ${cm[1]}({ ${key} }) declares no numeric default, but the field claims whenBlank ${claimed}`);
-        continue;
-      }
-      const real = defs.get(key);
-      if (Number(claimed) !== real) {
-        errors.push(`${name}: ${cm[1]}({ ${key} }) defaults to ${real}, but the field claims whenBlank ${claimed}`);
-      }
+  const creg = COMPUTE_MAP[id];
+  if (!creg) { errors.push(`${id}: declares ${Object.keys(blanks).length} blank default(s) but has no compute registered`); continue; }
+  let cmod;
+  try { cmod = await import(pathToFileURL(resolve(ROOT, "test", "fixtures", creg.module)).href); } catch { errors.push(`${id}: its compute module will not import`); continue; }
+  const compute = cmod[creg.fn];
+  if (typeof compute !== "function") { errors.push(`${id}: ${creg.fn} is not an exported function`); continue; }
+  const defs = sigDefaults(compute);
+  if (!defs) { errors.push(`${id}: ${creg.fn} has no destructured parameter to read`); continue; }
+
+  for (const [key, claimed] of Object.entries(blanks)) {
+    checked += 1;
+    if (!defs.has(key)) {
+      errors.push(`${id}: ${creg.fn}({ ${key} }) declares no numeric default, but the field claims whenBlank ${claimed}`);
+      continue;
+    }
+    const real = defs.get(key);
+    if (Number(claimed) !== real) {
+      errors.push(`${id}: ${creg.fn}({ ${key} }) defaults to ${real}, but the field claims whenBlank ${claimed}`);
     }
   }
 }
@@ -108,4 +107,4 @@ if (errors.length) {
   console.error(`check-blank-defaults FAILED: ${errors.length} field(s) claim a default their compute does not apply.`);
   process.exit(1);
 }
-console.log(`check-blank-defaults OK: ${checked} whenBlank value(s) across ${specs} renderer spec(s) match the default their compute applies.`);
+console.log(`check-blank-defaults OK: ${checked} whenBlank value(s) across ${tiles} tile(s) match the default their compute applies.`);

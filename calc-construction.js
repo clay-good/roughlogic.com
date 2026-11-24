@@ -6399,8 +6399,8 @@ const _renderConcreteVibratorSpacing = _simpleRenderer({
   citation: "Citation: ACI 309 spacing rule by name. max spacing = 1.5 x radius of action; edge distance <= 0.75 x radius of action; insertions = ceil(lift length x 12 / spacing). The radius of action comes from the vibrator manufacturer.",
   example: concreteVibratorSpacingExample.inputs,
   fields: [
-    { key: "radius_of_action_in", label: "Vibrator radius of action R (in)", kind: "number", whenBlank: 12 },
-    { key: "lift_length_ft", label: "Lift / run length to consolidate (ft)", kind: "number", whenBlank: 20 },
+    { key: "radius_of_action_in", label: "Vibrator radius of action R (in)", kind: "number" },
+    { key: "lift_length_ft", label: "Lift / run length to consolidate (ft)", kind: "number" },
   ],
   outputs: [
     { key: "s", id: "cvs-out-s", label: "Max insertion spacing", value: (r) => _fmtC(r.max_spacing_in, 1) + " in" },
@@ -6498,7 +6498,7 @@ const _renderMassConcreteTempRise = _simpleRenderer({
   fields: [
     { key: "cementitious_lb_per_cy", label: "Total cementitious content (lb/cy)", kind: "number", whenBlank: 600 },
     { key: "rise_f_per_100lb", label: "Adiabatic rise per 100 lb cementitious (degF)", kind: "number", whenBlank: 12 },
-    { key: "placing_temp_f", label: "Concrete placing temperature (degF)", kind: "number", attrs: { step: "any" } },
+    { key: "placing_temp_f", label: "Concrete placing temperature (degF)", kind: "number", attrs: { step: "any" }, whenBlank: 70 },
     { key: "diff_limit_f", label: "Surface-core differential target (degF)", kind: "number", whenBlank: 35 },
   ],
   outputs: [
@@ -6691,7 +6691,7 @@ const _renderConcreteMaturity = _simpleRenderer({
     { key: "hours", label: "Elapsed curing time (hours)", kind: "number", attrs: { step: "any" } },
     { key: "datum_f", label: "Datum temperature T0 (°F)", kind: "number", default: 32, required: true, attrs: { step: "any" } },
     { key: "q_kelvin", label: "Arrhenius constant Q (K)", kind: "number", whenBlank: 5000 },
-    { key: "ref_temp_f", label: "Reference temperature Tr (°F)", kind: "number", attrs: { step: "any" } },
+    { key: "ref_temp_f", label: "Reference temperature Tr (°F)", kind: "number", attrs: { step: "any" }, whenBlank: 68 },
     { key: "target_ttf_c", label: "Target TTF (°C-hr, 0 = none)", kind: "number" },
   ],
   outputs: [
@@ -9959,8 +9959,8 @@ const _v867renderSillPlateAnchorCount = _simpleRenderer({
   citation: "Citation: anchor-count identity by name (IRC R403.1.6). bolts = max(2, ceil((wall - 2 x end distance) / max spacing) + 1). The IRC caps the spacing at 6 ft with a bolt within 12 in of each end and a minimum of two per plate.",
   example: sillPlateAnchorCountExample.inputs,
   fields: [
-    { key: "wall_length_ft", label: "Wall / plate length (ft)", kind: "number", whenBlank: 40 },
-    { key: "max_spacing_ft", label: "Maximum anchor spacing (ft)", kind: "number", whenBlank: 6 },
+    { key: "wall_length_ft", label: "Wall / plate length (ft)", kind: "number" },
+    { key: "max_spacing_ft", label: "Maximum anchor spacing (ft)", kind: "number" },
     { key: "end_distance_in", label: "Bolt distance from each end (in)", kind: "number", default: 9 },
   ],
   outputs: [
@@ -10121,8 +10121,8 @@ const _v869renderSuspendedCeilingGrid = _simpleRenderer({
   citation: "Citation: 2x4 grid takeoff ratios by name. panels = area / 8; main tee = area / 4; cross tee = area / 2; wall angle = perimeter; hangers = area / 16 (mains at 4 ft on center). Seismic areas add bracing per code.",
   example: suspendedCeilingGridExample.inputs,
   fields: [
-    { key: "room_length_ft", label: "Room length (ft)", kind: "number", whenBlank: 24 },
-    { key: "room_width_ft", label: "Room width (ft)", kind: "number", whenBlank: 40 },
+    { key: "room_length_ft", label: "Room length (ft)", kind: "number" },
+    { key: "room_width_ft", label: "Room width (ft)", kind: "number" },
   ],
   outputs: [
     { key: "p", id: "scg-out-p", label: "Ceiling panels (2x4)", value: (r) => _fmtC(r.panels, 0) + " " + (_fmtC(r.panels, 0) === "1" ? "panel" : "panels") },
@@ -10167,9 +10167,9 @@ const _v870renderMasonryControlJointLayout = _simpleRenderer({
   citation: "Citation: masonry control-joint rule by name (NCMA empirical). max spacing = min(1.5 x wall height, project cap); panels = ceil(wall length / max spacing); joints = panels - 1. Control joints also go at openings and changes in height or thickness.",
   example: masonryControlJointLayoutExample.inputs,
   fields: [
-    { key: "wall_length_ft", label: "Wall length (ft)", kind: "number", whenBlank: 80 },
-    { key: "wall_height_ft", label: "Wall height (ft)", kind: "number", whenBlank: 16 },
-    { key: "max_spacing_cap_ft", label: "Project spacing cap (ft)", kind: "number", whenBlank: 25 },
+    { key: "wall_length_ft", label: "Wall length (ft)", kind: "number" },
+    { key: "wall_height_ft", label: "Wall height (ft)", kind: "number" },
+    { key: "max_spacing_cap_ft", label: "Project spacing cap (ft)", kind: "number" },
   ],
   outputs: [
     { key: "j", id: "mcj-out-j", label: "Control joints", value: (r) => _fmtC(r.joints, 0) + " " + (_fmtC(r.joints, 0) === "1" ? "joint" : "joints") + " (" + _fmtC(r.panels, 0) + " " + (_fmtC(r.panels, 0) === "1" ? "panel" : "panels") + ")" },
@@ -10685,9 +10685,9 @@ const _v881renderBalusterPicketCount = _simpleRenderer({
   citation: "Citation: spacing rule by name (IRC 4 in sphere). pickets = ceil((clear - max gap) / (picket width + max gap)); actual gap = (clear - pickets x width) / (pickets + 1). The IRC limits the opening so a 4 in sphere cannot pass through a guard.",
   example: balusterPicketCountExample.inputs,
   fields: [
-    { key: "rail_clear_in", label: "Clear span between posts (in)", kind: "number", whenBlank: 96 },
-    { key: "picket_width_in", label: "Picket width (in)", kind: "number", whenBlank: 1.5 },
-    { key: "max_gap_in", label: "Maximum clear gap (in)", kind: "number", whenBlank: 4 },
+    { key: "rail_clear_in", label: "Clear span between posts (in)", kind: "number" },
+    { key: "picket_width_in", label: "Picket width (in)", kind: "number" },
+    { key: "max_gap_in", label: "Maximum clear gap (in)", kind: "number" },
   ],
   outputs: [
     { key: "p", id: "bpc-out-p", label: "Balusters / pickets", value: (r) => _fmtC(r.pickets, 0) + " " + (_fmtC(r.pickets, 0) === "1" ? "picket" : "pickets") + " (" + _fmtC(r.gaps, 0) + " " + (_fmtC(r.gaps, 0) === "1" ? "gap" : "gaps") + ")" },
@@ -10895,9 +10895,9 @@ const _v886renderConcreteSawcutFootage = _simpleRenderer({
   citation: "Citation: saw-cut-footage identity by name. panels each way = ceil(dimension / spacing); joint footage = (panels_L - 1) x width + (panels_W - 1) x length. The spacing comes from control-joint-spacing.",
   example: concreteSawcutFootageExample.inputs,
   fields: [
-    { key: "length_ft", label: "Slab length (ft)", kind: "number", whenBlank: 60 },
-    { key: "width_ft", label: "Slab width (ft)", kind: "number", whenBlank: 40 },
-    { key: "spacing_ft", label: "Joint spacing (ft)", kind: "number", whenBlank: 12 },
+    { key: "length_ft", label: "Slab length (ft)", kind: "number" },
+    { key: "width_ft", label: "Slab width (ft)", kind: "number" },
+    { key: "spacing_ft", label: "Joint spacing (ft)", kind: "number" },
   ],
   outputs: [
     { key: "panels", id: "csf-out-p", label: "Panel grid", value: (r) => _fmtC(r.panels_l, 0) + " x " + _fmtC(r.panels_w, 0) + " = " + _fmtC(r.panels, 0) + " " + (_fmtC(r.panels, 0) === "1" ? "panel" : "panels") },
@@ -11748,8 +11748,8 @@ CONSTRUCTION_RENDERERS["siding-course-layout"] = _simpleRenderer({
   fields: [
     { key: "wall_height_ft", label: "Wall height (ft)", kind: "number" },
     { key: "wall_length_ft", label: "Wall length (ft)", kind: "number" },
-    { key: "target_exposure_in", label: "Target exposure / reveal (in)", kind: "number", whenBlank: 7 },
-    { key: "board_height_in", label: "Board height (in)", kind: "number", whenBlank: 8 },
+    { key: "target_exposure_in", label: "Target exposure / reveal (in)", kind: "number" },
+    { key: "board_height_in", label: "Board height (in)", kind: "number" },
     { key: "min_overlap_in", label: "Manufacturer minimum overlap (in)", kind: "number", default: 1 },
   ],
   outputs: [

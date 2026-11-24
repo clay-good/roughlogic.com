@@ -477,7 +477,7 @@ const renderTimberCruise = _r({
   example: timberCruiseExample.inputs,
   fields: [
     { key: "small_end_dib_in", label: "Small-end DIB (in)", kind: "number" },
-    { key: "log_length_ft", label: "Log length (ft)", kind: "number" },
+    { key: "log_length_ft", label: "Log length (ft)", kind: "number", whenBlank: 16 },
     { key: "rule", label: "Rule", kind: "select", options: [{ value: "doyle", label: "Doyle" }, { value: "scribner", label: "Scribner" }, { value: "international", label: "International 1/4" }] },
     { key: "price_per_bf", label: "Price ($/bf, optional)", kind: "number", attrs: { step: "any", min: "0" } },
   ],
@@ -497,7 +497,7 @@ const renderSeedRate = _r({
     { key: "in_row_spacing_in", label: "In-row spacing (in, optional)", kind: "number" },
     { key: "target_pop_per_acre", label: "Target population / acre", kind: "number" },
     { key: "seeds_per_lb", label: "Seeds per lb", kind: "number" },
-    { key: "germination_pct", label: "Germination %", kind: "number" },
+    { key: "germination_pct", label: "Germination %", kind: "number", whenBlank: 100 },
     { key: "seed_price_per_lb", label: "Seed price ($/lb, optional)", kind: "number" },
   ],
   outputs: [
@@ -588,7 +588,7 @@ const renderBulkDensity = _r({
   fields: [
     { key: "dry_mass_g", label: "Dry core mass (g)", kind: "number" },
     { key: "core_volume_cc", label: "Core volume (cc)", kind: "number" },
-    { key: "particle_density_pcc", label: "Particle density (g/cc)", kind: "number" },
+    { key: "particle_density_pcc", label: "Particle density (g/cc)", kind: "number", whenBlank: 2.65 },
     { key: "texture", label: "Texture", kind: "select", options: Object.keys(COMPACTION_THRESHOLDS_PCC).map((k) => ({ value: k, label: k.replace(/_/g, " ") + (k === "clay" ? " (over 45% clay)" : "") })) },
   ],
   outputs: [
@@ -2700,8 +2700,8 @@ const renderSodTakeoff = _v23SimpleRenderer({
   fields: [
     { key: "lawn_ft2", label: "Lawn area to sod (ft²)", kind: "number" },
     { key: "waste_pct", label: "Cut / edge waste (%)", kind: "number" },
-    { key: "slab_ft2", label: "Slab coverage (ft²)", kind: "number" },
-    { key: "pallet_ft2", label: "Pallet coverage (ft²)", kind: "number" },
+    { key: "slab_ft2", label: "Slab coverage (ft²)", kind: "number", whenBlank: 10 },
+    { key: "pallet_ft2", label: "Pallet coverage (ft²)", kind: "number", whenBlank: 450 },
   ],
   outputs: [
     { key: "o", id: "sod-out-o", label: "Order area", value: (r) => fmt(r.order_ft2, 0) + " ft^2 (" + fmt(r.order_syd, 1) + " syd)" },

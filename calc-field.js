@@ -1407,7 +1407,7 @@ FIELD_RENDERERS["contour-slope"] = _r({
     { key: "contour_interval_ft", label: "Contour interval (ft)", kind: "number" },
     { key: "intervals_crossed", label: "Intervals crossed", kind: "number" },
     { key: "map_distance_in", label: "Measured map distance (in)", kind: "number" },
-    { key: "representative_fraction", label: "Representative fraction denominator", kind: "number" },
+    { key: "representative_fraction", label: "Representative fraction denominator", kind: "number", whenBlank: 24000 },
   ],
   outputs: [
     { key: "r", id: "cnsl-out-r", label: "Rise and run", value: (r) => fmt(r.rise_ft, 1) + " ft over " + fmt(r.run_ft, 1) + " ft" },
@@ -1473,7 +1473,7 @@ FIELD_RENDERERS["helicopter-lz-sizing"] = _r({
     { key: "size_factor", label: "Size factor (2 for routine daytime)", kind: "number", default: 2 },
     { key: "measured_clear_ft", label: "Measured clear area, side (ft)", kind: "number" },
     { key: "ground_slope_deg", label: "Ground slope (deg)", kind: "number" },
-    { key: "slope_limit_deg", label: "Aircraft slope limit (deg)", kind: "number" },
+    { key: "slope_limit_deg", label: "Aircraft slope limit (deg)", kind: "number", whenBlank: 8 },
     { key: "obstacle_height_ft", label: "Tallest obstacle on the approach (ft)", kind: "number" },
     { key: "approach_ratio", label: "Approach ratio (10 for 10:1)", kind: "number", default: 10 },
   ],
@@ -1529,11 +1529,11 @@ FIELD_RENDERERS["litter-carry-team"] = _r({
   example: litterCarryTeamExample.inputs,
   fields: [
     { key: "distance_mi", label: "Carry distance (mi)", kind: "number" },
-    { key: "pace_mph", label: "Sustained pace (mph)", kind: "number" },
-    { key: "carriers_per_litter", label: "Carriers per litter", kind: "number" },
+    { key: "pace_mph", label: "Sustained pace (mph)", kind: "number", whenBlank: 1 },
+    { key: "carriers_per_litter", label: "Carriers per litter", kind: "number", whenBlank: 6 },
     { key: "duty_fraction", label: "Duty fraction per team (0.5 = half the time carrying)", kind: "number", default: 0.5 },
-    { key: "rotation_interval_min", label: "Rotation interval (min)", kind: "number" },
-    { key: "support_personnel", label: "Attendants and support personnel", kind: "number" },
+    { key: "rotation_interval_min", label: "Rotation interval (min)", kind: "number", whenBlank: 10 },
+    { key: "support_personnel", label: "Attendants and support personnel", kind: "number", whenBlank: 2 },
   ],
   outputs: [
     { key: "t", id: "ltcy-out-t", label: "Carry time", value: (r) => fmt(r.carry_time_hr, 2) + " hr (" + fmt(r.carry_time_min, 0) + " min)" },

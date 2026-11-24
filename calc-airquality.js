@@ -1242,7 +1242,7 @@ AIRQUALITY_RENDERERS["noise-barrier-insertion-loss"] = _simpleRenderer({
     { key: "source_to_receiver_ft", label: "Source to receiver direct (ft, 0 to skip)", kind: "number", attrs: { step: "any" } },
     { key: "frequency_hz", label: "Frequency (Hz)", kind: "number", attrs: { step: "any" } },
     { key: "second_frequency_hz", label: "Second frequency to compare (Hz, 0 to skip)", kind: "number", attrs: { step: "any" } },
-    { key: "practical_ceiling_db", label: "Practical ceiling from flanking (dB)", kind: "number", attrs: { step: "any" } },
+    { key: "practical_ceiling_db", label: "Practical ceiling from flanking (dB)", kind: "number", attrs: { step: "any" }, whenBlank: 20 },
   ],
   outputs: [
     { key: "p", id: "nbil-out-p", label: "Insertion loss", value: (r) => r.primary_verdict },

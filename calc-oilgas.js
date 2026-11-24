@@ -1630,7 +1630,7 @@ OILGAS_RENDERERS["separator-retention-sizing"] = _simpleRenderer({
   fields: [
     { key: "vessel_diameter_ft", label: "Vessel diameter (ft)" },
     { key: "seam_to_seam_ft", label: "Seam-to-seam length (ft)" },
-    { key: "liquid_fraction", label: "Liquid fraction of a HORIZONTAL vessel's cross-section AREA (0 to 1; a 30% level is about 25% of the area)", attrs: { step: "any", min: "0", max: "1" } },
+    { key: "liquid_fraction", label: "Liquid fraction of a HORIZONTAL vessel's cross-section AREA (0 to 1; a 30% level is about 25% of the area)", attrs: { step: "any", min: "0", max: "1" }, whenBlank: 0.5 },
     { key: "liquid_rate_bpd", label: "Liquid rate (bbl/day)" },
     { key: "required_retention_min", label: "Required retention (min)" },
     { key: "gas_rate_mmscfd", label: "Gas rate (MMSCFD)" },

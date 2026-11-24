@@ -3827,7 +3827,7 @@ HVAC_RENDERERS["blown-insulation-coverage"] = _rEnv({
   fields: [
     { key: "area_sqft", label: "Attic area (sq ft)", kind: "number" },
     { key: "bags_per_1000", label: "Bags per 1,000 sq ft", kind: "number" },
-    { key: "r_per_inch", label: "R per inch", kind: "number" },
+    { key: "r_per_inch", label: "R per inch", kind: "number", whenBlank: 3.5 },
     { key: "target_r", label: "Target R-value", kind: "number" },
   ],
   outputs: [
@@ -3877,7 +3877,7 @@ HVAC_RENDERERS["heat-pump-seasonal-energy"] = _rEnv({
     { key: "seasonal_load_mmbtu", label: "Seasonal heating load (MMBtu)", kind: "number" },
     { key: "hspf", label: "Heat-pump HSPF", kind: "number" },
     { key: "rate_kwh", label: "Electric rate ($/kWh)", kind: "number" },
-    { key: "afue", label: "Furnace AFUE (0-1)", kind: "number" },
+    { key: "afue", label: "Furnace AFUE (0-1)", kind: "number", whenBlank: 0.95 },
     { key: "rate_therm", label: "Gas rate ($/therm, 0 = skip gas)", kind: "number" },
   ],
   outputs: [
@@ -3915,7 +3915,7 @@ HVAC_RENDERERS["dual-fuel-balance-point"] = _rEnv({
   fields: [
     { key: "rate_kwh", label: "Electric rate ($/kWh)", kind: "number" },
     { key: "rate_therm", label: "Gas rate ($/therm)", kind: "number" },
-    { key: "afue", label: "Furnace AFUE (0-1)", kind: "number" },
+    { key: "afue", label: "Furnace AFUE (0-1)", kind: "number", whenBlank: 0.95 },
     { key: "cop_now", label: "Heat-pump COP at current temp", kind: "number" },
   ],
   outputs: [
@@ -4005,8 +4005,8 @@ HVAC_RENDERERS["air-leak-cost"] = _rEnv({
     { key: "compressor_cfm", label: "Compressor delivered capacity (cfm)", kind: "number" },
     { key: "load_min", label: "Loaded time over test cycles (min)", kind: "number" },
     { key: "unload_min", label: "Unloaded time over test cycles (min)", kind: "number" },
-    { key: "specific_power", label: "Specific power (kW/100cfm)", kind: "number" },
-    { key: "run_hours", label: "Run hours/yr (energized)", kind: "number" },
+    { key: "specific_power", label: "Specific power (kW/100cfm)", kind: "number", whenBlank: 22 },
+    { key: "run_hours", label: "Run hours/yr (energized)", kind: "number", whenBlank: 8760 },
     { key: "rate_kwh", label: "Energy rate ($/kWh)", kind: "number" },
   ],
   outputs: [
@@ -4047,10 +4047,10 @@ HVAC_RENDERERS["compressed-air-power"] = _rEnv({
   example: compressedAirPowerExample.inputs,
   fields: [
     { key: "free_air_cfm", label: "Free-air flow at intake (cfm)", kind: "number" },
-    { key: "inlet_psia", label: "Inlet pressure (psia)", kind: "number" },
+    { key: "inlet_psia", label: "Inlet pressure (psia)", kind: "number", whenBlank: 14.7 },
     { key: "discharge_psig", label: "Discharge pressure (psig)", kind: "number" },
-    { key: "overall_eff", label: "Overall wire-to-air efficiency (0-1)", kind: "number" },
-    { key: "run_hours", label: "Run hours/yr", kind: "number" },
+    { key: "overall_eff", label: "Overall wire-to-air efficiency (0-1)", kind: "number", whenBlank: 0.75 },
+    { key: "run_hours", label: "Run hours/yr", kind: "number", whenBlank: 4000 },
     { key: "rate_kwh", label: "Energy rate ($/kWh)", kind: "number" },
   ],
   outputs: [
@@ -4096,9 +4096,9 @@ HVAC_RENDERERS["air-pressure-setpoint-savings"] = _rEnv({
   fields: [
     { key: "current_psig", label: "Current discharge setpoint (psig)", kind: "number" },
     { key: "reduced_psig", label: "Proposed lower setpoint (psig)", kind: "number" },
-    { key: "inlet_psia", label: "Inlet pressure (psia)", kind: "number" },
+    { key: "inlet_psia", label: "Inlet pressure (psia)", kind: "number", whenBlank: 14.7 },
     { key: "input_kw", label: "Current compressor input (kW)", kind: "number" },
-    { key: "run_hours", label: "Run hours/yr", kind: "number" },
+    { key: "run_hours", label: "Run hours/yr", kind: "number", whenBlank: 6000 },
     { key: "rate_kwh", label: "Energy rate ($/kWh)", kind: "number" },
   ],
   outputs: [
@@ -4197,7 +4197,7 @@ HVAC_RENDERERS["mua-tempering-load"] = _rEnv({
     { key: "cfm", label: "Makeup airflow (cfm, = exhaust)", kind: "number" },
     { key: "t_oa_F", label: "Outdoor air temperature (°F)", kind: "number", required: true },
     { key: "t_target_F", label: "Target supply temperature (°F)", kind: "number", required: true },
-    { key: "eta", label: "Heater thermal efficiency (0-1)", kind: "number" },
+    { key: "eta", label: "Heater thermal efficiency (0-1)", kind: "number", whenBlank: 0.8 },
     { key: "w_oa_gr", label: "Outdoor humidity ratio (gr/lb, optional)", kind: "number" },
     { key: "w_target_gr", label: "Target humidity ratio (gr/lb, optional)", kind: "number" },
   ],
@@ -4237,7 +4237,7 @@ HVAC_RENDERERS["dcv-co2-ventilation"] = _rEnv({
     { key: "n", label: "Occupancy (people)", kind: "number" },
     { key: "co2_set_ppm", label: "Indoor CO2 setpoint (ppm)", kind: "number" },
     { key: "co2_oa_ppm", label: "Outdoor CO2 (ppm)", kind: "number", default: 400 },
-    { key: "gen_cfm", label: "CO2 generation per person (cfm)", kind: "number" },
+    { key: "gen_cfm", label: "CO2 generation per person (cfm)", kind: "number", whenBlank: 0.0106 },
   ],
   outputs: [
     { key: "qp", id: "dcv-out-qp", label: "Outdoor airflow per person", value: (r) => fmt(r.Q_person_cfm, 1) + " cfm/person" },

@@ -1330,7 +1330,7 @@ KITCHEN_RENDERERS["dough-water-temperature"] = _r({
   citation: "Citation: desired dough temperature (DDT) mixing-water calculation (Hamelman / Bread Bakers Guild), by name. water = DDT x N - (sum of the other factors + friction); N = 3 (flour, room, friction) or 4 (adds a preferment). Friction factor ~0-5 F hand, ~24-30 F spiral mixer, measured per mixer. If below freezing, add weighed ice. The measured friction factor and the finished-dough reading govern.",
   example: doughWaterTemperatureExample.inputs,
   fields: [
-    { key: "desired_dough_temp_f", label: "Desired dough temp DDT (°F)", kind: "number" },
+    { key: "desired_dough_temp_f", label: "Desired dough temp DDT (°F)", kind: "number", whenBlank: 75 },
     { key: "flour_temp_f", label: "Flour temp (°F)", kind: "number", required: true },
     { key: "room_temp_f", label: "Room temp (°F)", kind: "number", required: true },
     { key: "friction_factor_f", label: "Friction factor (F, ~24-30 spiral, 0-5 hand)", kind: "number", default: 24 },
@@ -1369,8 +1369,8 @@ KITCHEN_RENDERERS["as-purchased-quantity"] = _r({
   citation: "Citation: as-purchased quantity from edible-portion needed (standard culinary math; CIA The Professional Chef, On Cooking), by name. AP = EP needed / yield (always divide, so the buy exceeds what you serve); AP units = AP / purchase unit size. The purchasing inverse of the yield-ep tile. The actual yield varies with grade, season, and trimming, so a yield test on the real product governs.",
   example: asPurchasedQuantityExample.inputs,
   fields: [
-    { key: "ep_quantity_needed", label: "Edible-portion quantity needed (lb or each)", kind: "number" },
-    { key: "yield_pct", label: "Yield (%)", kind: "number" },
+    { key: "ep_quantity_needed", label: "Edible-portion quantity needed (lb or each)", kind: "number", whenBlank: 20 },
+    { key: "yield_pct", label: "Yield (%)", kind: "number", whenBlank: 75 },
     { key: "purchase_unit_size", label: "Amount per purchase unit, in the EP unit (0 to skip)", kind: "number" },
   ],
   outputs: [
@@ -1406,8 +1406,8 @@ KITCHEN_RENDERERS["abv-from-gravity"] = _r({
   citation: "Citation: alcohol by volume from gravity (standard homebrew/brewing formula; Papazian, The Complete Joy of Homebrewing), by name. ABV% = (OG - FG) x 131.25; apparent attenuation = (OG - FG)/(OG - 1). The 131.25 factor is an approximation (drifts low on strong brews). A temperature-corrected hydrometer/refractometer and, for a sold product, the TTB/lab method govern the label.",
   example: abvFromGravityExample.inputs,
   fields: [
-    { key: "original_gravity", label: "Original gravity (OG)", kind: "number" },
-    { key: "final_gravity", label: "Final gravity (FG)", kind: "number" },
+    { key: "original_gravity", label: "Original gravity (OG)", kind: "number", whenBlank: 1.055 },
+    { key: "final_gravity", label: "Final gravity (FG)", kind: "number", whenBlank: 1.012 },
   ],
   outputs: [
     { key: "a", id: "abv-out-a", label: "Alcohol by volume", value: (r) => fmt(r.abv_pct, 2) + " % ABV" },
@@ -1452,9 +1452,9 @@ KITCHEN_RENDERERS["ice-machine-sizing"] = _r({
   fields: [
     { key: "covers_per_day", label: "Covers per day", kind: "number" },
     { key: "lb_per_cover", label: "Ice per cover (lb)", kind: "number" },
-    { key: "derate_factor", label: "Installed-condition derate (0-1)", kind: "number" },
-    { key: "utilization", label: "Target utilization (0-1)", kind: "number" },
-    { key: "peak_fraction", label: "Peak-period fraction of daily demand (0-1)", kind: "number" },
+    { key: "derate_factor", label: "Installed-condition derate (0-1)", kind: "number", whenBlank: 0.8 },
+    { key: "utilization", label: "Target utilization (0-1)", kind: "number", whenBlank: 0.9 },
+    { key: "peak_fraction", label: "Peak-period fraction of daily demand (0-1)", kind: "number", whenBlank: 0.4 },
   ],
   outputs: [
     { key: "d", id: "icems-out-d", label: "Daily ice demand", value: (r) => fmt(r.daily_demand_lb, 1) + " lb/day" },
@@ -1503,10 +1503,10 @@ KITCHEN_RENDERERS["warewasher-hot-water"] = _r({
   fields: [
     { key: "rinse_gpm", label: "Final-rinse flow (gpm)", kind: "number" },
     { key: "supply_temp_f", label: "Supply water temperature (F)", kind: "number", required: true },
-    { key: "rinse_temp_f", label: "Final-rinse temperature (F)", kind: "number" },
+    { key: "rinse_temp_f", label: "Final-rinse temperature (F)", kind: "number", whenBlank: 180 },
     { key: "racks_per_hour", label: "Racks per hour", kind: "number" },
     { key: "gal_per_rack", label: "Gallons per rack", kind: "number" },
-    { key: "booster_efficiency", label: "Booster thermal efficiency (0-1)", kind: "number" },
+    { key: "booster_efficiency", label: "Booster thermal efficiency (0-1)", kind: "number", whenBlank: 0.8 },
   ],
   outputs: [
     { key: "t", id: "wwhw-out-t", label: "Temperature rise", value: (r) => fmt(r.delta_t_f, 1) + " F" },
@@ -1625,7 +1625,7 @@ KITCHEN_RENDERERS["thaw-time"] = _r({
     { key: "density_pcf", label: "Product density (lb/ft3)", kind: "number" },
     { key: "latent_heat_btu_lb", label: "Latent heat of the product (BTU/lb)", kind: "number" },
     { key: "thaw_point_f", label: "Thaw point (F)", kind: "number", default: 28 },
-    { key: "cooler_temp_f", label: "Cooler air temperature (F)", kind: "number" },
+    { key: "cooler_temp_f", label: "Cooler air temperature (F)", kind: "number", whenBlank: 38 },
     { key: "h_coeff", label: "Surface coefficient h (BTU/hr-ft2-F)", kind: "number" },
     { key: "k_unfrozen", label: "Unfrozen conductivity k (BTU/hr-ft-F)", kind: "number" },
   ],
@@ -1674,8 +1674,8 @@ KITCHEN_RENDERERS["fryer-oil-turnover"] = _r({
   fields: [
     { key: "vat_capacity_lb", label: "Vat oil capacity (lb)", kind: "number" },
     { key: "daily_product_lb", label: "Product fried per day (lb)", kind: "number" },
-    { key: "absorption_fraction", label: "Oil absorption fraction (0-1)", kind: "number" },
-    { key: "operating_days", label: "Operating days per year", kind: "number" },
+    { key: "absorption_fraction", label: "Oil absorption fraction (0-1)", kind: "number", whenBlank: 0.12 },
+    { key: "operating_days", label: "Operating days per year", kind: "number", whenBlank: 360 },
     { key: "oil_price_per_lb", label: "Oil price ($/lb)", kind: "number" },
   ],
   outputs: [
@@ -1738,7 +1738,7 @@ KITCHEN_RENDERERS["keg-yield"] = _r({
   fields: [
     { key: "keg_size", label: "Keg size", kind: "select", options: Object.keys(KEG_SIZES_GAL).map((k) => ({ value: k, label: KEG_SIZES_GAL[k].label })) },
     { key: "custom_gallons", label: "Custom keg volume (gal, 0 to use the preset)", kind: "number" },
-    { key: "serving_oz", label: "Serving size (oz)", kind: "number" },
+    { key: "serving_oz", label: "Serving size (oz)", kind: "number", whenBlank: 16 },
     { key: "loss_fraction", label: "Loss fraction (0-1)", kind: "number", default: 0.15 },
     { key: "keg_cost", label: "Keg cost ($)", kind: "number" },
     { key: "menu_price", label: "Menu price per serving ($)", kind: "number" },
@@ -1784,7 +1784,7 @@ KITCHEN_RENDERERS["beverage-co2-duration"] = _r({
   example: beverageCo2DurationExample.inputs,
   fields: [
     { key: "cylinder_lb", label: "Cylinder weight (lb of CO2)", kind: "number" },
-    { key: "lb_co2_per_keg", label: "CO2 per keg (lb)", kind: "number" },
+    { key: "lb_co2_per_keg", label: "CO2 per keg (lb)", kind: "number", whenBlank: 1.2 },
     { key: "kegs_per_day", label: "Kegs dispensed per day", kind: "number" },
     { key: "reserve_fraction", label: "Reserve fraction (0-1)", kind: "number", default: 0.2 },
   ],
@@ -1843,7 +1843,7 @@ KITCHEN_RENDERERS["dough-ball-scaling"] = _r({
     { key: "diameter_in", label: "Round pan diameter (in)", kind: "number" },
     { key: "length_in", label: "Rectangular pan length (in)", kind: "number" },
     { key: "width_in", label: "Rectangular pan width (in)", kind: "number" },
-    { key: "thickness_factor", label: "Thickness factor (oz per sq in)", kind: "number" },
+    { key: "thickness_factor", label: "Thickness factor (oz per sq in)", kind: "number", whenBlank: 0.1 },
     { key: "reference_weight_oz", label: "Known-good dough ball weight (oz, 0 to skip)", kind: "number" },
     { key: "reference_diameter_in", label: "Diameter of that known-good pan (in, 0 to skip)", kind: "number" },
   ],
@@ -1891,9 +1891,9 @@ KITCHEN_RENDERERS["fermentation-time-q10"] = _r({
   example: fermentationTimeQ10Example.inputs,
   fields: [
     { key: "reference_time_hr", label: "Reference proof or bulk time (hr)", kind: "number" },
-    { key: "reference_temp_f", label: "Reference dough temperature (F)", kind: "number" },
-    { key: "actual_temp_f", label: "Actual dough temperature (F)", kind: "number" },
-    { key: "q10", label: "Q10", kind: "number" },
+    { key: "reference_temp_f", label: "Reference dough temperature (F)", kind: "number", whenBlank: 78 },
+    { key: "actual_temp_f", label: "Actual dough temperature (F)", kind: "number", whenBlank: 78 },
+    { key: "q10", label: "Q10", kind: "number", whenBlank: 2 },
   ],
   outputs: [
     { key: "t", id: "ferq-out-t", label: "Predicted time", value: (r) => fmt(r.predicted_time_hr, 2) + " hr (" + fmt(r.predicted_time_min, 0) + " min)" },
@@ -1995,7 +1995,7 @@ KITCHEN_RENDERERS["par-level-order"] = _r({
     { key: "safety_factor", label: "Safety factor (0.25 = 25%)", kind: "number", default: 0.25 },
     { key: "on_hand", label: "Quantity on hand", kind: "number" },
     { key: "on_order", label: "Quantity already on order", kind: "number" },
-    { key: "units_per_case", label: "Units per case", kind: "number" },
+    { key: "units_per_case", label: "Units per case", kind: "number", whenBlank: 1 },
   ],
   outputs: [
     { key: "c", id: "parl-out-c", label: "Coverage window", value: (r) => fmt(r.coverage_days, 1) + " days" },
@@ -2090,7 +2090,7 @@ KITCHEN_RENDERERS["tphc-window"] = _r({
     { key: "window_option", label: "Window option", kind: "select", options: Object.keys(TPHC_WINDOWS).map((k) => ({ value: k, label: TPHC_WINDOWS[k].label })) },
     { key: "start_temp_f", label: "Starting product temperature (F)", kind: "number", required: true },
     { key: "ambient_f", label: "Ambient temperature (F)", kind: "number", required: true, default: 75 },
-    { key: "tau_hr", label: "Product time constant tau (hr)", kind: "number" },
+    { key: "tau_hr", label: "Product time constant tau (hr)", kind: "number", whenBlank: 4 },
   ],
   outputs: [
     { key: "d", id: "tphc-out-d", label: "Discard time", value: (r) => r.discard_time + " (" + fmt(r.window_hr, 0) + " hr window)" },
@@ -2148,13 +2148,13 @@ KITCHEN_RENDERERS["steam-kettle-heatup"] = _r({
   example: steamKettleHeatupExample.inputs,
   fields: [
     { key: "gallons", label: "Kettle working volume (gal)", kind: "number" },
-    { key: "specific_gravity", label: "Product specific gravity", kind: "number" },
-    { key: "specific_heat", label: "Product specific heat (BTU/lb-F)", kind: "number" },
-    { key: "start_temp_f", label: "Starting temperature (F)", kind: "number", required: true, whenBlank: 70 },
-    { key: "final_temp_f", label: "Final temperature (F)", kind: "number" },
+    { key: "specific_gravity", label: "Product specific gravity", kind: "number", whenBlank: 1 },
+    { key: "specific_heat", label: "Product specific heat (BTU/lb-F)", kind: "number", whenBlank: 1 },
+    { key: "start_temp_f", label: "Starting temperature (F)", kind: "number", required: true },
+    { key: "final_temp_f", label: "Final temperature (F)", kind: "number", whenBlank: 200 },
     { key: "rated_input_btuh", label: "Rated heat input (BTU/hr)", kind: "number" },
-    { key: "jacket_efficiency", label: "Jacket efficiency (0-1)", kind: "number" },
-    { key: "latent_heat_btu_lb", label: "Latent heat of steam (BTU/lb)", kind: "number" },
+    { key: "jacket_efficiency", label: "Jacket efficiency (0-1)", kind: "number", whenBlank: 0.85 },
+    { key: "latent_heat_btu_lb", label: "Latent heat of steam (BTU/lb)", kind: "number", whenBlank: 945.6 },
   ],
   outputs: [
     { key: "m", id: "stkh-out-m", label: "Batch mass", value: (r) => fmt(r.mass_lb, 1) + " lb" },

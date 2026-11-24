@@ -809,7 +809,7 @@ STEEL_RENDERERS["steel-bolt-slip-critical"] = _simpleRenderer({
   fields: [
     { key: "mu", label: "Slip coefficient mu (0.30 A / 0.50 B)", kind: "number", default: 0.3 },
     { key: "tb_kip", label: "Minimum pretension Tb (kip, Table J3.1)", kind: "number" },
-    { key: "ns", label: "Slip planes ns (1 single, 2 double)", kind: "number", attrs: { step: "1", min: "1" } },
+    { key: "ns", label: "Slip planes ns (1 single, 2 double)", kind: "number", attrs: { step: "1", min: "1" }, whenBlank: 1 },
     { key: "n", label: "Number of bolts", kind: "number", attrs: { step: "1", min: "1" }, default: 1 },
     { key: "hf", label: "Filler factor hf", kind: "number", whenBlank: 1 },
     { key: "du", label: "Du multiplier", kind: "number", whenBlank: 1.13 },
@@ -818,7 +818,7 @@ STEEL_RENDERERS["steel-bolt-slip-critical"] = _simpleRenderer({
     { key: "rb", id: "sbsc-out-rb", label: "Slip resistance per bolt", value: (r) => fmt(r.rn_bolt_kip, 2) + " kip (ASD " + fmt(r.asd_bolt_kip, 2) + " / LRFD " + fmt(r.lrfd_bolt_kip, 2) + ")" },
     { key: "ta", id: "sbsc-out-ta", label: "Connection total (ASD)", value: (r) => fmt(r.asd_total_kip, 1) + " kip" },
     { key: "tl", id: "sbsc-out-tl", label: "Connection total (LRFD)", value: (r) => fmt(r.lrfd_total_kip, 1) + " kip" },
-    { key: "n", id: "sbsc-out-n", label: "Note", value: (r) => r.note },
+    { key: "n", id: "sbsc-out-n", label: "Note", value: (r) => r.note, whenBlank: 1 },
   ],
   compute: computeSteelBoltSlipCritical,
 });
@@ -1520,7 +1520,7 @@ STEEL_RENDERERS["slip-critical-with-tension"] = _simpleRenderer({
     { key: "tb_kip", label: "Minimum pretension Tb (kip, Table J3.1)", kind: "number" },
     { key: "applied_tension_kip", label: "Applied tension on the connection Tu (kip)", kind: "number" },
     { key: "n", label: "Number of bolts", kind: "number", attrs: { step: "1", min: "1" }, default: 1 },
-    { key: "ns", label: "Slip planes ns (1 single, 2 double)", kind: "number", attrs: { step: "1", min: "1" } },
+    { key: "ns", label: "Slip planes ns (1 single, 2 double)", kind: "number", attrs: { step: "1", min: "1" }, whenBlank: 1 },
     { key: "hf", label: "Filler factor hf", kind: "number", whenBlank: 1 },
     { key: "du", label: "Du multiplier", kind: "number", whenBlank: 1.13 },
   ],
@@ -1529,7 +1529,7 @@ STEEL_RENDERERS["slip-critical-with-tension"] = _simpleRenderer({
     { key: "b", id: "scwt-out-b", label: "Reduced resistance per bolt", value: (r) => fmt(r.reduced_rn_bolt_kip, 3) + " kip nominal (from " + fmt(r.unreduced_rn_bolt_kip, 3) + " unreduced)" },
     { key: "t", id: "scwt-out-t", label: "Connection total", value: (r) => fmt(r.lrfd_total_kip, 2) + " kip LRFD / " + fmt(r.asd_total_kip, 2) + " kip ASD (unreduced LRFD was " + fmt(r.unreduced_lrfd_total_kip, 2) + ")" },
     { key: "c", id: "scwt-out-c", label: "Total clamping force Du x Tb x nb", value: (r) => fmt(r.clamp_total_kip, 1) + " kip" },
-    { key: "n", id: "scwt-out-n", label: "Note", value: (r) => r.note },
+    { key: "n", id: "scwt-out-n", label: "Note", value: (r) => r.note, whenBlank: 1 },
   ],
   compute: computeSlipCriticalWithTension,
 });

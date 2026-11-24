@@ -8,106 +8,112 @@
 //     params[f.key] = f.required && blank ? null : blank ? undefined : Number(value)
 //
 // `undefined` is exactly what a destructuring default is for, so the compute's
-// own signature default applies -- and "show the steps" skips an `undefined`
-// param, so the value appears on NO surface. A reader looking at an empty
-// "Corner height (ft)" and a finished answer has no way to learn that 8 ft was
-// used. The agent door already refuses these (`inputDefaults` takes a default
-// only where the field's OWN declared default agrees one exists, so a default
-// that lives only in the compute signature is not an answer); the page is the
-// remaining surface.
+// own signature default applies -- and "show the steps" used to skip an
+// `undefined` param, so the value appeared on NO surface. A reader looking at an
+// empty "Water temperature (F)" and a finished answer had no way to learn that
+// 60 F was used. The agent door already refuses these (`inputDefaults` takes a
+// default only where the field's OWN declared default agrees one exists); the
+// page is the surface this measures.
 //
-// This sweep is the measurement, not a remedy. For every tile whose inputs come
-// from a renderer schema, it takes each number field whose declared default is
-// null -- an empty box -- and compares running the tile with that key ABSENT
-// against running it with an explicit 0. Where the two agree, a blank box means
-// zero and nothing is hidden. Where the tile refuses, that is honest too. What
-// is left is a silent third value.
+// IT ASKS THE PAGE, NOT THE COMPUTE. The first version of this harness ran each
+// tile with a key absent and with an explicit 0 and called the difference a
+// hidden value. That is the right question to ask of a compute and the wrong one
+// to ask of a page: it never looks at what the RENDERER sends. A hand-written
+// renderer that reads a blank box as `null` (ohms-law's readNum) or as
+// `Number(v) || 0` passes a value, so the signature default never applies and
+// nothing is hidden -- and the compute probe counted 190 such fields as hidden
+// while missing real ones the worked example happened not to carry. Nor may the
+// sweep CLEAR the boxes: a field that declares a default is prefilled, the
+// reader can read it, and clearing it measures a reader who deleted a shown
+// value instead (that mistake reported 1,591 phantoms, 748 of them visible).
 //
-// Measured 2026-11-23: 971 fields on 453 tiles. Only 19 are recoverable from the
-// answer itself (the result echoes the key), so there is no cheap disclosure
-// path -- a remedy has to choose between PREFILLING the number into the box, so
-// the page shows what it computes with, and REFUSING a blank primary input. The
-// first makes a number the reader did not type look like one they did; the
-// second changes answers that are correct today. 17 fields whose own label
-// states the value were prefilled on 2026-11-23 (commit 03be1c06) as the
-// uncontroversial slice.
+// So: render every tile under the fake DOM with the compute spied on, leave the
+// boxes exactly as the renderer built them, and report every argument that
+// arrives `undefined` while its compute declares a non-zero default. That is
+// the page as it opens.
 //
-// About five minutes. Zero dependencies, no network.
+// Measured 2026-11-24: 785 fields on 375 tiles. 773 are disclosed -- the field
+// carries `whenBlank` and the steps panel prints it as "60 (default, box left
+// blank)" -- and 12 are not, on ten hand-written renderers that pass the panel
+// a list of key NAMES and read the values back off the page, where a blank box
+// has nothing to read. scripts/check-blank-defaults.mjs holds every published
+// value to its compute's own signature.
+//
+// About two minutes. Zero dependencies, no network.
 //
 //   node scripts/measure-phantom-defaults.mjs [--all]
+import { execFileSync } from "node:child_process";
 import { resolve, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const SHOW_ALL = process.argv.includes("--all");
-const cat = await import(resolve(ROOT, "mcp", "catalog.mjs"));
-const { TOOLS } = await import(resolve(ROOT, "tools-data.js"));
 
-// Which of these the page now DISCLOSES. `whenBlank` is what the steps panel
-// prints for a blank box the calculator still computes with; it is deliberately
-// not part of the MCP input contract (`describe_calculator` still reports
-// `default: null`, so the agent door keeps refusing a default the page does not
-// show). The renderer publishes it as `schema.blankDefaults`, read here per
-// TILE through the renderer registry -- a source regex over the three binding
-// forms the modules use got this wrong in both directions (2026-11-24), and a
-// harness that miscounts its own subject is worth less than none.
-// scripts/check-blank-defaults.mjs holds each value to its compute's signature.
-const { RENDERER_MAP } = await import(resolve(ROOT, "test", "fixtures", "renderer-map.js"));
-const disclosed = new Map();   // tile id -> Set of field keys
-for (const [id, reg] of Object.entries(RENDERER_MAP)) {
-  if (!reg || !reg.module || !reg.exportName) continue;
-  let mod;
-  try { mod = await import(resolve(ROOT, "test", "fixtures", reg.module)); } catch { continue; }
-  const table = mod[reg.exportName];
-  const fn = table && table[id];
-  const blanks = fn && fn.schema && fn.schema.blankDefaults;
-  if (blanks && Object.keys(blanks).length) disclosed.set(id, new Set(Object.keys(blanks)));
-}
-const isDisclosed = (id, key) => {
-  const keys = disclosed.get(id);
-  return Boolean(keys && keys.has(key));
-};
+// The page's own behaviour, from the fake-DOM sweep (it installs globals and a
+// module loader hook, so it runs in its own process).
+const sweep = JSON.parse(execFileSync(process.execPath,
+  [resolve(ROOT, "test", "fixtures", "render-blank-arg-sweep.js")],
+  { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "ignore"] }));
 
-let tiles = 0, fields = 0, echoed = 0, refused = 0, zeroLike = 0, shown = 0;
-const rows = [];
+const { RENDERER_MAP } = await import(pathToFileURL(resolve(ROOT, "test", "fixtures", "renderer-map.js")).href);
+const { COMPUTE_MAP } = await import(pathToFileURL(resolve(ROOT, "test", "fixtures", "compute-map.js")).href);
 
-for (const t of TOOLS) {
-  let d;
-  try { d = await cat.describe({ id: t.id }); } catch { continue; }
-  if (d.inputs_source !== "renderer") continue;
-  const ex = d.example && d.example.inputs;
-  if (!ex || typeof ex !== "object") continue;
-  let hit = false;
-
-  for (const inp of d.inputs || []) {
-    if (inp.kind !== "number" && inp.kind !== undefined) continue;
-    if (inp.default !== null && inp.default !== undefined) continue;   // the box shows a value
-    const key = inp.key ?? inp.name;
-    if (!(key in ex)) continue;
-
-    const without = { ...ex };
-    delete without[key];
-    let absent, zero;
-    try { absent = await cat.run({ id: t.id, inputs: without }); } catch { continue; }
-    try { zero = await cat.run({ id: t.id, inputs: { ...without, [key]: 0 } }); } catch { continue; }
-    if (JSON.stringify(absent && absent.result) === JSON.stringify(zero && zero.result)) { zeroLike++; continue; }
-    if (absent && absent.result && absent.result.error) { refused++; continue; }
-
-    fields++; hit = true;
-    const used = absent.result && absent.result[key];
-    const echo = typeof used === "number" && Number.isFinite(used);
-    if (echo) echoed++;
-    if (isDisclosed(t.id, key)) { shown++; continue; }
-    if (SHOW_ALL || rows.length < 40) rows.push(`${t.id}.${key} (${inp.label})${echo ? ` -- the answer echoes ${used}` : ""}`);
+// The numeric literal defaults of a destructured single-object parameter.
+function sigDefaults(fn) {
+  const src = String(fn).replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/[^\n]*/g, "");
+  const open = src.indexOf("(");
+  const brace = src.indexOf("{", open);
+  if (open === -1 || brace === -1 || src.slice(open, brace).includes(")")) return null;
+  let depth = 0, end = -1;
+  for (let i = brace; i < src.length; i += 1) {
+    if (src[i] === "{") depth += 1;
+    else if (src[i] === "}") { depth -= 1; if (!depth) { end = i; break; } }
   }
-  if (hit) tiles++;
+  if (end === -1) return null;
+  const parts = []; depth = 0; let cur = "";
+  for (const ch of src.slice(brace + 1, end)) {
+    if ("([{".includes(ch)) depth += 1;
+    else if (")]}".includes(ch)) depth -= 1;
+    if (ch === "," && !depth) { parts.push(cur); cur = ""; } else cur += ch;
+  }
+  if (cur.trim()) parts.push(cur);
+  const map = new Map();
+  for (const p of parts) {
+    const eq = p.indexOf("=");
+    if (eq === -1) continue;
+    const name = p.slice(0, eq).trim(), raw = p.slice(eq + 1).trim();
+    if (/^[A-Za-z_$][\w$]*$/.test(name) && /^-?\d+(?:\.\d+)?$/.test(raw)) map.set(name, Number(raw));
+  }
+  return map;
 }
 
-console.log(`measure-phantom-defaults: ${fields} field(s) on ${tiles} tile(s) whose EMPTY box computes with a number the reader did not type.`);
-console.log(`  now DISCLOSED -- the steps panel prints it as the default (whenBlank): ${shown}`);
+const imp = (rel) => import(pathToFileURL(resolve(ROOT, "test", "fixtures", rel)).href);
+let fields = 0, shown = 0;
+const tiles = new Set(), left = [];
+
+for (const [id, keys] of Object.entries(sweep.undefinedArgs || {})) {
+  const creg = COMPUTE_MAP[id], rreg = RENDERER_MAP[id];
+  if (!creg || !rreg) continue;
+  let cmod, rmod;
+  try { cmod = await imp(creg.module); rmod = await imp(rreg.module); } catch { continue; }
+  const compute = cmod[creg.fn];
+  if (typeof compute !== "function") continue;
+  const defs = sigDefaults(compute);
+  if (!defs) continue;
+  const rf = (rmod[rreg.exportName] || {})[id];
+  const blanks = (rf && rf.schema && rf.schema.blankDefaults) || {};
+  for (const key of keys) {
+    const used = defs.get(key);
+    if (used === undefined || used === 0) continue;   // a blank box IS zero: nothing hidden
+    fields += 1; tiles.add(id);
+    if (key in blanks) shown += 1;
+    else left.push(`${id}.${key} = ${used}`);
+  }
+}
+
+console.log(`measure-phantom-defaults: ${fields} field(s) on ${tiles.size} tile(s) whose EMPTY box computes with a number the reader did not type.`);
+console.log(`  DISCLOSED -- the field carries whenBlank and the steps panel prints it: ${shown}`);
 console.log(`  still shown on no surface: ${fields - shown}`);
-console.log(`  recoverable from the answer itself (the result echoes the key): ${echoed}`);
-console.log(`  not a phantom -- a blank box behaves as zero: ${zeroLike}`);
-console.log(`  not a phantom -- the calculator refuses a blank: ${refused}`);
-for (const l of rows) console.log("    " + l);
-if (!SHOW_ALL && fields > rows.length) console.log(`    ... and ${fields - rows.length} more (--all)`);
+console.log(`  (${sweep.rendered} tile(s) rendered; ${sweep.tiles} reached their compute from an untouched page)`);
+for (const l of (SHOW_ALL ? left : left.slice(0, 40))) console.log("    " + l);
+if (!SHOW_ALL && left.length > 40) console.log(`    ... and ${left.length - 40} more (--all)`);

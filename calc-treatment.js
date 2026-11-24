@@ -902,8 +902,8 @@ const renderDigesterGasProduction = _rPool({
   fields: [
     { key: "vs_fed_lb_day", label: "Volatile solids fed (lb/day)", kind: "number" },
     { key: "vs_reduction_pct", label: "VS reduction (%, typical 50-60)", kind: "number" },
-    { key: "gas_yield_ft3_lb", label: "Gas yield (ft³ per lb VS destroyed)", kind: "number" },
-    { key: "methane_pct", label: "Methane fraction of gas (%)", kind: "number" },
+    { key: "gas_yield_ft3_lb", label: "Gas yield (ft³ per lb VS destroyed)", kind: "number", whenBlank: 15 },
+    { key: "methane_pct", label: "Methane fraction of gas (%)", kind: "number", whenBlank: 65 },
   ],
   outputs: [
     { key: "vsd", id: "dgp-out-vsd", label: "VS destroyed", value: (r) => fmt(r.vs_destroyed_lb_day, 0) + " lb/day" },
@@ -1447,8 +1447,8 @@ TREATMENT_RENDERERS["pool-calcium-hardness-dose"] = _rPool({
   citation: "Citation: pool calcium hardness increase with calcium chloride, by name. lb = ppm x gallons x 8.34e-6 x (110.98/100.09) / (purity/100), the CaCO3-equivalent converted to calcium chloride by molecular weight and product purity. ~1.2 lb of 77% flake per 10,000 gal per 10 ppm. Add to water (heat!), pump running, retest; the test kit and the product label govern.",
   example: poolCalciumHardnessDoseExample.inputs,
   fields: [
-    { key: "gallons", label: "Pool volume (gal)" },
-    { key: "ppm_increase", label: "Calcium hardness increase (ppm)" },
+    { key: "gallons", label: "Pool volume (gal)", whenBlank: 20000 },
+    { key: "ppm_increase", label: "Calcium hardness increase (ppm)", whenBlank: 20 },
     { key: "product_purity_pct", label: "Calcium chloride content (percent: ~77 flake, ~94 anhydrous)", default: 77 },
   ],
   outputs: [

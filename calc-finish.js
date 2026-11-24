@@ -276,8 +276,8 @@ FINISH_RENDERERS["retaining-wall-block"] = _simpleRenderer({
   fields: [
     { key: "wall_length_ft", label: "Wall length (ft)", kind: "number" },
     { key: "exposed_height_ft", label: "Exposed height (ft)", kind: "number" },
-    { key: "block_length_in", label: "Block face length (in)", kind: "number", whenBlank: 18 },
-    { key: "block_height_in", label: "Block face height (in)", kind: "number", whenBlank: 8 },
+    { key: "block_length_in", label: "Block face length (in)", kind: "number" },
+    { key: "block_height_in", label: "Block face height (in)", kind: "number" },
   ],
   outputs: [
     { key: "r", id: "rwb-out-r", label: "Blocks per course", value: (r) => String(r.blocks_per_row) },

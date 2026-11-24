@@ -474,7 +474,7 @@ SPECIALTYTRADES_RENDERERS["igu-u-factor"] = _simpleRenderer({
     { key: "r_gap", label: "Resistance of each gap (hr-sq ft-F/BTU)", kind: "number", whenBlank: 1.02 },
     { key: "r_indoor_film", label: "Indoor air film resistance", kind: "number", whenBlank: 0.68 },
     { key: "r_outdoor_film", label: "Outdoor air film resistance", kind: "number", whenBlank: 0.17 },
-    { key: "indoor_temp_f", label: "Indoor temperature (F)", kind: "number", required: true, whenBlank: 70 },
+    { key: "indoor_temp_f", label: "Indoor temperature (F)", kind: "number", required: true },
     { key: "outdoor_temp_f", label: "Outdoor temperature (F)", kind: "number", attrs: { step: "any" }, required: true },
     { key: "indoor_rh_pct", label: "Indoor relative humidity (%)", kind: "number", whenBlank: 40 },
   ],

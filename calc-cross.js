@@ -1677,12 +1677,12 @@ const renderNIOSHLifting = _simpleRendererG({
   example: nioshLiftingExample.inputs,
   fields: [
     { key: "weight_lb", label: "Load weight (lb)", kind: "number" },
-    { key: "H_in", label: "Horizontal distance H (in)", kind: "number" },
-    { key: "V_in", label: "Origin height V (in)", kind: "number" },
+    { key: "H_in", label: "Horizontal distance H (in)", kind: "number", whenBlank: 10 },
+    { key: "V_in", label: "Origin height V (in)", kind: "number", whenBlank: 30 },
     { key: "D_in", label: "Vertical travel D (in)", kind: "number" },
     { key: "asymmetry_deg", label: "Asymmetry angle (deg)", kind: "number" },
-    { key: "frequency_per_min", label: "Lifts per minute", kind: "number" },
-    { key: "duration_hr", label: "Duration (hr)", kind: "number" },
+    { key: "frequency_per_min", label: "Lifts per minute", kind: "number", whenBlank: 1 },
+    { key: "duration_hr", label: "Duration (hr)", kind: "number", whenBlank: 1 },
     { key: "coupling", label: "Coupling", kind: "select", options: [{ value: "good", label: "Good" }, { value: "fair", label: "Fair" }, { value: "poor", label: "Poor" }] },
   ],
   outputs: [
@@ -3197,7 +3197,7 @@ const renderExtensionLadderOverlap = _simpleRendererG({
   example: extensionLadderOverlapExample.inputs,
   fields: [
     { key: "nominal_length_ft", label: "Nominal ladder length (ft, as labeled)", kind: "number" },
-    { key: "sections", label: "Sections", kind: "number" },
+    { key: "sections", label: "Sections", kind: "number", whenBlank: 2 },
     { key: "overlap_override_ft", label: "Overlap override (ft, 0 = rule)", kind: "number" },
   ],
   outputs: [

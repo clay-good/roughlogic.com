@@ -225,8 +225,8 @@ TRUCKINGFIELD_RENDERERS["kingpin-to-axle"] = _simpleRenderer({
   example: kingpinToAxleExample.inputs,
   fields: [
     { key: "kpra_ft", label: "Measured kingpin to rear-axle center (ft)", kind: "number" },
-    { key: "state_limit_ft", label: "Governing state limit (ft)", kind: "number", whenBlank: 40 },
-    { key: "hole_spacing_in", label: "Tandem hole spacing (in)", kind: "number", whenBlank: 6 },
+    { key: "state_limit_ft", label: "Governing state limit (ft)", kind: "number" },
+    { key: "hole_spacing_in", label: "Tandem hole spacing (in)", kind: "number" },
   ],
   outputs: [
     { key: "e", id: "kpra-out-e", label: "Over the limit by", value: (r) => (r.excess_ft > 0 ? fmt(r.excess_ft, 2) + " ft (" + fmt(r.excess_ft * 12, 1) + " in)" : "not over") },
