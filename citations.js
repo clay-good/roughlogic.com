@@ -22024,6 +22024,20 @@ export const CITATIONS = {
       { name: "Securement is separate and regulated", value: "log loads have their own FMCSA requirements", source: "FMCSA" },
     ],
   },
+  // spec-v1998: what a piece of dressed lumber or a panel weighs.
+  "lumber-weight": {
+    formula: "density including water = G x 62.43 lb/ft^3 x (1 + MC/100), where G is specific gravity on the ovendry-mass basis at the volume for that moisture content (Wood Handbook Eq. 4-12); volume per piece = dressed thickness x dressed width / 144 x length; weight = volume x density; ovendry mass = G x 62.43 x volume, and the balance of the weight is water.",
+    edition: "USDA Forest Service, Wood Handbook -- Wood as an Engineering Material, General Technical Report FPL-GTR-190 (2010), Chapter 4 \"Moisture Relations and Physical Properties of Wood\", Equation (4-12) and Table 4-6b. The species specific gravity, the actual moisture content of the piece, and the supplier's dressed sizes govern.",
+    freeAccess: "The full handbook is published free by the Forest Products Laboratory at fs.usda.gov; Table 4-6b tabulates this relation for G 0.30 to 0.70 and 0% to 150% moisture content.",
+    governance: GOVERNANCE.general,
+    editionNote: "Two things make this a calculation rather than a lookup, and both are routinely got wrong. The first is that nominal call-outs do not weigh anything: a 2x10 is 1.5 by 9.25 in dressed, so weighing it as 2 by 10 overstates it by about 44%. The second is moisture. Wood is weighed wet, and the water is a large and moving fraction of the number -- the same 20 ft 2x10 is 67 lb at the 12% a kiln leaves it at and about 86 lb green, which is the difference between a one-man lift and a two-man lift and the difference between a legal and an overweight delivery. Above roughly 30% moisture, the fibre saturation point, the volume stops changing and further water simply adds mass; below it the volume moves with moisture too, which is why the specific gravity entered has to be on the volume at the moisture content in question. Specific gravity is an input here and not a bundled species table: the per-species values are published in Wood Handbook Tables 5-3 through 5-5, they vary by 10% within a species, and a figure read off a supplier's own stock beats any table. Treated lumber carries retained chemical and water this relation does not model, and an engineered member -- LVL, LSL, an I-joist -- is weighed from the maker's published unit weight, not from a specific gravity.",
+    assumptions: [
+      { name: "Dressed size, not nominal", value: "a 2x10 is 1.5 by 9.25 in; nominal overstates the weight by about 44%", source: "Wood Handbook Ch. 4 / standard dressed sizes" },
+      { name: "The water is a large share", value: "the same piece is about 28% heavier green than kiln-dried", source: "Wood Handbook Table 4-6b" },
+      { name: "Fibre saturation is about 30%", value: "above it the volume no longer changes with moisture", source: "Wood Handbook Ch. 4" },
+      { name: "Specific gravity is an input", value: "species values are in Tables 5-3 to 5-5 and vary ~10% within a species", source: "Wood Handbook Ch. 5" },
+    ],
+  },
   // spec-v1550..v1556: the 2026-09-05 trade-expansion wind-energy band.
   // Group A, Electrical.
   "tip-speed-ratio": {

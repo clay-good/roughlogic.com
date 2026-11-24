@@ -61831,6 +61831,30 @@ test("hardening slice 50 group 4 (short-primer GC%, tiny triangles, no-load batt
   assert.ok(!/tier 4/.test((await run("critical-load-shed-tiers", { source_kw: 500 })).served_tiers));
   // 0.015 lb over the gross read "OVER the gross limit by 0 lb".
   assert.match((await run("log-truck-payload", { load_volume_mbf: 4.57143 })).load_verdict, /^AT the gross limit/);
+  // spec-v1998 computeLumberWeight: the Wood Handbook relation, pinned at three cells of its own
+  // Table 4-6b, and at the two seams a nominal call-out walks into.
+  {
+    const cell = async (specific_gravity, moisture_pct) => (await run("lumber-weight",
+      { pieces: 1, thickness_in: 12, width_in: 12, length_ft: 1, specific_gravity, moisture_pct })).density_pcf;
+    assert.ok(Math.abs(await cell(0.50, 12) - 34.9) < 0.1, String(await cell(0.50, 12)));
+    assert.ok(Math.abs(await cell(0.40, 0) - 25.0) < 0.1, String(await cell(0.40, 0)));
+    assert.ok(Math.abs(await cell(0.70, 60) - 69.9) < 0.1, String(await cell(0.70, 60)));
+    // A 20 ft 2x10, dressed, kiln-dried: 67.4 lb, of which 7.2 lb is water.
+    const dressed = await run("lumber-weight", {});
+    assert.ok(Math.abs(dressed.weight_lb_total - 67.3724) < 0.01, String(dressed.weight_lb_total));
+    assert.ok(Math.abs(dressed.water_weight_lb_total - 7.2185) < 0.01, String(dressed.water_weight_lb_total));
+    // Green is the same arithmetic at a higher moisture content, and the note
+    // has to say which side of fibre saturation the reader is on.
+    const green = await run("lumber-weight", { moisture_pct: 40 });
+    assert.ok(green.weight_lb_total > dressed.weight_lb_total, String(green.weight_lb_total));
+    assert.match(green.note, /above the roughly 30% fibre saturation point/);
+    assert.match(dressed.note, /below the roughly 30% fibre saturation point/);
+    // Half a piece is not a piece, and nothing is denser than the cell wall.
+    assert.match((await run("lumber-weight", { pieces: 1.5 })).error, /whole number/);
+    assert.match((await run("lumber-weight", { specific_gravity: 1.6 })).error, /denser than any wood/);
+    assert.match((await run("lumber-weight", { moisture_pct: 301 })).error, /maximum any wood can hold/);
+    assert.match((await run("lumber-weight", { thickness_in: 0 })).error, /thickness must be positive/);
+  }
   // Blank appliance rows were counted as appliances.
   assert.equal((await run("gas-appliance-demand", { appliances: [100000, null, "", 40000] })).appliance_count, 2);
   // PV that alone filled the limit read "downsize the main to 0 A or less".

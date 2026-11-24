@@ -947,6 +947,7 @@ export const RENDERER_MAP = {
   "bandmill-speed-bite": { module: "../../calc-sawmill.js", exportName: "SAWMILL_RENDERERS" },
   "sawmill-residue-yield": { module: "../../calc-sawmill.js", exportName: "SAWMILL_RENDERERS" },
   "log-truck-payload": { module: "../../calc-sawmill.js", exportName: "SAWMILL_RENDERERS" },
+  "lumber-weight": { module: "../../calc-sawmill.js", exportName: "SAWMILL_RENDERERS" },
   "tip-speed-ratio": { module: "../../calc-wind.js", exportName: "WIND_RENDERERS" },
   "wind-power-density-betz": { module: "../../calc-wind.js", exportName: "WIND_RENDERERS" },
   "wind-shear-hub-height": { module: "../../calc-wind.js", exportName: "WIND_RENDERERS" },

@@ -1043,6 +1043,12 @@
     {"term":"lawn fertilizer","target":"lawn-fertilizer-rate","kind":"industry"},
     {"term":"pounds of fertilizer per 1000 sq ft","target":"lawn-fertilizer-rate","kind":"industry"},
     {"term":"lb of nitrogen per 1000 square feet","target":"lawn-fertilizer-rate","kind":"industry"},
+    {"term":"lumber weight","target":"lumber-weight","kind":"industry"},
+    {"term":"how much does a 2x10 weigh","target":"lumber-weight","kind":"question"},
+    {"term":"weight of a sheet of plywood","target":"lumber-weight","kind":"question"},
+    {"term":"how much does lumber weigh","target":"lumber-weight","kind":"question"},
+    {"term":"green vs kiln dried lumber weight","target":"lumber-weight","kind":"question"},
+    {"term":"wood density from specific gravity","target":"lumber-weight","kind":"industry"},
     {"term":"head of cattle drink","target":"livestock-water-requirement","kind":"question"}
   ]
 }

@@ -1665,6 +1665,7 @@ export const COMPUTE_MAP = {
   "bandmill-speed-bite": { module: "../../calc-sawmill.js", fn: "computeBandmillSpeedBite" },
   "sawmill-residue-yield": { module: "../../calc-sawmill.js", fn: "computeSawmillResidueYield" },
   "log-truck-payload": { module: "../../calc-sawmill.js", fn: "computeLogTruckPayload" },
+  "lumber-weight": { module: "../../calc-sawmill.js", fn: "computeLumberWeight" },
   // spec-v1550..v1556 wind-energy band
   "tip-speed-ratio": { module: "../../calc-wind.js", fn: "computeTipSpeedRatio" },
   "wind-power-density-betz": { module: "../../calc-wind.js", fn: "computeWindPowerDensityBetz" },

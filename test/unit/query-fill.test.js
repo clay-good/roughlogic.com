@@ -905,3 +905,19 @@ test("query-fill: indexed siblings take their values in the order they are writt
   const pr = [num("p", "Principal", "usd"), num("x", "Extra principal per month", "usd")];
   assert.deepEqual(queryFill("loan extra principal 100", pr).filled, {});
 });
+
+test("query-fill: a nominal lumber size never fills a box that asks for the dressed one", () => {
+  // A 2x10 is 1.5 by 9.25 in dressed, so writing the call-out into a dressed
+  // box overstates the piece by 44% (2026-11-24, spec-v1998).
+  const weight = [num("thickness_in", "Dressed thickness", "in"), num("width_in", "Dressed width", "in"),
+    num("length_ft", "Length", "ft"), num("specific_gravity", "Specific gravity G")];
+  const w = queryFill("lumber weight 20 ft 2x10 specific gravity 0.5", weight).filled;
+  assert.equal(w.thickness_in, undefined, JSON.stringify(w));
+  assert.equal(w.width_in, undefined, JSON.stringify(w));
+  assert.deepEqual([w.length_ft, w.specific_gravity], ["20", "0.5"]);
+  // A tile that wants the NOMINAL size still takes it.
+  const bf = [num("thickness_in", "Thickness", "in"), num("width_in", "Width", "in"),
+    num("length_ft", "Length", "ft"), num("count", "Count")];
+  assert.deepEqual(queryFill("board feet in 100 2x4 8 ft", bf).filled,
+    { thickness_in: "2", width_in: "4", count: "100", length_ft: "8" });
+});

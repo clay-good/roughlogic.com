@@ -892,7 +892,7 @@ const _TILES = [
   ["kiln-charge-water", "L"],
   ["bandmill-speed-bite", "L"],
   ["sawmill-residue-yield", "L"],
-  ["log-truck-payload", "L"],
+  ["log-truck-payload", "L"], ["lumber-weight", "L"],
   // spec-v1550..v1556 wind-energy band (Group A)
   ["tip-speed-ratio", "A"],
   ["wind-power-density-betz", "A"],

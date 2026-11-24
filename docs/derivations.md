@@ -3477,6 +3477,7 @@ cross-check.
 | calc-sawmill.js | `computeKilnDryingTime` | `{ mc_initial_pct = 0, mc_final_pct = 0, fsp_mc_pct = 30, rate_above_fsp_ppd =...` | _ | _ | _ |
 | calc-sawmill.js | `computeLogTruckPayload` | `{ legal_gross_lb = 0, tare_lb = 0, weight_per_mbf_lb = 0, alt_weight_per_mbf_...` | _ | _ | _ |
 | calc-sawmill.js | `computeLumberRecoveryOverrun` | `{ scaled_bf = 0, actual_bf = 0, log_volume_cuft = 0, benchmark_lrf = 7, avg_l...` | _ | _ | _ |
+| calc-sawmill.js | `computeLumberWeight` | `{ pieces = 1, thickness_in = 0, width_in = 0, length_ft = 0, specific_gravity...` | _ | _ | _ |
 | calc-sawmill.js | `computeSawmillResidueYield` | `{ lumber_recovery_pct = 0, kerf_in = 0, target_kerf_in = 0, board_thickness_i...` | _ | _ | _ |
 | calc-septic.js | `computeLeachFieldAggregate` | `{ num_trenches = 3, trench_length_ft = 60, trench_width_in = 24, stone_depth_...` | _ | _ | _ |
 | calc-septic.js | `computeSepticDoseTank` | `{ daily_flow_gpd, doses_per_day = 4, drainback_gal = 0, network_volume_gal = ...` | _ | _ | _ |
@@ -3957,7 +3958,7 @@ cross-check.
 | pure-math.js | `threePhasePower` | `{ V_LL, I_L, pf }` | _ | _ | _ |
 | pure-math.js | `voltageDrop` | `{ phase, material, awg, length_ft, current_A }` | _ | _ | _ |
 
-Row count: 2541.
+Row count: 2542.
 
 <!-- END function-corpus-v14 -->
 
@@ -5893,7 +5894,7 @@ per spec-v14 §13.1 second paragraph.
 | `wheel-offset-backspacing` | Wheel Offset and Backspacing | wheel offset / backspacing conversion...; spec-v510 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `worm-gear-geometry` | Worm and Worm-Wheel Geometry | Machinery's Handbook (worm gearing); lead = 0.5 x 1 = 0.5 in; lead angle = atan(0.5/(pi x 2)) ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
 
-### Group L Agriculture (97 tiles)
+### Group L Agriculture (98 tiles)
 
 | tile_id | name | citation source | fixture |
 | --- | --- | --- | --- |
@@ -5944,6 +5945,7 @@ per spec-v14 §13.1 second paragraph.
 | `log-limb-weight` | Green Log and Limb Weight | USDA FPL Technical Note 218 green wei...; 16 in butt / 16 in top, 8 ft red oak (Q. borealis, 63 lb/... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `log-truck-payload` | Log Truck Payload and Legal Load Volume | Project (first-principles); the applicable state and federal weight limits and the br... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `lumber-recovery-overrun` | Sawmill Overrun and Lumber Recovery Factor | Project (first-principles); the applicable scaling rule and handbook govern | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+4 more) |
+| `lumber-weight` | Lumber and Panel Weight | USDA Forest Service, Forest Products ...; Table 4-6b, the Gx 0.50 column at 12% moisture content: 3... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) |
 | `mad-irrigation-trigger` | Available Water and MAD Irrigation Trigger | FAO-56 / NRCS soil-water reservoir (MAD); TAW = (0.30-0.12)*24 = 4.32; RAW = 0.5*4.32 = 2.16; inter... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `manure-application-rate` | Nutrient-Based Manure Application Rate | USDA NRCS Code 590; spec-v340 section 2.1 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 | `manure-cover-savings` | Manure Storage Roof Savings (Covered vs Open) | USDA-NRCS Conservation Practice 313 (...; 8,000 ft2 pit, 6-in net precip + 4-in storm -> 6,667 ft3 ... | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+1 more) |
@@ -6417,6 +6419,6 @@ per spec-v14 §13.1 second paragraph.
 | `wire-rope-strength` | Wire-Rope Breaking-Strength Estimate and WLL | Wire Rope Users Manual rule-of-thumb ...; spec-v117 section 2.2 pinned example | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+3 more) |
 | `wire-rope-stretch` | Wire Rope Elastic Stretch Under Load | Project (first-principles); dL = P L /(A_m E_r) | [test/fixtures/worked-examples.json](../test/fixtures/worked-examples.json) (+2 more) |
 
-Tile count: 2287. Fixture-covered or reference-cadence: 2287 / 2287.
+Tile count: 2288. Fixture-covered or reference-cadence: 2288 / 2288.
 
 <!-- END tile-index-v14 -->

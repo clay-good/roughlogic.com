@@ -776,6 +776,7 @@ export const TOOL_MODULES = (() => {
   declare("./calc-sawmill.js", "SAWMILL_RENDERERS", [
     "lumber-recovery-overrun", "kiln-drying-time", "kiln-charge-water",
     "bandmill-speed-bite", "sawmill-residue-yield", "log-truck-payload",
+    "lumber-weight",
   ]);
   // spec-v1550..v1556: the wind-energy bench. Every existing "wind" tile
   // treats wind as a STRUCTURAL load; these seven treat it as a resource.

@@ -691,7 +691,14 @@ export function queryFill(query, rows, opts) {
   // went nowhere (2026-11-23).
   {
     const lumber = quantities.map((q, i) => (q.lumber ? i : -1)).filter((i) => i >= 0);
-    const inRow = (w) => numberRows.filter((r) => rowUnit(r) === "in" && termsByRow.get(r.d).has(w));
+    // ...but never into a box that asks for the DRESSED (actual) size. A 2x10
+    // is 1.5 by 9.25 in, so writing the nominal call-out into a dressed box
+    // overstates the piece by 44% -- and several calculators ask for the
+    // dressed size by name, saying so in the label, because that is what the
+    // stick measures (2026-11-24: lumber weight, the joist notch/bore limits,
+    // the formwork members). A wrong value is worse than no value.
+    const inRow = (w) => numberRows.filter((r) => rowUnit(r) === "in" && termsByRow.get(r.d).has(w) &&
+      !/\b(dressed|actual)\b/i.test(String(r.l || "")));
     const thick = inRow("thickness"), wide = inRow("width");
     if (lumber.length === 2 && thick.length === 1 && wide.length === 1 && !inRow("depth").length && thick[0].d !== wide[0].d) {
       filled[thick[0].d] = String(quantities[lumber[0]].value);
@@ -942,8 +949,10 @@ export function queryFill(query, rows, opts) {
         break;
       }
       if (!matched) continue;
-      // A number the lumber rewrite wrote only fills a field about the stick's size.
-      if (qty.lumber && ![...termsByRow.get(row.d)].some((t) => ["nominal", "width", "depth", "thickness", "lumber"].includes(t))) continue;
+      // A number the lumber rewrite wrote only fills a field about the stick's size,
+      // and never one that asks for the DRESSED size (see the block below).
+      if (qty.lumber && (/\b(dressed|actual)\b/i.test(String(row.l || "")) ||
+          ![...termsByRow.get(row.d)].some((t) => ["nominal", "width", "depth", "thickness", "lumber"].includes(t)))) continue;
       if (valueFor(qty, row, text, labelWords) === null) continue;   // unit disagreement
       // The same in the other direction: "a 40 ft wall 16 on center" names the
       // wall AFTER its 40 ft, and reading "wall" forward handed the bare 16 to

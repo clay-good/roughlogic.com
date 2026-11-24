@@ -501,3 +501,78 @@ SAWMILL_RENDERERS["log-truck-payload"] = _simpleRenderer({
   ],
   compute: computeLogTruckPayload,
 });
+
+// spec-v1998: the weight of a piece of dressed lumber or a panel. USDA Forest
+// Service Wood Handbook (FPL-GTR-190) Chapter 4, Equation (4-12): the density
+// of wood including its water is its specific gravity on the ovendry-mass
+// basis times the density of water times (1 + MC/100). Table 4-6b tabulates
+// exactly that, and 589 of its 590 cells are reproduced to within
+// 0.2 lb/ft^3 by this relation.
+//
+// Specific gravity is an input, not a bundled species table: the per-species
+// values live in Wood Handbook Tables 5-3 through 5-5, which this tile does
+// not reproduce. Dimensions are the DRESSED size -- a 2x10 is 1.5 x 9.25 in --
+// because that is what a piece actually measures and therefore what it weighs.
+const WATER_PCF = 62.43;            // Wood Handbook Ch. 4: rho_w at 4 C (39 F)
+const FIBRE_SATURATION_PCT = 30;    // Wood Handbook Ch. 4: MCfs averages ~30%
+
+// dims: in { pieces: dimensionless, thickness_in: L, width_in: L, length_ft: L, specific_gravity: dimensionless, moisture_pct: dimensionless } out: { density_pcf: M*L^-3, volume_ft3_each: L^3, volume_ft3_total: L^3, weight_lb_each: M, weight_lb_total: M, board_feet: L^3, ovendry_weight_lb_total: M, water_weight_lb_total: M }
+export function computeLumberWeight({ pieces = 1, thickness_in = 0, width_in = 0, length_ft = 0, specific_gravity = 0, moisture_pct = 12 } = {}) {
+  const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  if (!(pieces >= 1) || !Number.isInteger(pieces)) return { error: "Pieces must be a whole number of 1 or more." };
+  if (!(thickness_in > 0)) return { error: "Dressed thickness must be positive (in)." };
+  if (!(width_in > 0)) return { error: "Dressed width must be positive (in)." };
+  if (!(length_ft > 0)) return { error: "Length must be positive (ft)." };
+  if (!(specific_gravity > 0)) return { error: "Specific gravity must be positive." };
+  if (specific_gravity > 1.5) return { error: "Specific gravity above 1.5 is denser than any wood (the cell wall itself is about 1.5)." };
+  if (!(moisture_pct >= 0)) return { error: "Moisture content cannot be negative (%)." };
+  if (moisture_pct > 300) return { error: "Moisture content above 300% exceeds the maximum any wood can hold." };
+
+  const density_pcf = specific_gravity * WATER_PCF * (1 + moisture_pct / 100);
+  const volume_ft3_each = thickness_in * width_in / 144 * length_ft;
+  const volume_ft3_total = volume_ft3_each * pieces;
+  const weight_lb_each = volume_ft3_each * density_pcf;
+  const weight_lb_total = weight_lb_each * pieces;
+  // The water is the part that leaves in a kiln or a dry season, so an
+  // estimator wants it named: ovendry mass is G x rho_w x volume, and the rest
+  // of the weight is water.
+  const ovendry_weight_lb_total = volume_ft3_total * specific_gravity * WATER_PCF;
+  const water_weight_lb_total = weight_lb_total - ovendry_weight_lb_total;
+  // Nominal board footage, for cross-checking an order written in board feet.
+  // Board feet are counted on the NOMINAL size, so this is only the dressed
+  // arithmetic and the note says so.
+  const board_feet = thickness_in * width_in * length_ft / 12 * pieces;
+
+  const green = moisture_pct > FIBRE_SATURATION_PCT;
+  return {
+    density_pcf, volume_ft3_each, volume_ft3_total, weight_lb_each, weight_lb_total,
+    ovendry_weight_lb_total, water_weight_lb_total, board_feet,
+    note: "Density = G x " + WATER_PCF + " lb/ft^3 x (1 + MC/100), the Wood Handbook (FPL-GTR-190) Chapter 4 relation its Table 4-6b tabulates; G is specific gravity on the ovendry-mass basis at the volume for this moisture content. Dimensions entered are the DRESSED size, so a nominal 2x10 is 1.5 by 9.25 in; the board-footage line is the dressed arithmetic, while a lumber order counts board feet on the NOMINAL size. "
+      + (green
+        ? "At " + fmt(moisture_pct, 0) + "% the wood is above the roughly 30% fibre saturation point, so this is a green weight: the volume no longer changes with moisture and the extra water simply adds mass."
+        : "At " + fmt(moisture_pct, 0) + "% the wood is below the roughly 30% fibre saturation point, where its volume still changes with moisture; the specific gravity entered must be on the volume at this moisture content.")
+      + " Treated lumber carries retained chemical and water this relation does not model, and an engineered member (LVL, LSL, I-joist) is weighed from the maker's published unit weight. Species specific gravities are in Wood Handbook Tables 5-3 through 5-5.",
+  };
+}
+const lumberWeightExample = { inputs: { pieces: 1, thickness_in: 1.5, width_in: 9.25, length_ft: 20, specific_gravity: 0.5, moisture_pct: 12 } };
+SAWMILL_RENDERERS["lumber-weight"] = _simpleRenderer({
+  citation: "Citation: USDA Forest Service, Wood Handbook -- Wood as an Engineering Material, General Technical Report FPL-GTR-190 (2010), Chapter 4 \"Moisture Relations and Physical Properties of Wood\", Equation (4-12) and Table 4-6b, by name; free at fs.usda.gov. Density including water = G x 62.43 lb/ft^3 x (1 + MC/100), where G is specific gravity on the ovendry-mass basis at the volume for that moisture content. Table 4-6b tabulates the same relation for G 0.30 to 0.70 and 0% to 150% moisture. Dressed (actual) dimensions govern the weight. Species specific gravities are in Tables 5-3 through 5-5 and are not bundled here.",
+  example: lumberWeightExample.inputs,
+  fields: [
+    { key: "pieces", label: "Pieces", kind: "number", default: 1, attrs: { step: "1", min: "1" } },
+    { key: "thickness_in", label: "Dressed thickness (in; a 2x is 1.5)", kind: "number" },
+    { key: "width_in", label: "Dressed width (in; a 2x10 is 9.25)", kind: "number" },
+    { key: "length_ft", label: "Length (ft)", kind: "number" },
+    { key: "specific_gravity", label: "Specific gravity G (0.30 to 0.70 spans most US species)", kind: "number", attrs: { step: "any", min: "0", max: "1.5" } },
+    { key: "moisture_pct", label: "Moisture content (%, 12 kiln-dried / 19 air-dried / 30 and up green)", kind: "number", default: 12, attrs: { step: "any", min: "0", max: "300" } },
+  ],
+  outputs: [
+    { key: "t", id: "lbw-out-t", label: "Total weight", value: (r) => fmt(r.weight_lb_total, 1) + " lb" },
+    { key: "e", id: "lbw-out-e", label: "Each piece", value: (r) => fmt(r.weight_lb_each, 1) + " lb, " + fmt(r.volume_ft3_each, 3) + " ft\u00b3" },
+    { key: "d", id: "lbw-out-d", label: "Density at this moisture content", value: (r) => fmt(r.density_pcf, 2) + " lb/ft\u00b3" },
+    { key: "v", id: "lbw-out-v", label: "Volume", value: (r) => fmt(r.volume_ft3_total, 3) + " ft\u00b3, " + fmt(r.board_feet, 1) + " board feet of dressed stock" },
+    { key: "w", id: "lbw-out-w", label: "Of that, water", value: (r) => fmt(r.water_weight_lb_total, 1) + " lb water over " + fmt(r.ovendry_weight_lb_total, 1) + " lb of ovendry wood" },
+    { key: "n", id: "lbw-out-n", label: "Note", value: (r) => r.note },
+  ],
+  compute: computeLumberWeight,
+});
