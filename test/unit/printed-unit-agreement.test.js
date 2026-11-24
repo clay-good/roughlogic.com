@@ -53,10 +53,13 @@ const EXEMPT = new Set([
 
 export function unscaledMismatches(table) {
   const out = [];
+  // Which exemptions this run used; an entry that waives nothing is a claim
+  // about a line that no longer exists, ready to hide the next real one.
+  const waived = new Set();
   let compared = 0;
   for (const [tile, keys] of Object.entries(table)) {
     for (const [key, spec] of Object.entries(keys)) {
-      if (EXEMPT.has(tile + "." + key)) continue;
+      if (EXEMPT.has(tile + "." + key)) { waived.add(tile + "." + key); continue; }
       const named = NAMED[(key.split("_").pop() || "").toLowerCase()];
       if (!named) continue;
       // Judge only a suffix that is a bare unit; one carrying prose
@@ -71,13 +74,15 @@ export function unscaledMismatches(table) {
       out.push(`${tile} ${key}: named ${named}, prints "${suffix}" (${printed}), no scale`);
     }
   }
-  return { compared, out };
+  return { compared, out, waived };
 }
 
 test("a bespoke output prints its key's unit, or declares the scale that converts it", () => {
-  const { compared, out } = unscaledMismatches(BESPOKE_OUTPUT_UNITS);
+  const { compared, out, waived } = unscaledMismatches(BESPOKE_OUTPUT_UNITS);
   assert.ok(compared > 600, "only " + compared + " output lines were comparable; the fixture did not load");
   assert.deepEqual(out, []);
+  assert.deepEqual([...EXEMPT].filter((k) => !waived.has(k)).sort(), [],
+    "an EXEMPT output line no longer exists; remove it");
 });
 
 test("the check is seeded red", () => {
@@ -123,10 +128,11 @@ const DIM_EXEMPT = new Map([
 
 export function printedVsDims(table, dims) {
   const bad = [];
+  const waived = new Set();
   let compared = 0;
   for (const [tile, keys] of Object.entries(table)) {
     for (const [key, spec] of Object.entries(keys)) {
-      if (DIM_EXEMPT.has(tile + "." + key)) continue;
+      if (DIM_EXEMPT.has(tile + "." + key)) { waived.add(tile + "." + key); continue; }
       // A declared scale means the printed unit is deliberately not the key's.
       if (Number.isFinite(spec.scale) && spec.scale !== 1) continue;
       const want = PRINTED_DIM[String(spec.suffix || "").trim().toLowerCase()];
@@ -138,13 +144,15 @@ export function printedVsDims(table, dims) {
       if (got !== canon(want)) bad.push(`${tile} ${key}: prints "${String(spec.suffix).trim()}", dims says ${got}`);
     }
   }
-  return { compared, bad };
+  return { compared, bad, waived };
 }
 
 test("a bespoke output's printed unit agrees with its declared dimension", () => {
-  const { compared, bad } = printedVsDims(BESPOKE_OUTPUT_UNITS, declaredDimensions());
+  const { compared, bad, waived } = printedVsDims(BESPOKE_OUTPUT_UNITS, declaredDimensions());
   assert.ok(compared > 350, "only " + compared + " output lines were comparable; a fixture did not load");
   assert.deepEqual(bad, []);
+  assert.deepEqual([...DIM_EXEMPT.keys()].filter((k) => !waived.has(k)).sort(), [],
+    "a DIM_EXEMPT output line no longer exists; remove it");
 });
 
 test("the dimension check is seeded red", () => {

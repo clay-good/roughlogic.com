@@ -60,4 +60,11 @@ test("count nouns: no rendered page prints a count of one beside a plural noun",
   assert.ok(report.withExample > 2200, `only ${report.withExample} tiles rendered an example`);
   const fresh = report.hits.filter((h) => h.kind === "plural" && !REVIEWED.has(h.id + " " + h.word)).map((h) => `${h.id} (${h.state}): ...${h.text}`);
   assert.deepEqual(fresh, [], "choose the noun by the printed count, or review the pair above");
+  // A waiver is a claim that the pair above is fine, and those rot: fix the
+  // line (or stop rendering it) and the entry stays behind, waiving nothing
+  // and ready to hide the next real one. `silent-flag-guard.test.js` has held
+  // its REVIEWED list to this since it landed; this one did not (2026-11-24).
+  const live = new Set(report.hits.filter((h) => h.kind === "plural").map((h) => h.id + " " + h.word));
+  assert.deepEqual([...REVIEWED].filter((k) => !live.has(k)).sort(), [],
+    "a REVIEWED pair no longer reproduces; remove it");
 });

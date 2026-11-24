@@ -49,10 +49,15 @@ const EXEMPT = new Map([
 
 export function labelDisagreements(labels, dims) {
   const bad = [];
+  // Which exemptions this run actually used. An exemption is a claim that the
+  // pair is fine, and claims rot: rename the key, fix the label or retire the
+  // tile and the entry stays behind, waiving nothing and ready to hide the
+  // next real disagreement (2026-11-24).
+  const waived = new Set();
   let compared = 0;
   for (const [tile, fields] of Object.entries(labels)) {
     for (const [key, label] of Object.entries(fields)) {
-      if (EXEMPT.has(tile + "." + key)) continue;
+      if (EXEMPT.has(tile + "." + key)) { waived.add(tile + "." + key); continue; }
       const m = /\(([^()]{1,8})\)\s*$/.exec(String(label));
       if (!m) continue;
       const want = LABEL_UNIT[m[1].trim().toLowerCase()];
@@ -68,13 +73,15 @@ export function labelDisagreements(labels, dims) {
       }
     }
   }
-  return { compared, bad };
+  return { compared, bad, waived };
 }
 
 test("a field label's unit agrees with the key's declared dimension", () => {
-  const { compared, bad } = labelDisagreements(BESPOKE_LABELS, declaredDimensions());
+  const { compared, bad, waived } = labelDisagreements(BESPOKE_LABELS, declaredDimensions());
   assert.ok(compared > 1200, "only " + compared + " labelled inputs were comparable; a fixture did not load");
   assert.deepEqual(bad, []);
+  assert.deepEqual([...EXEMPT.keys()].filter((k) => !waived.has(k)).sort(), [],
+    "an EXEMPT field no longer exists or no longer carries a unit parenthetical; remove it");
 });
 
 test("the check is seeded red", () => {

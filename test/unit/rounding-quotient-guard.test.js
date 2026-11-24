@@ -75,11 +75,17 @@ function unguardedVariables(src) {
 }
 
 test("a rounded variable that holds a computed quotient or product carries a float guard", () => {
-  const all = [];
+  const all = [], waived = new Set();
   for (const f of readdirSync(ROOT).filter((n) => /^calc-.*\.js$/.test(n))) {
     for (const v of unguardedVariables(readFileSync(resolve(ROOT, f), "utf8"))) {
-      if (!REVIEWED.has(f + ":" + v)) all.push(f + ": " + v);
+      if (REVIEWED.has(f + ":" + v)) waived.add(f + ":" + v);
+      else all.push(f + ": " + v);
     }
   }
   assert.deepEqual(all, []);
+  // A waiver is a claim about a line, and lines move: guard the variable or
+  // rename it and the entry stays behind, waiving nothing and ready to hide
+  // the next unguarded quotient (2026-11-24).
+  assert.deepEqual([...REVIEWED].filter((k) => !waived.has(k)).sort(), [],
+    "a REVIEWED variable is now guarded or gone; remove it");
 });
