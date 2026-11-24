@@ -56,7 +56,19 @@ export class Node {
   set innerText(v) { this.textContent = v; }
   get innerHTML() { return this.textContent; }
   set innerHTML(v) { this.textContent = String(v).replace(/<[^>]*>/g, ""); }
-  setAttribute(k, v) { this.attributes[k] = String(v); if (k === "id") this.id = String(v); if (k === "class") this.className = String(v); }
+  // A `value` attribute on a control IS its value until something dirties it,
+  // which is how `makeNumber(label, id, { value: "45" })` prefills a box. The
+  // fake DOM stored the attribute without reflecting it, so every sweep that
+  // drives a renderer saw those boxes as blank -- which is how the phantom-
+  // default sweep reported a prefilled NOCT of 45 as a number the reader
+  // cannot see (2026-11-24). Mirrors the browser: the attribute sets the value
+  // only while the control is still clean.
+  setAttribute(k, v) {
+    this.attributes[k] = String(v);
+    if (k === "id") this.id = String(v);
+    if (k === "class") this.className = String(v);
+    if (k === "value" && !this._valueSet && (this.tagName === "INPUT" || this.tagName === "TEXTAREA")) this.value = String(v);
+  }
   getAttribute(k) { return k in this.attributes ? this.attributes[k] : (k === "id" && this.id ? this.id : null); }
   hasAttribute(k) { return k in this.attributes; }
   removeAttribute(k) { delete this.attributes[k]; }

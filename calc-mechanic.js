@@ -1190,8 +1190,8 @@ MECHANIC_RENDERERS["gear-contact-stress"] = _simpleRenderer({
     { key: "pinion_teeth", label: "Pinion teeth Np", kind: "number" },
     { key: "gear_teeth", label: "Gear teeth Ng", kind: "number" },
     { key: "face_width_in", label: "Face width F (in)", kind: "number" },
-    { key: "pressure_angle_deg", label: "Pressure angle phi (deg)", kind: "number", attrs: { step: "any", value: "20" }, whenBlank: 20 },
-    { key: "elastic_coefficient_cp", label: "Elastic coefficient Cp (sqrt-psi)", kind: "number", attrs: { step: "any", value: "2300" }, whenBlank: 2300 },
+    { key: "pressure_angle_deg", label: "Pressure angle phi (deg)", kind: "number", attrs: { step: "any", value: "20" } },
+    { key: "elastic_coefficient_cp", label: "Elastic coefficient Cp (sqrt-psi)", kind: "number", attrs: { step: "any", value: "2300" } },
   ],
   outputs: [
     { key: "s", id: "gcs-out-s", label: "Contact stress", value: (r) => fmt(r.contact_stress_psi, 0) + " psi" },
@@ -1240,7 +1240,7 @@ MECHANIC_RENDERERS["aerodynamic-drag-force"] = _simpleRenderer({
     { key: "speed_mph", label: "Speed V (mph)", kind: "number" },
     { key: "frontal_area_ft2", label: "Frontal area A (ft²)", kind: "number" },
     { key: "drag_coefficient", label: "Drag coefficient Cd", kind: "number" },
-    { key: "air_density_lb_ft3", label: "Air density (lb/ft³)", kind: "number", attrs: { step: "any", value: "0.0765" }, whenBlank: 0.0765 },
+    { key: "air_density_lb_ft3", label: "Air density (lb/ft³)", kind: "number", attrs: { step: "any", value: "0.0765" } },
   ],
   outputs: [
     { key: "f", id: "adf-out-f", label: "Drag force", value: (r) => fmt(r.drag_force_lbf, 1) + " lbf" },
@@ -1294,7 +1294,7 @@ MECHANIC_RENDERERS["vehicle-road-load-power"] = _simpleRenderer({
     { key: "drag_coefficient", label: "Drag coefficient Cd", kind: "number" },
     { key: "rolling_coefficient", label: "Rolling-resistance coefficient Crr", kind: "number", default: 0.012, attrs: { step: "any", value: "0.012" } },
     { key: "grade_pct", label: "Grade (%)", kind: "number", attrs: { step: "any", value: "0" } },
-    { key: "air_density_lb_ft3", label: "Air density (lb/ft³)", kind: "number", attrs: { step: "any", value: "0.0765" }, whenBlank: 0.0765 },
+    { key: "air_density_lb_ft3", label: "Air density (lb/ft³)", kind: "number", attrs: { step: "any", value: "0.0765" } },
   ],
   outputs: [
     { key: "p", id: "vrl-out-p", label: "Road-load power (at the wheels)", value: (r) => fmt(r.road_load_power_hp, 2) + " hp (" + fmt(r.road_load_power_kw, 2) + " kW)" },
@@ -2062,7 +2062,7 @@ MECHANIC_RENDERERS["terminal-velocity"] = _simpleRenderer({
     { key: "weight_lb", label: "Object weight W (lb)", kind: "number" },
     { key: "frontal_area_ft2", label: "Frontal area A (ft²)", kind: "number" },
     { key: "drag_coefficient", label: "Drag coefficient Cd", kind: "number" },
-    { key: "air_density_lb_ft3", label: "Air density (lb/ft³)", kind: "number", attrs: { step: "any", value: "0.0765" }, whenBlank: 0.0765 },
+    { key: "air_density_lb_ft3", label: "Air density (lb/ft³)", kind: "number", attrs: { step: "any", value: "0.0765" } },
   ],
   outputs: [
     { key: "v", id: "tv-out-v", label: "Terminal velocity", value: (r) => fmt(r.terminal_velocity_fps, 1) + " ft/s (" + fmt(r.terminal_velocity_mph, 1) + " mph)" },
