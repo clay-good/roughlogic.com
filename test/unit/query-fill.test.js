@@ -992,3 +992,14 @@ test("query-fill: a dropdown's whole label written before an option takes it", (
   const one = [sel("mode", "Mode", ["fast", "slow"])];
   assert.equal(queryFill("Mode fast", one).filled.mode, "fast");
 });
+
+test("query-fill: a tie between two sibling groups is broken by what is written", () => {
+  // "Point 1 x".."Point 3 y" are three x's and three y's, and fullWords drops
+  // the single distinguishing letter, so one value named all six and the
+  // circle recovered nothing (2026-11-24). The group whose own words are all
+  // written beside the number is the one meant.
+  const circle = [num("x1", "Point 1 x"), num("y1", "Point 1 y"), num("x2", "Point 2 x"),
+    num("y2", "Point 2 y"), num("x3", "Point 3 x"), num("y3", "Point 3 y")];
+  assert.deepEqual(queryFill("Point x 4, Point y 3, Point x -2, Point y 5, Point x 1, Point y -1", circle).filled,
+    { x1: "4", y1: "3", x2: "-2", y2: "5", x3: "1", y3: "-1" });
+});

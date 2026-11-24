@@ -754,6 +754,7 @@ export function queryFill(query, rows, opts) {
   const proposals = new Map();     // row key -> [quantity index]
   const rowsFor = new Map();       // quantity index -> [row key]
   const wholeByQi = new Map();     // quantity index -> hits whose label is written whole
+  const windowByQi = new Map();    // quantity index -> the words written around it
 
   const optionWordsInText = new Set();
   for (const r of selectRows) for (const o of r.o) {
@@ -1119,7 +1120,7 @@ export function queryFill(query, rows, opts) {
         // has no window to rule them out for itself. Two fields called "That
         // zone to outside" lost their group to a "House to outside" that was
         // never written whole (2026-11-24).
-        else if (whole.length > 1) wholeByQi.set(qi, whole);
+        else if (whole.length > 1) { wholeByQi.set(qi, whole); windowByQi.set(qi, said); }
       }
     }
     rowsFor.set(qi, hits);
@@ -1162,9 +1163,31 @@ export function queryFill(query, rows, opts) {
       for (const k of hits) tally.set(sigOf(k), (tally.get(sigOf(k)) || 0) + 1);
       let sig = null, best = 0;
       for (const [g, n] of tally) if (n > best) { best = n; sig = g; }
+      // Two groups of the same size are a tie the count cannot break, and the
+      // window can: "Point 1 x".."Point 3 y" are three x's and three y's, and
+      // `fullWords` drops the single distinguishing letter, so "Point x 4"
+      // named all six and the circle recovered nothing (2026-11-24). The group
+      // whose own words are all written beside the number is the one meant.
+      const said = windowByQi.get(qi);
+      if (said) {
+        const written = (g) => g.split(" ").filter(Boolean).every((w) => said.has(w) || said.has(w + "s"));
+        const tied = [...tally].filter(([, n]) => n === best).map(([g]) => g);
+        if (tied.length > 1) {
+          const only = tied.filter(written);
+          if (only.length !== 1) continue;
+          sig = only[0];
+        }
+      }
       if (!sig || best < 2) continue;
       const group = hits.filter((k) => sigOf(k) === sig);
-      if (!hits.every((k) => sigOf(k) === sig || wordsOf(k) > sig.split(" ").filter(Boolean).length)) continue;
+      const sigWords = sig.split(" ").filter(Boolean).length;
+      // A hit outside the group has to be ruled out, not merely outvoted: it
+      // carries more label words than the siblings' signature (so it is a
+      // different, longer-named field), or its own words are not all written
+      // beside this number (so the reader did not name it here).
+      const ruledOut = (k) => wordsOf(k) > sigWords
+        || (said && !sigOf(k).split(" ").filter(Boolean).every((w) => said.has(w) || said.has(w + "s")));
+      if (!hits.every((k) => sigOf(k) === sig || ruledOut(k))) continue;
       const tag = [...group].sort().join("|");
       if (!byHitSet.has(tag)) byHitSet.set(tag, []);
       byHitSet.get(tag).push(qi);
