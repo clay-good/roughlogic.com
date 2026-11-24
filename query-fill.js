@@ -753,6 +753,7 @@ export function queryFill(query, rows, opts) {
   // readings the reverse reading manufactures a false hit for every one.
   const proposals = new Map();     // row key -> [quantity index]
   const rowsFor = new Map();       // quantity index -> [row key]
+  const wholeByQi = new Map();     // quantity index -> hits whose label is written whole
 
   const optionWordsInText = new Set();
   for (const r of selectRows) for (const o of r.o) {
@@ -1112,6 +1113,13 @@ export function queryFill(query, rows, opts) {
             fullWords(other).some((w) => !mine.has(stem(w)) && inSaid(w)));
         });
         if (whole.length === 1) hits.splice(0, hits.length, whole[0]);
+        // More than one written whole is not a tie to break here -- they may be
+        // the indexed or repeated boxes the sibling pass places by position --
+        // but the ones NOT written whole are already ruled out, and that pass
+        // has no window to rule them out for itself. Two fields called "That
+        // zone to outside" lost their group to a "House to outside" that was
+        // never written whole (2026-11-24).
+        else if (whole.length > 1) wholeByQi.set(qi, whole);
       }
     }
     rowsFor.set(qi, hits);
@@ -1141,7 +1149,8 @@ export function queryFill(query, rows, opts) {
     };
     const byHitSet = new Map();      // "a|b|c" -> [quantity index, ...]
     const wordsOf = (k) => sigOf(k).split(" ").filter(Boolean).length;
-    for (const [qi, hits] of rowsFor) {
+    for (const [qi, raw] of rowsFor) {
+      const hits = wholeByQi.get(qi) || raw;
       if (!hits || hits.length < 2 || suppressed.has(qi)) continue;
       // One field whose label merely CONTAINS the siblings' word is not one of
       // them: "Sag at the ruling span" joined all eight "Span N" fields and
@@ -1188,6 +1197,32 @@ export function queryFill(query, rows, opts) {
       // reading is only sound when the question accounts for every sibling.
       if (ordered.length !== keys.length) continue;
       if (indexed ? qis.length > ordered.length : qis.length !== ordered.length) continue;
+      // A SHORT list must be an unbroken run. "Fuel Oil Heating for Atomizing
+      // Viscosity" repeats "viscosity" in its own name, so the first window
+      // matched the siblings and the data-sheet temperature between the two
+      // readings did not -- leaving a gapped candidate set that slid the
+      // second viscosity into the first box (2026-11-24). Values a reader
+      // writes as a list are consecutive; anything else is not that list.
+      if (indexed && qis.length < ordered.length) {
+        const order = [...qis].sort((x, y) => x - y);
+        // An unbroken run: values a reader writes as a list are consecutive.
+        if (order.some((q, i) => i > 0 && q !== order[i - 1] + 1)) continue;
+        // ...and no OTHER value may have named a member of the group, or the
+        // list is not the list it looks like. "Fuel Oil Heating for Atomizing
+        // Viscosity" repeats "viscosity" in its own name, so the first of its
+        // two data-sheet readings matched the siblings AND the target
+        // viscosity -- a different hit set, which left the second reading
+        // alone as a one-item "list" and put it in the first box
+        // (2026-11-24). The exact-count branch needs no such test: it already
+        // accounts for every sibling.
+        const inGroup = new Set(keys);
+        let stray = false;
+        for (const [other, hits2] of rowsFor) {
+          if (qis.includes(other) || suppressed.has(other)) continue;
+          if ((wholeByQi.get(other) || hits2 || []).some((k) => inGroup.has(k))) { stray = true; break; }
+        }
+        if (stray) continue;
+      }
       if (ordered.some((k) => k in filled)) continue;
       qis.sort((x, y) => x - y);
       let ok = true;

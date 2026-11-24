@@ -966,3 +966,12 @@ test("query-fill: a one-word label that is a stopword still names its field", ()
   const dryer = [num("num_dryers", "Number of dryers"), num("nameplate_w", "Each dryer nameplate", "w")];
   assert.equal(queryFill("Number of dryers 4, Each dryer nameplate 4500 w", dryer).filled.num_dryers, "4");
 });
+
+test("query-fill: a rival never written whole does not break a sibling group", () => {
+  // Two boxes share the label "That zone to outside"; a third, "House to
+  // outside", shares only "outside" and was never written whole, yet it joined
+  // the hit set and cost the pair its group (2026-11-24).
+  const zonal = [num("house", "House to outside"), num("za", "That zone to outside"), num("zb", "That zone to outside")];
+  assert.deepEqual(queryFill("House to outside 50, That zone to outside 4, That zone to outside 12", zonal).filled,
+    { za: "4", zb: "12" });
+});
