@@ -981,6 +981,56 @@ export function queryFill(query, rows, opts) {
       const exact = hits.filter((k) => { const t = termsByRow.get(k); return t && t.size > 0 && [...t].every((w) => written.has(w)) && [...written].every((w) => t.has(w)) &&
         fullWords(k).every((w) => literal.has(w) || literal.has(w + "s")); });
       if (exact.length === 1) hits.splice(0, hits.length, exact[0]);
+      // ...and where no label is written exactly, the one whose label is
+      // written WHOLE still beats one that only shares a word. "Number of
+      // dryers 4" named both "Number of dryers" and "Each dryer nameplate",
+      // because "dryer" is in each, so the count filled nothing and the door
+      // answered for one dryer instead of four (2026-11-23). Every word of
+      // "Number of dryers" is written here and "nameplate" is not, so the
+      // shared word decides nothing. The same resolves "Entering water temp
+      // 54 degf, Leaving water temp 44 degf", where "water" and "temp" are
+      // both fields' words and only the direction word tells them apart.
+      // Strictly stronger than sharing a word: "Inverter Vdc max" is still not
+      // the word "inverter", because "vdc" and "max" are not written either.
+      else {
+        // Every word WRITTEN. A word that is also a select's option value
+        // cannot distinguish two fields, which is why `literal` drops it --
+        // but it is still written, and this test asks whether the whole label
+        // is. On the chiller, "water" is the Fluid select's value and a word
+        // of both "Entering water temp" and "Leaving water temp", so dropping
+        // it left neither label whole and both temperatures went unread
+        // (2026-11-23).
+        //
+        // A WHOLE option value only. A fragment of a hyphenated option is not
+        // a word the reader wrote: "power-ratio, 1 w, 2 w" offers "power",
+        // which is the whole of "Power p2" and would hand it the reference
+        // power -- the swap `literal`'s option filter exists to stop, and the
+        // terse lens caught it at once (decibel-converter, soil-permeability).
+        const wholeOptionWords = new Set();
+        for (const r of selectRows) for (const o of r.o) {
+          const tok = String(o).toLowerCase();
+          if (/^[a-z]{3,}$/.test(tok) && String(window).toLowerCase().includes(tok)) wholeOptionWords.add(tok);
+        }
+        const said = new Set([...literal, ...wholeOptionWords]);
+        const inSaid = (w) => said.has(w) || said.has(w + "s") || said.has(w.replace(/s$/, ""));
+        const whole = hits.filter((k) => {
+          const fw = fullWords(k);
+          if (!fw.length || !fw.every(inSaid)) return false;
+          // ...and nothing written points at a RIVAL instead. "Extra principal
+          // 100" writes every word of "Principal", but "extra" is the other
+          // field's word and the reader wrote it, so the short label is not
+          // what they named (2026-11-23). A word the two labels SHARE decides
+          // nothing either way, which is the whole point of this branch.
+          // Singular and plural are the same word here: "Number of dryers"
+          // and "Each dryer nameplate" share "dryer", and treating them as
+          // different words made the shared word look like the rival's own.
+          const stem = (w) => w.replace(/s$/, "");
+          const mine = new Set(fw.map(stem));
+          return !hits.some((other) => other !== k &&
+            fullWords(other).some((w) => !mine.has(stem(w)) && inSaid(w)));
+        });
+        if (whole.length === 1) hits.splice(0, hits.length, whole[0]);
+      }
     }
     rowsFor.set(qi, hits);
     for (const key of hits) {

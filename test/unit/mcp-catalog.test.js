@@ -877,10 +877,15 @@ test("answer_query: a value the question gave and nothing read is not answered a
   // Measured by phrasing every tile's worked example as a question: 106 OK
   // answers left a supplied number unread and 36 returned a number that
   // disagreed with the calculator's own worked example.
+  const tax = await answerQuery({ query: "Compound Sales Tax state rate 6.25, local rate 1.5, pre-tax amount 1000" });
+  assert.equal(tax.status, "MISSING_INPUTS");
+  assert.equal(tax.id, "sales-tax-compound");
+  assert.deepEqual(tax.unread, ["6.25", "1.5"]);
+  // The dryer count is now READ rather than refused, which is the better fix:
+  // four dryers at a 4,500 W nameplate count at the 5,000 W floor.
   const dryer = await answerQuery({ query: "Household Clothes Dryer Demand Load (NEC 220.54) Number of dryers 4, Each dryer nameplate 4500 w, Service voltage 240 v" });
-  assert.equal(dryer.status, "MISSING_INPUTS");
-  assert.equal(dryer.id, "dryer-demand-220-54");
-  assert.deepEqual(dryer.unread, ["4"]);
+  assert.equal(dryer.status, "OK");
+  assert.equal(dryer.result.demand_w, 20000);
   // A date nothing can fill is an empty box too: this answered for today.
   const sun = await answerQuery({ query: "Solar Times latitude 40 deg, longitude -105 deg, date 2026-06-21, timezone offset -6 hr" });
   assert.notEqual(sun.status, "OK", JSON.stringify(sun.result || {}).slice(0, 80));

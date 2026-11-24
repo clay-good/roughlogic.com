@@ -840,3 +840,27 @@ test("query-fill: a surface by its length and width in words, and a piece's area
   const sheath = [num("area_sf", "Area to sheathe", "ft2"), num("sheet_sf", "Panel area", "ft2")];
   assert.deepEqual(queryFill("how many sheets of plywood for a 24 by 40 floor", sheath).filled, { area_sf: "960" });
 });
+
+test("query-fill: a label written WHOLE beats one that only shares a word", () => {
+  // "dryer" is in both labels, so the shared word decided nothing and the
+  // count went unread; every word of "Number of dryers" is written here.
+  const dryer = [num("num_dryers", "Number of dryers"), num("nameplate_w", "Each dryer nameplate", "w"), num("supply_v", "Service voltage", "v")];
+  assert.deepEqual(queryFill("Household Clothes Dryer Demand Load (NEC 220.54) Number of dryers 4, Each dryer nameplate 4500 w, Service voltage 240 v", dryer,
+    { name: "Household Clothes Dryer Demand Load (NEC 220.54)" }).filled,
+    { num_dryers: "4", nameplate_w: "4500", supply_v: "240" });
+  // "water" is the Fluid select's own value AND a word of both temperatures:
+  // written as part of a label phrase, it still counts toward the whole label.
+  const chiller = [num("gpm", "Chilled-water flow", "gpm"), num("ewt_F", "Entering water temp", "degf"),
+    num("lwt_F", "Leaving water temp", "degf"), sel("fluid", "Fluid", ["water", "glycol_30", "glycol_50"])];
+  const c = queryFill("Chiller Tonnage (Delta-T and GPM) Chilled-water flow 240 gpm, Entering water temp 54 degf, Leaving water temp 44 degf, Fluid water", chiller,
+    { name: "Chiller Tonnage (Delta-T and GPM)" }).filled;
+  assert.deepEqual([c.ewt_F, c.lwt_F], ["54", "44"]);
+  // A FRAGMENT of a hyphenated option is not a word the reader wrote:
+  // "power-ratio" must not make "power" the whole of "Power p2".
+  const db = [sel("mode", "Mode", ["power-ratio", "voltage-ratio"]), num("p1", "Reference power p1", "w"), num("p2", "Power p2", "w")];
+  const d = queryFill("power-ratio, 1 w, 2 w", db).filled;
+  assert.ok(d.p1 === undefined || d.p1 === "1", JSON.stringify(d));
+  // ...and a label only half written still names nothing.
+  const pv = [num("module_voc_V", "Module Voc", "v"), num("inverter_mppt_max_V", "Inverter MPPT max", "v"), num("inverter_vdc_max_V", "Inverter Vdc max", "v")];
+  assert.deepEqual(queryFill("inverter 49", pv).filled, {});
+});

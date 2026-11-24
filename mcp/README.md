@@ -342,8 +342,19 @@ chatter and the answer stands.
 
 `scripts/measure-unread-answers.mjs` is the sweep, about four minutes, beside the
 other `measure-*` harnesses. It also checks that a question opening with a
-calculator's own name is never answered by a different calculator: 0 of 1,625,
+calculator's own name is never answered by a different calculator: 0 of 1,944,
 and cheap to keep asking.
+
+Most of those 106 were better served by **reading** the value than by refusing
+it. Two fields whose labels share a word used to cancel each other out, so
+*"Number of dryers 4"* filled nothing because "dryer" is also in "Each dryer
+nameplate". Where no label is written exactly, `query-fill.js` now prefers the
+one written WHOLE, with three guards the lenses forced: a word pointing at the
+rival still refuses, a fragment of a hyphenated option is not a word the reader
+wrote, and a half-written label names nothing. Field recovery went from 8,751 to
+9,911 of 10,678 and the door's own answers from 1,625 to 1,944, with 0 wrong in
+either lens. The refusal above is what remains for the values nothing can read:
+a date, a list, a rate whose label declares no unit.
 
 `scripts/measure-alias-door.mjs` sweeps the whole corpus through the door, about
 six minutes; it sits with the other `measure-*` harnesses rather than in the

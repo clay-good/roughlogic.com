@@ -1860,10 +1860,14 @@ export async function answerQuery({ query } = {}) {
     const empty = emptyBoxes();
     if (!empty.length) return [];
     const units = new Set(empty.map((r) => r.u).filter(Boolean));
-    const unitless = empty.some((r) => !r.u);
     return unplaced().filter((u) => {
       const tail = String(u).replace(/^-?\d+(?:\.\d+)?\s*/, "").trim();
-      return tail ? units.has(tail) : unitless;
+      // A bare number with no unit on it is a value wherever a box is empty:
+      // `split-phase-leg-balance` takes eight load currents and the extractor
+      // read seven of them without their amps, so requiring a UNITLESS empty
+      // box let the question through and the generator balanced no load at
+      // all (2026-11-23). A unit no empty box declares is still chatter.
+      return tail ? units.has(tail) : true;
     });
   };
   const unreadRefusal = (left) => ({
