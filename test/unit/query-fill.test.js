@@ -888,3 +888,20 @@ test("query-fill: scientific notation is written out before the number is read",
   const sh = [num("coeff_c", "Coefficient C"), num("r_ohm", "Measured resistance", "ohm")];
   assert.equal(queryFill("Coefficient C 8.5663516e-8, Measured resistance 10000 ohm", sh).filled.coeff_c, "0.000000085663516");
 });
+
+test("query-fill: indexed siblings take their values in the order they are written", () => {
+  // "Span 1".."Span 4" are one name and a counter: strip the digit and the
+  // labels are identical, so every value named all four and none was filled.
+  const spans = [num("s1", "Span 1", "ft"), num("s2", "Span 2", "ft"), num("s3", "Span 3", "ft")];
+  assert.deepEqual(queryFill("Ruling Span Span 300 ft, Span 450 ft, Span 380 ft", spans, { name: "Ruling Span" }).filled,
+    { s1: "300", s2: "450", s3: "380" });
+  const valves = [num("v1", "Valve 1 set pressure", "psi"), num("v2", "Valve 2 set pressure", "psi")];
+  assert.deepEqual(queryFill("Valve set pressure 150 psi, Valve set pressure 175 psi", valves).filled,
+    { v1: "150", v2: "175" });
+  // As many values as siblings, exactly: a short list cannot be placed by
+  // position, because the values would slide up a place.
+  assert.deepEqual(queryFill("Ruling Span Span 300 ft, Span 450 ft", spans, { name: "Ruling Span" }).filled, {});
+  // ...and a tie between fields that are NOT siblings is still refused.
+  const pr = [num("p", "Principal", "usd"), num("x", "Extra principal per month", "usd")];
+  assert.deepEqual(queryFill("loan extra principal 100", pr).filled, {});
+});

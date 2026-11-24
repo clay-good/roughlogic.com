@@ -877,18 +877,21 @@ test("answer_query: a value the question gave and nothing read is not answered a
   // Measured by phrasing every tile's worked example as a question: 106 OK
   // answers left a supplied number unread and 36 returned a number that
   // disagreed with the calculator's own worked example.
-  const tax = await answerQuery({ query: "Compound Sales Tax state rate 6.25, local rate 1.5, pre-tax amount 1000" });
-  assert.equal(tax.status, "MISSING_INPUTS");
-  assert.equal(tax.id, "sales-tax-compound");
-  assert.deepEqual(tax.unread, ["6.25", "1.5"]);
-  // The dryer count is now READ rather than refused, which is the better fix:
-  // four dryers at a 4,500 W nameplate count at the 5,000 W floor.
+  // A date nothing can fill is an empty box too: this answered for TODAY,
+  // 583 minutes of daylight instead of 901.
+  const sun = await answerQuery({ query: "Solar Times latitude 40 deg, longitude -105 deg, date 2026-06-21, timezone offset -6 hr" });
+  assert.equal(sun.status, "MISSING_INPUTS");
+  assert.equal(sun.id, "solar-times");
+  assert.deepEqual(sun.unread, ["2026"]);
+  // Two cases this refused when it landed are now READ instead, which is the
+  // better fix: four dryers count at the 5,000 W floor, and a compound sales
+  // tax reads both of its rates.
   const dryer = await answerQuery({ query: "Household Clothes Dryer Demand Load (NEC 220.54) Number of dryers 4, Each dryer nameplate 4500 w, Service voltage 240 v" });
   assert.equal(dryer.status, "OK");
   assert.equal(dryer.result.demand_w, 20000);
-  // A date nothing can fill is an empty box too: this answered for today.
-  const sun = await answerQuery({ query: "Solar Times latitude 40 deg, longitude -105 deg, date 2026-06-21, timezone offset -6 hr" });
-  assert.notEqual(sun.status, "OK", JSON.stringify(sun.result || {}).slice(0, 80));
+  const tax = await answerQuery({ query: "Compound Sales Tax state rate 6.25, local rate 1.5, pre-tax amount 1000" });
+  assert.equal(tax.status, "OK");
+  assert.equal(tax.result.tax, 77.5);
   // With every box filled, a stray number is chatter and still answers.
   const vd = await answerQuery({ query: "voltage drop phase single, material copper, awg 10, length one-way 150 ft, current 20 a, source voltage 240 v" });
   assert.equal(vd.status, "OK");

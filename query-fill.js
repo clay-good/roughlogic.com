@@ -1078,6 +1078,64 @@ export function queryFill(query, rows, opts) {
     }
   });
 
+  // INDEXED SIBLINGS, in the order they are written. "Span 1", "Span 2",
+  // "Span 3" are one name and a counter: strip the digit and the labels are
+  // identical, so every value named all of them and none was filled. A ruling
+  // span recovered NOTHING, and so did the per-leg generator loads, the relief
+  // valves, the ventilation zones, the wall layers and the harmonic orders --
+  // the largest remaining group of misses (2026-11-23).
+  //
+  // Position is the only reading there is, and it is the one a person means:
+  // the k-th value written goes to the k-th field. Narrow on purpose -- every
+  // one of these values must name the SAME set of two or more sibling fields
+  // and nothing else, there must be no more values than siblings, and the
+  // siblings take them in the order the calculator declares them. A tie
+  // between fields that are not siblings is still burned below.
+  {
+    const sigOf = (k) => {
+      const r = rows.find((x) => x.d === k);
+      return r ? String(r.l || "").toLowerCase().replace(/\d+/g, "").replace(/[^a-z]+/g, " ").trim() : "";
+    };
+    const byHitSet = new Map();      // "a|b|c" -> [quantity index, ...]
+    for (const [qi, hits] of rowsFor) {
+      if (!hits || hits.length < 2 || suppressed.has(qi)) continue;
+      const sig = sigOf(hits[0]);
+      if (!sig || !hits.every((k) => sigOf(k) === sig)) continue;
+      const tag = [...hits].sort().join("|");
+      if (!byHitSet.has(tag)) byHitSet.set(tag, []);
+      byHitSet.get(tag).push(qi);
+    }
+    for (const [tag, qis] of byHitSet) {
+      const keys = tag.split("|");
+      // Declared order, not sorted-by-key order: "Layer 10" must not precede
+      // "Layer 2", and the row list is the order the page shows.
+      const ordered = rows.filter((r) => keys.includes(r.d)).map((r) => r.d);
+      // As MANY values as there are siblings, exactly. A short list cannot be
+      // placed by position: `caz-depressurization-limit` carries four boxes all
+      // labelled "Its limit", one of its four values reached this rule naming
+      // something else as well, and the remaining three slid up a place -- the
+      // furnace limit took the induced-draft figure (2026-11-23). Positional
+      // reading is only sound when the question accounts for every sibling.
+      if (ordered.length !== keys.length || qis.length !== ordered.length) continue;
+      if (ordered.some((k) => k in filled)) continue;
+      qis.sort((x, y) => x - y);
+      let ok = true;
+      const pending = [];
+      for (let i = 0; i < qis.length; i += 1) {
+        const row = rows.find((r) => r.d === ordered[i]);
+        const v = valueFor(quantities[qis[i]], row, text, labelWords);
+        if (v === null) { ok = false; break; }
+        pending.push([ordered[i], v, qis[i]]);
+      }
+      if (!ok) continue;
+      for (const [key, v, qi] of pending) {
+        filled[key] = v;
+        suppressed.add(qi); claimed.add(qi);
+        rowsFor.set(qi, [key]);
+      }
+    }
+  }
+
   // A fragment that named TWO fields is ambiguous, and it stays ambiguous.
   // Burning it here is the point: without this, "slope 2 in per ft" -- where
   // "slope" names both the Slope field and its Slope-units select -- falls
