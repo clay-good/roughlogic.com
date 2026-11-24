@@ -85,6 +85,13 @@ function _simpleRenderer(spec) {
 
   _rlRender.schema = {
     inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
+    // spec-v1964 disclosure: the default each calculator applies to a BLANK
+    // box, so the steps panel can print it and the harness can count it per
+    // tile. Deliberately NOT inside `inputs` -- describe_calculator reports
+    // `default: null` for these, so the agent door keeps refusing a default
+    // the page does not show. scripts/check-blank-defaults.mjs holds every
+    // value to its compute's own signature.
+    blankDefaults: Object.fromEntries((spec.fields || []).filter((f) => typeof f.whenBlank === "number").map((f) => [f.key, f.whenBlank])),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -164,7 +171,7 @@ ELECDESIGN_RENDERERS["lumen-method"] = _simpleRenderer({
     { key: "area_sqft", label: "Room area (sq ft)", kind: "number" },
     { key: "lumens_per_lum", label: "Lumens per luminaire", kind: "number" },
     { key: "cu", label: "Coefficient of utilization (CU)", kind: "number", whenBlank: 0.7 },
-    { key: "llf", label: "Light-loss factor (LLF)", kind: "number" },
+    { key: "llf", label: "Light-loss factor (LLF)", kind: "number", whenBlank: 0.8 },
   ],
   outputs: [
     { key: "c", id: "lm-out-c", label: "Luminaires (rounded up)", value: (r) => String(r.count) },
@@ -726,8 +733,8 @@ ELECDESIGN_RENDERERS["room-cavity-ratio"] = _simpleRenderer({
   citation: "Citation: room cavity ratio, IES zonal-cavity method, by name. RCR = 5 x cavity height x (L + W) / (L x W); cavity height = luminaire plane to the WORK plane (not floor to ceiling). The RCR (with the surface reflectances) reads the CU off the fixture's photometric report, which feeds the lumen method. The IES photometric file and the actual reflectances govern the CU.",
   example: roomCavityRatioExample.inputs,
   fields: [
-    { key: "room_length_ft", label: "Room length (ft)", kind: "number" },
-    { key: "room_width_ft", label: "Room width (ft)", kind: "number" },
+    { key: "room_length_ft", label: "Room length (ft)", kind: "number", whenBlank: 40 },
+    { key: "room_width_ft", label: "Room width (ft)", kind: "number", whenBlank: 30 },
     { key: "cavity_height_ft", label: "Cavity height: luminaire to work plane (ft)", kind: "number", whenBlank: 8 },
   ],
   outputs: [

@@ -205,3 +205,31 @@ test("stepRows: a blank box the calculator still computes with says so", () => {
   // A field with no whenBlank is still skipped when blank, as before.
   assert.equal(stepRows([{ key: "x", label: "X" }], {}, { y: 1 }, (k) => k).filter((r) => r.section === "in").length, 0);
 });
+
+test("every whenBlank a renderer declares is published on its schema and nowhere else", async () => {
+  const { RENDERER_MAP } = await import("../fixtures/renderer-map.js");
+  const { describe } = await import("../../mcp/catalog.mjs");
+  let tiles = 0, fields = 0;
+  for (const [id, reg] of Object.entries(RENDERER_MAP)) {
+    if (!reg || !reg.module || !reg.exportName) continue;
+    let mod;
+    try { mod = await import("../fixtures/" + reg.module.replace(/^\.\.\/\.\.\//, "../../")); } catch { continue; }
+    const fn = (mod[reg.exportName] || {})[id];
+    const blanks = fn && fn.schema && fn.schema.blankDefaults;
+    if (!blanks || !Object.keys(blanks).length) continue;
+    tiles += 1;
+    const d = await describe({ id });
+    for (const [key, v] of Object.entries(blanks)) {
+      fields += 1;
+      assert.equal(typeof v, "number", id + "." + key);
+      assert.ok(Number.isFinite(v) && v !== 0, id + "." + key + " = " + v);
+      // The MCP input contract is untouched: the door must keep refusing a
+      // default the page's own box does not show.
+      const inp = (d.inputs || []).find((i) => (i.key ?? i.name) === key);
+      assert.ok(inp, id + "." + key + " is not an advertised input");
+      assert.equal(inp.default, null, id + "." + key + " leaked whenBlank into describe()'s default");
+    }
+  }
+  assert.ok(tiles > 250, "tiles carrying a blank default: " + tiles);
+  assert.ok(fields > 600, "fields carrying a blank default: " + fields);
+});

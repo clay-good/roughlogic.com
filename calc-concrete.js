@@ -91,6 +91,13 @@ function _simpleRenderer(spec) {
 
   _rlRender.schema = {
     inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
+    // spec-v1964 disclosure: the default each calculator applies to a BLANK
+    // box, so the steps panel can print it and the harness can count it per
+    // tile. Deliberately NOT inside `inputs` -- describe_calculator reports
+    // `default: null` for these, so the agent door keeps refusing a default
+    // the page does not show. scripts/check-blank-defaults.mjs holds every
+    // value to its compute's own signature.
+    blankDefaults: Object.fromEntries((spec.fields || []).filter((f) => typeof f.whenBlank === "number").map((f) => [f.key, f.whenBlank])),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -346,7 +353,7 @@ CONCRETE_RENDERERS["rc-column-steel-for-load"] = _simpleRenderer({
     { key: "target_load_kip", label: "Target factored axial load phi Pn (kip)", kind: "number" },
     { key: "b_in", label: "Column width b (in)", kind: "number" },
     { key: "h_in", label: "Column depth h (in)", kind: "number" },
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "fy_psi", label: "Steel yield fy (psi)", kind: "number", whenBlank: 60000 },
   ],
   outputs: [
@@ -363,7 +370,7 @@ CONCRETE_RENDERERS["rc-column-axial"] = _simpleRenderer({
   fields: [
     { key: "b_in", label: "Column width b (in)", kind: "number" },
     { key: "h_in", label: "Column depth h (in)", kind: "number" },
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "fy_psi", label: "Steel yield fy (psi)", kind: "number", whenBlank: 60000 },
     { key: "ast_in2", label: "Total longitudinal steel Ast (in²)", kind: "number" },
   ],
@@ -422,7 +429,7 @@ CONCRETE_RENDERERS["rc-punching-shear"] = _simpleRenderer({
     { key: "c1_in", label: "Column dimension c1 (in)", kind: "number" },
     { key: "c2_in", label: "Column dimension c2 (in)", kind: "number" },
     { key: "d_in", label: "Effective slab depth d (in)", kind: "number" },
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "position", label: "Column position (alpha_s)", kind: "select", options: [
       { value: "interior", label: "Interior (alpha_s = 40)" },
       { value: "edge", label: "Edge (alpha_s = 30)" },
@@ -475,7 +482,7 @@ CONCRETE_RENDERERS["rc-one-way-shear"] = _simpleRenderer({
   citation: "Citation: ACI 318-19 Table 22.5.5.1(c) one-way shear Vc = 8 lambda_s lambda (rho_w)^(1/3) sqrt(f'c) bw d for a member without at least minimum shear reinforcement, the 22.5.5.1.3 size-effect factor lambda_s = sqrt(2/(1 + d/10)) <= 1.0, the 22.5.3.1 sqrt(f'c) <= 100 psi cap, and phi = 0.75, by name. Axial load enters as Nu/(6 Ag) when entered; the stirrup-reinforced case is rc-beam-shear. A design aid, not a substitute for the engineer of record.",
   example: rcOneWayShearExample.inputs,
   fields: [
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "bw_in", label: "Section width bw (in)", kind: "number" },
     { key: "d_in", label: "Effective depth d (in)", kind: "number" },
     { key: "as_in2", label: "Tension steel As (in²)", kind: "number" },
@@ -550,7 +557,7 @@ CONCRETE_RENDERERS["rc-min-shear-reinforcement"] = _simpleRenderer({
   citation: "Citation: ACI 318-19 9.6.3.4 (Av,min/s = greater of 0.75 sqrt(f'c) bw/fyt and 50 bw/fyt), 9.6.3.1 (Av,min required where Vu > phi lambda sqrt(f'c) bw d, the 2019 replacement for the 318-14 0.5 phi Vc trigger), 22.5.1.2 (Vs <= 8 sqrt(f'c) bw d section-size ceiling), and 9.7.6.2.2 (spacing at the lesser of d/2 and 24 in, halved past Vs = 4 sqrt(f'c) bw d), with phi = 0.75, by name. The Table 9.6.3.1 exemptions are not modeled. A design aid, not a substitute for the engineer of record.",
   example: rcMinShearReinforcementExample.inputs,
   fields: [
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "fyt_psi", label: "Stirrup yield fyt (psi)", kind: "number", whenBlank: 60000 },
     { key: "stirrup_type", label: "Stirrup type (sets the 20.2.2.4(a) fyt cap)", kind: "select", options: [{ value: "bar", label: "Deformed bar (fyt up to 60,000 psi)", selected: true }, { value: "wwr", label: "Welded deformed wire (up to 80,000 psi)" }] },
     { key: "bw_in", label: "Web width bw (in)", kind: "number" },
@@ -623,7 +630,7 @@ CONCRETE_RENDERERS["rc-hook-development"] = _simpleRenderer({
   fields: [
     { key: "db_in", label: "Bar diameter db (in; #8 = 1.0)", kind: "number" },
     { key: "fy_psi", label: "Steel yield fy (psi)", kind: "number", whenBlank: 60000 },
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "psi_e", label: "Epoxy factor psi_e", kind: "number", whenBlank: 1 },
     { key: "psi_r", label: "Confinement factor psi_r", kind: "number", whenBlank: 1 },
     { key: "psi_o", label: "Location/cover factor psi_o", kind: "number", whenBlank: 1 },
@@ -859,7 +866,7 @@ CONCRETE_RENDERERS["rc-doubly-reinforced"] = _simpleRenderer({
     { key: "dp_in", label: "Compression-steel depth d' (in)", kind: "number" },
     { key: "as_in2", label: "Tension steel As (in²)", kind: "number" },
     { key: "asp_in2", label: "Compression steel A's (in²)", kind: "number" },
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "fy_psi", label: "Steel yield fy (psi)", kind: "number", whenBlank: 60000 },
   ],
   outputs: [
@@ -914,7 +921,7 @@ CONCRETE_RENDERERS["rc-shear-friction"] = _simpleRenderer({
     { key: "avf_in2", label: "Reinforcement crossing the plane Avf (in²)", kind: "number" },
     { key: "fy_psi", label: "Steel yield fy (psi)", kind: "number", whenBlank: 60000 },
     { key: "ac_in2", label: "Interface area Ac (in²)", kind: "number" },
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "iface", label: "Interface condition (mu)", kind: "select", options: [
       { value: "monolithic", label: "Monolithic (1.4)" },
       { value: "roughened", label: "Against roughened concrete (1.0)" },
@@ -954,7 +961,7 @@ CONCRETE_RENDERERS["concrete-elastic-modulus"] = _simpleRenderer({
   citation: "Citation: ACI 318-19 §19.2.2.1(a): Ec = wc^1.5 x 33 x sqrt(f'c) (psi), applicable for wc between 90 and 160 pcf; §19.2.2.1(b) gives the normalweight shortcut Ec = 57000 x sqrt(f'c). Returns the secant modulus used for deflection, drift, and stiffness; it is not the dynamic or tangent modulus, and the actual in-place modulus varies with aggregate and mix. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: concreteElasticModulusExample.inputs,
   fields: [
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "wc_pcf", label: "Unit weight wc (pcf, 145 normalweight)", kind: "number", default: 145 },
   ],
   outputs: [
@@ -1020,7 +1027,7 @@ CONCRETE_RENDERERS["concrete-modulus-of-rupture"] = _simpleRenderer({
   citation: "Citation: ACI 318-19 §19.2.3.1: fr = 7.5 x lambda x sqrt(f'c) (psi), the modulus of rupture, with lambda = 1.0 normalweight and 0.75 all-lightweight (§19.2.4). This is the code cracking stress used for the cracking moment Mcr and minimum flexural reinforcement; the true rupture strength of a given mix scatters above this conservative design value. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: concreteModulusOfRuptureExample.inputs,
   fields: [
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "lambda", label: "Lightweight factor lambda (1.0 NW, 0.75 LW)", kind: "number", default: 1 },
   ],
   outputs: [
@@ -1094,7 +1101,7 @@ CONCRETE_RENDERERS["concrete-cracking-moment"] = _simpleRenderer({
   fields: [
     { key: "b_in", label: "Section width b (in)", kind: "number" },
     { key: "h_in", label: "Section total depth h (in)", kind: "number" },
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "lambda", label: "Lightweight factor lambda (1.0 NW, 0.75 LW)", kind: "number", default: 1 },
   ],
   outputs: [
@@ -1140,7 +1147,7 @@ CONCRETE_RENDERERS["concrete-depth-for-cracking-moment"] = _simpleRenderer({
   fields: [
     { key: "target_mcr_kipft", label: "Target cracking moment Mcr (kip-ft)", kind: "number" },
     { key: "b_in", label: "Section width b (in)", kind: "number" },
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "lambda", label: "Lightweight factor lambda (1.0 NW, 0.75 LW)", kind: "number", default: 1 },
   ],
   outputs: [
@@ -1274,7 +1281,7 @@ CONCRETE_RENDERERS["concrete-beam-min-flexural-steel"] = _simpleRenderer({
   citation: "Citation: ACI 318-19 §9.6.1.2: minimum flexural reinforcement As,min = max(3 sqrt(f'c)/fy, 200/fy) x bw x d with fy limited to 80,000 psi, ensuring the cracking moment does not exceed the flexural capacity (no sudden failure at first crack). The 200/fy floor governs to about f'c = 4444 psi; the sqrt term controls above. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: concreteBeamMinFlexuralSteelExample.inputs,
   fields: [
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "fy_psi", label: "Steel yield fy (psi)", kind: "number", whenBlank: 60000 },
     { key: "bw_in", label: "Web width bw (in)", kind: "number" },
     { key: "d_in", label: "Effective depth d (in)", kind: "number" },
@@ -1399,7 +1406,7 @@ CONCRETE_RENDERERS["concrete-bearing-strength"] = _simpleRenderer({
   fields: [
     { key: "loaded_area_in2", label: "Loaded area A1 (in²)", kind: "number" },
     { key: "support_area_in2", label: "Supporting area A2 (in², >= A1)", kind: "number" },
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "factored_load_kip", label: "Factored load Pu (kip, 0 = capacity only)", kind: "number", default: 0 },
   ],
   outputs: [
@@ -1445,7 +1452,7 @@ CONCRETE_RENDERERS["rc-compression-dev-length"] = _simpleRenderer({
   fields: [
     { key: "bar_diameter_in", label: "Bar diameter db (in, #8 = 1.00)", kind: "number" },
     { key: "fy_psi", label: "Bar yield fy (psi)", kind: "number", whenBlank: 60000 },
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "lambda", label: "Lightweight factor lambda (1.0 normalweight, 0.75 lightweight)", kind: "number", default: 1 },
     { key: "psi_r", label: "Confinement factor psi_r (0.75 with ties/spiral, else 1.0)", kind: "number", default: 1 },
   ],
@@ -1518,7 +1525,7 @@ CONCRETE_RENDERERS["concrete-effective-inertia"] = _simpleRenderer({
     { key: "h_in", label: "Total depth h (in)", kind: "number" },
     { key: "d_in", label: "Effective depth d to tension steel (in)", kind: "number" },
     { key: "as_in2", label: "Tension steel area As (in²)", kind: "number" },
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "ma_kipft", label: "Service moment Ma (kip-ft)", kind: "number" },
     { key: "lambda", label: "Lightweight factor lambda (1.0 NW, 0.75 LW)", kind: "number", default: 1 },
   ],
@@ -1627,7 +1634,7 @@ CONCRETE_RENDERERS["concrete-immediate-deflection"] = _simpleRenderer({
   example: concreteImmediateDeflectionExample.inputs,
   fields: [
     { key: "ie_in4", label: "Effective inertia Ie (in⁴, from the Ie tile)", kind: "number" },
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "w_klf", label: "Service load w (kip/ft)", kind: "number" },
     { key: "span_ft", label: "Span L (ft)", kind: "number" },
     { key: "point_load_kip", label: "Concentrated service load P (kip, midspan or cantilever tip; 0 if none)", kind: "number" },
@@ -1684,7 +1691,7 @@ CONCRETE_RENDERERS["concrete-cracked-inertia-doubly"] = _simpleRenderer({
     { key: "b_in", label: "Section width b (in)", kind: "number" },
     { key: "d_in", label: "Effective depth d to tension steel (in)", kind: "number" },
     { key: "as_in2", label: "Tension steel area As (in²)", kind: "number" },
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "asp_in2", label: "Compression steel area As' (in², 0 if none)", kind: "number" },
     { key: "dp_in", label: "Compression steel depth d' (in)", kind: "number", whenBlank: 2.5 },
   ],
@@ -1752,7 +1759,7 @@ CONCRETE_RENDERERS["concrete-cracked-inertia-tee"] = _simpleRenderer({
     { key: "bw_in", label: "Web width bw (in)", kind: "number" },
     { key: "d_in", label: "Effective depth d to tension steel (in)", kind: "number" },
     { key: "as_in2", label: "Tension steel area As (in²)", kind: "number" },
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
   ],
   outputs: [
     { key: "icr", id: "cit-out-icr", label: "Cracked inertia Icr", value: (r) => fmt(r.icr_in4, 0) + " in^4" },
@@ -2150,7 +2157,7 @@ CONCRETE_RENDERERS["concrete-anchor-shear-breakout"] = _simpleRenderer({
   fields: [
     { key: "anchor_dia_in", label: "Anchor diameter da (in)", kind: "number" },
     { key: "embedment_in", label: "Effective embedment hef (in)", kind: "number" },
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "edge_distance_in", label: "Edge distance c_a1, toward the shear (in)", kind: "number" },
     { key: "perp_edge_in", label: "Perpendicular edge c_a2 (in, 0 = none)", kind: "number" },
     { key: "member_thickness_in", label: "Member thickness ha (in, 0 = thick)", kind: "number" },
@@ -2194,7 +2201,7 @@ CONCRETE_RENDERERS["concrete-anchor-pryout"] = _simpleRenderer({
   example: concreteAnchorPryoutExample.inputs,
   fields: [
     { key: "embedment_in", label: "Effective embedment hef (in)", kind: "number" },
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "edge_distance_in", label: "Nearest edge distance ca1 (in, large = away)", kind: "number" },
     { key: "anchor_type", label: "Anchor type", kind: "select", options: [{ value: "cast-in", label: "Cast-in (kc = 24)" }, { value: "post-installed", label: "Post-installed, Category 1 (kc = 17)" }, { value: "post-installed-cat2", label: "Post-installed, Category 2 (kc = 17)" }, { value: "post-installed-cat3", label: "Post-installed, Category 3 (kc = 17)" }] },
     { key: "lambda", label: "Lightweight factor lambda_a (1.0 normal weight)", kind: "number", default: 1 },
@@ -2548,7 +2555,7 @@ CONCRETE_RENDERERS["slab-dowel-schedule"] = _simpleRenderer({
   example: slabDowelScheduleExample.inputs,
   fields: [
     { key: "joint_length_ft", label: "Joint length (ft)", kind: "number", whenBlank: 40 },
-    { key: "slab_thickness_in", label: "Slab thickness (in)", kind: "number" },
+    { key: "slab_thickness_in", label: "Slab thickness (in)", kind: "number", whenBlank: 6 },
     { key: "dowel_spacing_in", label: "Dowel spacing (in o.c.)", kind: "number", whenBlank: 12 },
     { key: "edge_clearance_in", label: "Edge clearance (in)", kind: "number", default: 6 },
     { key: "num_joints", label: "Number of dowelled joints", kind: "number", whenBlank: 5 },
@@ -2590,9 +2597,9 @@ CONCRETE_RENDERERS["concrete-premix-bags"] = _simpleRenderer({
   citation: "Citation: bagged (premix) concrete count for a small pour, by name. volume = L x W x (thickness_in/12); bags = ceil(volume x (1 + waste) / bag yield). Bag yield ~0.0075 ft^3/lb: 80 lb ~0.60 ft^3, 60 lb ~0.45, 50 lb ~0.375, 40 lb ~0.30. Round up; past ~1 cu yd (~45 of the 80 lb bags) ready-mix is cheaper. The printed bag yield, the real formwork, and the mix design govern.",
   example: concretePremixBagsExample.inputs,
   fields: [
-    { key: "length_ft", label: "Length (ft)", kind: "number" },
-    { key: "width_ft", label: "Width (ft)", kind: "number" },
-    { key: "thickness_in", label: "Thickness (in)", kind: "number" },
+    { key: "length_ft", label: "Length (ft)", kind: "number", whenBlank: 4 },
+    { key: "width_ft", label: "Width (ft)", kind: "number", whenBlank: 4 },
+    { key: "thickness_in", label: "Thickness (in)", kind: "number", whenBlank: 4 },
     { key: "bag_yield_ft3", label: "Bag yield (ft³): 80lb 0.60, 60lb 0.45, 50lb 0.375, 40lb 0.30", kind: "number", default: 0.6 },
     { key: "waste_pct", label: "Waste (percent)", kind: "number", default: 10 },
   ],
@@ -2697,7 +2704,7 @@ CONCRETE_RENDERERS["rc-tbeam-flexure"] = _simpleRenderer({
   citation: "Citation: ACI 318-19 T-beam flexure - 22.2.2.4.1 equivalent rectangular stress block, 6.3.2 effective flange width (delegated to the landed t-beam-effective-flange-width tile so the two cannot disagree), and 21.2.2 for the strength-reduction factor. If the trial block a = As fy / (0.85 f'c be) stays within the flange the section is rectangular of width be and Mn = As fy (d - a/2), identical to the rectangular tile. If it runs past, the flange overhangs are resolved as Asf = 0.85 f'c (be - bw) hf / fy at a lever arm d - hf/2 and the remaining steel Asw = As - Asf is balanced by the web with a = Asw fy / (0.85 f'c bw). phi follows 21.2.2 - tension-controlled at eps_t >= eps_ty + 0.003, compression-controlled at eps_t <= eps_ty = fy/Es, interpolated between; the 2019 edition replaced the fixed 0.005 limit, which matters above Grade 60. POSITIVE MOMENT ONLY: over a support the slab is in tension and the section reverts to a rectangle of the web width. Singly reinforced; minimum steel, shear, deflection, spacing, and development are separate. A design aid, not a substitute for a licensed engineer's design.",
   example: rcTBeamFlexureExample.inputs,
   fields: [
-    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number" },
+    { key: "fc_psi", label: "Concrete strength f'c (psi)", kind: "number", whenBlank: 4000 },
     { key: "fy_psi", label: "Steel yield fy (psi)", kind: "number", whenBlank: 60000 },
     { key: "as_in2", label: "Tension steel area As (in²)", kind: "number" },
     { key: "bw_in", label: "Web width bw (in)", kind: "number" },

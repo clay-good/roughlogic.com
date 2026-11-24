@@ -90,6 +90,13 @@ function _simpleRenderer(spec) {
 
   _rlRender.schema = {
     inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
+    // spec-v1964 disclosure: the default each calculator applies to a BLANK
+    // box, so the steps panel can print it and the harness can count it per
+    // tile. Deliberately NOT inside `inputs` -- describe_calculator reports
+    // `default: null` for these, so the agent door keeps refusing a default
+    // the page does not show. scripts/check-blank-defaults.mjs holds every
+    // value to its compute's own signature.
+    blankDefaults: Object.fromEntries((spec.fields || []).filter((f) => typeof f.whenBlank === "number").map((f) => [f.key, f.whenBlank])),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -121,7 +128,7 @@ STEEL_RENDERERS["steel-beam-flexure"] = _simpleRenderer({
   citation: "Citation: AISC 360-22 Chapter F (F2.1) nominal flexural strength of a compact, laterally-braced doubly-symmetric I-shape: Mn = Mp = Fy x Zx. The ASD allowable is Mn / Omega_b (Omega_b = 1.67) and the LRFD design strength is phi_b x Mn (phi_b = 0.90), per §B3.1 / §B3.2. This is the plastic-moment plateau only -- it assumes the section is compact (F2 applies, not the F3 flange-local-buckling or F4/F5 slender-web reductions) and the compression flange is continuously braced or Lb <= Lp (no lateral-torsional buckling, F2.2). Take Zx from the AISC Steel Construction Manual for the actual shape. A design aid, not a substitute for the engineer of record.",
   example: steelBeamFlexureExample.inputs,
   fields: [
-    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number" },
+    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number", whenBlank: 50 },
     { key: "zx", label: "Plastic section modulus Zx (in³)", kind: "number" },
     { key: "mu", label: "Required moment, ASD service-level Ma (kip-ft, 0 to skip)", kind: "number", default: 0 },
   ],
@@ -200,7 +207,7 @@ STEEL_RENDERERS["required-section-modulus"] = _simpleRenderer({
   citation: "Citation: required plastic section modulus for a compact braced beam, AISC 360 Chapter F Mp = Fy Zx inverted -- LRFD Zx >= 12 Mu/(0.90 Fy), ASD Zx >= 12(1.67)Ma/Fy, by name. Compact, fully braced (Lb <= Lp, Mn = Mp); select the lightest W-shape with Zx >= this. A design aid; the engineer of record governs.",
   example: requiredSectionModulusExample.inputs,
   fields: [
-    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number" },
+    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number", whenBlank: 50 },
     { key: "moment_kipft", label: "Demand moment Mu (LRFD) or Ma (ASD) (kip-ft)", kind: "number" },
     { key: "method", label: "Design method", kind: "select", options: [{ value: "lrfd", label: "LRFD (phi_b = 0.90)" }, { value: "asd", label: "ASD (Omega = 1.67)" }], default: "lrfd" },
   ],
@@ -240,7 +247,7 @@ STEEL_RENDERERS["steel-beam-shear"] = _simpleRenderer({
   citation: "Citation: AISC 360-22 Chapter G (G2.1) web shear strength of a rolled I-shape: Vn = 0.6 x Fy x Aw x Cv1 with Aw = d x tw. For rolled I-shapes with h/tw <= 2.24 sqrt(E/Fy) (about 53.9 at Fy = 50 ksi), Cv1 = 1.0 and the paired factors are Omega_v = 1.50 (ASD) / phi_v = 1.00 (LRFD) per G2.1(a); slenderer webs take Cv1 < 1.0 and the general Omega_v = 1.67 / phi_v = 0.90 per G2.1(b). The ASD allowable is Vn / Omega_v and the LRFD design strength is phi_v x Vn. Block shear at a coped or bolted end (J4.3) is a separate check. Take d and tw from the AISC Manual for the actual shape. A design aid, not a substitute for the engineer of record.",
   example: steelBeamShearExample.inputs,
   fields: [
-    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number" },
+    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number", whenBlank: 50 },
     { key: "d", label: "Section depth d (in)", kind: "number" },
     { key: "tw", label: "Web thickness tw (in)", kind: "number" },
     { key: "cv1", label: "Web shear coefficient Cv1", kind: "number", default: 1 },
@@ -286,9 +293,9 @@ STEEL_RENDERERS["steel-column-capacity"] = _simpleRenderer({
   citation: "Citation: AISC 360-22 Chapter E (E3) flexural-buckling compressive strength of a doubly-symmetric member with no slender elements: KL/r is the slenderness about the governing axis (usually the weak axis, r = ry), Fe = pi^2 E / (KL/r)^2 is the elastic buckling stress, and Fcr = (0.658^(Fy/Fe)) x Fy when KL/r <= 4.71 sqrt(E/Fy) (inelastic) else 0.877 x Fe (elastic). Pn = Fcr x Ag; the ASD allowable is Pn / Omega_c (Omega_c = 1.67) and the LRFD design strength is phi_c x Pn (phi_c = 0.90). Flexural buckling only (no torsional / flexural-torsional, no slender-element Q reduction); take K from the end conditions (or an alignment chart) and r, Ag from the AISC Manual for the actual shape. A design aid, not a substitute for the engineer of record.",
   example: steelColumnCapacityExample.inputs,
   fields: [
-    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number" },
+    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number", whenBlank: 50 },
     { key: "e_mod", label: "Modulus E (ksi)", kind: "number", whenBlank: 29000 },
-    { key: "k", label: "Effective-length factor K", kind: "number" },
+    { key: "k", label: "Effective-length factor K", kind: "number", whenBlank: 1 },
     { key: "l_ft", label: "Unbraced length L (ft)", kind: "number" },
     { key: "r_in", label: "Radius of gyration r (in)", kind: "number" },
     { key: "ag", label: "Gross area Ag (in²)", kind: "number" },
@@ -563,7 +570,7 @@ STEEL_RENDERERS["steel-beam-ltb"] = _simpleRenderer({
   citation: "Citation: AISC 360-22 Section F2 lateral-torsional buckling of a doubly-symmetric compact I-shape: Lp = 1.76 ry sqrt(E/Fy), Lr per Eq. F2-6, inelastic Mn = Cb[Mp - (Mp - 0.7 Fy Sx)(Lb-Lp)/(Lr-Lp)] <= Mp, elastic Fcr per Eq. F2-4 (E = 29,000 ksi, c = 1). ASD Omega_b = 1.67, LRFD phi_b = 0.90. Cb must match the moment diagram. A design aid, not a substitute for the engineer of record.",
   example: steelBeamLtbExample.inputs,
   fields: [
-    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number" },
+    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number", whenBlank: 50 },
     { key: "zx", label: "Plastic section modulus Zx (in³)", kind: "number" },
     { key: "sx", label: "Elastic section modulus Sx (in³)", kind: "number" },
     { key: "ry", label: "Weak-axis radius of gyration ry (in)", kind: "number" },
@@ -619,7 +626,7 @@ STEEL_RENDERERS["steel-block-shear"] = _simpleRenderer({
   example: steelBlockShearExample.inputs,
   fields: [
     { key: "t_in", label: "Element thickness (in)", kind: "number" },
-    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number" },
+    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number", whenBlank: 36 },
     { key: "fu", label: "Tensile stress Fu (ksi)", kind: "number", whenBlank: 58 },
     { key: "n", label: "Bolts in the shear line", kind: "number", attrs: { step: "1", min: "1" } },
     { key: "s_in", label: "Bolt spacing / pitch (in)", kind: "number", whenBlank: 3 },
@@ -689,7 +696,7 @@ STEEL_RENDERERS["steel-tension-member"] = _simpleRenderer({
   example: steelTensionMemberExample.inputs,
   fields: [
     { key: "ag_in2", label: "Gross area Ag (in²)", kind: "number" },
-    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number" },
+    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number", whenBlank: 36 },
     { key: "fu", label: "Tensile stress Fu (ksi)", kind: "number", whenBlank: 58 },
     { key: "nh", label: "Hole lines across the section (0 if welded)", kind: "number", attrs: { step: "1", min: "0" } },
     { key: "t_in", label: "Thickness at the holes (in)", kind: "number" },
@@ -753,7 +760,7 @@ STEEL_RENDERERS["steel-web-local-strength"] = _simpleRenderer({
   citation: "Citation: AISC 360-22 J10.2 web local yielding Rn = Fy tw (5k + lb) interior / (2.5k + lb) end (phi 1.00 / Omega 1.50) and J10.3 web crippling Rn = 0.80 tw^2 [...] sqrt(E Fy tf/tw) interior (Eq. J10-4), 0.40 lead coefficient at an end (Eq. J10-5a/b, the bracket becoming (4 lb/d - 0.2) when lb/d > 0.2), phi 0.75 / Omega 2.00, E = 29,000 ksi, by name. Stiffener design and sidesway buckling are separate. A design aid, not a substitute for the engineer of record.",
   example: steelWebLocalStrengthExample.inputs,
   fields: [
-    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number" },
+    { key: "fy", label: "Yield stress Fy (ksi)", kind: "number", whenBlank: 50 },
     { key: "tw", label: "Web thickness tw (in)", kind: "number" },
     { key: "tf", label: "Flange thickness tf (in)", kind: "number" },
     { key: "k_in", label: "k distance kdes (in)", kind: "number" },

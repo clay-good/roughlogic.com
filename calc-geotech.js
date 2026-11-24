@@ -92,6 +92,13 @@ function _simpleRenderer(spec) {
 
   _rlRender.schema = {
     inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
+    // spec-v1964 disclosure: the default each calculator applies to a BLANK
+    // box, so the steps panel can print it and the harness can count it per
+    // tile. Deliberately NOT inside `inputs` -- describe_calculator reports
+    // `default: null` for these, so the agent door keeps refusing a default
+    // the page does not show. scripts/check-blank-defaults.mjs holds every
+    // value to its compute's own signature.
+    blankDefaults: Object.fromEntries((spec.fields || []).filter((f) => typeof f.whenBlank === "number").map((f) => [f.key, f.whenBlank])),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -142,7 +149,7 @@ GEOTECH_RENDERERS["soil-bearing-capacity"] = _simpleRenderer({
     { key: "b_ft", label: "Footing width B (ft)", kind: "number" },
     { key: "df_ft", label: "Embedment depth Df (ft)", kind: "number", default: 0 },
     { key: "shape", label: "Footing shape", kind: "select", options: [{ value: "strip", label: "Strip (continuous)" }, { value: "square", label: "Square" }, { value: "circular", label: "Circular" }], default: "strip" },
-    { key: "fs", label: "Factor of safety", kind: "number" },
+    { key: "fs", label: "Factor of safety", kind: "number", whenBlank: 3 },
   ],
   outputs: [
     { key: "nf", id: "sbc-out-nf", label: "Bearing factors Nc / Nq / Ngamma", value: (r) => fmt(r.nc, 2) + " / " + fmt(r.nq, 2) + " / " + fmt(r.ngamma, 2) },
@@ -561,7 +568,7 @@ GEOTECH_RENDERERS["pile-axial-capacity"] = _simpleRenderer({
     { key: "l_ft", label: "Embedded length L (ft)", kind: "number" },
     { key: "cu_ksf", label: "Undrained shear strength cu (ksf)", kind: "number" },
     { key: "alpha", label: "Adhesion factor alpha (~0.55 medium stiff)", kind: "number", default: 0.55 },
-    { key: "fs", label: "Factor of safety FS", kind: "number" },
+    { key: "fs", label: "Factor of safety FS", kind: "number", whenBlank: 3 },
   ],
   outputs: [
     { key: "qs", id: "pac-out-qs", label: "Skin friction Qs", value: (r) => fmt(r.qs_kip, 1) + " kip (" + fmt(r.skin_frac * 100, 0) + "% of capacity)" },
@@ -612,7 +619,7 @@ GEOTECH_RENDERERS["pile-length-for-capacity"] = _simpleRenderer({
     { key: "d_ft", label: "Pile diameter D (ft)", kind: "number" },
     { key: "cu_ksf", label: "Undrained shear strength cu (ksf)", kind: "number" },
     { key: "alpha", label: "Adhesion factor alpha (~0.55 medium stiff)", kind: "number", default: 0.55 },
-    { key: "fs", label: "Factor of safety FS", kind: "number" },
+    { key: "fs", label: "Factor of safety FS", kind: "number", whenBlank: 3 },
   ],
   outputs: [
     { key: "l", id: "plc-out-l", label: "Required embedded length L", value: (r) => fmt(r.l_ft, 1) + " ft" },

@@ -89,6 +89,13 @@ function _simpleRenderer(spec) {
 
   _rlRender.schema = {
     inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
+    // spec-v1964 disclosure: the default each calculator applies to a BLANK
+    // box, so the steps panel can print it and the harness can count it per
+    // tile. Deliberately NOT inside `inputs` -- describe_calculator reports
+    // `default: null` for these, so the agent door keeps refusing a default
+    // the page does not show. scripts/check-blank-defaults.mjs holds every
+    // value to its compute's own signature.
+    blankDefaults: Object.fromEntries((spec.fields || []).filter((f) => typeof f.whenBlank === "number").map((f) => [f.key, f.whenBlank])),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -132,7 +139,7 @@ MASONRY_RENDERERS["cmu-wall-flexure"] = _simpleRenderer({
   citation: "Citation: TMS 402-16 (Building Code Requirements for Masonry Structures) allowable-stress-design cracked transformed-section flexure: n = Es/Em with Es = 29,000,000 psi and Em = 900 f'm for concrete masonry, rho = As/(b d), k = sqrt(2 rho n + (rho n)^2) - rho n, j = 1 - k/3, the steel-governed allowable moment Ms = As Fs j d and the masonry-governed Mm = 0.5 Fb k j b d^2, with Fs = 32,000 psi for Grade 60 reinforcement and Fb = 0.45 f'm, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C (Allowable Stress Design of Concrete Masonry). Returns the allowable service-level bending moment of a singly reinforced, fully grouted section by the working-stress method: the section is assumed cracked, the reinforcement developed and in tension, the axial compression negligible (near-pure flexure), and one steel layer at the reported depth. The axial term and the one-third stress increase are not applied, and this is not the strength-design (LRFD) moment. Take f'm, the bar size, and the spacing from the structural drawings. A design aid, not a substitute for the engineer of record's stamped design.",
   example: cmuWallFlexureExample.inputs,
   fields: [
-    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
+    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number", whenBlank: 2000 },
     { key: "as_in2", label: "Steel area As over the strip (in²)", kind: "number" },
     { key: "d_in", label: "Effective depth d (in)", kind: "number" },
     { key: "b_in", label: "Strip width b (in)", kind: "number", whenBlank: 12 },
@@ -190,7 +197,7 @@ MASONRY_RENDERERS["cmu-shear-wall"] = _simpleRenderer({
   citation: "Citation: TMS 402-16 allowable-stress in-plane shear: Fvm = c x ((4.0 - 1.75 x M/(V dv)) x sqrt(f'm)) + 0.25 x (P/An), c = 1/2 (1/4 for a special reinforced shear wall), with the shear-span ratio taken positive and not greater than 1.0 inside the masonry term, Fvs = 0.5 x (Av Fs dv) / (An s), the combined Fv = (Fvm + Fvs) gamma_g, and the maximum-Fv cap of 3 sqrt(f'm) at M/(V dv) <= 0.25 grading linearly to 2 sqrt(f'm) at M/(V dv) >= 1.0, also x gamma_g (1.0 fully, 0.75 partially grouted), as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C. Returns the allowable service-level in-plane shear of a reinforced masonry shear wall (fully grouted by default). P is the sustained gravity compression (a larger P raises the masonry term, so use the load combination that actually acts with the shear); M/(V dv) is the shear-span ratio the designer supplies from the wall's height and length; the special-reinforced detailing and minimum-reinforcement rules of TMS 402 are the engineer's to satisfy separately. A design aid, not a substitute for the engineer of record's stamped lateral design.",
   example: cmuShearWallExample.inputs,
   fields: [
-    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
+    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number", whenBlank: 1500 },
     { key: "b_in", label: "Net wall thickness (in)", kind: "number" },
     { key: "dv_in", label: "Shear depth dv, wall length (in)", kind: "number" },
     { key: "p_lb", label: "Sustained axial load P (lb)", kind: "number", default: 0 },
@@ -235,7 +242,7 @@ MASONRY_RENDERERS["cmu-wall-axial"] = _simpleRenderer({
   citation: "Citation: TMS 402-16 allowable-stress axial compression for reinforced masonry: Pa = (0.25 f'm An + 0.65 Ast Fs) x (1 - (h/(140 r))^2) for a slenderness ratio h/r <= 99, and Pa = (0.25 f'm An + 0.65 Ast Fs) x (70 r / h)^2 for h/r > 99 (the two branches meet at h/r = 99), with Fs the allowable compressive stress in the reinforcement, as compiled in the Masonry Designers' Guide and CMHA TEK 14-07C. Returns the allowable service-level concentric axial compression of a reinforced, fully grouted masonry wall or column. The 0.65 Ast Fs reinforcement term applies where the vertical bars are laterally tied per the code's column provisions -- for an untied wall the conservative practice is to drop that term (enter Ast = 0) and take only 0.25 f'm An x R. Pure axial only: the moment interaction is separate (combine with the CMU wall flexure tile through the unity check). The radius of gyration r and effective height h come from the section and the wall's actual bracing. A design aid, not a substitute for the engineer of record's stamped design.",
   example: cmuWallAxialExample.inputs,
   fields: [
-    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
+    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number", whenBlank: 2000 },
     { key: "an_in2", label: "Net area An (in²)", kind: "number" },
     { key: "ast_in2", label: "Vertical steel Ast, tied (in², 0 = untied)", kind: "number", default: 0 },
     { key: "h_in", label: "Effective height h (in)", kind: "number" },
@@ -421,7 +428,7 @@ MASONRY_RENDERERS["masonry-anchor-bolt"] = _simpleRenderer({
   citation: "Citation: TMS 402 ASD headed anchor bolt tension: allowable = lesser of masonry breakout Bab = 1.25 x Apt x sqrt(f'm) (Apt = pi x lbe^2, the projected cone) and steel Bas = 0.6 x Ab x fy. Edge distance reduces Apt; shear is the masonry anchor bolt shear calculator. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: masonryAnchorBoltExample.inputs,
   fields: [
-    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
+    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number", whenBlank: 1500 },
     { key: "lbe_in", label: "Effective embedment lb (in)", kind: "number" },
     { key: "ab_in2", label: "Bolt effective tensile area Ab (in², net: 1/2 in 0.142, 3/4 in 0.334)", kind: "number" },
     { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number", default: 36000 },
@@ -470,8 +477,8 @@ MASONRY_RENDERERS["masonry-anchor-embedment"] = _simpleRenderer({
   example: masonryAnchorEmbedmentExample.inputs,
   fields: [
     { key: "required_tension_lb", label: "Required tension T (lb)", kind: "number" },
-    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
-    { key: "ab_in2", label: "Bolt effective tensile area Ab (in², net: 1/2 in 0.142, 3/4 in 0.334)", kind: "number" },
+    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number", whenBlank: 1500 },
+    { key: "ab_in2", label: "Bolt effective tensile area Ab (in², net: 1/2 in 0.142, 3/4 in 0.334)", kind: "number", whenBlank: 0.334 },
     { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number", default: 36000 },
   ],
   outputs: [
@@ -527,10 +534,10 @@ MASONRY_RENDERERS["masonry-anchor-shear"] = _simpleRenderer({
   citation: "Citation: TMS 402-13 ASD headed anchor bolt shear as NCMA TEK 12-03C prints it (402-16 raised crushing and uses a 5/3-power interaction): allowable = least of masonry breakout Bvb = 1.25 x Apv x sqrt(f'm) (Apv = pi lbe^2 / 2, lbe = edge distance), masonry crushing Bvc = 350 x (f'm Ab)^(1/4), anchor pryout Bvpry = 2.0 x Bab (Bab = 1.25 x pi lb^2 x sqrt(f'm)), and bolt steel Bvs = 0.36 x Ab x fy. TEK 12-03C example (f'm 2,000, 1/2 in, Ab 0.142) reproduces Bvc 1,437 lb and Bvs 3,067 lb. A design aid, not a substitute for a licensed engineer's design -- the engineer of record's stamped design governs.",
   example: masonryAnchorShearExample.inputs,
   fields: [
-    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number" },
+    { key: "fm_psi", label: "Masonry strength f'm (psi)", kind: "number", whenBlank: 1500 },
     { key: "lb_in", label: "Effective embedment lb (in)", kind: "number", whenBlank: 5 },
     { key: "lbe_in", label: "Edge distance lbe (in)", kind: "number", whenBlank: 4 },
-    { key: "ab_in2", label: "Bolt effective tensile area Ab (in², net: 1/2 in 0.142, 3/4 in 0.334)", kind: "number" },
+    { key: "ab_in2", label: "Bolt effective tensile area Ab (in², net: 1/2 in 0.142, 3/4 in 0.334)", kind: "number", whenBlank: 0.334 },
     { key: "fy_psi", label: "Bolt yield fy (psi, A307 = 36000)", kind: "number", default: 36000 },
   ],
   outputs: [
@@ -679,8 +686,8 @@ MASONRY_RENDERERS["masonry-joint-reinforcement"] = _simpleRenderer({
   citation: "Citation: masonry joint-reinforcement takeoff by name. reinforced courses = ceil(height in / vertical spacing); pieces per course = 1 + ceil((length - piece) / (piece - lap)); total = courses x pieces. IRC R606.12.2 / TMS 402 cap the vertical spacing at 16 in; wire laps >= 6 in. The structural spec and the adopted code govern.",
   example: masonryJointReinforcementExample.inputs,
   fields: [
-    { key: "wall_length_ft", label: "Wall length (ft)", kind: "number" },
-    { key: "wall_height_ft", label: "Wall height (ft)", kind: "number" },
+    { key: "wall_length_ft", label: "Wall length (ft)", kind: "number", whenBlank: 40 },
+    { key: "wall_height_ft", label: "Wall height (ft)", kind: "number", whenBlank: 12 },
     { key: "vertical_spacing_in", label: "Vertical spacing (in, code cap 16)", kind: "number", default: 16 },
     { key: "piece_length_ft", label: "Wire piece length (ft)", kind: "number", whenBlank: 10 },
     { key: "lap_in", label: "Lap between pieces (in, 6 min; 9 for 3/16 in wire)", kind: "number", default: 6, required: true },

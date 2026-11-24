@@ -641,6 +641,13 @@ function _simpleRenderer(spec) {
 
   _rlRender.schema = {
     inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
+    // spec-v1964 disclosure: the default each calculator applies to a BLANK
+    // box, so the steps panel can print it and the harness can count it per
+    // tile. Deliberately NOT inside `inputs` -- describe_calculator reports
+    // `default: null` for these, so the agent door keeps refusing a default
+    // the page does not show. scripts/check-blank-defaults.mjs holds every
+    // value to its compute's own signature.
+    blankDefaults: Object.fromEntries((spec.fields || []).filter((f) => typeof f.whenBlank === "number").map((f) => [f.key, f.whenBlank])),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -695,9 +702,9 @@ const renderPalletLoadout = _simpleRenderer({
     { key: "case_height_in",   label: "Case height (in)",  kind: "number" },
     { key: "case_weight_lb",   label: "Case weight (lb)",  kind: "number" },
     { key: "cases_per_pallet", label: "Cases per pallet",  kind: "number", default: 36 },
-    { key: "pallet_length_in", label: "Pallet length (in)",kind: "number" },
-    { key: "pallet_width_in",  label: "Pallet width (in)", kind: "number" },
-    { key: "pallet_height_in", label: "Pallet height (in)",kind: "number" },
+    { key: "pallet_length_in", label: "Pallet length (in)",kind: "number", whenBlank: 48 },
+    { key: "pallet_width_in",  label: "Pallet width (in)", kind: "number", whenBlank: 40 },
+    { key: "pallet_height_in", label: "Pallet height (in)",kind: "number", whenBlank: 48 },
     { key: "trailer", label: "Trailer", kind: "select", options: Object.keys(TRAILER_DIMENSIONS_IN).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
     { key: "pinwheel", label: "Pinwheel allowed", kind: "checkbox" },
   ],
@@ -835,8 +842,8 @@ const renderReeferBurn = _simpleRenderer({
   example: reeferBurnExample.inputs,
   fields: [
     { key: "unit", label: "Reefer unit / mode", kind: "select", options: Object.keys(REEFER_BURN_GPH).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
-    { key: "tank_gal", label: "Tank capacity (gal)", kind: "number" },
-    { key: "haul_hr", label: "Haul duration (hr)", kind: "number" },
+    { key: "tank_gal", label: "Tank capacity (gal)", kind: "number", whenBlank: 50 },
+    { key: "haul_hr", label: "Haul duration (hr)", kind: "number", whenBlank: 24 },
     { key: "ambient_band", label: "Ambient band", kind: "select", options: [{ value: "cold", label: "Cold" }, { value: "moderate", label: "Moderate", selected: true }, { value: "hot", label: "Hot" }] },
     { key: "haul_miles", label: "Haul distance (mi, optional)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "average_mph", label: "Average speed (mph)", kind: "number", default: 55, attrs: { step: "any", min: "0" } },
@@ -1838,9 +1845,9 @@ const renderInvoiceFactoringCost = _simpleRenderer({
   example: invoiceFactoringCostExample.inputs,
   fields: [
     { key: "invoice_usd", label: "Invoice amount ($)", kind: "number" },
-    { key: "advance_pct", label: "Advance rate (%)", kind: "number" },
-    { key: "fee_pct", label: "Factoring fee (%)", kind: "number" },
-    { key: "days_to_pay", label: "Days until customer pays", kind: "number" },
+    { key: "advance_pct", label: "Advance rate (%)", kind: "number", whenBlank: 90 },
+    { key: "fee_pct", label: "Factoring fee (%)", kind: "number", whenBlank: 3 },
+    { key: "days_to_pay", label: "Days until customer pays", kind: "number", whenBlank: 30 },
   ],
   outputs: [
     { key: "adv", id: "ifc-out-adv", label: "Advance now / fee", value: (r) => "$" + fmt(r.advance_usd, 2) + " advanced, $" + fmt(r.fee_usd, 2) + " fee" },

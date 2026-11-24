@@ -2596,6 +2596,13 @@ function _simpleRenderer(spec) {
 
   _rlRender.schema = {
     inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
+    // spec-v1964 disclosure: the default each calculator applies to a BLANK
+    // box, so the steps panel can print it and the harness can count it per
+    // tile. Deliberately NOT inside `inputs` -- describe_calculator reports
+    // `default: null` for these, so the agent door keeps refusing a default
+    // the page does not show. scripts/check-blank-defaults.mjs holds every
+    // value to its compute's own signature.
+    blankDefaults: Object.fromEntries((spec.fields || []).filter((f) => typeof f.whenBlank === "number").map((f) => [f.key, f.whenBlank])),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -3017,7 +3024,7 @@ SHOP_RENDERERS["bucket-elevator-capacity"] = _simpleRenderer({
     { key: "fill_factor", label: "Fill factor (0 to 1)", kind: "number", whenBlank: 0.75 },
     { key: "bulk_density_pcf", label: "Material bulk density (lb/cubic ft)", kind: "number" },
     { key: "lift_ft", label: "Lift height (ft)", kind: "number" },
-    { key: "drive_efficiency", label: "Drive efficiency (0 to 1)", kind: "number" },
+    { key: "drive_efficiency", label: "Drive efficiency (0 to 1)", kind: "number", whenBlank: 0.75 },
     { key: "friction_allowance", label: "Scoop and friction allowance (1.2 = +20%)", kind: "number", default: 1.2 },
   ],
   outputs: [
@@ -3514,7 +3521,7 @@ SHOP_RENDERERS["belt-conveyor-tension-power"] = _simpleRenderer({
     { key: "belt_weight_plf", label: "Belt weight (lb per ft)", kind: "number" },
     { key: "idler_weight_plf", label: "Idler rotating weight (lb per ft)", kind: "number" },
     { key: "friction_factor", label: "Friction factor", kind: "number", whenBlank: 0.022 },
-    { key: "drive_efficiency", label: "Drive efficiency (0 to 1)", kind: "number" },
+    { key: "drive_efficiency", label: "Drive efficiency (0 to 1)", kind: "number", whenBlank: 0.85 },
   ],
   outputs: [
     { key: "w", id: "bctp-out-w", label: "Material load on the belt", value: (r) => fmt(r.material_load_plf, 1) + " lb per ft of belt" },

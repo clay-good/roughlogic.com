@@ -87,6 +87,13 @@ function _simpleRenderer(spec) {
 
   _rlRender.schema = {
     inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
+    // spec-v1964 disclosure: the default each calculator applies to a BLANK
+    // box, so the steps panel can print it and the harness can count it per
+    // tile. Deliberately NOT inside `inputs` -- describe_calculator reports
+    // `default: null` for these, so the agent door keeps refusing a default
+    // the page does not show. scripts/check-blank-defaults.mjs holds every
+    // value to its compute's own signature.
+    blankDefaults: Object.fromEntries((spec.fields || []).filter((f) => typeof f.whenBlank === "number").map((f) => [f.key, f.whenBlank])),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -131,7 +138,7 @@ FINISH_RENDERERS["thinset-coverage"] = _simpleRenderer({
       { value: "half", label: "1/2 in (~45 sq ft/bag)" },
     ] },
     { key: "coverage_per_bag", label: "Coverage override (sq ft/bag, optional)", kind: "number" },
-    { key: "bag_weight_lb", label: "Bag weight (lb)", kind: "number" },
+    { key: "bag_weight_lb", label: "Bag weight (lb)", kind: "number", whenBlank: 50 },
     { key: "waste_pct", label: "Waste (%)", kind: "number", default: 10 },
   ],
   outputs: [
@@ -736,7 +743,7 @@ FINISH_RENDERERS["closet-shelf-takeoff"] = _simpleRenderer({
     { key: "linen_wall_ft", label: "Linen wall length (ft)", kind: "number", default: 0 },
     { key: "linen_shelf_count", label: "Linen shelves (count)", kind: "number", whenBlank: 4 },
     { key: "bracket_spacing_in", label: "Support spacing (in)", kind: "number", whenBlank: 32 },
-    { key: "stock_length_ft", label: "Stock length (ft)", kind: "number" },
+    { key: "stock_length_ft", label: "Stock length (ft)", kind: "number", whenBlank: 8 },
   ],
   outputs: [
     { key: "rod", id: "cst-out-rod", label: "Rod", value: (r) => fmt(r.rod_lf, 0) + " ft (" + fmt(r.rod_sticks, 0) + " " + (fmt(r.rod_sticks, 0) === "1" ? "stick" : "sticks") + ")" + (r.splice_needed ? " - splice at a support" : "") },
@@ -939,7 +946,7 @@ FINISH_RENDERERS["drip-edge-takeoff"] = _simpleRenderer({
     { key: "rake_run_ft", label: "Horizontal run of ONE rake (ft, plan)", kind: "number", default: 0 },
     { key: "rake_count", label: "Number of rakes", kind: "number", default: 0 },
     { key: "pitch_rise_per_12", label: "Roof pitch (rise per 12)", kind: "number" },
-    { key: "stock_length_ft", label: "Stock length (ft)", kind: "number" },
+    { key: "stock_length_ft", label: "Stock length (ft)", kind: "number", whenBlank: 10 },
     { key: "lap_in", label: "Lap at each joint (in)", kind: "number", default: 2 },
     { key: "waste_pct", label: "Waste (%)", kind: "number", default: 10 },
   ],
@@ -1004,9 +1011,9 @@ FINISH_RENDERERS["valley-flashing-takeoff"] = _simpleRenderer({
   fields: [
     { key: "valley_run_ft", label: "Plan run of ONE valley (ft)", kind: "number" },
     { key: "valley_count", label: "Number of valleys", kind: "number", default: 1 },
-    { key: "pitch_rise_per_12", label: "Roof pitch (rise per 12)", kind: "number" },
+    { key: "pitch_rise_per_12", label: "Roof pitch (rise per 12)", kind: "number", whenBlank: 6 },
     { key: "metal_width_in", label: "Valley metal width (in)", kind: "number", whenBlank: 24 },
-    { key: "stock_length_ft", label: "Stock length (ft)", kind: "number" },
+    { key: "stock_length_ft", label: "Stock length (ft)", kind: "number", whenBlank: 10 },
     { key: "lap_in", label: "Lap at each joint (in)", kind: "number", default: 6 },
     { key: "waste_pct", label: "Waste (%)", kind: "number", default: 10 },
   ],
@@ -1315,7 +1322,7 @@ FINISH_RENDERERS["texture-material-takeoff"] = _simpleRenderer({
     { key: "openings_sqft", label: "Openings to deduct (sq ft)", kind: "number" },
     { key: "coverage_per_bag_sqft", label: "Coverage per bag, from the product (sq ft)", kind: "number" },
     { key: "waste_pct", label: "Waste factor (%)", kind: "number", default: 10 },
-    { key: "bag_weight_lb", label: "Bag weight (lb)", kind: "number" },
+    { key: "bag_weight_lb", label: "Bag weight (lb)", kind: "number", whenBlank: 40 },
     { key: "water_gal_per_bag", label: "Mix water per bag (gal)", kind: "number" },
   ],
   outputs: [

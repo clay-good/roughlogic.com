@@ -1938,6 +1938,13 @@ function _simpleRenderer(spec) {
 
   _rlRender.schema = {
     inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
+    // spec-v1964 disclosure: the default each calculator applies to a BLANK
+    // box, so the steps panel can print it and the harness can count it per
+    // tile. Deliberately NOT inside `inputs` -- describe_calculator reports
+    // `default: null` for these, so the agent door keeps refusing a default
+    // the page does not show. scripts/check-blank-defaults.mjs holds every
+    // value to its compute's own signature.
+    blankDefaults: Object.fromEntries((spec.fields || []).filter((f) => typeof f.whenBlank === "number").map((f) => [f.key, f.whenBlank])),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -1989,7 +1996,7 @@ FAB_RENDERERS["tube-bend-wall-thinning"] = _simpleRenderer({
     { key: "od_in", label: "Tube outside diameter (in)", kind: "number" },
     { key: "wall_in", label: "Wall thickness (in)", kind: "number" },
     { key: "clr_in", label: "Centerline bend radius (in)", kind: "number" },
-    { key: "bend_angle_deg", label: "Bend angle (deg)", kind: "number" },
+    { key: "bend_angle_deg", label: "Bend angle (deg)", kind: "number", whenBlank: 90 },
   ],
   outputs: [
     { key: "r", id: "tbwt-out-r", label: "Bend ratio", value: (r) => fmt(r.bend_ratio, 2) + "D" },

@@ -90,6 +90,13 @@ function _simpleRenderer(spec) {
 
   _rlRender.schema = {
     inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any", min: "0" }) })),
+    // spec-v1964 disclosure: the default each calculator applies to a BLANK
+    // box, so the steps panel can print it and the harness can count it per
+    // tile. Deliberately NOT inside `inputs` -- describe_calculator reports
+    // `default: null` for these, so the agent door keeps refusing a default
+    // the page does not show. scripts/check-blank-defaults.mjs holds every
+    // value to its compute's own signature.
+    blankDefaults: Object.fromEntries((spec.fields || []).filter((f) => typeof f.whenBlank === "number").map((f) => [f.key, f.whenBlank])),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -353,8 +360,8 @@ FIRESPRINKLER_RENDERERS["smoke-detector-spacing-count"] = _simpleRenderer({
   citation: "Citation: NFPA 72 spot-detector grid by name. detectors = the fewest grid cells that each fit the listed S x S square or keep every point within 0.7 S (NFPA 72 17.7.4.2.3.1); wall maximum = spacing / 2.",
   example: smokeDetectorSpacingCountExample.inputs,
   fields: [
-    { key: "room_length_ft", label: "Room length (ft)", kind: "number" },
-    { key: "room_width_ft", label: "Room width (ft)", kind: "number" },
+    { key: "room_length_ft", label: "Room length (ft)", kind: "number", whenBlank: 60 },
+    { key: "room_width_ft", label: "Room width (ft)", kind: "number", whenBlank: 40 },
     { key: "listed_spacing_ft", label: "Device listed spacing (ft)", kind: "number", whenBlank: 30 },
   ],
   outputs: [
@@ -495,8 +502,8 @@ FIRESPRINKLER_RENDERERS["stairwell-pressurization"] = _simpleRenderer({
   fields: [
     { key: "leakage_area_sqft", label: "Total effective leakage area (sq ft)", kind: "number" },
     { key: "pressure_inwg", label: "Design pressure difference (in. w.g.)", kind: "number", whenBlank: 0.15 },
-    { key: "door_width_ft", label: "Door width (ft)", kind: "number" },
-    { key: "door_height_ft", label: "Door height (ft)", kind: "number" },
+    { key: "door_width_ft", label: "Door width (ft)", kind: "number", whenBlank: 3 },
+    { key: "door_height_ft", label: "Door height (ft)", kind: "number", whenBlank: 7 },
     { key: "knob_setback_in", label: "Knob setback from the latch edge (in)", kind: "number", whenBlank: 3 },
     { key: "closer_force_lbf", label: "Door closer force (lbf)", kind: "number", default: 10 },
     { key: "force_limit_lbf", label: "Opening-force limit (lbf)", kind: "number", whenBlank: 30 },

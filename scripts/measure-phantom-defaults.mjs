@@ -47,31 +47,21 @@ const { TOOLS } = await import(resolve(ROOT, "tools-data.js"));
 // prints for a blank box the calculator still computes with; it is deliberately
 // not part of the MCP input contract (`describe_calculator` still reports
 // `default: null`, so the agent door keeps refusing a default the page does not
-// show), which is why it has to be read from the renderer source here.
-// scripts/check-blank-defaults.mjs holds each one to its compute's signature.
-const { readFileSync, readdirSync } = await import("node:fs");
-// Tied to the TILE, not just the module: a key name can appear in several
-// specs in one file, and a measurement that over-counts its own progress is
-// worth less than no measurement.
+// show). The renderer publishes it as `schema.blankDefaults`, read here per
+// TILE through the renderer registry -- a source regex over the three binding
+// forms the modules use got this wrong in both directions (2026-11-24), and a
+// harness that miscounts its own subject is worth less than none.
+// scripts/check-blank-defaults.mjs holds each value to its compute's signature.
+const { RENDERER_MAP } = await import(resolve(ROOT, "test", "fixtures", "renderer-map.js"));
 const disclosed = new Map();   // tile id -> Set of field keys
-const blockAt = (src, at) => {
-  let depth = 0;
-  for (let i = at; i < src.length; i += 1) {
-    if (src[i] === "{") depth += 1;
-    else if (src[i] === "}") { depth -= 1; if (!depth) return src.slice(at, i + 1); }
-  }
-  return "";
-};
-for (const name of readdirSync(ROOT).filter((f) => /^calc-.*\.js$/.test(f))) {
-  const src = readFileSync(resolve(ROOT, name), "utf8");
-  if (!src.includes("whenBlank:")) continue;
-  for (const m of src.matchAll(/RENDERERS\[\s*"([a-z0-9-]+)"\s*\]\s*=\s*_simpleRenderer\(\s*\{/g)) {
-    const spec = blockAt(src, m.index + m[0].length - 1);
-    if (!spec.includes("whenBlank:")) continue;
-    const keys = new Set();
-    for (const f of spec.matchAll(/\{[^{}\n]*\bkey:\s*"([^"]+)"[^{}\n]*\bwhenBlank:/g)) keys.add(f[1]);
-    disclosed.set(m[1], keys);
-  }
+for (const [id, reg] of Object.entries(RENDERER_MAP)) {
+  if (!reg || !reg.module || !reg.exportName) continue;
+  let mod;
+  try { mod = await import(resolve(ROOT, "test", "fixtures", reg.module)); } catch { continue; }
+  const table = mod[reg.exportName];
+  const fn = table && table[id];
+  const blanks = fn && fn.schema && fn.schema.blankDefaults;
+  if (blanks && Object.keys(blanks).length) disclosed.set(id, new Set(Object.keys(blanks)));
 }
 const isDisclosed = (id, key) => {
   const keys = disclosed.get(id);

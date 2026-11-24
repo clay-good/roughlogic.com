@@ -526,6 +526,13 @@ function _simpleRenderer(spec) {
 
   _rlRender.schema = {
     inputs: (spec.fields || []).map((f) => ({ key: f.key, label: f.label, kind: f.kind ?? "number", options: f.options ?? null, default: f.default ?? null, attrs: f.attrs ?? (f.kind && f.kind !== "number" ? null : { step: "any" }) })),
+    // spec-v1964 disclosure: the default each calculator applies to a BLANK
+    // box, so the steps panel can print it and the harness can count it per
+    // tile. Deliberately NOT inside `inputs` -- describe_calculator reports
+    // `default: null` for these, so the agent door keeps refusing a default
+    // the page does not show. scripts/check-blank-defaults.mjs holds every
+    // value to its compute's own signature.
+    blankDefaults: Object.fromEntries((spec.fields || []).filter((f) => typeof f.whenBlank === "number").map((f) => [f.key, f.whenBlank])),
     outputs: (spec.outputs || []).map((o) => ({ key: o.key, label: o.label, unit: o.unit ?? null, format: o.value })),
     citation: spec.citation ?? null,
     scope: spec.scope ?? null,
@@ -538,7 +545,7 @@ const renderPropSlip = _simpleRenderer({
   example: propSlipExample.inputs,
   fields: [
     { key: "rpm", label: "Engine RPM", kind: "number" },
-    { key: "gear_ratio", label: "Gear ratio", kind: "number" },
+    { key: "gear_ratio", label: "Gear ratio", kind: "number", whenBlank: 1 },
     { key: "pitch_in", label: "Prop pitch (in)", kind: "number" },
     { key: "gps_speed_kt", label: "GPS speed (kt)", kind: "number" },
   ],
@@ -640,7 +647,7 @@ const renderFuelRange = _simpleRenderer({
     { key: "mpg", label: "MPG", kind: "number" },
     { key: "target_range_mi", label: "Range (mi, for inverse modes)", kind: "number" },
     { key: "mpg_basis", label: "MPG basis fuel", kind: "select", options: Object.keys(FUEL_PROPERTIES).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
-    { key: "load_factor", label: "Load factor (0-1.5)", kind: "number" },
+    { key: "load_factor", label: "Load factor (0-1.5)", kind: "number", whenBlank: 1 },
     // v8 §C.5 + §D.1: optional cost input. The simple renderer treats this
     // as a numeric field; the user leaves it blank to skip the cost output.
     { key: "price_per_gal", label: "Price ($/gal, optional)", kind: "number", attrs: { step: "any", min: "0" } },
@@ -664,7 +671,7 @@ const renderTireGearing = _simpleRenderer({
     { key: "new_size", label: "New tire size", kind: "text" },
     { key: "axle_ratio", label: "Axle ratio", kind: "number" },
     { key: "top_gear_ratio", label: "Top gear ratio", kind: "number", default: 0.69 },
-    { key: "target_rpm", label: "Target cruise RPM", kind: "number" },
+    { key: "target_rpm", label: "Target cruise RPM", kind: "number", whenBlank: 1800 },
     { key: "indicated_mph", label: "Indicated speed (mph, optional)", kind: "number", default: 0 },
   ],
   outputs: [
@@ -686,12 +693,12 @@ const renderBrakePadLife = _simpleRenderer({
     { key: "vehicle_weight_lb", label: "Vehicle weight (lb)", kind: "number" },
     { key: "speed_delta_mph", label: "Speed delta per stop (mph)", kind: "number" },
     { key: "stops_per_mile", label: "Stops per mile", kind: "number", default: 0.4 },
-    { key: "pad_thickness_mm", label: "Pad thickness (mm)", kind: "number" },
+    { key: "pad_thickness_mm", label: "Pad thickness (mm)", kind: "number", whenBlank: 12 },
     { key: "pad_material", label: "Pad material", kind: "select", options: Object.keys(PAD_WEAR_RATE).map((k) => ({ value: k, label: PAD_WEAR_RATE[k].label })) },
     // v23 EN.14: optional shop wear-rate override + front/rear bias split.
     { key: "wear_rate_mm_per_kj", label: "Wear rate (mm/kJ, optional shop data)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "front_bias_pct", label: "Front brake bias (%, default 50)", kind: "number", default: 50 },
-    { key: "rotor_mass_lb", label: "Rotor mass (lb)", kind: "number" },
+    { key: "rotor_mass_lb", label: "Rotor mass (lb)", kind: "number", whenBlank: 18 },
     { key: "pad_set_cost_usd", label: "Pad-set cost ($, optional)", kind: "number", attrs: { step: "any", min: "0" } },
   ],
   outputs: [
@@ -768,7 +775,7 @@ const renderValveFlowCoefficient = _simpleRenderer({
       { value: "liquid", label: "Liquid" },
       { value: "gas", label: "Gas (flagged - different equation)" },
     ] },
-    { key: "specific_gravity", label: "Specific gravity", kind: "number" },
+    { key: "specific_gravity", label: "Specific gravity", kind: "number", whenBlank: 1 },
     { key: "cv", label: "Cv", kind: "number" },
     { key: "flow_gpm", label: "Flow (gpm)", kind: "number" },
     { key: "dp_psi", label: "Pressure drop (psi)", kind: "number" },
@@ -2265,8 +2272,8 @@ const renderPaintMixRatio = _simpleRenderer({
   example: paintMixRatioExample.inputs,
   fields: [
     { key: "paint_volume_oz", label: "Base / color volume (fl oz; mix ratios are by volume, not weight)", kind: "number" },
-    { key: "part_paint", label: "Paint parts", kind: "number" },
-    { key: "part_hardener", label: "Hardener parts", kind: "number" },
+    { key: "part_paint", label: "Paint parts", kind: "number", whenBlank: 4 },
+    { key: "part_hardener", label: "Hardener parts", kind: "number", whenBlank: 1 },
     { key: "part_reducer", label: "Reducer parts (0 = two-part)", kind: "number", default: 0 },
   ],
   outputs: [
@@ -3857,8 +3864,8 @@ MECHANIC_RENDERERS["dynamic-compression-ratio"] = _simpleRenderer({
   citation: "Citation: dynamic compression ratio by name (slider-crank geometry from intake-valve-closing). clearance volume from the static CR; piston position at IVC from the rod/stroke; DCR = (swept-from-IVC + clearance) / clearance. ~7.5-8.5 suits pump gas at sea level; the cam seat-timing, octane, and tune govern.",
   example: dynamicCompressionRatioExample.inputs,
   fields: [
-    { key: "bore_in", label: "Bore (in)", kind: "number" },
-    { key: "stroke_in", label: "Stroke (in)", kind: "number" },
+    { key: "bore_in", label: "Bore (in)", kind: "number", whenBlank: 4.03 },
+    { key: "stroke_in", label: "Stroke (in)", kind: "number", whenBlank: 3.75 },
     { key: "rod_length_in", label: "Rod length (in, center-to-center)", kind: "number", whenBlank: 6 },
     { key: "static_cr", label: "Static compression ratio", kind: "number", whenBlank: 10.5 },
     { key: "ivc_abdc_deg", label: "Intake valve closing (deg ABDC, at checking lash)", kind: "number", whenBlank: 60 },
@@ -3992,7 +3999,7 @@ MECHANIC_RENDERERS["sailboat-performance-ratios"] = _simpleRenderer({
   example: sailboatPerformanceRatiosExample.inputs,
   fields: [
     { key: "sail_area_sqft", label: "Sail area (sq ft)", kind: "number", whenBlank: 500 },
-    { key: "displacement_lb", label: "Displacement (lb)", kind: "number" },
+    { key: "displacement_lb", label: "Displacement (lb)", kind: "number", whenBlank: 10000 },
     { key: "lwl_ft", label: "Waterline length LWL (decimal ft: 26 ft 7 in is 26.58)", kind: "number", whenBlank: 30 },
   ],
   outputs: [
