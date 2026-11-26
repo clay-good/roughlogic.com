@@ -126,3 +126,67 @@ test("Pallet: 20 ft ocean box uses the ISO 668 (2005+) 30,480 kg gross, same as 
   const r = computePalletLoadout({ case_length_in: 12, case_width_in: 10, case_height_in: 12, case_weight_lb: 100, cases_per_pallet: 40, trailer: "ocean_20" });
   assert.equal(r.pallets_by_weight, 15); // floor(62,000 / 4,000); the old row gave floor(47,500 / 4,000) = 11
 });
+
+// --- 49 CFR 395.5 passenger-carrying rules ---------------------------
+//
+// The property profiles (395.3) were pinned behaviourally: drive_remaining
+// and on_duty_remaining imply drive_max 11 and the 14-hour window. The
+// passenger profiles (395.5) were pinned only at drive_max 10, and the three
+// rules that make 395.5 DIFFERENT -- a 15-hour window ACCUMULATED rather than
+// run as a consecutive clock, an 8-hour reset instead of 10, and no 30-minute
+// break -- were held by nothing. Each of the five seeds below passed before
+// these tests existed: flipping the passenger profile's window_is_clock and
+// break_required to the property values computed a bus driver's day under
+// 395.3, and the weekly cap could be raised from 60 to 70 with every test
+// green. All four profiles are reached so the legacy key name cannot mislead.
+
+test("HOS 395.5: a 9-hour off-duty break resets a passenger driver but not a property driver", () => {
+  const events = [{ kind: "drive", hours: 5 }, { kind: "off_duty", hours: 9 }, { kind: "drive", hours: 1 }];
+  // Passenger: 9 >= the 8-hour reset, so the shift restarts -- 1 hr driven of 10.
+  for (const profile of ["passenger_70_7", "passenger_70_8"]) {
+    const pax = computeHOS({ profile, events });
+    assert.equal(pax.drive_remaining, 9, profile);
+    assert.equal(pax.on_duty_remaining, 14, profile);
+  }
+  // Property: 9 < the 10-hour reset, and because its window IS a clock the
+  // off-duty hours are consumed by it -- 5+9+1 = 15 against a 14-hour window.
+  const prop = computeHOS({ profile: "property_70_8", events });
+  assert.equal(prop.drive_remaining, 5);
+  assert.equal(prop.on_duty_remaining, 0);
+});
+
+test("HOS 395.5: the 15-hour passenger window accumulates on-duty time, it is not a clock", () => {
+  // A 2-hour off-duty period is below both resets. Property adds it to the
+  // window (window_is_clock), passenger does not (on-duty time only).
+  const events = [{ kind: "on_duty", hours: 4 }, { kind: "off_duty", hours: 2 }, { kind: "drive", hours: 3 }];
+  assert.equal(computeHOS({ profile: "passenger_70_7", events }).on_duty_remaining, 8);  // 15 - (4+3)
+  assert.equal(computeHOS({ profile: "property_70_8", events }).on_duty_remaining, 5);   // 14 - (4+2+3)
+});
+
+test("HOS 395.5: the 30-minute break of 395.3(a)(3)(ii) does not apply to passenger drivers", () => {
+  const events = [{ kind: "drive", hours: 8 }];
+  assert.equal(computeHOS({ profile: "property_70_8", events }).needs_break, true);
+  assert.equal(computeHOS({ profile: "property_60_7", events }).needs_break, true);
+  assert.equal(computeHOS({ profile: "passenger_70_7", events }).needs_break, false);
+  assert.equal(computeHOS({ profile: "passenger_70_8", events }).needs_break, false);
+});
+
+test("HOS: each profile's weekly cap is its own, including the legacy-named 60/7", () => {
+  // `passenger_70_7` encodes 60 hr / 7 days -- the key is kept for shared-URL
+  // back-compat and its name states the wrong figure, so the cap is pinned
+  // here rather than inferred from the name.
+  const events = [{ kind: "on_duty", hours: 2 }];
+  const left = (profile) => computeHOS({ profile, events, weekly_on_duty_used_hr: 55 }).weekly_remaining;
+  assert.equal(left("passenger_70_7"), 3);   // 60 - 57
+  assert.equal(left("property_60_7"), 3);    // 60 - 57
+  assert.equal(left("passenger_70_8"), 13);  // 70 - 57
+  assert.equal(left("property_70_8"), 13);   // 70 - 57
+});
+
+test("HOS: the weekly-limit message names each profile's own rolling period", () => {
+  const exhausted = { events: [{ kind: "on_duty", hours: 5 }], weekly_on_duty_used_hr: 70, current_time_iso: "2026-11-26T12:00:00.000Z" };
+  assert.match(computeHOS({ profile: "passenger_70_7", ...exhausted }).next_drive_reason, /60-hour weekly limit.*7-day period/);
+  assert.match(computeHOS({ profile: "passenger_70_8", ...exhausted }).next_drive_reason, /70-hour weekly limit.*8-day period/);
+  assert.match(computeHOS({ profile: "property_60_7", ...exhausted }).next_drive_reason, /60-hour weekly limit.*7-day period/);
+  assert.match(computeHOS({ profile: "property_70_8", ...exhausted }).next_drive_reason, /70-hour weekly limit.*8-day period/);
+});
