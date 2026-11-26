@@ -74,7 +74,18 @@ function introspect(fn) {
     if (ch === "," && !d) { out.push(cur); cur = ""; } else cur += ch;
   }
   if (cur.trim()) out.push(cur);
-  return out.map((p) => { const eq = p.indexOf("="); const n = (eq < 0 ? p : p.slice(0, eq)).trim(); return n.startsWith("...") ? null : n; }).filter(Boolean);
+  // Slice at the colon too: `protected: prot` renames the key on the way in
+  // and the caller still sends `protected`. Without this the gate does not
+  // see a renamed parameter, so a schema that correctly advertises it reads
+  // as divergent -- the same way this copy disagreed over comments.
+  return out.map((p) => {
+    const eq = p.indexOf("=");
+    let n = (eq < 0 ? p : p.slice(0, eq)).trim();
+    if (n.startsWith("...")) return null;
+    const colon = n.indexOf(":");
+    if (colon !== -1) n = n.slice(0, colon).trim();
+    return n || null;
+  }).filter(Boolean);
 }
 
 async function main() {

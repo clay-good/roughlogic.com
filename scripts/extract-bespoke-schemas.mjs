@@ -730,8 +730,17 @@ async function computeParams(reg) {
   if (cur.trim()) parts.push(cur);
   return parts.map((p) => {
     const eq = p.indexOf("=");
-    const name = (eq < 0 ? p : p.slice(0, eq)).trim();
+    let name = (eq < 0 ? p : p.slice(0, eq)).trim();
     if (!name || name.startsWith("...")) return null;
+    // `protected: prot` RENAMES the key on the way in, and the caller still
+    // sends `protected`. The door's parser slices at the colon for exactly
+    // this; these two copies did not, so the renamed parameters were missing
+    // from the extractor's view and no schema row could be built for them.
+    // Measured by running all three parsers over every compute and diffing the
+    // name sets: six parameters on two calculators, `exterior-opening-
+    // protection`'s own `protected` flag among them.
+    const colon = name.indexOf(":");
+    if (colon !== -1) name = name.slice(0, colon).trim();
     // Classify the default so a string-select mapped to a number/boolean param
     // (a type-mismatch that would break enum validation) can be rejected.
     let defType = "none", defValue = null;
@@ -743,7 +752,20 @@ async function computeParams(reg) {
       else defType = "other";
       try { defValue = JSON.parse(raw.replace(/'/g, '"')); } catch { defValue = null; }
     }
-    return { name, defType, defValue };
+    // Does the COMPUTE itself coerce this parameter's option strings? A yes/no
+    // select handed straight to a boolean parameter is normally a hard skip for
+    // the whole calculator, because a compute reading `flag ? a : b` finds "no"
+    // truthy and would answer confidently wrong. But some computes do the
+    // conversion themselves -- `const p = prot === true || prot === "yes" ||
+    // prot === "true"` -- and for those the select's own values are exactly
+    // what the page sends and exactly what the compute expects, so advertising
+    // the enum is right and skipping the tile loses its other fields for
+    // nothing. Checked against the LOCAL the parameter is bound to (`prot`),
+    // since that is the name the body compares.
+    const local = (colon !== -1 ? (eq < 0 ? p : p.slice(0, eq)).trim().slice(colon + 1).trim() : name) || name;
+    const coercesStrings = defType === "boolean"
+      && new RegExp("\\b" + local.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s*===\\s*[\"']").test(s);
+    return { name, defType, defValue, coercesStrings };
   }).filter(Boolean);
 }
 
@@ -852,7 +874,7 @@ async function main() {
     // a silent-wrong-value risk we refuse to introduce.
     let typeMismatch = false, hasSelect = false, anyUnmapped = false;
     const inputs = [];
-    for (const { name: key, defType, defValue } of params) {
+    for (const { name: key, defType, defValue, coercesStrings } of params) {
       const ref = effectiveCallMap.get(key);
       if (!ref) { anyUnmapped = true; continue; } // param not sourced from a field
       let field = fields.get(ref.var);
