@@ -581,6 +581,25 @@ async function main() {
   checked += checkPattern(correctness, /([\d,]+) of [\d,]+ across \d+ modules/g, dimsFns, "annotated-function count (docs/correctness.md)", errors);
   checked += checkPattern(correctness, /[\d,]+ of [\d,]+ across (\d+) modules/g, live.modules + 1, "annotated-module count (docs/correctness.md)", errors);
 
+  // The same dims-gate figures are quoted a second time in docs/how-it-works.md,
+  // in the long `check-dimensions` row, and that copy was NOT anchored -- so it
+  // rotted while the correctness.md copy beside it stayed right. On 2026-11-26 it
+  // read "across all 115 modules" against a live 124, and "21 genuine collisions"
+  // against the gate's 22 -- the latter visible without running anything, since
+  // the row states 37 declared two ways and 15 + 21 is 36. Both are read off the
+  // gate's own summary now. The unit-tail figure in the same row (12,033) was
+  // already correct and is anchored too, so the whole row is derived.
+  const dimsCollisions = gateFigure("check-dimensions.mjs", /(\d+) genuine name collisions/, "genuine-collision count");
+  const dimsUnitTail = gateFigure("check-dimensions.mjs", /([\d,]+) keys checked against the unit/, "unit-tail key count");
+  checked += checkPattern(howItWorks, /must mean \*\*one\*\* quantity across all (\d+) modules/g, live.modules + 1, "annotated-module count (docs/how-it-works.md)", errors);
+  checked += checkPattern(howItWorks, /(\d+) genuine collisions like/g, dimsCollisions, "genuine-collision count (docs/how-it-works.md)", errors);
+  checked += checkPattern(howItWorks, /([\d,]+) keys \*named\* for a unit/g, dimsUnitTail, "unit-tail key count (docs/how-it-works.md)", errors);
+
+  // mcp/README.md states the both-doors contract's reach in prose ("checked for
+  // all N tiles on every build"). Unanchored, it had drifted to 2,266 while the
+  // SAME FILE said 2,288 of 2,288 ninety lines later.
+  checked += checkPattern(mcpReadme, /checked for all ([\d,]+) tiles on/g, live.tiles, "both-doors tile count (mcp/README.md)", errors);
+
   // mcp/README.md quotes the query-fill corpus size in a fourth place. d073f51a
   // refreshed the figures that had gone stale when the corpus moved and missed
   // this one, which still read 1,763 -- the corpus size from 2026-09-01. It is

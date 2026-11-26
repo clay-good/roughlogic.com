@@ -147,7 +147,7 @@ element — the keys of the publisher-verified worked example fill the gap, so
 returning an empty list. `scripts/check-both-doors.mjs` holds the door to that
 contract: every advertised name must be a key a caller can actually send, every
 key the tile's own example sets must be advertised, and that example must run
-clean through `run_calculator`. All three are checked for all 2,266 tiles on
+clean through `run_calculator`. All three are checked for all 2,288 tiles on
 every build.
 
 All four warnings are swept over the whole catalog by the unit suite, which is
