@@ -160,6 +160,41 @@ for (const rel of TARGETS) {
   }
 }
 
+// A TEXT-PARSER OF tools-data.js MUST ASSERT ITS OWN REACH.
+//
+// catalog-size.mjs exists because those regexes match a fixed field order, so a
+// tile written another way is silently skipped -- and "a sweep that covered
+// 1,700 of 1,804 reports exactly what a sweep that covered all of them
+// reports: nothing". Its header says "Every such parser asserts here", and on
+// 2026-11-26 that was not true: check-spec-status.mjs read the file with a
+// `{ id: "` regex and never checked the count, which mattered because its whole
+// output is a comparison of spec statuses against that set. This makes the
+// header's claim enforceable rather than aspirational.
+{
+  const parsers = [];
+  for (const name of readdirSync(resolve(ROOT, "scripts"))) {
+    if (!/\.mjs$/.test(name) || name === "catalog-size.mjs") continue;
+    const src = await readFile(resolve(ROOT, "scripts", name), "utf8");
+    const readsText = /read(?:File|FileSync)\([^)]*tools-data\.js/.test(src);
+    const regexesEntries = /matchAll\(\s*\/[^\n]*\bid:/.test(src);
+    if (!readsText || !regexesEntries) continue;
+    // The CALL, not the mention: `import { assertFullCatalogParse }` contains
+    // the name and asserts nothing. The first version of this check looked for
+    // the bare string, so deleting the call while leaving the import passed it
+    // -- which the seed caught and is the whole reason to seed one.
+    if (!/assertFullCatalogParse\s*\(/.test(src)) parsers.push(name);
+  }
+  if (parsers.length) {
+    failed = true;
+    for (const name of parsers) {
+      console.error(
+        `scripts/${name}: reads tools-data.js as text and regexes tile entries out of it, but never calls `
+        + "assertFullCatalogParse. A tile the pattern misses is a tile this gate never checks, and it would "
+        + "report the same clean result either way. Import catalog-size.mjs and assert the count.");
+    }
+  }
+}
+
 if (failed) {
   process.exit(1);
 } else {

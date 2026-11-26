@@ -33,6 +33,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join, resolve, dirname } from "node:path";
 import { argv } from "node:process";
 import { fileURLToPath } from "node:url";
+import { assertFullCatalogParse } from "./catalog-size.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -141,8 +142,18 @@ export function specStatusErrors({ word, span, block }, ids, catalog, built = fa
   return [];
 }
 
-function main() {
+async function main() {
   const catalog = new Set([...readFileSync(join(ROOT, "tools-data.js"), "utf8").matchAll(/\{ id: "([a-z0-9-]+)"/g)].map((m) => m[1]));
+  // This was the one text-parser of tools-data.js that did not assert its own
+  // reach, while catalog-size.mjs's header said "Every such parser asserts
+  // here". The pattern above wants `{ id: "` with exactly one space: `{id:`,
+  // `{  id:` and `{ id:"` are each missed, so a tile formatted any of those
+  // ways would drop out of `catalog` -- and this gate's whole output is a
+  // comparison against it. A spec whose tile had vanished from the set would
+  // read as a status disagreement, or worse, a CUT spec whose tile is actually
+  // live would read as agreeing. It parses all 2,288 today; this keeps that
+  // true rather than assuming it.
+  await assertFullCatalogParse(catalog.size, "check-spec-status");
   const headers = new Set();
   for (const name of readdirSync(ROOT)) {
     if (!/^calc-.*\.js$/.test(name)) continue;
@@ -183,4 +194,4 @@ function main() {
   console.log("check-spec-status OK: " + specs.length + " specs; statuses agree with the catalog (" + summary + ").");
 }
 
-if (resolve(argv[1] || "") === fileURLToPath(import.meta.url)) main();
+if (resolve(argv[1] || "") === fileURLToPath(import.meta.url)) await main();
