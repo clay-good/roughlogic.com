@@ -160,15 +160,24 @@ function factoryAliases(src) {
     fmt: alt(of("fmt")),
     number: alt(of("makeNumber")),
     select: alt(of("makeSelect")),
+    // makeCheckbox was not modelled at all, so every boolean built with it was
+    // dropped and its compute parameter reached the agent door as a bare key:
+    // breaker-sizing's "Continuous load (3 hours or more)" advertised no label,
+    // no kind and no default, on 28 call sites. A yes/no SELECT was already
+    // published as a checkbox (so a compute reading `flag ? a : b` is handed a
+    // boolean rather than a truthy string); the real checkbox control is the
+    // same contract and belongs in the same shape.
+    checkbox: alt(of("makeCheckbox")),
     // The loose input pass models the text/row factories too.
     anyInput: alt([...of("makeNumber"), ...of("makeSelect"), ...of("makeText"),
-                   ...of("makeTextarea"), ...of("makeRowField")]),
+                   ...of("makeTextarea"), ...of("makeRowField"), ...of("makeCheckbox")]),
   };
 }
 
 const DEFAULT_ALIASES = {
   outLine: "makeOutputLine", fmt: "fmt", number: "makeNumber", select: "makeSelect",
-  anyInput: "make(?:Number|Select|Text|Textarea|RowField)",
+  checkbox: "makeCheckbox",
+  anyInput: "make(?:Number|Select|Text|Textarea|RowField|Checkbox)",
 };
 
 // Which variable a renderer holds its compute result in. The reads below were
@@ -450,6 +459,46 @@ function resolveLocalHelper(expr, modSrc, ns) {
   return evalOptions(decl[1], ns || {});
 }
 
+// The options argument is often neither a literal nor a bare helper call. Two
+// shapes account for most of what was dropped:
+//   const tradeSizes = ["1/2","3/4",...].map((v) => ({ value: v, label: v }));
+//   makeSelect("Trade size", "cf-trade", tradeSizes)
+// and
+//   makeSelect("AWG", "cf-awg", awgOptions().filter((o) => o.value !== "18"))
+// -- a local const declared in the renderer body, and a module-local helper
+// used inside a larger expression. `evalOptions` only ever had the module's
+// EXPORTS in scope, so each evaluated to nothing and the whole field was
+// dropped: the agent door advertised a trade size with no list of sizes.
+//
+// This binds the names the expression actually mentions, resolving each from
+// the renderer body or the module source, then lets the existing sandbox
+// evaluate as before. Depth-capped, and every initializer passes the same
+// denied-token check, so it stays a resolver rather than an interpreter.
+function optionsScope(expr, body, modSrc, ns, depth = 0) {
+  const scope = { ...(ns || {}) };
+  if (depth > 2) return scope;
+  const names = new Set((String(expr).match(/[A-Za-z_$][\w$]*/g) || []).filter((n) => !(n in scope)));
+  for (const name of names) {
+    const esc = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    // A const in the renderer body.
+    const c = body && new RegExp("\\b(?:const|let|var)\\s+" + esc + "\\s*=\\s*([\\s\\S]*?);\\s*(?:\\n|$)", "m").exec(body);
+    if (c && !DENIED_TOKENS.test(c[1])) {
+      const inner = optionsScope(c[1], body, modSrc, ns, depth + 1);
+      try { scope[name] = new Function(...Object.keys(inner), `"use strict"; return (${c[1]});`)(...Object.values(inner)); continue; } catch { /* fall through */ }
+    }
+    // A zero-argument helper in the module source, bound as a callable.
+    const f = modSrc && new RegExp("function\\s+" + esc + "\\s*\\(\\s*\\)\\s*\\{\\s*return\\s+([\\s\\S]*?);\\s*\\}", "m").exec(modSrc);
+    if (f && !DENIED_TOKENS.test(f[1])) {
+      const retExpr = f[1];
+      const inner = optionsScope(retExpr, body, modSrc, ns, depth + 1);
+      scope[name] = () => {
+        try { return new Function(...Object.keys(inner), `"use strict"; return (${retExpr});`)(...Object.values(inner)); } catch { return null; }
+      };
+    }
+  }
+  return scope;
+}
+
 function parseFields(body, ns, aliases = DEFAULT_ALIASES, modSrc = null) {
   const fields = new Map();
   // makeSelect: the options argument is balanced-parsed, then evaluated against
@@ -459,7 +508,10 @@ function parseFields(body, ns, aliases = DEFAULT_ALIASES, modSrc = null) {
   while ((m = re.exec(body))) {
     const expr = argAt(body, m.index + m[0].length, 0);
     if (expr === null) continue;
-    const options = (ns ? evalOptions(expr, ns) : null) || resolveLocalHelper(expr, modSrc, ns) || parseOptions(expr);
+    const options = (ns ? evalOptions(expr, ns) : null)
+      || resolveLocalHelper(expr, modSrc, ns)
+      || evalOptions(expr, optionsScope(expr, body, modSrc, ns))
+      || parseOptions(expr);
     fields.set(m[1], { kind: "select", label: JSON.parse(m[2]), options });
   }
   // makeNumber(label, id[, attrs]) -- three args (the id is required); attrs is
@@ -474,6 +526,19 @@ function parseFields(body, ns, aliases = DEFAULT_ALIASES, modSrc = null) {
     // "end areas 100,100" as the single value 100100.
     const kind = attrs && attrs.type === "text" ? "text" : "number";
     fields.set(m[1], { kind, label: JSON.parse(m[2]), attrs });
+  }
+  // makeCheckbox(label, id[, checked]) -- a real boolean control. Its third
+  // argument is whether the box STARTS TICKED, which is a page prefill and NOT
+  // the compute's default: `breaker-sizing`'s continuous-load box is ticked,
+  // while omitting the parameter sizes the breaker as non-continuous. Publishing
+  // the ticked state as the schema default told an agent that leaving the key
+  // out meant 125%, when it means 100% -- and the prefilled-default gate said so
+  // at once. The label and kind are what this recovers; the default comes from
+  // the compute signature alone, as it does everywhere else.
+  const CHK_RE = new RegExp("\\b([A-Za-z_$][\\w$]*)\\s*=\\s*(?:\\w*(?:" + (aliases.checkbox || DEFAULT_ALIASES.checkbox) + "))\\(\\s*(\"(?:[^\"\\\\]|\\\\.)*\")\\s*,\\s*(\"(?:[^\"\\\\]|\\\\.)*\")\\s*(?:,\\s*(true|false))?\\s*\\)", "g");
+  for (const m of body.matchAll(CHK_RE)) {
+    if (fields.has(m[1])) continue;
+    fields.set(m[1], { kind: "checkbox", label: JSON.parse(m[2]), attrs: null });
   }
   return fields;
 }
@@ -498,7 +563,10 @@ function parseComputeCall(body) {
   // (`const key = Number(fieldvar.input.value)` then `{ ..., key }`) -- the `[:=]`
   // covers both. Spurious matches to non-params are ignored (only real compute
   // params are looked up).
-  for (const m of body.matchAll(/([A-Za-z_$][\w$]*)\s*[:=]\s*(Number\(\s*)?([A-Za-z_$][\w$]*)\.(select|input)\.value(\s*===\s*"[^"]*")?/g)) {
+  // `.checked` as well as `.value`: a real checkbox is read `flag.input.checked`,
+  // which this pass did not match, so a boolean built with makeCheckbox was
+  // never mapped to its compute parameter and the door advertised a bare key.
+  for (const m of body.matchAll(/([A-Za-z_$][\w$]*)\s*[:=]\s*(Number\(\s*)?([A-Za-z_$][\w$]*)\.(select|input)\.(?:value|checked)(\s*===\s*"[^"]*")?/g)) {
     if (!map.has(m[1])) {
       map.set(m[1], { var: m[3], coerced: Boolean(m[2]), accessor: m[4], boolEq: Boolean(m[5]) });
     }
@@ -688,6 +756,12 @@ async function main() {
       if (!ref) { anyUnmapped = true; continue; } // param not sourced from a field
       let field = fields.get(ref.var);
       if (!field) { anyUnmapped = true; continue; }
+      // A real checkbox control. Its own `checked` argument is the page's
+      // default; the compute's own default wins where it has one.
+      if (field.kind === "checkbox") {
+        inputs.push({ key, label: field.label, kind: "checkbox", options: null, default: defValue ?? false, attrs: null });
+        continue;
+      }
       if (field.kind === "select") {
         // A yes/no dropdown the renderer turns into a boolean itself:
         // `secondary_protection: sp.select.value === "both"`. The PAGE is

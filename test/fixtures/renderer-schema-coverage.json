@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
   "total_tiles": 2288,
-  "covered_count": 2223,
+  "covered_count": 2224,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -889,6 +889,7 @@
     "hay-dry-matter",
     "hazard-tree-stump-screen",
     "haze-machine-sizing",
+    "hazmat-placard-threshold",
     "hdd-annular-pressure",
     "hdd-bend-radius",
     "hdd-fluid-volume",

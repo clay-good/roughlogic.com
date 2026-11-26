@@ -806,8 +806,8 @@
       "date": "2026-10-17"
     },
     "/tools/box-fill/": {
-      "sha": "ae34de86bf05356c",
-      "date": "2026-10-20"
+      "sha": "7128e6e1cd90572c",
+      "date": "2026-11-26"
     },
     "/tools/brake-pad-life/": {
       "sha": "324e86696cbe0bdf",
@@ -838,8 +838,8 @@
       "date": "2026-10-17"
     },
     "/tools/breaker-sizing/": {
-      "sha": "8380962b7502f16f",
-      "date": "2026-10-20"
+      "sha": "cdc1bdc61cf84767",
+      "date": "2026-11-26"
     },
     "/tools/breakeven/": {
       "sha": "82bb44c24581506d",
@@ -1038,8 +1038,8 @@
       "date": "2026-10-17"
     },
     "/tools/category-deterioration/": {
-      "sha": "0cc409b9737264b7",
-      "date": "2026-10-17"
+      "sha": "5771ecf7c734be4d",
+      "date": "2026-11-26"
     },
     "/tools/category-weighted-grade/": {
       "sha": "6dc3b255652b180c",
@@ -1978,8 +1978,8 @@
       "date": "2026-10-17"
     },
     "/tools/cross-connection-air-gap/": {
-      "sha": "59dab6909fe14d5b",
-      "date": "2026-10-17"
+      "sha": "09d0599cd434f99d",
+      "date": "2026-11-26"
     },
     "/tools/crosswind-component/": {
       "sha": "251844e023fff444",
@@ -2154,8 +2154,8 @@
       "date": "2026-10-17"
     },
     "/tools/declining-balance-depreciation/": {
-      "sha": "9da3e325bce2310f",
-      "date": "2026-10-17"
+      "sha": "6c1fcf5d3dde91b2",
+      "date": "2026-11-26"
     },
     "/tools/def-consumption/": {
       "sha": "a94f446181401d9e",
@@ -2786,8 +2786,8 @@
       "date": "2026-10-17"
     },
     "/tools/ev-charger-load/": {
-      "sha": "8386522b500767f0",
-      "date": "2026-10-20"
+      "sha": "39655de6b3e27a6d",
+      "date": "2026-11-26"
     },
     "/tools/ev-charger-throttle/": {
       "sha": "87a840072c97f8ce",
@@ -3134,12 +3134,12 @@
       "date": "2026-10-17"
     },
     "/tools/flood-cut-quantity/": {
-      "sha": "98e9bdccb3b8eaf2",
-      "date": "2026-10-17"
+      "sha": "40a8ab627b6f1522",
+      "date": "2026-11-26"
     },
     "/tools/flood-cut-takeoff/": {
-      "sha": "e83e38119f31633d",
-      "date": "2026-10-17"
+      "sha": "fba0bcaf4280a3b9",
+      "date": "2026-11-26"
     },
     "/tools/flood-debris-impact/": {
       "sha": "02acae359c81068f",
@@ -3742,8 +3742,8 @@
       "date": "2026-10-17"
     },
     "/tools/hazmat-placard-threshold/": {
-      "sha": "7112f074ec252a1b",
-      "date": "2026-10-17"
+      "sha": "b2a26bd2f70c9c75",
+      "date": "2026-11-26"
     },
     "/tools/hdd-annular-pressure/": {
       "sha": "efa94f262a4dcbdd",
@@ -4454,8 +4454,8 @@
       "date": "2026-10-17"
     },
     "/tools/livestock-water-requirement/": {
-      "sha": "0745ace406a75122",
-      "date": "2026-10-17"
+      "sha": "82a71f3236b5a0a5",
+      "date": "2026-11-26"
     },
     "/tools/load-profitability/": {
       "sha": "4be36a03ad119872",
@@ -4898,8 +4898,8 @@
       "date": "2026-10-17"
     },
     "/tools/mold-remediation-level/": {
-      "sha": "04b9a87d730e055e",
-      "date": "2026-10-17"
+      "sha": "b108062d0e70d036",
+      "date": "2026-11-26"
     },
     "/tools/mold-shrinkage-dimension/": {
       "sha": "86e76eaebafe5817",
@@ -7394,8 +7394,8 @@
       "date": "2026-10-17"
     },
     "/tools/soot-cleaning-takeoff/": {
-      "sha": "816872af4b83806d",
-      "date": "2026-10-17"
+      "sha": "0b68793c3e242fce",
+      "date": "2026-11-26"
     },
     "/tools/sous-vide-pasteurization/": {
       "sha": "72d809974b078ffc",

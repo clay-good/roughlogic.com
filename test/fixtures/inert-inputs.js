@@ -142,6 +142,7 @@ export const INERT_INPUTS = {
   "utm-conversion::hemisphere": "read only in the UTM-to-latitude/longitude direction",
   "vapor-barrier-rolls::overlap_waste_pct": "moves the answer once another input changes (1,500 randomized settings)",
   "vehicle-load::front_gawr_lb": "moves the answer once another input changes (1,500 randomized settings)",
+  "parallel-conductor-derate::conductor_size": "guard only: enforces the NEC 310.10 1/0 minimum and sets `permitted`, so every size that IS permitted (1/0 through 4/0, 250 kcmil and up) gives the same answer and only a barred size changes anything",
   "vehicle-load::gvwr_lb": "moves the answer once another input changes (1,500 randomized settings)",
   "vehicle-load::rear_gawr_lb": "moves the answer once another input changes (1,500 randomized settings)",
   "vent-terminal-check::design_temp_f": "changes only the answer text",

@@ -16,6 +16,13 @@
 // JSON report; the comparison against describe() lives in the audit that reads
 // it.
 //
+// UPDATED 2026-11-26 after three of the shapes were fixed: the figure is now
+// 237 on 143 calculators (it was 262 on 158). What moved: makeCheckbox was not
+// modelled at all, a select's options could not come from a const in the
+// renderer body, and a module-local helper could not be used inside a larger
+// expression. See the commit; the split below is from the original measurement
+// and the proportions still hold.
+//
 // MEASURED 2026-11-26, which is the point of the file. Of the 262 compute
 // parameters the door advertises with no detail:
 //     47  are LIST-valued -- one parameter rendered as many boxes (a panel's

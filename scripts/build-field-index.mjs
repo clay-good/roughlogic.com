@@ -161,7 +161,20 @@ async function requiredKeys(id, rows, blank = 0) {
     else delete trimmed[row.d];
     try {
       const result = await run({ id, inputs: trimmed });
-      if (cannotAnswer(base.result, result.result)) out.add(row.d);
+      // A CHECKBOX is exempt from the collapsed-to-zero half of the test. That
+      // rule exists because a blank length answering "0 V drop" looks like an
+      // answer and is not one -- but switching a boolean off is MEANT to take
+      // its quantity to zero, and that zero is the answer. Unticking "primer
+      // needed" gives 0 gallons of primer, which is correct and complete;
+      // reading it as a failure to answer made the field required, and the
+      // agent door then refused "paint for 1200 sq ft of wall with 2 coats"
+      // with MISSING_INPUTS asking whether primer was needed. Surfaced the
+      // moment checkboxes gained schemas: before that they were unindexed and
+      // this never arose.
+      const bad = row.k === "checkbox"
+        ? (!result.result || typeof result.result !== "object" || Boolean(result.result.error))
+        : cannotAnswer(base.result, result.result);
+      if (bad) out.add(row.d);
     } catch {
       out.add(row.d);
     }
