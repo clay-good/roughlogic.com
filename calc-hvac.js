@@ -779,7 +779,10 @@ export function computeInsulationThickness({
 
 export const insulationThicknessExample = {
   inputs: { pipe_od_in: 1, surface_temp_F: 250, ambient_F: 75, surface_limit_F: 120, k_btu_in_per_hr_ft2_F: 0.27 },
-  expectedRange: { thickness_in: { min: 0.4, max: 3.0 } },
+  // Corrected 2026-11-26: the band said min 0.4 and the verified answer is
+  // 0.364 in, since conduction per foot takes k/12. The fix that changed the
+  // answer updated calc-hvac-v2.test.js and left this claim behind.
+  expectedRange: { thickness_in: { min: 0.3, max: 0.45 } },
 };
 
 // --- Utility 85: Latent Heat Evaporative Cooling ---
