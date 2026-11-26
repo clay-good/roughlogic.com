@@ -63,6 +63,36 @@
 // the declared sweep above, where the browser, `run_calculator` and
 // `answer_query` all see it too.
 //
+// RE-READ 2026-11-25, by the same reasoning that re-triaged the declared half:
+// this mode's population is not what it was. It now probes 573 tiles, not
+// 1,120, because the tiles that gained a declared bound moved into the sweep
+// above -- so the old conclusion covers a superset, and the only genuinely new
+// members are the calculators that have landed since. All 26 current changes
+// were read, and the finding below STILL HOLDS: none of them is permissive.
+// The two that looked it on the summary line were not, and both are worth
+// recording because each is a shape rather than a one-off:
+//
+//   conductor-uplift-check   a negative back-span rise flipped "the structure
+//                            is STILL being lifted" to "carries 392 lb net
+//                            downward" -- which is CORRECT PHYSICS, and the
+//                            field's own label says so: "negative if it is
+//                            lower". A back structure that sits lower makes the
+//                            back span pull down. Now excluded by SAYS_SIGNED.
+//   silencer-insertion-loss  a negative regenerated sound power dropped the
+//                            "THE REGENERATED NOISE IS NOW THE DOMINANT SOURCE"
+//                            warning -- but what replaces it is the tile's own
+//                            prompt ("NO REGENERATED SOUND POWER WAS ENTERED,
+//                            and it is the limit people discover last"), so it
+//                            is the degrade-to-a-prompt bucket, not a false
+//                            all-clear.
+//
+// Noted, not fixed, because it is a per-field domain call this mode does not
+// make: fuel-oil-atomizing-viscosity at a check temperature of -185 F returns
+// 3.43e+54 SSU. The verdict direction stays correct (ABOVE the atomizing
+// target), so nothing permissive follows from it, but the printed figure is
+// nonsense and a sane lower bound on that field would be worth someone's
+// judgement.
+//
 // AND IT WAS THE ONLY ONE. Of the 118 conclusions that change in this mode,
 // **zero** go from a baseline that reads as a problem to a negated verdict that
 // reads as permissive. They move the other way ("in range (4-20 mA)" ->
@@ -133,6 +163,16 @@ const { TOOLS } = await import(resolve(ROOT, "tools-data.js"));
 // label is the only evidence there is.
 const SIGNED = /(temp|deg\s?[fc]\b|°|declination|elevation|elev\b|offset|delta|change|difference|grade|slope|balance|profit|margin|\bnet\b|latitude|longitude|altitude|bearing|azimuth|correction|drift|error|score|mean|z-?score|value\b|tolerance)/i;
 
+// A label that SAYS negative is allowed has declared the domain outright, and
+// that beats guessing from the quantity's name. conductor-uplift-check asks for
+// the "Rise from this structure UP to the back structure (ft; negative if it is
+// lower)" -- a back structure that sits lower makes the back span pull DOWN, so
+// the uplift legitimately disappears, and the sweep reported that correct
+// physics as a conclusion change for want of reading the parenthesis. The word
+// "rise" cannot go in SIGNED above, because a stair rise or a pump head is not
+// signed; the field's own sentence is the evidence.
+const SAYS_SIGNED = /negative|signed|may be below zero|can be below zero/i;
+
 const flips = [];
 let scanned = 0;
 let probes = 0;
@@ -169,6 +209,7 @@ for (const tool of TOOLS) {
       if (hasMin) continue;
       if (value <= 0) continue;
       if (SIGNED.test(String(f.label || key))) continue;
+      if (SAYS_SIGNED.test(String(f.label || ""))) continue;
       bounded.push({ key, edge: "negated", limit: 0, probe: -value });
       continue;
     }
