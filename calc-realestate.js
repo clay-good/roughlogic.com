@@ -1569,6 +1569,15 @@ async function loadShard(file) {
   return promise;
 }
 
+// 12 U.S.C. 1454(a)(2): the conventional-mortgage limits "may be increased by
+// not to exceed 50 per centum" for properties in Alaska, Guam, Hawaii and the
+// Virgin Islands, and FHFA grants all four the full increase -- which lands on
+// the same figure as the HERA high-cost ceiling, as this tile's shard records
+// from the FHFA 2027 county list. The statute's own "150 percent" sits in a
+// DIFFERENT clause of the same subsection (a cap on the median-price increase
+// available in any area), so the rule here is the 50% increase and not that
+// phrase. Puerto Rico is not one of the four: it takes the contiguous baseline.
+const SPECIAL_AREA_STATES = new Set(["AK", "HI", "GU", "VI"]);
 // dims: in { shard: dimensionless, state: dimensionless, county_fips: dimensionless, county_name: dimensionless }
 //        out: { conforming_limit: dimensionless, conforming_high_cost_limit: dimensionless, fha_limit: dimensionless, va_no_down_limit: dimensionless, county: dimensionless, source: dimensionless, asOf: dimensionless, year: dimensionless, conforming_year: dimensionless, fha_year: dimensionless, conforming_one_unit_usd: dimensionless, fha_one_unit_usd: dimensionless }
 // (FHFA / FHA / VA county-level loan-limit shard lookup. Monetary
@@ -1611,19 +1620,42 @@ export function computeLoanLimits({ shard = null, state = "", county_fips = "", 
       source: cycles + " (per-county lookup matched).",
     };
   }
-  // Fallback: baseline.
+  // Fallback: baseline -- but the baseline is not one figure.
+  //
+  // Alaska, Guam, Hawaii and the Virgin Islands take a statutory increase of up
+  // to 50%, which FHFA grants in full (see SPECIAL_AREA_STATES above), putting
+  // them on the same figure as the high-cost ceiling. Only a sample of
+  // high-cost counties is
+  // bundled, so any county in those four that is not in the sample fell through
+  // to the CONTIGUOUS baseline: Kauai, Hawaii County, Fairbanks and Juneau each
+  // answered $855,400 against a true $1,283,100, understating the limit by
+  // $427,700. This tile's own advisory has stated the rule the whole time
+  // ("Alaska / Hawaii / Guam / USVI receive the high-cost ceiling ... as their
+  // conforming baseline") -- the prose was right and the arithmetic was not.
+  //
+  // The figure is read from the shard's own ceiling rather than multiplying by
+  // 1.5 here, so the two cannot drift apart and no constant is introduced.
+  // Nothing is assumed about the FHA column: HUD treats these areas under its
+  // own floor/ceiling rule, and the bundled Anchorage row carries the ordinary
+  // floor, so FHA keeps the shard's figure.
+  const specialArea = SPECIAL_AREA_STATES.has(wantState);
+  const baseConforming = specialArea && shard.baseline.ceiling_high_cost_one_unit_usd
+    ? shard.baseline.ceiling_high_cost_one_unit_usd
+    : shard.baseline.conforming_one_unit_usd;
   return {
     kind: "baseline",
+    special_area: specialArea,
     year: shard.year,
     conforming_year: cYear,
     fha_year: fYear,
     state: wantState || "(unknown)",
     county: wantName || "(unknown)",
     county_fips: wantFips || "",
-    conforming_one_unit_usd: shard.baseline.conforming_one_unit_usd,
+    conforming_one_unit_usd: baseConforming,
     fha_one_unit_usd: shard.baseline.fha_floor_one_unit_usd,
     va_note: "VA full-entitlement: no cap (removed " + shard.va.full_entitlement_cap_removed_since + ")",
-    source: cycles + "; baseline applies (county not in the bundled high-cost list).",
+    source: cycles + "; baseline applies (county not in the bundled high-cost list)"
+      + (specialArea ? ", at the Alaska / Guam / Hawaii / Virgin Islands figure (12 USC 1454(a)(2) allows up to a 50% increase, which FHFA grants in full)" : "") + ".",
     advisory: shard.unknown_county_message,
   };
 }
@@ -1638,7 +1670,7 @@ export const loanLimitsExample = {
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderLoanLimits(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
-    "Citation: 2027 conforming loan limit per FHFA Conforming Loan Limit Values (announced 2026-11-24, effective 2027-01-01; fhfa.gov). FHA single-family mortgage limit per HUD (entp.hud.gov / idapp / html / hicostlook.cfm) for CY2026, the latest cycle HUD has published -- HUD issues the next year's FHA limits in December, so the FHA column trails the conforming column until then. VA full-entitlement cap removed effective 2020-01-01 per the Blue Water Navy Vietnam Veterans Act. Unknown counties fall back to the baseline; verify against the FHFA / HUD lookup or with the lender.";
+    "Citation: 2027 conforming loan limit per FHFA Conforming Loan Limit Values (announced 2026-11-24, effective 2027-01-01; fhfa.gov). FHA single-family mortgage limit per HUD (entp.hud.gov / idapp / html / hicostlook.cfm) for CY2026, the latest cycle HUD has published -- HUD issues the next year's FHA limits in December, so the FHA column trails the conforming column until then. VA full-entitlement cap removed effective 2020-01-01 per the Blue Water Navy Vietnam Veterans Act. Unknown counties fall back to the baseline -- the contiguous figure, or the higher Alaska / Guam / Hawaii / Virgin Islands figure in those four, where 12 USC 1454(a)(2) allows up to a 50% increase and FHFA grants it in full; verify against the FHFA / HUD lookup or with the lender.";
   const S = makeText("State (2-letter, e.g., CA)", "ll-state", { placeholder: "CA", maxlength: "2" });
   const F = makeText("County FIPS (5-digit, optional)", "ll-fips", { placeholder: "06075", maxlength: "5" });
   const N = makeText("County name (optional)", "ll-name", { placeholder: "San Francisco" });

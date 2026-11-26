@@ -139,7 +139,7 @@
     },
     "loan-limits": {
       "group": "calc-realestate.js (Group X, v12 §8)",
-      "stamp": "Citation: 2027 conforming loan limit per FHFA Conforming Loan Limit Values (announced 2026-11-24, effective 2027-01-01; fhfa.gov). FHA single-family mortgage limit per HUD (entp.hud.gov / idapp / html / hicostlook.cfm) for CY2026, the latest cycle HUD has published -- HUD issues the next year's FHA limits in December, so the FHA column trails the conforming column until then. VA full-entitlement cap removed effective 2020-01-01 per the Blue Water Navy Vietnam Veterans Act. Unknown counties fall back to the baseline; verify against the FHFA / HUD lookup or with the lender."
+      "stamp": "Citation: 2027 conforming loan limit per FHFA Conforming Loan Limit Values (announced 2026-11-24, effective 2027-01-01; fhfa.gov). FHA single-family mortgage limit per HUD (entp.hud.gov / idapp / html / hicostlook.cfm) for CY2026, the latest cycle HUD has published -- HUD issues the next year's FHA limits in December, so the FHA column trails the conforming column until then. VA full-entitlement cap removed effective 2020-01-01 per the Blue Water Navy Vietnam Veterans Act. Unknown counties fall back to the baseline -- the contiguous figure, or the higher Alaska / Guam / Hawaii / Virgin Islands figure in those four, where 12 USC 1454(a)(2) allows up to a 50% increase and FHFA grants it in full; verify against the FHFA / HUD lookup or with the lender."
     },
     "ltv": {
       "group": "calc-realestate.js (Group X, v12 §8)",

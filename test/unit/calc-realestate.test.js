@@ -567,6 +567,92 @@ test("computeLoanLimits: unknown county falls back to baseline + advisory", () =
   assert.match(r.advisory, /consult lender/i);
 });
 
+// THE PROSE WAS RIGHT AND THE ARITHMETIC WAS NOT.
+//
+// Only a sample of high-cost counties is bundled, so an unbundled county falls
+// back to the baseline -- and the baseline is not one figure. 12 U.S.C.
+// 1454(a)(2) lets the limits "be increased by not to exceed 50 per centum" for
+// Alaska, Guam, Hawaii and the Virgin Islands, and FHFA grants the full
+// increase, which lands on the same figure as the high-cost ceiling. (The
+// statute's own "150 percent" is a different clause -- a cap on the median-price
+// increase available anywhere -- so it is the 50% increase that applies here;
+// read on law.cornell.edu and the GPO 2023 edition on 2026-11-26.)
+// Until 2026-11-26 every unbundled county in those four got
+// the CONTIGUOUS figure: Kauai, Hawaii County, Fairbanks and Juneau answered
+// $855,400 against a true $1,283,100, understating the limit by $427,700.
+//
+// THREE surfaces stated the rule while the code did something else -- the
+// shard's `source` provenance, its `unknown_county_message` advisory, and the
+// page citation. So the gate below reads the rule off the shipped shard's own
+// prose rather than restating it, and a shard that stops claiming it stops
+// demanding it.
+test("computeLoanLimits: Alaska and Hawaii fall back to the 150% ceiling, not the contiguous baseline", () => {
+  const ceiling = LOAN_LIMITS_SHARD.baseline.ceiling_high_cost_one_unit_usd;
+  const national = LOAN_LIMITS_SHARD.baseline.conforming_one_unit_usd;
+  assert.notEqual(ceiling, national, "the fixture must distinguish the two, or this test proves nothing");
+
+  for (const state of ["AK", "HI", "GU", "VI"]) {
+    const r = computeLoanLimits({ state, county_name: "Not A Bundled County", shard: LOAN_LIMITS_SHARD });
+    assert.equal(r.kind, "baseline");
+    assert.equal(r.special_area, true, `${state} is a 150% area`);
+    assert.equal(r.conforming_one_unit_usd, ceiling, `${state} takes the ceiling as its conforming baseline`);
+    assert.match(r.source, /50% increase/, "and the answer says why it is higher");
+    assert.match(r.source, /Virgin Islands/, "naming the four areas the statute names");
+  }
+
+  // The contiguous states are untouched, which is the half that must not move.
+  for (const state of ["TX", "FL", "OH", "PR"]) {
+    const r = computeLoanLimits({ state, county_name: "Not A Bundled County", shard: LOAN_LIMITS_SHARD });
+    assert.equal(r.special_area, false, `${state} is not a 150% area (Puerto Rico is contiguous-baseline)`);
+    assert.equal(r.conforming_one_unit_usd, national);
+    assert.doesNotMatch(r.source, /50% increase/, "and a contiguous answer does not claim the increase");
+  }
+
+  // FHA is deliberately NOT given the same treatment: HUD sets those county by
+  // county in these areas, and the bundled Anchorage row carries the ordinary
+  // floor. Asserted so a later "consistency" change has to argue with it.
+  const ak = computeLoanLimits({ state: "AK", county_name: "Not A Bundled County", shard: LOAN_LIMITS_SHARD });
+  assert.equal(ak.fha_one_unit_usd, LOAN_LIMITS_SHARD.baseline.fha_floor_one_unit_usd);
+});
+
+test("computeLoanLimits: a bundled special-area county keeps its OWN published value", async () => {
+  const { readFileSync } = await import("node:fs");
+  // Maui's published one-unit figure is above the ceiling, so the fallback must
+  // never be allowed to overwrite a per-county match.
+  const shard = JSON.parse(readFileSync(new URL("../../data/realestate/loan-limits.json", import.meta.url), "utf8"));
+  const maui = shard.high_cost_counties_one_unit.find((c) => c.county_fips === "15009");
+  assert.ok(maui, "Maui is bundled");
+  const r = computeLoanLimits({ state: "HI", county_name: "Maui", shard });
+  assert.equal(r.kind, "high_cost");
+  assert.equal(r.conforming_one_unit_usd, maui.conforming_usd);
+  assert.notEqual(r.conforming_one_unit_usd, shard.baseline.ceiling_high_cost_one_unit_usd);
+});
+
+test("computeLoanLimits: the shipped shard's own prose and its arithmetic agree", async () => {
+  const { readFileSync } = await import("node:fs");
+  const shard = JSON.parse(readFileSync(new URL("../../data/realestate/loan-limits.json", import.meta.url), "utf8"));
+  // The rule is read off the shard, not restated here. Both prose fields have
+  // carried it since the 2027 refresh; if a future shard drops the claim this
+  // test stops demanding the behaviour, which is the point.
+  const prose = String(shard.source || "") + " " + String(shard.unknown_county_message || "");
+  const claimsRule = /Alaska/i.test(prose) && /ceiling/i.test(prose);
+  assert.ok(claimsRule, "the shipped shard states the Alaska / Hawaii ceiling rule");
+
+  const ceiling = shard.baseline.ceiling_high_cost_one_unit_usd;
+  for (const state of ["AK", "HI"]) {
+    const r = computeLoanLimits({ state, county_name: "No Such County", shard });
+    assert.equal(
+      r.conforming_one_unit_usd, ceiling,
+      `the shard's prose says ${state} receives the ceiling as its conforming baseline, so the compute must return it`,
+    );
+  }
+  // And the national figure is still what a contiguous county gets, so the two
+  // branches are genuinely different numbers on the shipped data too.
+  const tx = computeLoanLimits({ state: "TX", county_name: "No Such County", shard });
+  assert.equal(tx.conforming_one_unit_usd, shard.baseline.conforming_one_unit_usd);
+  assert.notEqual(tx.conforming_one_unit_usd, ceiling);
+});
+
 test("computeLoanLimits: VA note carries the 2020 cap-removal date", () => {
   const r = computeLoanLimits({ ...loanLimitsExample.inputs, shard: LOAN_LIMITS_SHARD });
   assert.match(r.va_note, /2020-01-01/);
