@@ -458,13 +458,73 @@ async function main() {
     }
   }
 
+  // C. A doc that quotes the WebKit project's testMatch must quote the one the
+  // config actually carries.
+  //
+  // 2026-11-26: `shell-print` was added to that project because the print proof
+  // "stopped printing on every engine but Chromium and a Chromium-only pass is
+  // what hid it" -- the config says exactly that, in a comment beside the
+  // change. docs/mobile-responsive.md went on saying the project re-runs
+  // *only* the responsive sweep, and quoted the old single-file regex. A reader
+  // choosing what to run locally was told to expect one file and would have got
+  // two, and a reader deciding whether the print proof is engine-checked was
+  // told it is not. Same shape as rule B: the job changed and the sentence
+  // describing it did not.
+  const CONFIG = resolve(ROOT, "test/integration/playwright.config.js");
+  if (existsSync(CONFIG)) {
+    const cfg = await readFile(CONFIG, "utf8");
+    // Anchored INSIDE the webkit project block: the config also carries a
+    // top-level `testMatch`, and matching that one made this rule compare the
+    // doc against the wrong regex on its first run.
+    const block = cfg.match(/name:\s*"webkit-responsive"[\s\S]*?\n\s*\},/);
+    const m = block && block[0].match(/testMatch:\s*(\/[^\n]*?\/)[,\s]/);
+    if (!m) {
+      errors.push(
+        "test/integration/playwright.config.js no longer carries a `testMatch:` regex for the " +
+        "webkit project. Move this check with it rather than letting it match nothing.");
+    } else {
+      const live = m[1];
+      // The files the live regex names, so the prose can be checked too.
+      const named = [...live.matchAll(/[a-z0-9-]+(?=[|)\\])/g)].map((x) => x[0])
+        .filter((x) => x && x !== "test" && x !== "js");
+      for (const doc of ["docs/mobile-responsive.md", "docs/performance.md", "README.md", "docs/launch-checklist.md"]) {
+        const f = resolve(ROOT, doc);
+        if (!existsSync(f)) continue;
+        const text = await readFile(f, "utf8");
+        if (!/webkit/i.test(text)) continue;
+        // Any quoted testMatch must be the live one.
+        for (const q of text.matchAll(/testMatch:\s*`?(\/[^`\s]*?\/)`?/g)) {
+          const quoted = q[1].replace(/\\\./g, ".");
+          if (quoted !== live.replace(/\\\./g, ".")) {
+            errors.push(
+              `${doc} quotes the webkit project's testMatch as \`${q[1]}\`, but ` +
+              `test/integration/playwright.config.js carries \`${live}\`.`);
+          }
+        }
+        // And a doc that says the project runs ONLY one sweep must be right.
+        if (named.length > 1 && /re-runs \*only\* the responsive sweep/i.test(text)) {
+          errors.push(
+            `${doc} says the webkit project re-runs *only* the responsive sweep, but its ` +
+            `testMatch names ${named.length} files (${named.join(", ")}).`);
+        }
+        for (const file of named) {
+          if (!text.includes(file)) {
+            errors.push(
+              `${doc} describes the webkit project but never mentions \`${file}\`, which its ` +
+              `testMatch runs. A reader is told the wrong set of files is engine-checked.`);
+          }
+        }
+      }
+    }
+  }
+
   if (errors.length) {
     console.error("check-ci-claims FAILED:");
     for (const e of errors) console.error("  - " + e);
     process.exit(1);
   }
   console.log(
-    `check-ci-claims OK: README names all ${jobs.length} CI jobs (${jobs.join(", ")}), states the axe pass at exactly its live size, no doc claims a gate the workflow does not run, both data-refresh lanes run the static gates plus the base-TIP stamp check themselves (the PRs they open never run CI), docs/performance.md's gate table and scripts/audit.mjs's header both name where each gate actually runs.`,
+    `check-ci-claims OK: README names all ${jobs.length} CI jobs (${jobs.join(", ")}), states the axe pass at exactly its live size, no doc claims a gate the workflow does not run, both data-refresh lanes run the static gates plus the base-TIP stamp check themselves (the PRs they open never run CI), docs/performance.md's gate table and scripts/audit.mjs's header both name where each gate actually runs, and every doc describing the WebKit project names the files its testMatch actually runs.`,
   );
 }
 
