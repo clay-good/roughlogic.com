@@ -59,6 +59,7 @@ const CAPS = {
   // is current (~30 KB gzipped at 423 tiles) plus headroom; it is NOT in
   // the home-view payload (check-home-payload's HOME_FILES omits it).
   "tools-lead.js": 250000, // 2026-10-10: the browser's catalog, generated from tools-data.js with each description cut to its opening sentence (208,574 B gz at 2,258 tiles against 714,698 for the full file). Grows about 90 B gz per tile. Like tools-data.js it is a registry, not a per-tile module, so the split remedy does not apply.
+  "shell-meta.js": 7000, // profession nouns for the 16 secondary trade slugs 2026-11-26 (default 6144 -> 7000): the map grew from 5,801 B gz (94.4%) to 6,054 B (98.5%), inside the ~0.2% CI build margin where a local pass still goes red. The payload is 16 map entries, not prose -- the explanatory comment was cut to two lines and the reasoning kept in shell-meta.test.js, which does not ship. Splitting does not apply: the map is one lookup the title builder reads whole.
   "desc-bucket.js": 6144,
   // Per-trade calc bundles.
   "calc-historical.js": 5000,

@@ -71,6 +71,28 @@ test("every tile resolves a profession noun from its own trades, not the fallbac
     }
   }
   assert.deepEqual(unmapped, [], "tiles whose primary trade has no profession noun");
+
+  // The same check one step earlier, closed 2026-11-26. The assertion above
+  // catches a trade slug the moment it LEADS a tile, which is the moment it
+  // reaches a title -- but it is silent while the slug is secondary, and
+  // sixteen were (fiber-optic, data-center, mission-critical, energy-audit,
+  // arboriculture, timber, av, signage, environmental, industrial-gas,
+  // hydraulics, weatherization, finish-carpentry, small-engine, excavation,
+  // framing). Nothing was wrong on any page; the trip was a new tile landing
+  // led by one of them, or an existing tile's trades being reordered, and the
+  // cost at that point is a wrong title rather than a missing map entry. The
+  // file already mapped `railroad` and `lowvoltage` defensively for exactly
+  // this reason, so this holds every slug a tile carries, in any position.
+  const unmappedAnywhere = new Set();
+  for (const tool of TOOLS) {
+    for (const trade of tool.trades || []) {
+      if (!Object.prototype.hasOwnProperty.call(PROFESSION_NOUN, trade)) unmappedAnywhere.add(trade);
+    }
+  }
+  assert.deepEqual(
+    [...unmappedAnywhere].sort(), [],
+    "a trade slug any tile carries must have a profession noun, so promoting it to primary cannot retitle the tile",
+  );
 });
 
 // The other direction, and the one that actually let this sit: `realestate`

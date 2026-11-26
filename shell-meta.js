@@ -165,6 +165,24 @@ export const PROFESSION_NOUN = {
   // Added 2026-09-18 with the commercial brewing and distilling band, where
   // it leads on all thirteen tiles.
   brewing: "Brewing",
+  // Added 2026-11-26: secondary on every tile today, mapped now for the
+  // reason `railroad` and `lowvoltage` were. See shell-meta.test.js.
+  "fiber-optic": "Fiber Optic",
+  "data-center": "Data Center",
+  "mission-critical": "Mission Critical",
+  "energy-audit": "Energy Audit",
+  arboriculture: "Arborists",
+  timber: "Timber",
+  av: "AV",
+  signage: "Signage",
+  environmental: "Environmental",
+  "industrial-gas": "Industrial Gas",
+  hydraulics: "Hydraulics",
+  weatherization: "Weatherization",
+  "finish-carpentry": "Finish Carpentry",
+  "small-engine": "Small Engine",
+  excavation: "Excavation",
+  framing: "Framing",
 };
 
 // Escape a string for embedding inside HTML text content or an attribute.
