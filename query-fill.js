@@ -1553,6 +1553,31 @@ export function queryFill(query, rows, opts) {
       if (at < 0) continue;
       if (needsName && !nameNear) continue;
       if (isNegated(optText, at)) continue;
+      // An option word sitting INSIDE another field's label is that label's
+      // word, not this select's choice -- the same reasoning as `ownsUnit`
+      // above. `steam_basis` offers "pressure" and a sibling field is labelled
+      // "Steam specific volume at pressure", so a reader naming the volume
+      // ("specific volume at pressure 13.7") set the MODE, and the tile then
+      // demanded a pressure the question never carried. Five steam tiles
+      // answered that way (2026-11-26).
+      //
+      // Narrow on purpose: the veto needs the two words before the match to
+      // belong to that sibling's label too, so the phrase really is the
+      // label being quoted. "steam basis pressure" still selects the mode,
+      // because "basis" is no sibling's word.
+      {
+        const before = optText.slice(0, at).toLowerCase().match(/([a-z]+)[^a-z]+([a-z]+)[^a-z]*$/);
+        if (before) {
+          const own = String(row.l || "").toLowerCase().split(/[^a-z]+/).filter(Boolean);
+          const quoted = rows.some((r) => {
+            if (r.d === row.d) return false;
+            const w = String(r.l || "").toLowerCase().split(/[^a-z]+/).filter(Boolean);
+            return w.includes(token) && w.includes(before[1]) && w.includes(before[2]) &&
+              !(own.includes(before[1]) && own.includes(before[2]));
+          });
+          if (quoted) continue;
+        }
+      }
       matches.push(String(opt));
     }
     if (matches.length !== 1) continue;   // two readings of one field: neither

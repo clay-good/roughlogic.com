@@ -14,15 +14,20 @@
 // called "pressure". A reader typing "specific volume at pressure 13.7" would
 // hit the same thing, so this is not only a harness artifact.
 //
-// Catalog-wide there are 10 extra fills and 6 that break an answer, all listed
-// with their cause, so a SEVENTH has to be looked at.
+// Catalog-wide there are 4 extra fills and ONE that breaks an answer, and that
+// one is a tile this harness cannot phrase rather than a misfill.
 //
-// It was 11 and 7 when this landed, and the two extra ones were the harness
-// rather than the extractor -- a correction worth keeping, because the first
-// reading looked like a real misfill. linear-interpolation's "extra" x1 came
-// from the phrasing below dropping the 1 and 2 out of "Point 1 x" and "Point 2
-// x", leaving a question with the same field named twice; given the digit back
-// it fills correctly. Only the steam cluster is a hazard a reader shares.
+// It was 11 and 7 when this test landed, and following each one to its cause
+// moved every number: two were the phrasing below, five were a real extractor
+// hazard now fixed in query-fill.js, and one is irreducible.
+//   -- linear-interpolation's "extra" x1 came from the phrasing dropping the 1
+//      and 2 out of "Point 1 x" and "Point 2 x", leaving a question that named
+//      the same field twice. Given the digit back it fills correctly.
+//   -- the five steam tiles were real: `steam_basis` offers an option called
+//      "pressure" and a sibling field is labelled "Steam specific volume at
+//      pressure", so a reader naming the volume set the MODE. query-fill.js now
+//      vetoes an option word quoted from another field's label, which also
+//      RAISED recovery (10,498 -> 10,501 fields) and left WRONG at 0.
 // The extractor itself is not changed here: its select path is built from many
 // narrow vetoes, each added for a measured misfill, and the guardrails on a
 // change to it are measure-query-fill's recall and WRONG count rather than
@@ -35,12 +40,6 @@ import { COMPUTE_MAP, importCalc } from "../fixtures/compute-map.js";
 const ROOT = new URL("../../", import.meta.url);
 
 const KNOWN = [
-  // THE ONE THAT IS NOT THE HARNESS. `steam_basis` owns an option called
-  // "pressure", and a sibling field's label reads "Steam specific volume at
-  // pressure". The mode then demands a pressure the question never carried, and
-  // a reader typing "specific volume at pressure 13.7" would hit it too.
-  "flash-steam-pct", "steam-pipe-velocity", "steam-pipe-capacity",
-  "steam-trap-sizing", "condensate-return-sizing",
   // A tile this harness cannot phrase at all. Its two flow fields are labelled
   // "Flow at 4 mA" and "Flow at 20 mA": drop the label's number and the two are
   // indistinguishable, keep it and the 20 is read as the reader's value for the
