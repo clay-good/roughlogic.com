@@ -184,6 +184,20 @@ sent as `"true"` or `"false"` becomes the boolean; `"false"` would otherwise
 be a truthy string and read as checked. List inputs get the same treatment,
 element by element and field by field, following the worked example's shape.
 
+Which fields are numeric is decided from three witnesses, in order: the kind the
+tile's renderer declares, the type of the value its worked example passes there,
+and the type of the compute parameter's own default. The third was added on
+2026-11-26, because an OPTIONAL input is exactly the one a publisher's worked
+example leaves out: 84 of the door's 296 kind-less parameters had no witness at
+all, and `motor-vd-starting` answered a caller who sent `lrc_estimated: "false"`
+with the caveat "LRC estimated as 6x FLA (no code letter entered - confirm
+against the nameplate)" against a figure they had read off the nameplate. A
+default types 28 of those 84; the other 56 declare no literal default, and a
+value sent there is passed through as typed. A list or object parameter is
+published with no kind on purpose -- `number | select | checkbox | text` has no
+spelling for a list of rows -- and the worked example returned beside the
+description is what shows its shape.
+
 The key a calculator's own page shows is never one of those misses. Four
 calculators sit on a correlation published in metric while facing the US user
 in the units the trade works in -- dyno correction (in Hg / deg F over

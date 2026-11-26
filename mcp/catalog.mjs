@@ -363,9 +363,9 @@ function validateSelects(schema, inputs) {
 // JSON callers often send numbers as strings, and a compute that adds or
 // compares them then concatenates ("12" + 3 = "123") or orders them as text
 // ("10" < "9"). 289 tiles answered differently on stringified worked examples.
-// A field is numeric when its schema says so, or, for a tile with no schema
-// (or a schema field with no kind), when its worked example passes a number
-// there. Selects are never touched: a select value like AWG "12" is a string
+// A field is numeric when its schema says so; failing that, when its worked
+// example passes a number there; failing that, when its compute parameter's own
+// default is one (see paramTypes below). Selects are never touched: a select value like AWG "12" is a string
 // on purpose. The same goes for a checkbox sent as "false", which is a truthy
 // string: 17 tiles read it as true, and 2 that test `=== true` read "true" as
 // false.
@@ -377,10 +377,41 @@ const _BOOLEAN_WORDS = new Map([["true", true], ["yes", true], ["on", true], ["y
 function booleanWord(value) {
   return _BOOLEAN_WORDS.get(String(value).trim().toLowerCase());
 }
-function coerceNumericStrings(schema, inputs, exampleRows) {
+// A THIRD type witness: the compute parameter's own default.
+//
+// Until 2026-11-26 a field was typed by its schema kind or, failing that, by
+// the value its worked example passes there. A worked example need not exercise
+// every input -- an optional one is exactly what a publisher's example leaves
+// out -- so 84 of the door's 296 kind-less parameters had NO witness at all and
+// were handed to the compute as typed. A default types 28 of those 84, on 16
+// tiles; the other 56 declare no literal default and stay honestly untyped. `motor-vd-starting` showed it: its
+// example sets a nameplate locked-rotor current and omits `lrc_estimated`, so a
+// caller sending the string "false" (or "no", or "off") got the truthy string,
+// and the answer carried the caveat "LRC estimated as 6x FLA (no code letter
+// entered - confirm against the nameplate)" against a figure they had read off
+// the nameplate themselves. That is the 2026-10-09 boolean-word bug again,
+// surviving in the gap its fix could not see.
+//
+// A destructured default IS a type declaration (`lrc_estimated = false`,
+// `k_const = 12.9`), and introspectInputs already parses it as a literal, so a
+// non-literal default stays undefined and types nothing. It is consulted LAST,
+// so no field the schema or the example already types can move.
+function paramTypes(fn) {
+  const out = new Map();
+  if (typeof fn !== "function") return out;
+  let params;
+  try { params = introspectInputs(fn); } catch { return out; }
+  for (const p of params) {
+    const t = typeof p.default;
+    if (t === "number" || t === "boolean") out.set(p.name, t);
+  }
+  return out;
+}
+function coerceNumericStrings(schema, inputs, exampleRows, fn) {
   if (!inputs || typeof inputs !== "object") return inputs;
   const kinds = new Map(schema ? schema.inputs.map((f) => [f.key, f.kind]) : []);
   const example = exampleRows && exampleRows[0] ? exampleRows[0].inputs || {} : {};
+  const declared = paramTypes(fn);
   let out = inputs;
   for (const [key, value] of Object.entries(inputs)) {
     if (Array.isArray(value) && Array.isArray(example[key])) {
@@ -394,13 +425,14 @@ function coerceNumericStrings(schema, inputs, exampleRows) {
     if (typeof value !== "string" || value.trim() === "") continue;
     const kind = kinds.get(key);
     const flag = booleanWord(value);
-    const boolean = kind ? kind === "checkbox" : typeof example[key] === "boolean";
+    const witness = key in example ? typeof example[key] : declared.get(key);
+    const boolean = kind ? kind === "checkbox" : witness === "boolean";
     if (boolean && flag !== undefined) {
       if (out === inputs) out = { ...inputs };
       out[key] = flag;
       continue;
     }
-    const numeric = kind ? kind === "number" : typeof example[key] === "number";
+    const numeric = kind ? kind === "number" : witness === "number";
     if (!numeric) continue;
     const n = Number(value);
     if (!Number.isFinite(n)) continue;
@@ -1249,7 +1281,7 @@ export async function run({ id, inputs } = {}) {
   // where the tile's renderer exposes a schema.
   const schema = schemaIfConsistent(await readSchema(id, RENDERER_MAP, modCache), fn);
   if (!usedExample) args = validateSelects(schema, args);
-  if (!usedExample) args = coerceNumericStrings(schema, args, examples.get(id));
+  if (!usedExample) args = coerceNumericStrings(schema, args, examples.get(id), fn);
   // A caller can omit any input. A parameter with no default is then
   // `undefined`, and until 2026-10-09 the door passed that straight through:
   // five computes threw (voltage-drop with no material), and about 80 more
