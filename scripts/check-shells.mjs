@@ -32,6 +32,9 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { gzipSync } from "node:zlib";
 import { assertFullCatalogParse } from "./catalog-size.mjs";
+// The group letter -> /groups/<slug>/ mapping the builder uses, so this gate
+// checks the hubs against the same table that names them.
+import { GROUP_SLUG } from "./build-shells.mjs";
 // The one implementation of the tile <title>/<meta description> rules, shared
 // with app.js. Compared against here so a second implementation cannot creep
 // back into the build script -- which is how the SPA and the shell came to
@@ -857,6 +860,39 @@ async function main() {
       if (missing.length) {
         errors.push("groups/" + slug + "/index.html: does not link " + missing.length +
           " sibling hub(s) (" + missing.slice(0, 3).join(", ") + "). Hub-to-hub links must be real URLs, not #group= fragments.");
+      }
+    }
+  }
+
+  // Every tile is listed on its OWN group's hub.
+  //
+  // This file sizes the hubs on that premise -- "the group hub lists every
+  // tile, taking electrical/index.html to ~12.6 KB gz" -- and nothing asserted
+  // it. The hub matters because it is the FALLBACK path: build-shells.mjs
+  // records that a tile no other tile links to "is reachable only from its
+  // group hub and the search box", so a tile dropped from its hub loses one of
+  // the two ways anyone arrives at it without searching for it by name.
+  //
+  // check-both-doors.mjs covers the other two paths (the search ranker and the
+  // MCP door); this is the third, and it was the one with no gate. Verified
+  // clean when it was written: all 2,288 tiles, 21 hubs.
+  if (existsSync(groupsDirForCross)) {
+    const byGroup = new Map();
+    for (const t of tools) {
+      const slug = GROUP_SLUG[t.group];
+      if (!slug) { errors.push(`tools-data.js: tile "${t.id}" is in group "${t.group}", which has no /groups/<slug>/ hub.`); continue; }
+      if (!byGroup.has(slug)) byGroup.set(slug, []);
+      byGroup.get(slug).push(t.id);
+    }
+    for (const [slug, ids] of byGroup) {
+      const p = resolve(groupsDirForCross, slug, "index.html");
+      if (!existsSync(p)) { errors.push(`groups/${slug}/index.html: missing, but ${ids.length} tile(s) name that group.`); continue; }
+      const html = await readFile(p, "utf8");
+      const linked = new Set([...html.matchAll(/href="[^"]*tools\/([a-z0-9-]+)\/"/g)].map((m) => m[1]));
+      const absent = ids.filter((id) => !linked.has(id));
+      if (absent.length) {
+        errors.push(`groups/${slug}/index.html: does not link ${absent.length} of its own ${ids.length} tile(s) ` +
+          `(${absent.slice(0, 3).join(", ")}). The hub is the only path to a tile nothing else links.`);
       }
     }
   }
