@@ -1004,3 +1004,71 @@ test("omitting a required input is named in a warning", async () => {
   assert.ok(only.usedExample, "no inputs at all means the worked example runs");
   assert.deepEqual(only.warnings, [], "and a verified example is in-range by construction, so it warns about nothing");
 });
+
+// The default the door ADVERTISES must be the one it applies.
+//
+// `describe().inputs[].default` tells an agent what a tile uses when a field is
+// left out. Run a worked example twice -- once omitting the field, once with it
+// set to the advertised default -- and the answers have to match, or the
+// advertised number is not the one in force.
+//
+// 461 fields carry a numeric default their example does not supply. Five
+// disagree, and the split matters:
+//
+//   THREE ARE DUAL-UNIT ALTERNATES and correct. computeDynoCorrectionSae takes
+//   `baro_mbar` OR `baro_inhg`, `air_temp_c` OR `air_temp_f`; the US box
+//   defaults to null precisely so omitting it falls to its SI partner. Same
+//   for flocculation-g-value's water_temp_f and time-alignment's ambient_F.
+//   The advertised number is the PAGE's prefill for that box, and omitting it
+//   is meant to change which input is read.
+//
+//   TWO ARE A REAL DIVERGENCE, listed by name. The page prefills a meaningful
+//   figure and the compute signature defaults to 0, so a person sees one
+//   answer and an agent that omits the field gets another. Which surface
+//   should move is a judgement about the engineering, not a typo: for
+//   srw-geogrid-spacing a buried base course of 0 in leaves MORE exposed wall
+//   and so MORE grid layers, and quietly defaulting it to 6 in would relax a
+//   retaining-wall design. That is left as it stands, recorded rather than
+//   guessed at, and pinned here so a SIXTH case has to be looked at.
+test("an advertised default is the one the tile actually applies", async () => {
+  const { describe, run } = await import("../../mcp/catalog.mjs");
+  const { RENDERER_MAP } = await import("../fixtures/renderer-map.js");
+  const stable = (o) => JSON.stringify(o, (k, v) => (typeof v === "number" && Number.isFinite(v) ? Number(v.toPrecision(10)) : v));
+
+  const KNOWN = [
+    // Dual-unit alternates: omitting the US box falls to its SI partner.
+    "dyno-correction-sae::baro_inhg",
+    "flocculation-g-value::water_temp_f",
+    "time-alignment::ambient_F",
+    // Page prefill vs a compute default of 0; see the note above.
+    "srw-geogrid-spacing::base_course_buried_in",
+    "kitchen-makeup-air-deficit::door_closer_force_lbf",
+  ];
+
+  const disagree = [];
+  let probed = 0;
+  for (const id of Object.keys(RENDERER_MAP)) {
+    let d;
+    try { d = await describe({ id }); } catch { continue; }
+    if (!d.runnable || !d.example) continue;
+    const example = d.example.inputs || {};
+    if (Object.keys(example).length < 2) continue;      // omitting the only key runs the example
+    for (const f of d.inputs || []) {
+      if (!f.key || typeof f.default !== "number" || !Number.isFinite(f.default)) continue;
+      if (f.key in example) continue;
+      probed += 1;
+      let a, b;
+      try {
+        a = await run({ id, inputs: { ...example } });
+        b = await run({ id, inputs: { ...example, [f.key]: f.default } });
+      } catch { continue; }
+      if (!a.result || !b.result || a.result.error || b.result.error) continue;
+      if (stable(a.result) === stable(b.result)) continue;
+      const key = `${id}::${f.key}`;
+      if (!KNOWN.includes(key)) disagree.push(`${key} advertises ${f.default}, but omitting it changes the answer`);
+    }
+  }
+
+  assert.ok(probed > 400, `the defaults are swept (${probed} fields)`);
+  assert.deepEqual(disagree.slice(0, 8), [], `${disagree.length} advertised default(s) are not the one in force`);
+});

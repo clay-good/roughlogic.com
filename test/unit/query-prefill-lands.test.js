@@ -124,3 +124,37 @@ test("a question's values reach the boxes on a tile the label match cannot reach
   assert.deepEqual(values, ["2", "12", "32", "57", "82", "95"], "each sieve's value lands in its own box");
   assert.ok(region.querySelectorAll(".field-provenance").length > 0, "and the reader is told which boxes came from their question");
 });
+
+// Two labels that collide once their unit is stripped.
+//
+// dovetail-over-pins prints "Known dimension" (which of the two the reader
+// has) beside "Known dimension (in)" (its value). Both normalise to "known
+// dimension", and the label map kept only the FIRST control under a label --
+// so the select claimed it, the dimension box could never be resolved, and the
+// reader's measurement was written nowhere. The tile then answered "The known
+// dimension must be positive" about a number the reader had typed.
+test("two controls under one label each take their own value", async () => {
+  const { doc, flushTimers } = await harness();
+  const { RENDERER_MAP } = await import("../fixtures/renderer-map.js");
+  const { TOOLS } = await import("../../tools-data.js");
+  const { applyQueryPrefill } = await import("../../tile-prefill.js");
+
+  const tool = TOOLS.find((t) => t.id === "dovetail-over-pins");
+  const reg = RENDERER_MAP["dovetail-over-pins"];
+  const render = (await import(new URL(reg.module, FIXTURES).href))[reg.exportName]["dovetail-over-pins"];
+
+  const view = doc.createElement("section");
+  const region = doc.createElement("div"), outputs = doc.createElement("div"), cite = doc.createElement("p");
+  view.append(region, outputs, cite);
+  doc.body.appendChild(view);
+  await render(region, outputs, cite);
+  flushTimers();
+
+  const q = "Dovetail type male, Known dimension flat, Known dimension 2 in, Rod / pin diameter 0.5 in, Included dovetail angle 60 deg";
+  applyQueryPrefill({ region, tool, params: {}, query: q, provenanceText: "from your question" });
+  for (let i = 0; i < 12; i++) { flushTimers(); await turn(); }
+
+  assert.equal(region.querySelector("#dvt-known").value, "flat", "the select takes which dimension is known");
+  assert.equal(region.querySelector("#dvt-dim").value, "2", "and the box beside it takes the measurement");
+  assert.equal(region.querySelector("#dvt-pin").value, "0.5");
+});

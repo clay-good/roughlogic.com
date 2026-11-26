@@ -25,19 +25,34 @@
 function resolveFields(region, rows) {
   const out = new Map();
   if (!region || !Array.isArray(rows)) return out;
+  // Every control under a given label, in DOM order -- not just the first.
+  //
+  // Stripping the trailing unit makes two DIFFERENT labels collide:
+  // dovetail-over-pins prints "Known dimension" (which of the two the reader
+  // has) beside "Known dimension (in)" (its value), and both normalise to
+  // "known dimension". Keeping only the first meant the select took it and the
+  // dimension box could never be resolved, so the reader's measurement was
+  // written nowhere and the tile answered "The known dimension must be
+  // positive". The field index has the same pair of rows in the same order, so
+  // taking the next unclaimed control under that label puts each where it
+  // belongs.
   const byLabel = new Map();
   for (const label of region.querySelectorAll("label[for]")) {
     const key = String(label.textContent || "")
       .replace(/\s*\([^()]*\)\s*$/, "").trim().toLowerCase();
-    if (key && !byLabel.has(key)) byLabel.set(key, label.getAttribute("for"));
+    const domId = label.getAttribute("for");
+    if (!key || !domId) continue;
+    if (!byLabel.has(key)) byLabel.set(key, []);
+    byLabel.get(key).push(domId);
   }
   const taken = new Set();
   for (const row of rows) {
     let el = null;
     try { el = region.querySelector("#" + CSS.escape(row.d)); } catch { el = null; }
     if (!el) {
-      const domId = byLabel.get(String(row.l || "").trim().toLowerCase());
-      if (domId && !taken.has(domId)) {
+      const ids = byLabel.get(String(row.l || "").trim().toLowerCase()) || [];
+      const domId = ids.find((x) => !taken.has(x));
+      if (domId) {
         try { el = region.querySelector("#" + CSS.escape(domId)); } catch { el = null; }
       }
     }
