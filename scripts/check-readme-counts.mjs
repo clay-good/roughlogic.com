@@ -671,6 +671,73 @@ async function main() {
     checked += 1;
   }
 
+  // A gate's own header can rot, and nothing was watching it.
+  //
+  // Three of them claimed a reach a fifth short of the catalog -- the
+  // both-doors gate, the field-index builder and the schema extractor each
+  // named a tile count from when they were written, against a live 2,288
+  // (2026-11-26). Every doc count in this file is anchored; prose inside the
+  // source was not.
+  //
+  // Deliberately narrow, and each narrowing is a false positive this found:
+  //   -- only "all N tiles" / "every one of the N tiles", a claim about the
+  //      WHOLE catalog, where the number is checkable and is never the point.
+  //   -- only N >= 1,000, because "all 18 tiles" in citations.test.js is a
+  //      claim about a FAMILY and this gate cannot know that population.
+  //   -- a count of a named subset ("the 2,256 calculators with numeric
+  //      inputs") says "calculators" and is out of scope for the same reason.
+  //   -- this file is skipped: the prose above describes the defect rather
+  //      than claiming a reach.
+  const HISTORICAL = new Map([
+    // A measurement taken at the time, not a claim about now: updating the
+    // number would falsify it ("left 269 of the 1,804 tiles receiving no
+    // related link").
+    ["scripts/build-shells.mjs", [1804]],
+    // Notes that quote what a header USED to read, beside its correction.
+    ["scripts/check-both-doors.mjs", [1804]],
+    ["scripts/build-field-index.mjs", [1709]],
+    // Paired with a second figure from the same measurement -- "all 1,804
+    // tiles answer to their own name; 81 did not before" -- so raising the
+    // count alone would falsify the 81. Found by this gate once comment
+    // markers were normalised, having been invisible to a line-by-line grep.
+    ["mcp/catalog.mjs", [1804]],
+  ]);
+  {
+    const dirs = ["scripts", "mcp", "test/unit", "test/fixtures"];
+    const re = /(?:all|every one of the)\s+([\d,]+)\s+tiles\b/gi;
+    for (const dir of dirs) {
+      let names = [];
+      try { names = await readdir(resolve(ROOT, dir)); } catch { continue; }
+      for (const name of names) {
+        if (!/\.(mjs|js)$/.test(name)) continue;
+        const rel = dir + "/" + name;
+        if (rel === "scripts/check-readme-counts.mjs") continue;
+        let src;
+        try { src = await readFile(resolve(ROOT, rel), "utf8"); } catch { continue; }
+        // Comment markers have to come out first, or the phrase this looks for
+        // cannot be found where it actually lives. Every one of the three stale
+        // headers was WRAPPED -- "... server. Every" ending a line and "// one
+        // of the 1,804 tiles" starting the next -- so matching the raw file
+        // found the one case written on a single line and missed the two that
+        // mattered. Seeded against the wrapped form for exactly that reason.
+        src = src.replace(/^[ \t]*(?:\/\/|\*)[ \t]?/gm, " ").replace(/\s+/g, " ");
+        const allowed = HISTORICAL.get(rel) || [];
+        checked += 1;
+        let m;
+        re.lastIndex = 0;
+        while ((m = re.exec(src))) {
+          const n = Number(String(m[1]).replace(/,/g, ""));
+          if (!Number.isFinite(n) || n < 1000 || n === live.tiles || allowed.includes(n)) continue;
+          errors.push(
+            `${rel}: says "${m[0]}" but the catalog holds ${live.tiles}. A claim about the whole catalog ` +
+            `either carries the live count or drops the number -- the claim is EVERY, not a figure. If it is ` +
+            `a measurement taken at the time rather than a statement about now, add it to HISTORICAL in ` +
+            `scripts/check-readme-counts.mjs with that reason.`);
+        }
+      }
+    }
+  }
+
   if (errors.length) {
     console.error("check-readme-counts FAILED (live: " + JSON.stringify(live) + "):");
     for (const e of errors) console.error("  - " + e);
