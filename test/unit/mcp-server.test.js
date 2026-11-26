@@ -316,3 +316,117 @@ test("a notification over the cap stays silent -- nobody is waiting on it", asyn
   assert.equal(msgs.filter((m) => m.id === null || m.id === undefined).length, 0, "no reply is addressed to a notification");
   assert.equal(new Set(msgs.map((m) => m.id)).size, 120, "and all 120 real requests are answered");
 });
+
+// Every tool's real output satisfies the outputSchema it publishes, for the
+// whole catalog.
+//
+// The tests above assert that each tool DECLARES an object outputSchema. That
+// is a check on the declaration, not on the output: nothing here had ever
+// compared a reply against the schema a client is told to expect. This drives
+// describe_calculator and run_calculator over all 2,288 tiles, plus the other
+// three tools, and validates `structuredContent` against the declared types,
+// required keys and enums -- 4,585 calls, which the server answers in under a
+// second through one process.
+//
+// It must WINDOW its requests. The server runs at most 100 at a time, and
+// before 2026-11-26 the rest were dropped in silence; the sweep that found
+// that defect looked exactly like a hung server for twenty minutes.
+function typeName(v) {
+  if (v === null) return "null";
+  if (Array.isArray(v)) return "array";
+  if (typeof v === "number") return Number.isInteger(v) ? "integer" : "number";
+  return typeof v;
+}
+function validateAgainst(schema, v, path, errs) {
+  if (!schema || typeof schema !== "object") return;
+  if (schema.type) {
+    const want = Array.isArray(schema.type) ? schema.type : [schema.type];
+    const got = typeName(v);
+    if (!want.some((t) => t === got || (t === "number" && got === "integer"))) {
+      errs.push(`${path}: declared ${want.join("|")}, got ${got}`);
+      return;
+    }
+  }
+  if (schema.enum && !schema.enum.some((e) => e === v)) errs.push(`${path}: ${JSON.stringify(v)} is not one of the declared values`);
+  if (v && typeName(v) === "object") {
+    for (const r of schema.required || []) {
+      if (!Object.prototype.hasOwnProperty.call(v, r)) errs.push(`${path}: required "${r}" absent`);
+    }
+    for (const [k, sub] of Object.entries(schema.properties || {})) {
+      if (v[k] !== undefined) validateAgainst(sub, v[k], `${path}.${k}`, errs);
+    }
+  }
+  if (typeName(v) === "array" && schema.items) v.forEach((x, i) => validateAgainst(schema.items, x, `${path}[${i}]`, errs));
+}
+
+test("every tool's output matches its published outputSchema, catalog-wide", async () => {
+  const { RENDERER_MAP } = await import("../fixtures/renderer-map.js");
+  const tiles = Object.keys(RENDERER_MAP);
+
+  const child = spawn("node", [SERVER], { stdio: ["pipe", "pipe", "ignore"] });
+  try {
+    const replies = new Map();
+    const pending = new Set();
+    const meta = new Map();
+    let buf = "";
+    child.stdout.on("data", (chunk) => {
+      buf += chunk;
+      let nl;
+      while ((nl = buf.indexOf("\n")) !== -1) {
+        const line = buf.slice(0, nl).trim();
+        buf = buf.slice(nl + 1);
+        if (!line) continue;
+        let msg;
+        try { msg = JSON.parse(line); } catch { continue; }
+        if (msg.id != null) { replies.set(msg.id, msg); pending.delete(msg.id); }
+      }
+    });
+
+    const WINDOW = 40;                       // well inside MAX_PENDING_RPC
+    let nextId = 1;
+    const send = async (method, params, tool, label) => {
+      while (pending.size >= WINDOW) await new Promise((r) => setTimeout(r, 5));
+      const id = nextId++;
+      meta.set(id, [tool, label]);
+      pending.add(id);
+      child.stdin.write(JSON.stringify({ jsonrpc: "2.0", id, method, params }) + "\n");
+      return id;
+    };
+    const callTool = (name, args, label) => send("tools/call", { name, arguments: args }, name, label);
+
+    const listId = await send("tools/list", {}, "__list", "list");
+    for (const t of tiles) {
+      await callTool("describe_calculator", { id: t }, t);
+      await callTool("run_calculator", { id: t }, t);
+    }
+    for (const q of ["voltage drop 120v 150 ft 12 awg copper 20a", "concrete for a 10x12 slab 4 inches deep", "what is the capital of mars"]) {
+      await callTool("answer_query", { query: q }, q.slice(0, 20));
+    }
+    for (const q of ["rebar", "duct", "zzzznope"]) await callTool("search_calculators", { query: q }, q);
+    await callTool("run_calculators", { calls: [{ id: "ohms-law", inputs: { V: 120, I: 10 } }, { id: "nope-not-a-tile" }] }, "batch");
+
+    const deadline = Date.now() + 120000;
+    while (pending.size && Date.now() < deadline) await new Promise((r) => setTimeout(r, 25));
+    assert.equal(pending.size, 0, `every request answered (${pending.size} outstanding)`);
+
+    const tools = new Map(replies.get(listId).result.tools.map((t) => [t.name, t]));
+    const errs = [];
+    let validated = 0;
+    for (const [id, [tool, label]] of meta) {
+      if (tool === "__list") continue;
+      const r = replies.get(id);
+      if (r.error) { errs.push(`${tool}(${label}): JSON-RPC error ${r.error.code} ${r.error.message}`); continue; }
+      const sc = r.result && r.result.structuredContent;
+      if (sc === undefined) { errs.push(`${tool}(${label}): no structuredContent, though the tool declares an outputSchema`); continue; }
+      validated++;
+      const e = [];
+      validateAgainst(tools.get(tool).outputSchema, sc, tool, e);
+      for (const m of e) errs.push(`${tool}(${label}): ${m}`);
+    }
+
+    assert.ok(validated > 4500, `swept the whole catalog (${validated} replies validated)`);
+    assert.deepEqual(errs.slice(0, 10), [], `${errs.length} reply/replies contradict the published schema`);
+  } finally {
+    child.kill();
+  }
+});
