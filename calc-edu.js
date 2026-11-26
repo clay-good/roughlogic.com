@@ -2162,7 +2162,11 @@ export const EDU_RENDERERS = {
 // dims: in { method: dimensionless, raw_score: dimensionless, param: dimensionless, class_mean: dimensionless } out: { curved: dimensionless, slope: dimensionless, intercept: dimensionless, raw: dimensionless }
 export function computeCurveGradeScaler({ method = "flat", raw_score = 0, param = 0, class_mean = 0 } = {}) {
   const raw = Number(raw_score);
-  if (!Number.isFinite(raw) || raw < 0) return { error: "Raw score must be a non-negative number." };
+  // The field declares max="100" and class_mean / param below already refuse
+  // their own range; raw_score did not. A 201 typed for 20.1 was clamped to a
+  // curved 100 -- full marks off a typo, where the square-root curve on 20.1
+  // gives 45.
+  if (!Number.isFinite(raw) || raw < 0 || raw > 100) return { error: "Raw score must be between 0 and 100." };
   if (method !== undefined && method !== null && method !== "" && !["flat", "sqrt", "linear"].includes(method)) return { error: "Unknown curve method; use flat or sqrt or linear." };
   const clamp = (x) => Math.max(0, Math.min(100, x));
   if (method === "sqrt") {

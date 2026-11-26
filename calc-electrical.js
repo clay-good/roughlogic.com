@@ -3166,6 +3166,14 @@ export function computeMotorBranchFromNameplate({
   const denom = PH === 1 ? (V * ETA * PF) : (sqrt3 * V * ETA * PF);
   const computed_fla_A = (HP * 746) / denom;
 
+  // An ENTERED nameplate FLA that is not positive is an impossible reading, not
+  // an absent one. Reading it as absent fell back to the computed estimate and
+  // returned a SMALLER circuit than the nameplate asked for -- nameplate 28 A
+  // gave a 35 A conductor and overload, while a typed -29 gave 29.7 A for both.
+  // Every other input here already refuses its own range.
+  if (nameplate_fla_A !== null && nameplate_fla_A !== "" && !(Number(nameplate_fla_A) > 0)) {
+    return { error: "Nameplate FLA must be positive. Leave it blank to size from the computed estimate instead." };
+  }
   // Design FLA: larger of computed or nameplate (when nameplate provided).
   const np = nameplate_fla_A !== null && nameplate_fla_A !== "" && Number(nameplate_fla_A) > 0 ? Number(nameplate_fla_A) : null;
   const design_fla_A = np !== null ? Math.max(computed_fla_A, np) : computed_fla_A;

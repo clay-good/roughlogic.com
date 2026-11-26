@@ -74,6 +74,50 @@
 // still worth declaring for the other reasons (the browser marks the field,
 // `run_calculator` warns, `answer_query` refuses), just not urgently.
 //
+// RE-TRIAGED 2026-11-25, because the reach had grown. The declared sweep now
+// covers 1,548 tiles rather than the 674 it was first read on, and the 14
+// conclusion changes it reports had never been gone through one by one. Three
+// were real, and they share a shape worth naming: the tile DECLARES the bound
+// on the field, the compute refuses every NEIGHBOURING input's range, and it
+// ignores its own -- and in each the out-of-range answer is the permissive one.
+//
+//   motor-branch-from-nameplate  an ENTERED nameplate FLA that is not positive
+//                                was read as ABSENT, so the tile fell back to
+//                                its computed estimate and sized a SMALLER
+//                                circuit than the nameplate asked for: a 35 A
+//                                conductor and overload became 29.7 A
+//   mortgage-point-breakeven     a base rate past the declared 30% max inflates
+//                                the monthly saving, collapsing the break-even
+//                                and FLIPPING the verdict -- a 24-month hold
+//                                against a 61-month break-even reads "Not worth
+//                                it", and the same inputs with the rate typed
+//                                61 instead of 6.1 read "Worth it, past the
+//                                1-mo break-even" (term > 50 yr guarded too)
+//   curve-grade-scaler           a raw score of 201 typed for 20.1 was clamped
+//                                to a curved 100 -- full marks off a typo,
+//                                where the curve on 20.1 gives 45
+//
+// All three are guarded in the compute and pinned in
+// test/unit/out-of-range-verdicts.test.js, each seeded to prove it bites. They
+// accounted for four of the fourteen reported entries (the mortgage tile
+// contributed two), so the sweep now reports 77 answered and 10 changed.
+//
+// Those ten were read and are NOT defects, which is worth writing down so the
+// list is not triaged a third time:
+//   - FOUR degrade to a prompt, which is the honest answer to an impossible
+//     reading (fall-protection-clearance, mortgage-point-breakeven's negative
+//     holding period, two-stroke-mix-ratio-check, water-heater-storage-sizing)
+//   - THREE are a boolean modelled as a number with max="1", where a 3 is
+//     simply truthy and the verdict it produces is the correct and MORE
+//     conservative one (scaffold-tie-spacing reads SHEETED and asks for tighter
+//     ties; shoring-reshoring-load reads BACKSHORED and raises utilisation from
+//     77% to 93%)
+//   - TWO move toward MORE caution (duct-breakout-noise goes from 32.5 dB over
+//     the criterion to 33.5 dB; residential-framing squares a negative pitch,
+//     so it returns LONGER rafters and MORE board feet, which over-orders
+//     rather than under-orders)
+//   - ONE is prose-only (markup-vs-margin's "diverge sharply" vs "diverge")
+//
 // Zero dependencies, no network. `node scripts/measure-verdict-bounds.mjs`.
 
 import { resolve, dirname } from "node:path";

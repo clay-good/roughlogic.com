@@ -54,6 +54,50 @@ test("an impossible reading does not buy a safer answer", async () => {
   assert.deepEqual(answered, []);
 });
 
+// The sweep's reach grew from 674 tiles to 1,548 once every tile's declared
+// bounds were read, and these three turned up in the wider population. Each
+// declares the bound on the field, guards every NEIGHBOURING input's range in
+// the compute, and ignored its own -- and in each the out-of-range answer is
+// the permissive one. Measured by scripts/measure-verdict-bounds.mjs.
+test("a value past its own declared bound does not buy a more permissive answer", async () => {
+  const { run, describe } = await import("../../mcp/catalog.mjs");
+  const ex = async (id) => (await describe({ id })).example.inputs;
+
+  // An ENTERED nameplate FLA that is not positive was read as ABSENT, so the
+  // tile fell back to its computed estimate and sized a SMALLER circuit than
+  // the nameplate asked for: 35 A conductor and overload became 29.7 A.
+  const motor = await ex("motor-branch-from-nameplate");
+  const negFla = await run({ id: "motor-branch-from-nameplate", inputs: { ...motor, nameplate_fla_A: -29 } });
+  assert.match(negFla.result.error, /Nameplate FLA must be positive/);
+  // Blank still means absent, which is the whole point of the field.
+  const blank = await run({ id: "motor-branch-from-nameplate", inputs: { ...motor, nameplate_fla_A: null } });
+  assert.ok(!blank.result.error, "a blank nameplate must still size from the estimate");
+  assert.equal(blank.result.design_source, "computed");
+
+  // A base rate above the declared 30% max inflates the monthly saving, which
+  // collapses the break-even and FLIPS the verdict. This hold is 24 months
+  // against a 61-month break-even, so the honest answer is "Not worth it".
+  const mort = { ...(await ex("mortgage-point-breakeven")), holding_years: 2 };
+  const inRange = await run({ id: "mortgage-point-breakeven", inputs: mort });
+  assert.match(inRange.result.verdict, /^Not worth it/);
+  for (const bad of [{ base_rate_pct: 61 }, { base_rate_pct: 31 }, { points_rate_pct: 31, base_rate_pct: 32 }]) {
+    const out = await run({ id: "mortgage-point-breakeven", inputs: { ...mort, ...bad } });
+    assert.match(out.result.error, /above 30%/, JSON.stringify(bad));
+  }
+  const longTerm = await run({ id: "mortgage-point-breakeven", inputs: { ...mort, term_years: 101 } });
+  assert.match(longTerm.result.error, /above 50 years/);
+
+  // A raw score of 201 typed for 20.1 was clamped to a curved 100 -- full marks
+  // off a typo, where the square-root curve on 20.1 gives 45.
+  const curve = await ex("curve-grade-scaler");
+  const over = await run({ id: "curve-grade-scaler", inputs: { ...curve, raw_score: 201 } });
+  assert.match(over.result.error, /between 0 and 100/);
+  // The bound is inclusive, and the example still answers.
+  const at100 = await run({ id: "curve-grade-scaler", inputs: { ...curve, raw_score: 100 } });
+  assert.equal(at100.result.curved, 100);
+  assert.equal((await run({ id: "curve-grade-scaler", inputs: curve })).result.curved, 70);
+});
+
 test("a negative meter reading is not a dry material", async () => {
   // Found by the same sweep run WITHOUT relying on a declared bound: no
   // moisture meter reads below zero, whether or not the renderer said so.

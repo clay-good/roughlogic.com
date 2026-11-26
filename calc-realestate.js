@@ -1799,9 +1799,16 @@ export function computeMortgagePointBreakeven({ loan_amount, base_rate_pct, poin
   if (!Number.isFinite(P) || P <= 0) return { error: "Enter a positive loan amount." };
   if (!Number.isFinite(rb) || rb <= 0) return { error: "Enter a positive base rate." };
   if (!Number.isFinite(rp) || rp < 0) return { error: "Enter a non-negative rate with points." };
+  // The rate fields declare max="30" and the term max="50"; the compute ignored
+  // both. An out-of-range rate inflates the monthly saving, which collapses the
+  // break-even and FLIPS the verdict: a 24-month hold against a 61-month
+  // break-even reads "Not worth it", and the same inputs with a base rate typed
+  // as 61 instead of 6.1 read "Worth it: past the 1-mo break-even".
+  if (rb > 30 || rp > 30) return { error: "Rates above 30% are outside the range this tile models; check for a misplaced decimal." };
   if (rp >= rb) return { error: "Rate with points must be below the base rate (points buy the rate down)." };
   if (!Number.isFinite(cpct) || cpct <= 0) return { error: "Enter a positive point cost (percent of loan)." };
   if (!Number.isFinite(yrs) || yrs <= 0) return { error: "Enter a positive term in years." };
+  if (yrs > 50) return { error: "A term above 50 years is outside the range this tile models." };
   const n = Math.round(yrs * 12);
   // A term under half a month rounded to 0 payments and divided by zero.
   if (n < 1) return { error: "The term must be at least one month." };
