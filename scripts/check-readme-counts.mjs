@@ -121,7 +121,7 @@ async function liveCounts() {
   // worth. Recomputed from the schema the door actually serves.
   const { describe: describeTile } = await import(pathToFileURL(resolve(ROOT, "mcp", "catalog.mjs")).href);
   const { RENDERER_MAP } = await import(pathToFileURL(resolve(ROOT, "test", "fixtures", "renderer-map.js")).href);
-  let numericTiles = 0, unboundedTiles = 0, inputTiles = 0;
+  let numericTiles = 0, unboundedTiles = 0, inputTiles = 0, freeTextTiles = 0;
   for (const id of Object.keys(RENDERER_MAP)) {
     let d;
     try { d = await describeTile({ id }); } catch { continue; }
@@ -130,6 +130,32 @@ async function liveCounts() {
     // tables, the GFCI/AFCI table) take none, and a claim about "tiles that
     // take inputs" is about the rest.
     if ((d.inputs || []).length) inputTiles += 1;
+    // FREE-TEXT tiles: the ones a typed question cannot fill, because the
+    // payload is a chemical formula, a primer or codon sequence, a paragraph to
+    // score, a close date, or a list of numbers typed as one blob. Derived as
+    // the tiles whose own worked example carries NO numeric value anywhere AND
+    // sets at least one input that is not a select -- a select-only tile is not
+    // free text, since a question can name an option. Checked behaviourally
+    // when this was first derived: all of them pick themselves and answer
+    // NO_VALUES, which is exactly what the README claims of them.
+    if ((d.inputs || []).length) {
+      const rows = d.examples || (d.example ? [d.example] : []);
+      const exInputs = (rows[0] && rows[0].inputs) || {};
+      const vals = Object.values(exInputs);
+      if (vals.length) {
+        const hasNum = (v) => typeof v === "number"
+          || (Array.isArray(v) && v.some(hasNum))
+          || (v && typeof v === "object" && Object.values(v).some(hasNum));
+        if (!vals.some(hasNum)) {
+          const byKey = new Map((d.inputs || []).map((f) => [f.key, f]));
+          const nonSelect = Object.keys(exInputs).filter((k) => {
+            const f = byKey.get(k);
+            return !f || f.kind !== "select";
+          });
+          if (nonSelect.length) freeTextTiles += 1;
+        }
+      }
+    }
     const nums = (d.inputs || []).filter((f) => f.key && (f.kind === "number" || f.kind == null));
     if (!nums.length) continue;
     numericTiles += 1;
@@ -157,6 +183,7 @@ async function liveCounts() {
     numericTiles,
     unboundedTiles,
     inputTiles,
+    freeTextTiles,
   };
 }
 
@@ -456,6 +483,12 @@ async function main() {
   // in a sentence whose whole job is to state the reach of a standing test.
   // That subset IS derivable, so it is held here rather than exempted.
   checked += checkPattern(mcpReadme, /wrong\s*\n?status for all ([\d,]+) tiles that take inputs/g, live.inputTiles, "tiles that take inputs (mcp/README.md)", errors);
+  // The free-text count was published as 15 against a live 16, and was left
+  // alone for one pass as "not mechanically derivable". It is derivable; the
+  // first proxy tried (a tile with text inputs and no numeric input) returned 0
+  // because those fields are not declared `kind: "text"`, which is a wrong
+  // proxy rather than an absent one.
+  checked += checkPattern(mcpReadme, /cannot be filled from a question, and there are ([\d,]+) of them/g, live.freeTextTiles, "free-text calculators (mcp/README.md)", errors);
 
   // docs/architecture.md states the module count in prose too, and it had
   // drifted to 56 against a live 57.
