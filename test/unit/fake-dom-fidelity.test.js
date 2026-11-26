@@ -138,3 +138,43 @@ test("fake DOM: a descendant selector matches only inside its ancestor", async (
   assert.equal(leaf.matches("div > span"), false, "a grandparent does not");
   assert.ok(leaf.matches("div span"), "but it does satisfy a descendant selector");
 });
+
+// The fourth infidelity of the week, and the same shape as the first three: a
+// property a browser defines that this harness did not.
+//
+// `HTMLOptionElement.text` is the words a reader actually chose.
+// steps-panel.js's domFields prints `el.options[el.selectedIndex].text` for a
+// select, so with `text` undefined it fell through to `el.value` -- and every
+// sweep that read a select off the page under this harness saw the raw code.
+// In a 2026-11-26 door-vs-page comparison that made 734 select values look
+// like drift ("copper" vs "Copper", "single" vs "Single", "led_lighting" vs
+// "LED lighting") when the door had been right every time. Fixing it dropped
+// those 734 to 68, and what remained was real.
+test("fake DOM: an option carries its text, as a browser does", async () => {
+  const { installDocument } = await import("../fixtures/fake-dom.js");
+  const doc = installDocument();
+
+  const sel = doc.createElement("select");
+  for (const [value, label] of [["copper", "Copper"], ["aluminum", "Aluminum"]]) {
+    const o = doc.createElement("option");
+    o.value = value;
+    o.textContent = label;
+    sel.appendChild(o);
+  }
+  assert.equal(sel.value, "copper", "the first option is selected by default");
+  assert.equal(sel.options[sel.selectedIndex].text, "Copper", "and its TEXT is what the reader read");
+
+  sel.value = "aluminum";
+  assert.equal(sel.options[sel.selectedIndex].text, "Aluminum", "it follows the selection");
+
+  // Only OPTION carries `text`, as in a browser: a div does not.
+  const div = doc.createElement("div");
+  div.textContent = "not an option";
+  assert.equal(div.text, undefined);
+
+  // The setter writes the text, so a renderer that assigns it is not silently lost.
+  const o = doc.createElement("option");
+  o.text = "Type C";
+  assert.equal(o.textContent, "Type C");
+  assert.equal(o.text, "Type C");
+});

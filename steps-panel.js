@@ -29,9 +29,19 @@ export function stepNum(v) {
 // Rendered the way each tile's own caption describes the shape it wants --
 // "one per line as N,E", "Categories (pct/weight, e.g. 92/20)" -- so a row's
 // values are joined by commas and the rows by semicolons.
+// A cell is NOT formatted with stepNum: that groups thousands, and the cells of
+// a row are joined by commas, so an odometer reading came back as
+// "2025-03-01,42,Client visit,12,300,12,342" -- five cells printed as seven,
+// with no way to tell which commas separated what. Same precision as stepNum,
+// no grouping.
+function cellNum(x) {
+  if (Number.isInteger(x)) return String(x);
+  const a = Math.abs(x);
+  return String(Number(x.toFixed(a >= 1000 ? 1 : a >= 10 ? 2 : a >= 1 ? 3 : 4)));
+}
 function cellText(x) {
   if (x === null || x === undefined || x === "") return "";
-  if (typeof x === "number") return Number.isFinite(x) ? stepNum(x) : "";
+  if (typeof x === "number") return Number.isFinite(x) ? cellNum(x) : "";
   if (typeof x === "boolean") return x ? "yes" : "no";
   if (typeof x === "object") return "";
   return String(x);
@@ -71,8 +81,15 @@ export function stepRows(fields, params, r, humanize) {
     // A select's value is a code ("chlorine_gas", "B"); the reader chose the
     // option's text ("Chlorine gas (Cl2)", "Type B"), so print that.
     const opt = Array.isArray(f.options) ? f.options.find((o) => o && String(o.value) === String(v)) : null;
+    // A checkbox reads "yes"/"no" on the page -- domFields renders
+    // `el.checked ? "yes" : "no"` -- while the door held the boolean itself and
+    // printed "true". Same control, same answer, two different words for it,
+    // and "yes"/"no" is what a reader sees and what `run` already accepts on
+    // the way in. (cellText below has always said yes/no for a boolean INSIDE a
+    // list row, so the scalar path disagreed with its own neighbour too.)
     const shown = opt && opt.label != null ? String(opt.label)
       : typeof v === "number" ? (Number.isFinite(v) ? stepNum(v) : null)
+      : typeof v === "boolean" ? (v ? "yes" : "no")
       : (v && typeof v === "object") ? structuredText(v)
       : String(v);
     if (shown !== null) rows.push({ section: "in", label: String(f.label), value: applied ? shown + " (default, box left blank)" : shown });

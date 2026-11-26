@@ -365,3 +365,35 @@ test("every door steps row is readable, and names every input the door can label
   assert.deepEqual(unreadable.slice(0, 10), [], `${unreadable.length} steps row(s) a reader cannot check`);
   assert.deepEqual(omitted.slice(0, 10), [], `${omitted.length} input(s) the door can label but leaves out of its steps`);
 });
+
+// How a step row PRINTS a value, pinned against the page's own wording.
+//
+// Three differences between the door's rows and the page's turned out to be the
+// door's to fix, all found by comparing the two surfaces tile by tile:
+test("a step row prints a value the way the page does", async () => {
+  const { describe, run } = await import("../../mcp/catalog.mjs");
+  const rowsFor = async (id) => {
+    const d = await describe({ id });
+    const out = await run({ id, inputs: { ...d.example.inputs } });
+    return new Map(out.steps.filter((s) => s.section === "in").map((s) => [s.label, s.value]));
+  };
+
+  // 1. A checkbox reads "yes"/"no" on the page (domFields renders
+  //    `el.checked ? "yes" : "no"`); the door printed the boolean itself as
+  //    "true". Same control, same answer, two words for it.
+  const breaker = await rowsFor("breaker-sizing");
+  assert.equal(breaker.get("Continuous load (3 hours or more)"), "yes");
+
+  // 2. A row's cells are joined by commas, so a cell must not CONTAIN one.
+  //    stepNum groups thousands, which turned five cells into seven:
+  //    "2025-03-01,42,Client visit,12,300,12,342".
+  const mileage = await rowsFor("mileage-rollup");
+  assert.equal(
+    mileage.get("Trips (date,miles,purpose[,start odometer,end odometer]; one per line)"),
+    "2025-03-01,42,Client visit,12300,12342; 2025-03-04,18,Supply run,12342,12361",
+  );
+
+  // 3. A list of rows reads the way that tile's own caption asks for it.
+  const area = await rowsFor("area-by-coordinates");
+  assert.equal(area.get("Boundary corners, one per line as N,E (>= 3)"), "0,0; 0,100; 100,100; 100,0");
+});

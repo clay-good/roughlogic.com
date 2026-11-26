@@ -52,6 +52,16 @@ export class Node {
   cloneNode() { const n = new Node(this.tagName, this.ownerDocument); n.textContent = this.textContent; return n; }
   get textContent() { if (this.isText) return this._text; return this.childNodes.length ? this.childNodes.map((c) => c.textContent).join("") : this._text; }
   set textContent(v) { this.childNodes = []; this._text = v == null ? "" : String(v); }
+  // HTMLOptionElement.text -- the words a reader actually chose. steps-panel.js
+  // domFields prints `el.options[el.selectedIndex].text` for a select, so with
+  // this undefined it fell through to `el.value` and every sweep that read a
+  // select off the page under this harness saw the raw code ("copper",
+  // "single", "led_lighting") where a browser shows the label ("Copper",
+  // "Single", "LED lighting"). That made 734 page-vs-door select values look
+  // like drift in a 2026-11-26 sweep when the door had been right each time.
+  // Only OPTION carries it, as in a browser.
+  get text() { return this.tagName === "OPTION" ? this.textContent : undefined; }
+  set text(v) { if (this.tagName === "OPTION") this.textContent = v; }
   get innerText() { return this.textContent; }
   set innerText(v) { this.textContent = v; }
   get innerHTML() { return this.textContent; }
