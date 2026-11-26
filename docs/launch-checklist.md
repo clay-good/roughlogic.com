@@ -255,6 +255,14 @@ Spec-v10 is platform-only: zero new tiles, zero new groups, zero new runtime dep
 
 ### Build numbers (v0.10, refreshed 2026-05-12)
 
+> **Historical, not current state.** Every figure below is the measurement taken
+> at that close, and updating one would falsify it. The live figures come from
+> `npm run lint` and `npm run check:module-sizes`. The gap is wide by now: this
+> section's 3,036 passing tests are 8,560 today, and `citations.js` -- named
+> here as the highest-utilization shipped module -- has since been split, so its
+> own figure no longer describes the same thing. That is the record working as
+> intended rather than a set of numbers to fix.
+
 - Test count: 2,708 (v0.9.0 baseline) -> **3,036 passing** (+328 across v10 + the 2026-05-12 v9 §F.2 timer batch + v9 §F.1 magnetic-declination + the doc-reconciliation passes + the 2026-05-12 integrity-FOLDERS regression test). Lint clean. Build clean. `npm run data:verify` reports all shards OK (120 entries including the new field/wmm shard). `npm run audit` reports all 4 stages OK.
 - Home-view payload: 45,364 B (v0.9.0) -> **48,850 B** (47.7% of 100 KB cap; integrity.js +62 B from the 2026-05-12 hardcoded-FOLDERS drift fix). Per-asset sub-budgets: HTML 9.2%, CSS 30.6%, JS 95.5% (next non-trivial home-view JS addition needs a per-tile split or refactor).
 - Module sizes (gzipped): citations.js at 93.6% of cap (the highest-utilization shipped module); several calc modules within 10% of their per-module cap (calc-restoration 98.6%, calc-trucking 98.4%, calc-water 96.3%, calc-plumbing 90.8%, calc-construction 89.4%); tile-meta.js 66.5%. The `WARN: N module(s) within 10% of their cap` advisory is informational only; the cap is raised with a CHANGELOG note when a new tile pushes a module over.
@@ -292,6 +300,13 @@ Spec-v12 broadens the catalog across five new groups (U Veterinary, V EMS / Pre-
 | 10. Audit-trail records external review for Group U (vet) and Group V (EMS) | gate | [docs/audit-trail.md](audit-trail.md) is the standing record per spec-v10 §I.3; the U / V reviewer signoff rows are solicited in the v0.11 / v0.12 release window and remain open as of 2026-05-17. The §13.1 override carries the renewal clause in [docs/profession-overrides.md](profession-overrides.md) so that lapsed reviews lapse the override. |
 
 ### Build numbers (v0.12, refreshed 2026-05-18)
+
+> **Historical, not current state.** Every figure below is the measurement taken
+> at that close, and updating one would falsify it. The live figures come from
+> `npm run lint` and `npm run check:module-sizes`; the module-size table in
+> particular is six months behind the catalog by now (`calc-realestate.js` was
+> 19.9 KB at the v0.12 close and is 53.1 KB today), which is the record working
+> as intended rather than a number to fix.
 
 - **Tile count**: 302 (v0.10 close) -> **385** (+83 across Groups U / V / W / X / Y). Group enumeration: A B C D E F G H J K L M N O P Q R S T U V W X Y (24 groups; I retired in v8).
 - **Test count**: 3,036 (v0.10) -> **3,435 passing** (+399 across the v12 group suites). Lint clean. Build clean. `npm run audit` reports all 5 stages OK.
