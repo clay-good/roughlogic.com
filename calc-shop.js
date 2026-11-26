@@ -2703,7 +2703,7 @@ SHOP_RENDERERS["bearing-regrease"] = _simpleRenderer({
     { key: "od_mm", label: "Bearing outside diameter (mm)", kind: "number" },
     { key: "width_mm", label: "Bearing width (mm)", kind: "number" },
     { key: "bore_mm", label: "Bearing bore (mm)", kind: "number" },
-    { key: "rpm", label: "Operating speed (rpm)", kind: "number" },
+    { key: "rpm", label: "Operating speed (rpm)", kind: "number" , attrs: { min: "0" } },
     { key: "correction_factor", label: "Correction factor (1.0 base; 0.5 vertical or hot, 0.25 both)", kind: "number", default: 1 },
     { key: "duty_hours_per_day", label: "Operating hours per day", kind: "number", whenBlank: 24 },
     { key: "bearing_type", label: "Bearing type (interval factor K)", kind: "select", options: [{ value: "ball", label: "Radial ball (K 10)" }, { value: "cylindrical", label: "Cylindrical / needle roller (K 5)" }, { value: "spherical", label: "Spherical / tapered roller (K 1)" }], default: "ball" },
@@ -3410,7 +3410,7 @@ SHOP_RENDERERS["heat-treat-soak-time"] = _simpleRenderer({
   citation: "Citation: the section-thickness soak convention used in heat-treating practice -- through-heat and soak each proportional to the maximum section thickness, commonly about one hour per inch at temperature -- by name, and charge heat from the sensible-heat relation weight x specific heat x temperature rise, divided by the furnace's overall efficiency for the input. Time and energy only. THIS SPECIFIES NO HEAT TREATMENT: temperature, soak, quench, temper, and properties come from the steel's specification and the applicable process standard. The metallurgist governs.",
   example: heatTreatSoakTimeExample.inputs,
   fields: [
-    { key: "charge_weight_lb", label: "Charge weight (lb)", kind: "number" },
+    { key: "charge_weight_lb", label: "Charge weight (lb)", kind: "number" , attrs: { min: "0" } },
     { key: "section_thickness_in", label: "Maximum section thickness (in)", kind: "number" },
     { key: "soak_temp_f", label: "Soak temperature (F)", kind: "number" },
     { key: "start_temp_f", label: "Starting temperature (F)", kind: "number", required: true, attrs: { step: "any" } },

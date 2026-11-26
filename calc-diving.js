@@ -566,8 +566,8 @@ DIVING_RENDERERS["lift-bag-sizing"] = _simpleRenderer({
   example: liftBagSizingExample.inputs,
   fields: [
     { key: "object_weight_lb", label: "Object weight in air (lb)", kind: "number" },
-    { key: "object_density_lb_ft3", label: "Object density (lb/cu ft; steel 490, aluminum 169, concrete 150)", kind: "number", default: 490, attrs: { step: "any", value: "490" } },
-    { key: "water_density_lb_ft3", label: "Water density (lb/cu ft; 64 sea, 62.4 fresh)", kind: "number", default: 64, attrs: { step: "any", value: "64" } },
+    { key: "object_density_lb_ft3", label: "Object density (lb/cu ft; steel 490, aluminum 169, concrete 150)", kind: "number", default: 490, attrs: { min: "0", step: "any", value: "490" } },
+    { key: "water_density_lb_ft3", label: "Water density (lb/cu ft; 64 sea, 62.4 fresh)", kind: "number", default: 64, attrs: { min: "0", step: "any", value: "64" } },
     { key: "depth_ft", label: "Depth of the bags (ft)", kind: "number" },
     { key: "bag_rating_lb", label: "Rated lift of one bag (lb, blank to skip)", kind: "number" },
     { key: "breakout_lb", label: "Breakout force for bottom suction (lb, 0 if free)", kind: "number" },

@@ -325,7 +325,7 @@ MILLWRIGHT_RENDERERS["alignment-thermal-growth"] = _simpleRenderer({
     { key: "n", id: "atg-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeAlignmentThermalGrowth,
-});
+ attrs: { min: "0" } });
 
 // ============ spec-v1472: soft foot measurement and correction ============
 
@@ -385,7 +385,7 @@ MILLWRIGHT_RENDERERS["soft-foot-correction"] = _simpleRenderer({
     { key: "n", id: "sfc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeSoftFootCorrection,
-});
+ attrs: { min: "0" } });
 
 // ============ spec-v1473: coupling alignment tolerance by speed ============
 
@@ -456,7 +456,7 @@ MILLWRIGHT_RENDERERS["coupling-alignment-tolerance"] = _simpleRenderer({
     { key: "n", id: "cat-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCouplingAlignmentTolerance,
-});
+ attrs: { min: "0" } });
 
 // ============ spec-v1474: vibration severity zone ============
 
@@ -532,7 +532,7 @@ MILLWRIGHT_RENDERERS["vibration-severity-zone"] = _simpleRenderer({
     { key: "n", id: "vsz-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeVibrationSeverityZone,
-});
+ attrs: { min: "0" } });
 
 // ============ spec-v1475: vibration forcing frequencies ============
 
@@ -599,7 +599,7 @@ MILLWRIGHT_RENDERERS["vibration-forcing-frequencies"] = _simpleRenderer({
     { key: "n", id: "vff-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeVibrationForcingFrequencies,
-});
+ attrs: { min: "0" } });
 
 // ============ spec-v1476: rolling-element bearing defect frequencies ============
 
@@ -660,7 +660,7 @@ MILLWRIGHT_RENDERERS["bearing-defect-frequencies"] = _simpleRenderer({
     { key: "n", id: "bdf-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeBearingDefectFrequencies,
-});
+ attrs: { min: "0" } });
 
 // ============ spec-v1477: single-plane field balance ============
 
@@ -734,7 +734,7 @@ MILLWRIGHT_RENDERERS["single-plane-field-balance"] = _simpleRenderer({
     { key: "n", id: "spb-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeSinglePlaneFieldBalance,
-});
+ attrs: { min: "0" } });
 
 // ============ spec-v1478: roller chain wear elongation ============
 
@@ -793,7 +793,7 @@ MILLWRIGHT_RENDERERS["roller-chain-wear-elongation"] = _simpleRenderer({
     { key: "z", id: "rcw-out-z", label: "Note", value: (r) => r.note },
   ],
   compute: computeRollerChainWearElongation,
-});
+ attrs: { min: "0" } });
 
 // ============ spec-v1479: gear reducer service factor ============
 
@@ -874,7 +874,7 @@ MILLWRIGHT_RENDERERS["gear-reducer-service-factor"] = _simpleRenderer({
     { key: "n", id: "grs-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeGearReducerServiceFactor,
-});
+ attrs: { min: "0" } });
 
 // ============ spec-v1480: air compressor CFM and duty sizing ============
 
@@ -955,7 +955,7 @@ MILLWRIGHT_RENDERERS["air-compressor-cfm-sizing"] = _simpleRenderer({
     { key: "n", id: "acs-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeAirCompressorCfmSizing,
-});
+ attrs: { min: "0" } });
 
 // ============ spec-v1482: air receiver pump-up and draw-down time ============
 
@@ -1027,7 +1027,7 @@ MILLWRIGHT_RENDERERS["receiver-pump-up-time"] = _simpleRenderer({
     { key: "n", id: "rpu-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeReceiverPumpUpTime,
-});
+ attrs: { min: "0" } });
 
 // ============ spec-v1481: refrigerated and desiccant air dryer sizing ============
 
@@ -1088,7 +1088,7 @@ MILLWRIGHT_RENDERERS["air-dryer-sizing"] = _simpleRenderer({
     { key: "n", id: "ads-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeAirDryerSizing,
-});
+ attrs: { min: "0" } });
 
 // ============ spec-v1961: compressed air moisture and condensate ============
 //
@@ -1164,7 +1164,7 @@ MILLWRIGHT_RENDERERS["compressed-air-condensate"] = _simpleRenderer({
     { key: "n", id: "cac-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCompressedAirCondensate,
-});
+ attrs: { min: "0" } });
 
 // ============ spec-v1483: vacuum pump evacuation time ============
 
@@ -1228,7 +1228,7 @@ MILLWRIGHT_RENDERERS["vacuum-evacuation-time"] = _simpleRenderer({
     { key: "n", id: "vet-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeVacuumEvacuationTime,
-});
+ attrs: { min: "0" } });
 
 // spec-v1948: first critical (whirl) speed of a shaft carrying up to three masses, by Rayleigh's method
 // (Shigley, Mechanical Engineering Design, Ch. 7): with each mass's static deflection y_i under the actual loads,
@@ -1275,4 +1275,4 @@ MILLWRIGHT_RENDERERS["shaft-critical-speed-rayleigh"] = _simpleRenderer({
     { key: "n", id: "scr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeShaftCriticalSpeedRayleigh,
-});
+ attrs: { min: "0" } });

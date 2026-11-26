@@ -1150,8 +1150,8 @@ SURVEY_RENDERERS["slope-staking"] = _simpleRenderer({
   citation: "Citation: slope-stake catch point with the ground cross-slope correction, d = half-width + H s / (1 - s g), by name -- standard construction-surveying practice. The level-ground form is the g = 0 case and is reported alongside for comparison. The grading plan, the surveyor of record, and the existing-ground breaks between shots govern.",
   example: slopeStakingExample.inputs,
   fields: [
-    { key: "half_width_ft", label: "Roadway or pad half-width (ft)", kind: "number" },
-    { key: "depth_ft", label: "Cut or fill depth at the hinge (ft)", kind: "number" },
+    { key: "half_width_ft", label: "Roadway or pad half-width (ft)", kind: "number" , attrs: { min: "0" } },
+    { key: "depth_ft", label: "Cut or fill depth at the hinge (ft)", kind: "number" , attrs: { min: "0" } },
     { key: "side_slope_ratio", label: "Side-slope ratio (run per unit rise, so 2 for 2:1)", kind: "number", default: 2 },
     { key: "ground_cross_slope", label: "Ground cross slope (0.10 = 10% rising away)", kind: "number", attrs: { step: "any" } },
     { key: "section", label: "Section", kind: "select", options: [{ value: "cut", label: "Cut" }, { value: "fill", label: "Fill" }] },
@@ -1294,7 +1294,7 @@ SURVEY_RENDERERS["drone-gsd-overlap"] = _simpleRenderer({
     { key: "n", id: "dgo-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeDroneGsdOverlap,
-});
+ attrs: { min: "0" } });
 
 // ============ spec-v1742: LiDAR point density and flight line spacing ============
 
@@ -1357,7 +1357,7 @@ SURVEY_RENDERERS["lidar-point-density"] = _simpleRenderer({
     { key: "n", id: "lpd-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeLidarPointDensity,
-});
+ attrs: { min: "0" } });
 
 // ============ spec-v1743: RTK baseline error budget ============
 
@@ -1440,7 +1440,7 @@ SURVEY_RENDERERS["rtk-error-budget"] = _simpleRenderer({
     { key: "n", id: "reb-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeRtkErrorBudget,
-});
+ attrs: { min: "0" } });
 
 // ============ spec-v1744: mass haul balance, free haul, and overhaul ============
 
@@ -1530,4 +1530,4 @@ SURVEY_RENDERERS["mass-haul-overhaul"] = _simpleRenderer({
     { key: "n", id: "mho-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeMassHaulOverhaul,
-});
+ attrs: { min: "0" } });

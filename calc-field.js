@@ -497,9 +497,9 @@ const renderPacing = _r({
   citation: "Citation: Public USAF / SAR field references generally. Pace length = calibration distance / paces; terrain factor lengthens the count.",
   example: pacingExample.inputs,
   fields: [
-    { key: "calibration_distance_ft", label: "Calibration distance (ft)", kind: "number" },
-    { key: "calibration_paces",       label: "Calibration paces",         kind: "number" },
-    { key: "current_paces",           label: "Current paces",             kind: "number" },
+    { key: "calibration_distance_ft", label: "Calibration distance (ft)", kind: "number" , attrs: { min: "0" } },
+    { key: "calibration_paces",       label: "Calibration paces",         kind: "number" , attrs: { min: "0" } },
+    { key: "current_paces",           label: "Current paces",             kind: "number" , attrs: { min: "0" } },
     { key: "terrain", label: "Terrain", kind: "select", options: Object.keys(TERRAIN_FACTORS).map((k) => ({ value: k, label: k })) },
   ],
   outputs: [
@@ -546,11 +546,11 @@ const renderBackcountry = _r({
   citation: "Citation: Public USACE / military doctrine water benchmarks (2-6 L/day). Caloric estimate from public exercise-physiology benchmarks (2500-6000 kcal/day).",
   example: backcountryExample.inputs,
   fields: [
-    { key: "body_weight_lb", label: "Body weight (lb)", kind: "number" },
+    { key: "body_weight_lb", label: "Body weight (lb)", kind: "number" , attrs: { min: "0" } },
     { key: "ambient_band",   label: "Ambient band", kind: "select", options: Object.keys(WATER_LITERS_BASELINE).map((k) => ({ value: k, label: k })) },
     { key: "exertion",       label: "Exertion", kind: "select", options: Object.keys(EXERTION_KCAL_FACTOR).map((k) => ({ value: k, label: k })) },
-    { key: "trip_days",      label: "Trip days", kind: "number", default: 1 },
-    { key: "group_size",     label: "Group size", kind: "number", default: 1 },
+    { key: "trip_days",      label: "Trip days", kind: "number", default: 1 , attrs: { min: "0" } },
+    { key: "group_size",     label: "Group size", kind: "number", default: 1 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "w", id: "bc-out-w", label: "Water / person / day", value: (r) => fmt(r.water_per_day_l, 2) + " L" },
@@ -1367,7 +1367,7 @@ FIELD_RENDERERS["map-scale-conversion"] = _r({
     { key: "n", id: "mpsc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeMapScaleConversion,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1398: slope and grade from contour lines =====================
 // dims: in { contour_interval_ft: L, intervals_crossed: dimensionless, map_distance_in: L, representative_fraction: dimensionless } out: { rise_ft: L, run_ft: L, grade_pct: dimensionless, slope_angle_deg: dimensionless, slope_distance_ft: L, slope_distance_excess_pct: dimensionless, slope_ratio: dimensionless }
@@ -1418,7 +1418,7 @@ FIELD_RENDERERS["contour-slope"] = _r({
     { key: "n", id: "cnsl-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeContourSlope,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1400: helicopter landing zone sizing =====================
 // dims: in { rotor_diameter_ft: L, size_factor: dimensionless, measured_clear_ft: L, ground_slope_deg: dimensionless, slope_limit_deg: dimensionless, obstacle_height_ft: L, approach_ratio: dimensionless } out: { required_side_ft: L, slope_limit_pct: dimensionless, approach_length_ft: L, total_clear_ft: L, ground_slope_pct: dimensionless }
@@ -1486,7 +1486,7 @@ FIELD_RENDERERS["helicopter-lz-sizing"] = _r({
     { key: "n", id: "hlz-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeHelicopterLzSizing,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1401: litter carry team size and rotation =====================
 // dims: in { distance_mi: L, pace_mph: L T^-1, carriers_per_litter: dimensionless, duty_fraction: dimensionless, rotation_interval_min: T, support_personnel: dimensionless } out: { carry_time_hr: T, teams_needed: dimensionless, total_personnel: dimensionless, person_hours: T, carriers_needed: dimensionless, carry_time_min: T, rotations: dimensionless }
@@ -1544,4 +1544,4 @@ FIELD_RENDERERS["litter-carry-team"] = _r({
     { key: "n", id: "ltcy-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeLitterCarryTeam,
-});
+ attrs: { min: "0" } });

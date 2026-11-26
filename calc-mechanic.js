@@ -249,9 +249,9 @@ const renderDriveshaftMaxLength = _simpleRenderer({
   citation: "Citation: Euler-Bernoulli first-mode critical speed solved for length: the critical RPM falls as 1/length^2, so L_max = L_ref x sqrt(0.65 x N_crit_ref / target_rpm), keeping the running speed below 0.65 of critical (public guidance 0.6-0.75). A bare-tube estimate; the yokes, slip joint, balance, and support bearings shift the real critical speed. A design aid; the driveline manufacturer and a whirl analysis govern.",
   example: driveshaftMaxLengthExample.inputs,
   fields: [
-    { key: "target_rpm", label: "Operating speed (RPM)", kind: "number" },
-    { key: "od_in", label: "Tube outer diameter (in)", kind: "number" },
-    { key: "wall_in", label: "Tube wall thickness (in)", kind: "number" },
+    { key: "target_rpm", label: "Operating speed (RPM)", kind: "number" , attrs: { min: "0" } },
+    { key: "od_in", label: "Tube outer diameter (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "wall_in", label: "Tube wall thickness (in)", kind: "number" , attrs: { min: "0" } },
     { key: "material", label: "Material", kind: "select", options: Object.keys(SHAFT_MATERIALS).map((k) => ({ value: k, label: k })) },
   ],
   outputs: [
@@ -555,7 +555,7 @@ const renderPropSlip = _simpleRenderer({
     { key: "c", id: "ps-out-c", label: "Category", value: (r) => r.category },
   ],
   compute: computePropSlip,
-});
+ attrs: { min: "0" } });
 
 const renderDisplacementCR = _simpleRenderer({
   citation: "Citation: Public engine geometry. Displacement = pi/4 * bore^2 * stroke * cylinders. CR = (V_cyl + V_TDC) / V_TDC where V_TDC = chamber + gasket + deck - dome.",
@@ -577,7 +577,7 @@ const renderDisplacementCR = _simpleRenderer({
     { key: "po", id: "dc-out-po", label: "Premium octane required", value: (r) => r.requires_premium_octane ? "YES - likely requires premium octane" : "no - regular pump gas window" },
   ],
   compute: computeDisplacementCR,
-});
+ attrs: { min: "0" } });
 
 const renderChamberCcForCr = _simpleRenderer({
   citation: "Citation: static compression-ratio identity solved for the chamber volume: TDC_volume = cylinder_cc / (target_CR - 1), chamber = TDC_volume - gasket - deck + dome, from CR = (cylinder_cc + TDC_volume) / TDC_volume. 1 in^3 = 16.387 cc. Static CR only; cc'ing the actual chambers and the engine builder govern.",
@@ -597,17 +597,17 @@ const renderChamberCcForCr = _simpleRenderer({
     { key: "n", id: "cccr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeChamberCcForCr,
-});
+ attrs: { min: "0" } });
 
 const renderBoltStretch = _simpleRenderer({
   citation: "Citation: Public engineering practice. Clamp load F = (stretch * area * E) / grip. Cross-check torque from utility 153 short form.",
   example: boltStretchExample.inputs,
   fields: [
-    { key: "diameter_in", label: "Bolt diameter (in)", kind: "number" },
-    { key: "grip_length_in", label: "Grip length (in)", kind: "number" },
-    { key: "stretch_thou", label: "Target stretch (0.001 in)", kind: "number" },
+    { key: "diameter_in", label: "Bolt diameter (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "grip_length_in", label: "Grip length (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "stretch_thou", label: "Target stretch (0.001 in)", kind: "number" , attrs: { min: "0" } },
     { key: "material", label: "Fastener material", kind: "select", options: Object.keys(FASTENER_MODULUS_PSI).map((k) => ({ value: k, label: k })) },
-    { key: "k_factor", label: "Torque K-factor", kind: "number", default: 0.18 },
+    { key: "k_factor", label: "Torque K-factor", kind: "number", default: 0.18 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "f", id: "bs-out-f", label: "Clamp load", value: (r) => fmt(r.clamp_load_lb, 0) + " lb" },
@@ -620,9 +620,9 @@ const renderDriveshaft = _simpleRenderer({
   citation: "Citation: Public Euler-Bernoulli derivation. Operate below 0.6-0.75 of critical RPM.",
   example: driveshaftExample.inputs,
   fields: [
-    { key: "od_in", label: "OD (in)", kind: "number" },
-    { key: "wall_in", label: "Wall (in)", kind: "number" },
-    { key: "length_in", label: "Length between U-joints (in)", kind: "number" },
+    { key: "od_in", label: "OD (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "wall_in", label: "Wall (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "length_in", label: "Length between U-joints (in)", kind: "number" , attrs: { min: "0" } },
     { key: "material", label: "Material", kind: "select", options: Object.keys(SHAFT_MATERIALS).map((k) => ({ value: k, label: k })) },
   ],
   outputs: [
@@ -643,11 +643,11 @@ const renderFuelRange = _simpleRenderer({
       { value: "tank", label: "Tank from range + MPG" },
     ] },
     { key: "fuel", label: "Fuel", kind: "select", options: Object.keys(FUEL_PROPERTIES).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
-    { key: "tank_gal", label: "Tank (gal)", kind: "number" },
-    { key: "mpg", label: "MPG", kind: "number" },
+    { key: "tank_gal", label: "Tank (gal)", kind: "number" , attrs: { min: "0" } },
+    { key: "mpg", label: "MPG", kind: "number" , attrs: { min: "0" } },
     { key: "target_range_mi", label: "Range (mi, for inverse modes)", kind: "number" },
     { key: "mpg_basis", label: "MPG basis fuel", kind: "select", options: Object.keys(FUEL_PROPERTIES).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
-    { key: "load_factor", label: "Load factor (0-1.5)", kind: "number", whenBlank: 1 },
+    { key: "load_factor", label: "Load factor (0-1.5)", kind: "number", whenBlank: 1 , attrs: { min: "0" } },
     // v8 §C.5 + §D.1: optional cost input. The simple renderer treats this
     // as a numeric field; the user leaves it blank to skip the cost output.
     { key: "price_per_gal", label: "Price ($/gal, optional)", kind: "number", attrs: { step: "any", min: "0" } },
@@ -690,15 +690,15 @@ const renderBrakePadLife = _simpleRenderer({
   citation: "Notice: Estimate only. Manufacturer and AHJ govern. Citation: KE = 0.5 m v^2; rotor rise = 0.20 KE / (m_rotor x 460 J/kg-K). The per-kJ pad wear rates are illustrative planning defaults, not a published benchmark; a shop-measured rate overrides them.",
   example: brakePadLifeExample.inputs,
   fields: [
-    { key: "vehicle_weight_lb", label: "Vehicle weight (lb)", kind: "number" },
+    { key: "vehicle_weight_lb", label: "Vehicle weight (lb)", kind: "number" , attrs: { min: "0" } },
     { key: "speed_delta_mph", label: "Speed delta per stop (mph)", kind: "number" },
-    { key: "stops_per_mile", label: "Stops per mile", kind: "number", default: 0.4 },
-    { key: "pad_thickness_mm", label: "Pad thickness (mm)", kind: "number", whenBlank: 12 },
+    { key: "stops_per_mile", label: "Stops per mile", kind: "number", default: 0.4 , attrs: { min: "0" } },
+    { key: "pad_thickness_mm", label: "Pad thickness (mm)", kind: "number", whenBlank: 12 , attrs: { min: "0" } },
     { key: "pad_material", label: "Pad material", kind: "select", options: Object.keys(PAD_WEAR_RATE).map((k) => ({ value: k, label: PAD_WEAR_RATE[k].label })) },
     // v23 EN.14: optional shop wear-rate override + front/rear bias split.
     { key: "wear_rate_mm_per_kj", label: "Wear rate (mm/kJ, optional shop data)", kind: "number", attrs: { step: "any", min: "0" } },
     { key: "front_bias_pct", label: "Front brake bias (%, default 50)", kind: "number", default: 50 },
-    { key: "rotor_mass_lb", label: "Rotor mass (lb)", kind: "number", whenBlank: 18 },
+    { key: "rotor_mass_lb", label: "Rotor mass (lb)", kind: "number", whenBlank: 18 , attrs: { min: "0" } },
     { key: "pad_set_cost_usd", label: "Pad-set cost ($, optional)", kind: "number", attrs: { step: "any", min: "0" } },
   ],
   outputs: [
@@ -775,10 +775,10 @@ const renderValveFlowCoefficient = _simpleRenderer({
       { value: "liquid", label: "Liquid" },
       { value: "gas", label: "Gas (flagged - different equation)" },
     ] },
-    { key: "specific_gravity", label: "Specific gravity", kind: "number", whenBlank: 1 },
-    { key: "cv", label: "Cv", kind: "number" },
+    { key: "specific_gravity", label: "Specific gravity", kind: "number", whenBlank: 1 , attrs: { min: "0" } },
+    { key: "cv", label: "Cv", kind: "number" , attrs: { min: "0" } },
     { key: "flow_gpm", label: "Flow (gpm)", kind: "number" },
-    { key: "dp_psi", label: "Pressure drop (psi)", kind: "number" },
+    { key: "dp_psi", label: "Pressure drop (psi)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "out", id: "vfc-out", label: "Result", value: (r) => r.solve_for === "cv" ? "Cv = " + fmt(r.cv, 2) : r.solve_for === "dp" ? fmt(r.dp_psi, 2) + " psi" : fmt(r.flow_gpm, 2) + " gpm" },
@@ -840,7 +840,7 @@ const renderScrewConveyor = _simpleRenderer({
     { key: "mass", id: "scv-out-mass", label: "Mass rate (if density given)", value: (r) => r.mass_rate_lb_hr === null ? "(enter bulk density)" : fmt(r.mass_rate_lb_hr, 0) + " lb/hr (" + fmt(r.mass_rate_ton_hr, 2) + " ton/hr)" },
   ],
   compute: computeScrewConveyor,
-});
+ attrs: { min: "0" } });
 MECHANIC_RENDERERS["screw-conveyor"] = renderScrewConveyor;
 
 // dims: in { target_ft3_hr: L^3 T^-1, screw_diameter_in: L, shaft_diameter_in: L, pitch_in: L, loading_fraction: dimensionless } out: { rpm: T^-1, area_ft2: L^2, per_rpm: L^3 }
@@ -883,7 +883,7 @@ MECHANIC_RENDERERS["screw-conveyor-rpm"] = _simpleRenderer({
     { key: "n", id: "scr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeScrewConveyorRpm,
-});
+ attrs: { min: "0" } });
 
 // --- v770: Helical compression spring rate (`helical-spring-rate`) ---
 // Rate k = G d^4 / (8 D^3 Na), G the wire shear modulus, d the wire diameter,
@@ -927,9 +927,9 @@ MECHANIC_RENDERERS["helical-spring-rate"] = _simpleRenderer({
   citation: "Citation: helical compression spring rate k = G d^4 / (8 D^3 Na), the standard Machinery's Handbook / Shigley formula, with the wire shear modulus G by material (music wire 11.85e6, hard-drawn 11.5e6, chrome-silicon 11.2e6, stainless 302 10.0e6, phosphor bronze 6.0e6 psi). d = wire diameter, D = mean coil diameter (OD - d), Na = active coils. A good spring index D/d is 4-12. Rate only (not stress, solid height, or buckling); the spring maker governs.",
   example: helicalSpringRateExample.inputs,
   fields: [
-    { key: "wire_diameter_in", label: "Wire diameter d (in)", kind: "number" },
+    { key: "wire_diameter_in", label: "Wire diameter d (in)", kind: "number" , attrs: { min: "0" } },
     { key: "mean_coil_diameter_in", label: "Mean coil diameter D = OD - d (in)", kind: "number" },
-    { key: "active_coils", label: "Active coils Na", kind: "number" },
+    { key: "active_coils", label: "Active coils Na", kind: "number" , attrs: { min: "0" } },
     { key: "material", label: "Wire material", kind: "select", default: "music-wire", options: Object.keys(SPRING_MATERIALS).map((k) => ({ value: k, label: SPRING_MATERIALS[k].label })) },
   ],
   outputs: [
@@ -977,9 +977,9 @@ MECHANIC_RENDERERS["spring-natural-frequency"] = _simpleRenderer({
   citation: "Citation: helical spring fundamental surge frequency fn = (1/2) sqrt(k g / W) for a spring between flat parallel plates (Shigley, Mechanical Engineering Design; Machinery's Handbook), with the rate k = G d^4/(8 D^3 Na) and the active-coil weight W = pi^2 d^2 D Na gamma / 4, gamma the wire weight density by material and g = 386.4 in/s^2. The rate is identical to the helical-spring-rate tile. Higher modes are integer multiples. A screen; the spring maker governs.",
   example: springNaturalFrequencyExample.inputs,
   fields: [
-    { key: "wire_diameter_in", label: "Wire diameter d (in)", kind: "number" },
+    { key: "wire_diameter_in", label: "Wire diameter d (in)", kind: "number" , attrs: { min: "0" } },
     { key: "mean_coil_diameter_in", label: "Mean coil diameter D = OD - d (in)", kind: "number" },
-    { key: "active_coils", label: "Active coils Na", kind: "number" },
+    { key: "active_coils", label: "Active coils Na", kind: "number" , attrs: { min: "0" } },
     { key: "material", label: "Wire material", kind: "select", default: "music-wire", options: Object.keys(SPRING_MATERIALS).map((k) => ({ value: k, label: SPRING_MATERIALS[k].label })) },
   ],
   outputs: [
@@ -1039,11 +1039,11 @@ MECHANIC_RENDERERS["spring-wire-stress"] = _simpleRenderer({
   citation: "Citation: helical compression spring wire shear stress tau = Kw x 8 F D / (pi d^3) with the Wahl correction factor Kw = (4C - 1)/(4C - 4) + 0.615/C, C = D/d, the standard Machinery's Handbook / Shigley formulation; solid height Nt d (ground ends) or (Nt + 1) d (unground) per the Shigley end-condition table; and the absolute-stability slenderness limit L0/D < 5.26 for squared-and-ground ends on parallel flat plates. Stress, travel, and buckling only - the allowable stress by material and duty, fatigue life, and set-removal are the spring maker's. The companion rate calculation is helical-spring-rate.",
   example: springWireStressExample.inputs,
   fields: [
-    { key: "wire_diameter_in", label: "Wire diameter d (in)", kind: "number" },
+    { key: "wire_diameter_in", label: "Wire diameter d (in)", kind: "number" , attrs: { min: "0" } },
     { key: "mean_coil_diameter_in", label: "Mean coil diameter D = OD - d (in)", kind: "number" },
-    { key: "force_lb", label: "Spring force F (lb)", kind: "number" },
-    { key: "total_coils", label: "Total coils Nt", kind: "number" },
-    { key: "free_length_in", label: "Free length L0 (in)", kind: "number" },
+    { key: "force_lb", label: "Spring force F (lb)", kind: "number" , attrs: { min: "0" } },
+    { key: "total_coils", label: "Total coils Nt", kind: "number" , attrs: { min: "0" } },
+    { key: "free_length_in", label: "Free length L0 (in)", kind: "number" , attrs: { min: "0" } },
     { key: "end_type", label: "End condition", kind: "select", options: [
       { value: "squared-ground", label: "Squared and ground (Ls = Nt d)" },
       { value: "squared", label: "Squared, not ground (Ls = (Nt+1) d)" },
@@ -1119,10 +1119,10 @@ MECHANIC_RENDERERS["gear-tooth-bending-stress"] = _simpleRenderer({
   citation: "Citation: Lewis beam-strength equation (Wilfred Lewis, 1892; public domain): sigma = Wt / (F pc y) with face width F, circular pitch pc = pi/Pd, and the Lewis form factor y = a - b/T (20 deg full depth a,b = 0.154, 0.912; 14.5 deg full depth 0.124, 0.684; 20 deg stub 0.175, 0.841). The diametral-pitch form is sigma = Wt Pd / (F Y) with Y = pi y. Static Lewis stress only - the Barth velocity factor is gear-dynamic-tooth-stress, and the AGMA 2001 geometry (J) and load factors are not modeled. The gear maker and AGMA govern.",
   example: gearToothBendingStressExample.inputs,
   fields: [
-    { key: "transmitted_load_lb", label: "Transmitted (tangential) load Wt (lb)", kind: "number" },
-    { key: "diametral_pitch_1_in", label: "Diametral pitch Pd (teeth per in)", kind: "number" },
-    { key: "face_width_in", label: "Face width F (in)", kind: "number" },
-    { key: "number_of_teeth", label: "Number of teeth T", kind: "number" },
+    { key: "transmitted_load_lb", label: "Transmitted (tangential) load Wt (lb)", kind: "number" , attrs: { min: "0" } },
+    { key: "diametral_pitch_1_in", label: "Diametral pitch Pd (teeth per in)", kind: "number" , attrs: { min: "0" } },
+    { key: "face_width_in", label: "Face width F (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "number_of_teeth", label: "Number of teeth T", kind: "number" , attrs: { min: "0" } },
     { key: "tooth_system", label: "Tooth system", kind: "select", options: [
       { value: "20-full-depth", label: "20 deg full depth" },
       { value: "14.5-full-depth", label: "14.5 deg full depth" },
@@ -1185,13 +1185,13 @@ MECHANIC_RENDERERS["gear-contact-stress"] = _simpleRenderer({
   citation: "Citation: Hertzian gear contact stress for surface durability (J. O. Buckingham; Shigley, Mechanical Engineering Design; AGMA surface-durability geometry): sigma_c = Cp sqrt(Wt / (F dp I)), with elastic coefficient Cp = sqrt(1/(pi ((1-v1^2)/E1 + (1-v2^2)/E2))) (about 2300 sqrt-psi steel on steel), pinion pitch diameter dp = Np/Pd, and geometry factor I = (cos phi sin phi / 2) mG/(mG+1) for an external spur mesh, mG = Ng/Np. Static value only - the AGMA 2001 Ko/Kv/Ks/Km/Cf factors are 1, and the allowable contact stress is the material's. The gear maker and AGMA govern.",
   example: gearContactStressExample.inputs,
   fields: [
-    { key: "transmitted_load_lb", label: "Transmitted (tangential) load Wt (lb)", kind: "number" },
-    { key: "diametral_pitch_1_in", label: "Diametral pitch Pd (teeth per in)", kind: "number" },
-    { key: "pinion_teeth", label: "Pinion teeth Np", kind: "number" },
-    { key: "gear_teeth", label: "Gear teeth Ng", kind: "number" },
-    { key: "face_width_in", label: "Face width F (in)", kind: "number" },
-    { key: "pressure_angle_deg", label: "Pressure angle phi (deg)", kind: "number", attrs: { step: "any", value: "20" } },
-    { key: "elastic_coefficient_cp", label: "Elastic coefficient Cp (sqrt-psi)", kind: "number", attrs: { step: "any", value: "2300" } },
+    { key: "transmitted_load_lb", label: "Transmitted (tangential) load Wt (lb)", kind: "number" , attrs: { min: "0" } },
+    { key: "diametral_pitch_1_in", label: "Diametral pitch Pd (teeth per in)", kind: "number" , attrs: { min: "0" } },
+    { key: "pinion_teeth", label: "Pinion teeth Np", kind: "number" , attrs: { min: "0" } },
+    { key: "gear_teeth", label: "Gear teeth Ng", kind: "number" , attrs: { min: "0" } },
+    { key: "face_width_in", label: "Face width F (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "pressure_angle_deg", label: "Pressure angle phi (deg)", kind: "number", attrs: { min: "0", step: "any", value: "20" } },
+    { key: "elastic_coefficient_cp", label: "Elastic coefficient Cp (sqrt-psi)", kind: "number", attrs: { min: "0", step: "any", value: "2300" } },
   ],
   outputs: [
     { key: "s", id: "gcs-out-s", label: "Contact stress", value: (r) => fmt(r.contact_stress_psi, 0) + " psi" },
@@ -1237,10 +1237,10 @@ MECHANIC_RENDERERS["aerodynamic-drag-force"] = _simpleRenderer({
   citation: "Citation: aerodynamic drag F = 1/2 rho V^2 Cd A (standard fluid mechanics; SAE road-load), with the mass density rho = (weight density)/g, and the drag power P = F V. Cd and frontal area are the user's (car ~0.30, pickup ~0.45, semi ~0.6-0.8). Aero drag only; rolling resistance, grade, and driveline loss make up the rest of the road load (vehicle-road-load-power). A planning estimate; the manufacturer's road-load data governs.",
   example: aerodynamicDragForceExample.inputs,
   fields: [
-    { key: "speed_mph", label: "Speed V (mph)", kind: "number" },
-    { key: "frontal_area_ft2", label: "Frontal area A (ft²)", kind: "number" },
-    { key: "drag_coefficient", label: "Drag coefficient Cd", kind: "number" },
-    { key: "air_density_lb_ft3", label: "Air density (lb/ft³)", kind: "number", attrs: { step: "any", value: "0.0765" } },
+    { key: "speed_mph", label: "Speed V (mph)", kind: "number" , attrs: { min: "0" } },
+    { key: "frontal_area_ft2", label: "Frontal area A (ft²)", kind: "number" , attrs: { min: "0" } },
+    { key: "drag_coefficient", label: "Drag coefficient Cd", kind: "number" , attrs: { min: "0" } },
+    { key: "air_density_lb_ft3", label: "Air density (lb/ft³)", kind: "number", attrs: { min: "0", step: "any", value: "0.0765" } },
   ],
   outputs: [
     { key: "f", id: "adf-out-f", label: "Drag force", value: (r) => fmt(r.drag_force_lbf, 1) + " lbf" },
@@ -1288,13 +1288,13 @@ MECHANIC_RENDERERS["vehicle-road-load-power"] = _simpleRenderer({
   citation: "Citation: vehicle road-load force and power (SAE J2263 / J1263 road-load): F_total = 1/2 rho V^2 Cd A + Crr W + W sin(atan(grade%/100)), P = F_total V. The aero term is the aerodynamic-drag-force tile. Power at the wheels; divide by driveline efficiency for engine power. A planning estimate; the manufacturer's coastdown data governs.",
   example: vehicleRoadLoadPowerExample.inputs,
   fields: [
-    { key: "speed_mph", label: "Speed V (mph)", kind: "number" },
-    { key: "vehicle_weight_lb", label: "Vehicle weight W (lb)", kind: "number" },
-    { key: "frontal_area_ft2", label: "Frontal area A (ft²)", kind: "number" },
-    { key: "drag_coefficient", label: "Drag coefficient Cd", kind: "number" },
-    { key: "rolling_coefficient", label: "Rolling-resistance coefficient Crr", kind: "number", default: 0.012, attrs: { step: "any", value: "0.012" } },
+    { key: "speed_mph", label: "Speed V (mph)", kind: "number" , attrs: { min: "0" } },
+    { key: "vehicle_weight_lb", label: "Vehicle weight W (lb)", kind: "number" , attrs: { min: "0" } },
+    { key: "frontal_area_ft2", label: "Frontal area A (ft²)", kind: "number" , attrs: { min: "0" } },
+    { key: "drag_coefficient", label: "Drag coefficient Cd", kind: "number" , attrs: { min: "0" } },
+    { key: "rolling_coefficient", label: "Rolling-resistance coefficient Crr", kind: "number", default: 0.012, attrs: { min: "0", step: "any", value: "0.012" } },
     { key: "grade_pct", label: "Grade (%)", kind: "number", attrs: { step: "any", value: "0" } },
-    { key: "air_density_lb_ft3", label: "Air density (lb/ft³)", kind: "number", attrs: { step: "any", value: "0.0765" } },
+    { key: "air_density_lb_ft3", label: "Air density (lb/ft³)", kind: "number", attrs: { min: "0", step: "any", value: "0.0765" } },
   ],
   outputs: [
     { key: "p", id: "vrl-out-p", label: "Road-load power (at the wheels)", value: (r) => fmt(r.road_load_power_hp, 2) + " hp (" + fmt(r.road_load_power_kw, 2) + " kW)" },
@@ -1350,9 +1350,9 @@ MECHANIC_RENDERERS["planetary-gear-ratio"] = _simpleRenderer({
   citation: "Citation: epicyclic (planetary) gear-train ratio by the Willis superposition method (Machinery's Handbook; Shigley, Mechanical Engineering Design), with R0 = Nr/Ns and the six standard held-member configurations; planet teeth Np = (Nr - Ns)/2 from Nr = Ns + 2 Np. A negative ratio reverses the output. A design aid; the gear maker governs.",
   example: planetaryGearRatioExample.inputs,
   fields: [
-    { key: "sun_teeth", label: "Sun teeth Ns", kind: "number" },
-    { key: "ring_teeth", label: "Ring teeth Nr", kind: "number" },
-    { key: "input_speed_rpm", label: "Input speed (rpm)", kind: "number" },
+    { key: "sun_teeth", label: "Sun teeth Ns", kind: "number" , attrs: { min: "0" } },
+    { key: "ring_teeth", label: "Ring teeth Nr", kind: "number" , attrs: { min: "0" } },
+    { key: "input_speed_rpm", label: "Input speed (rpm)", kind: "number" , attrs: { min: "0" } },
     { key: "configuration", label: "Configuration (held member, in -> out)", kind: "select", default: "ring-fixed-sun-carrier", options: Object.keys(PLANETARY_CONFIGS).map((k) => ({ value: k, label: PLANETARY_CONFIGS[k].label })) },
   ],
   outputs: [
@@ -1418,7 +1418,7 @@ MECHANIC_RENDERERS["band-brake-torque"] = _simpleRenderer({
     { key: "n", id: "bbt-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeBandBrakeTorque,
-});
+ attrs: { min: "0" } });
 
 // --- spec-v1295 K: centrifugal force of a rotating mass (`centrifugal-force`) ---
 // flywheel-energy stores rotational KE but nothing computes the centrifugal force a rotating mass
@@ -1463,7 +1463,7 @@ MECHANIC_RENDERERS["centrifugal-force"] = _simpleRenderer({
     { key: "n", id: "cff-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCentrifugalForce,
-});
+ attrs: { min: "0" } });
 
 // --- spec-v1296 K: helical torsion spring rate and torque (`torsion-spring-rate`) ---
 // The spring family covers the compression coil but not the torsion spring (garage-door counterbalance,
@@ -1503,10 +1503,10 @@ MECHANIC_RENDERERS["torsion-spring-rate"] = _simpleRenderer({
   citation: "Citation: helical torsion spring rate k' = d^4 E/(10.8 D Na) in-lbf per turn (Young's modulus E, the wire is in bending), torque T = k'(deg/360), and bending stress sigma = Kb 32 T/(pi d^3) with the Wahl factor Kb = (4C^2 - C - 1)/(4C(C - 1)) (Shigley, Mechanical Engineering Design, Ch. 10; Machinery's Handbook). Compare to the material's allowable bending stress; the spring maker governs.",
   example: torsionSpringRateExample.inputs,
   fields: [
-    { key: "wire_diameter_in", label: "Wire diameter d (in)", kind: "number" },
+    { key: "wire_diameter_in", label: "Wire diameter d (in)", kind: "number" , attrs: { min: "0" } },
     { key: "mean_coil_diameter_in", label: "Mean coil diameter D (in)", kind: "number" },
-    { key: "active_coils", label: "Active coils Na", kind: "number" },
-    { key: "deflection_deg", label: "Wind-up deflection (deg)", kind: "number" },
+    { key: "active_coils", label: "Active coils Na", kind: "number" , attrs: { min: "0" } },
+    { key: "deflection_deg", label: "Wind-up deflection (deg)", kind: "number" , attrs: { min: "0" } },
     { key: "material", label: "Wire material", kind: "select", default: "music-wire", options: Object.keys(SPRING_MATERIALS).map((k) => ({ value: k, label: SPRING_MATERIALS[k].label })) },
   ],
   outputs: [
@@ -1570,7 +1570,7 @@ MECHANIC_RENDERERS["universal-joint-speed"] = _simpleRenderer({
     { key: "n", id: "ujs-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeUniversalJointSpeed,
-});
+ attrs: { min: "0" } });
 
 // --- spec-v1300 K: slider-crank piston position (`slider-crank-piston-position`) ---
 // The engine bench has mean-piston-speed (average) but not the instantaneous piston position at a crank
@@ -1631,7 +1631,7 @@ MECHANIC_RENDERERS["slider-crank-piston-position"] = _simpleRenderer({
     { key: "n", id: "scp-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeSliderCrankPistonPosition,
-});
+ attrs: { min: "0" } });
 
 // --- spec-v1333 K: scotch-yoke motion (`scotch-yoke-motion`) ---
 // The slider-crank tile's note calls out "the pure-sinusoid position r(1 - cos theta)" as the thing rod obliquity
@@ -1686,7 +1686,7 @@ MECHANIC_RENDERERS["scotch-yoke-motion"] = _simpleRenderer({
     { key: "n", id: "syk-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeScotchYokeMotion,
-});
+ attrs: { min: "0" } });
 
 // --- spec-v1334 K: toggle mechanism mechanical advantage (`toggle-mechanism-force`) ---
 // The MA family has pulley (pulley-ma-gen), rope (rope-ma), and chain hoist (chain-lever-hoist) but not the TOGGLE -
@@ -1729,7 +1729,7 @@ MECHANIC_RENDERERS["toggle-mechanism-force"] = _simpleRenderer({
     { key: "w", id: "tgl-out-w", label: "Note", value: (r) => (r.warnings && r.warnings.length ? r.warnings.join(" ") + " " : "") + r.note },
   ],
   compute: computeToggleMechanismForce,
-});
+ attrs: { min: "0" } });
 
 // --- spec-v1335 K: inclined-plane push/hold force (`inclined-plane-force`) ---
 // The simple-machine the MA bench skips: the force to move a load along an incline (skidding a crate up a loading
@@ -1779,7 +1779,7 @@ MECHANIC_RENDERERS["inclined-plane-force"] = _simpleRenderer({
     { key: "t", id: "inc-out-t", label: "Note", value: (r) => r.note },
   ],
   compute: computeInclinedPlaneForce,
-});
+ attrs: { min: "0" } });
 
 // --- spec-v1336 K: wedge splitting force and self-locking (`wedge-force`) ---
 // The last classic simple machine: a wedge splits, lifts, or shims. A driving force P along the centerline of a
@@ -1834,7 +1834,7 @@ MECHANIC_RENDERERS["wedge-force"] = _simpleRenderer({
     { key: "n", id: "wdg-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeWedgeForce,
-});
+ attrs: { min: "0" } });
 
 // --- spec-v1302 K: impact load factor, energy method (`impact-load-factor`) ---
 // No general impact factor for a dropped/suddenly-applied load (fall-arrest is PPE, tree-rigging-shock is
@@ -1874,7 +1874,7 @@ MECHANIC_RENDERERS["impact-load-factor"] = _simpleRenderer({
     { key: "note", id: "ilf-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeImpactLoadFactor,
-});
+ attrs: { min: "0" } });
 
 // --- spec-v1304 K: hydraulic accumulator usable oil volume (`hydraulic-accumulator-volume`) ---
 // The catalog sizes a compressed-AIR receiver but not a hydraulic accumulator, which sizes on the gas law
@@ -1916,10 +1916,10 @@ MECHANIC_RENDERERS["hydraulic-accumulator-volume"] = _simpleRenderer({
   citation: "Citation: hydraulic accumulator usable oil volume dV = V0[(P0/P1)^(1/n) - (P0/P2)^(1/n)] with absolute pressures (Machinery's Handbook; NFPA fluid-power practice; Boyle's law n = 1 isothermal, 1.4 adiabatic). The precharge sits at or below the minimum working pressure. A design aid; the accumulator maker governs.",
   example: hydraulicAccumulatorVolumeExample.inputs,
   fields: [
-    { key: "accumulator_size_gal", label: "Accumulator size V0 (gal)", kind: "number" },
-    { key: "precharge_psig", label: "Gas precharge P0 (psig)", kind: "number" },
-    { key: "min_pressure_psig", label: "Minimum working pressure P1 (psig)", kind: "number" },
-    { key: "max_pressure_psig", label: "Maximum working pressure P2 (psig)", kind: "number" },
+    { key: "accumulator_size_gal", label: "Accumulator size V0 (gal)", kind: "number" , attrs: { min: "0" } },
+    { key: "precharge_psig", label: "Gas precharge P0 (psig)", kind: "number" , attrs: { min: "0" } },
+    { key: "min_pressure_psig", label: "Minimum working pressure P1 (psig)", kind: "number" , attrs: { min: "0" } },
+    { key: "max_pressure_psig", label: "Maximum working pressure P2 (psig)", kind: "number" , attrs: { min: "0" } },
     { key: "gas_process", label: "Gas process", kind: "select", default: "isothermal", options: [
       { value: "isothermal", label: "Isothermal (slow cycle, n = 1)" },
       { value: "adiabatic", label: "Adiabatic (fast cycle, n = 1.4)" },
@@ -1972,8 +1972,8 @@ MECHANIC_RENDERERS["projectile-range"] = _simpleRenderer({
   citation: "Citation: level-ground projectile kinematics (standard mechanics): range R = v^2 sin(2 theta)/g, max height H = v^2 sin^2(theta)/(2g), flight time t = 2 v sin(theta)/g, g = 32.174 ft/s^2. Range peaks at 45 degrees; complementary angles give equal range. Still-air (no drag) upper bound. A planning estimate; field conditions govern.",
   example: projectileRangeExample.inputs,
   fields: [
-    { key: "velocity_fps", label: "Launch speed v (ft/s)", kind: "number" },
-    { key: "angle_deg", label: "Launch angle above horizontal (deg)", kind: "number" },
+    { key: "velocity_fps", label: "Launch speed v (ft/s)", kind: "number" , attrs: { min: "0" } },
+    { key: "angle_deg", label: "Launch angle above horizontal (deg)", kind: "number" , attrs: { min: "0" } },
     { key: "launch_height_ft", label: "Launch height above the landing (ft; 0 level, negative if landing higher)", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [
@@ -2022,7 +2022,7 @@ MECHANIC_RENDERERS["free-fall-drop"] = _simpleRenderer({
     { key: "n", id: "ffd-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeFreeFallDrop,
-});
+ attrs: { min: "0" } });
 
 // --- spec-v1308 K: terminal velocity from weight, area, and drag (`terminal-velocity`) ---
 // free-fall-drop gives the no-drag speed and aerodynamic-drag-force gives drag at a speed; this is where
@@ -2059,10 +2059,10 @@ MECHANIC_RENDERERS["terminal-velocity"] = _simpleRenderer({
   citation: "Citation: terminal-velocity balance W = 1/2 rho V^2 Cd A solved for V (standard fluid mechanics): V_t = sqrt(2 W/(rho_mass Cd A)), rho_mass = (weight density)/g. Time and distance to 95% of terminal from rest, v = Vt tanh(g t/Vt); tumbling and density change are separate. A planning estimate; field conditions govern.",
   example: terminalVelocityExample.inputs,
   fields: [
-    { key: "weight_lb", label: "Object weight W (lb)", kind: "number" },
-    { key: "frontal_area_ft2", label: "Frontal area A (ft²)", kind: "number" },
-    { key: "drag_coefficient", label: "Drag coefficient Cd", kind: "number" },
-    { key: "air_density_lb_ft3", label: "Air density (lb/ft³)", kind: "number", attrs: { step: "any", value: "0.0765" } },
+    { key: "weight_lb", label: "Object weight W (lb)", kind: "number" , attrs: { min: "0" } },
+    { key: "frontal_area_ft2", label: "Frontal area A (ft²)", kind: "number" , attrs: { min: "0" } },
+    { key: "drag_coefficient", label: "Drag coefficient Cd", kind: "number" , attrs: { min: "0" } },
+    { key: "air_density_lb_ft3", label: "Air density (lb/ft³)", kind: "number", attrs: { min: "0", step: "any", value: "0.0765" } },
   ],
   outputs: [
     { key: "v", id: "tv-out-v", label: "Terminal velocity", value: (r) => fmt(r.terminal_velocity_fps, 1) + " ft/s (" + fmt(r.terminal_velocity_mph, 1) + " mph)" },
@@ -2284,7 +2284,7 @@ const renderPaintMixRatio = _simpleRenderer({
     { key: "n", id: "pmr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computePaintMixRatio,
-});
+ attrs: { min: "0" } });
 MECHANIC_RENDERERS["paint-mix-ratio"] = renderPaintMixRatio;
 
 // ===================== spec-v323..v325: engine-build performance batch =====================
@@ -2357,11 +2357,11 @@ MECHANIC_RENDERERS["injector-max-hp"] = _simpleRenderer({
   citation: "Citation: fuel-injector power capacity HP_max = injector lb/h x n_cyl x duty / BSFC, the inverse of the injector-sizing relation, with BSFC ~0.50 NA / 0.55-0.65 boosted, the 80% maximum duty cycle, and lb/h x 10.5 = cc/min for gasoline, by name. Port injection, entered BSFC. A tuning aid; the measured fueling governs.",
   example: injectorMaxHpExample.inputs,
   fields: [
-    { key: "inj_flow", label: "Injector static flow", kind: "number" },
+    { key: "inj_flow", label: "Injector static flow", kind: "number" , attrs: { min: "0" } },
     { key: "flow_unit", label: "Flow unit", kind: "select", options: [{ value: "lbh", label: "lb/h" }, { value: "ccmin", label: "cc/min" }], default: "lbh" },
     { key: "n_cyl", label: "Number of injectors", kind: "number", attrs: { step: "1", min: "1" } },
-    { key: "duty", label: "Maximum duty cycle (0-1)", kind: "number", whenBlank: 0.8 },
-    { key: "bsfc", label: "BSFC (lb/hp-h; 0.50 NA, 0.55-0.65 boost)", kind: "number", default: 0.5 },
+    { key: "duty", label: "Maximum duty cycle (0-1)", kind: "number", whenBlank: 0.8 , attrs: { min: "0" } },
+    { key: "bsfc", label: "BSFC (lb/hp-h; 0.50 NA, 0.55-0.65 boost)", kind: "number", default: 0.5 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "hp", id: "imh-out-hp", label: "Maximum supported horsepower", value: (r) => fmt(r.hp_max, 0) + " hp" },
@@ -2433,7 +2433,7 @@ MECHANIC_RENDERERS["max-rpm-from-piston-speed"] = _simpleRenderer({
     { key: "n", id: "mrps-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeMaxRpmFromPistonSpeed,
-});
+ attrs: { min: "0" } });
 
 // dims: in { weight_lb: M L T^-2, trap_mph: L T^-1 } out: { hp: M L^2 T^-3, et_s: T }
 export function computeTrapSpeedHorsepower({ weight_lb = 0, trap_mph = 0 } = {}) {
@@ -2495,7 +2495,7 @@ MECHANIC_RENDERERS["et-horsepower"] = _simpleRenderer({
     { key: "n", id: "eth-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeEtHorsepower,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v396..v398: fluid-power / cooling trio (Group K) =====================
 
@@ -2530,7 +2530,7 @@ MECHANIC_RENDERERS["hydraulic-pump-horsepower"] = _simpleRenderer({
     { key: "n", id: "hph-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeHydraulicPumpHorsepower,
-});
+ attrs: { min: "0" } });
 
 // dims: in { drive_hp: M L^2 T^-3, psi: M L^-1 T^-2, efficiency: dimensionless } out: { max_gpm: L^3 T^-1, fluid_hp: M L^2 T^-3 }
 export function computeHydraulicDriveFlowLimit({ drive_hp = 0, psi = 0, efficiency = 0.85 } = {}) {
@@ -2565,7 +2565,7 @@ MECHANIC_RENDERERS["hydraulic-drive-flow-limit"] = _simpleRenderer({
     { key: "n", id: "hdfl-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeHydraulicDriveFlowLimit,
-});
+ attrs: { min: "0" } });
 
 // dims: in { psi: M L^-1 T^-2, disp_in3: L^3, gpm: L^3 T^-1, mech_eff: dimensionless, vol_eff: dimensionless } out: { torque_inlb: M L^2 T^-2, rpm: T^-1, output_hp: M L^2 T^-3 }
 export function computeHydraulicMotorTorqueSpeed({ psi = 0, disp_in3 = 0, gpm = 0, mech_eff = 0.90, vol_eff = 0.95 } = {}) {
@@ -2606,7 +2606,7 @@ MECHANIC_RENDERERS["hydraulic-motor-torque-speed"] = _simpleRenderer({
     { key: "note", id: "hmt-out-note", label: "Note", value: (r) => r.note },
   ],
   compute: computeHydraulicMotorTorqueSpeed,
-});
+ attrs: { min: "0" } });
 
 // dims: in { disp_in3: L^3, rpm: T^-1, vol_eff: dimensionless } out: { q_theo_gpm: L^3 T^-1, q_actual_gpm: L^3 T^-1, q_slip_gpm: L^3 T^-1 }
 export function computeHydraulicPumpFlow({ disp_in3 = 0, rpm = 0, vol_eff = 0.95 } = {}) {
@@ -2640,7 +2640,7 @@ MECHANIC_RENDERERS["hydraulic-pump-flow"] = _simpleRenderer({
     { key: "n", id: "hpf-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeHydraulicPumpFlow,
-});
+ attrs: { min: "0" } });
 
 // dims: in { q_btuh: M L^2 T^-3, dt_f: T, coolant: dimensionless } out: { gpm: L^3 T^-1, c: M L^-1 T^-3 }
 export function computeCoolingSystemFlow({ q_btuh = 0, dt_f = 0, coolant = "water" } = {}) {
@@ -2663,7 +2663,7 @@ MECHANIC_RENDERERS["cooling-system-flow"] = _simpleRenderer({
   citation: "Citation: Cooling-system coolant flow (heat-transfer first principles): gpm = Q / (c x deltaT), with c = 500 for water and about 427 for 50/50 glycol (density x specific heat x 60 min/hr). A sizing aid; the equipment ratings and the actual fluid properties govern.",
   example: coolingSystemFlowExample.inputs,
   fields: [
-    { key: "q_btuh", label: "Heat rejection to coolant (Btu/hr)", kind: "number" },
+    { key: "q_btuh", label: "Heat rejection to coolant (Btu/hr)", kind: "number" , attrs: { min: "0" } },
     { key: "dt_f", label: "Coolant temperature rise (°F)", kind: "number" },
     { key: "coolant", label: "Coolant", kind: "select", options: [
       { value: "water", label: "Water (c=500)" },
@@ -2713,7 +2713,7 @@ MECHANIC_RENDERERS["prop-pitch-selection"] = _simpleRenderer({
     { key: "n", id: "pps-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computePropPitchSelection,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v463: engine fuel burn from horsepower (BSFC) =====================
 // dims: in { horsepower: M L^2 T^-3, bsfc_lb_hp_hr: dimensionless, density_lb_gal: M L^-3, tank_gal: L^3 } out: { gph: L^3 T^-1, run_hours: T, lb_per_hr: M T^-1 }
@@ -2750,7 +2750,7 @@ MECHANIC_RENDERERS["engine-fuel-burn-gph"] = _simpleRenderer({
     { key: "n", id: "efb-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeEngineFuelBurnGph,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v464: alternator charging load balance =====================
 // dims: in { total_load_a: I, alternator_a: I, idle_frac: dimensionless, cruise_frac: dimensionless } out: { idle_out_a: I, cruise_out_a: I, idle_balance_a: I, cruise_balance_a: I }
@@ -2791,7 +2791,7 @@ MECHANIC_RENDERERS["alternator-charging-load"] = _simpleRenderer({
     { key: "n", id: "acl-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeAlternatorChargingLoad,
-});
+ attrs: { min: "0" } });
 
 // spec-v485: torque-wrench extension / crowfoot correction. A crowfoot or
 // in-line extension changes the effective lever, so the wrench setting differs
@@ -2835,7 +2835,7 @@ MECHANIC_RENDERERS["torque-adapter-correction"] = _simpleRenderer({
     { key: "n", id: "tac-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeTorqueAdapterCorrection,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v500: density altitude and pressure altitude =====================
 
@@ -2884,7 +2884,7 @@ MECHANIC_RENDERERS["density-altitude"] = _simpleRenderer({
   example: densityAltitudeExample.inputs,
   fields: [
     { key: "field_elevation_ft", label: "Field / station elevation (ft)", kind: "number" },
-    { key: "altimeter_in_hg", label: "Altimeter setting (in Hg)", kind: "number", whenBlank: 29.92 },
+    { key: "altimeter_in_hg", label: "Altimeter setting (in Hg)", kind: "number", whenBlank: 29.92 , attrs: { min: "0" } },
     { key: "oat_f", required: true, label: "Outside air temperature (°F)", kind: "number", default: 59 },
     { key: "relative_humidity_pct", label: "Relative humidity (%, blank for dry air)", kind: "number", attrs: { step: "any", min: "0", max: "100" } },
   ],
@@ -2935,7 +2935,7 @@ MECHANIC_RENDERERS["true-airspeed"] = _simpleRenderer({
     { key: "n", id: "tas-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeTrueAirspeed,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v501: crosswind and headwind component =====================
 
@@ -2990,7 +2990,7 @@ MECHANIC_RENDERERS["crosswind-component"] = _simpleRenderer({
     { key: "n", id: "cwc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCrosswindComponent,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v502: displacement hull speed and speed/length ratio =====================
 
@@ -3026,7 +3026,7 @@ MECHANIC_RENDERERS["hull-speed"] = _simpleRenderer({
     { key: "n", id: "hs-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeHullSpeed,
-});
+ attrs: { min: "0" } });
 
 // waterline-for-hull-speed: inverse of hull-speed. The forward tile gives the
 // displacement hull speed from a waterline length; sizing the waterline a hull
@@ -3060,7 +3060,7 @@ MECHANIC_RENDERERS["waterline-for-hull-speed"] = _simpleRenderer({
     { key: "n", id: "wlh-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeWaterlineForHullSpeed,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v505: anchor rode scope and swing radius =====================
 
@@ -3103,7 +3103,7 @@ MECHANIC_RENDERERS["anchor-rode-scope"] = _simpleRenderer({
     { key: "n", id: "ars-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeAnchorRodeScope,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v506: turbocharger pressure ratio and charge-air temp =====================
 
@@ -3153,7 +3153,7 @@ MECHANIC_RENDERERS["turbo-pressure-ratio"] = _simpleRenderer({
     { key: "n", id: "tpr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeTurboPressureRatio,
-});
+ attrs: { min: "0" } });
 
 // turbo-max-boost-for-charge-temp: inverse of turbo-pressure-ratio. The forward
 // tile gives the charge-air temperature from a boost; keeping that temperature
@@ -3239,7 +3239,7 @@ MECHANIC_RENDERERS["crouch-planing-speed"] = _simpleRenderer({
     { key: "n", id: "cps-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCrouchPlaningSpeed,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v671: horsepower for a target planing speed (inverse of crouch-planing-speed) =====================
 
@@ -3277,7 +3277,7 @@ MECHANIC_RENDERERS["crouch-hp-for-speed"] = _simpleRenderer({
     { key: "n", id: "chfs-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCrouchHpForSpeed,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v510: wheel offset and backspacing =====================
 
@@ -3325,7 +3325,7 @@ MECHANIC_RENDERERS["wheel-offset-backspacing"] = _simpleRenderer({
     { key: "n", id: "wob-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeWheelOffsetBackspacing,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v514: brake pedal ratio and line pressure =====================
 
@@ -3378,7 +3378,7 @@ MECHANIC_RENDERERS["brake-pedal-hydraulic"] = _simpleRenderer({
     { key: "n", id: "bph-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeBrakePedalHydraulic,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v515: SAE J1349 dyno correction factor =====================
 
@@ -3442,7 +3442,7 @@ MECHANIC_RENDERERS["dyno-correction-sae"] = _simpleRenderer({
     { key: "n", id: "dcs-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeDynoCorrectionSae,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v516: aircraft weight and balance (CG envelope) =====================
 
@@ -3523,7 +3523,7 @@ MECHANIC_RENDERERS["aircraft-weight-balance"] = _simpleRenderer({
     { key: "n", id: "awb-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeAircraftWeightBalance,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v517: ABYC E-11 marine DC wire sizing =====================
 // Standard AWG circular-mil areas, smallest wire to largest.
@@ -3573,7 +3573,7 @@ MECHANIC_RENDERERS["abyc-dc-wire"] = _simpleRenderer({
     { key: "n", id: "adw-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeAbycDcWire,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v783: BCI reserve capacity to amp-hours =====================
 // Reserve capacity (RC) is the minutes a fully charged 12 V battery at 80 F sustains a
@@ -3604,7 +3604,7 @@ MECHANIC_RENDERERS["reserve-capacity-amp-hours"] = _simpleRenderer({
     { key: "n", id: "rcah-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeReserveCapacityAmpHours,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v786: sacrificial (galvanic) anode service life =====================
 // Faraday's law: an anode's life = the charge it can deliver / the charge it consumes per year.
@@ -3644,8 +3644,8 @@ MECHANIC_RENDERERS["sacrificial-anode-life"] = _simpleRenderer({
   fields: [
     { key: "anode_material", label: "Anode material", kind: "select", options: [{ value: "zinc", label: "Zinc (~354 A-h/lb)" }, { value: "aluminum", label: "Aluminum Al-Zn-In (~907 A-h/lb)" }, { value: "magnesium", label: "Magnesium (~500 A-h/lb)" }] },
     { key: "anode_mass_lb", label: "Anode net mass (lb)", kind: "number" },
-    { key: "current_draw_a", label: "Protective current draw (A)", kind: "number" },
-    { key: "utilization_factor", label: "Utilization factor (0-1, ~0.85)", kind: "number", default: 0.85 },
+    { key: "current_draw_a", label: "Protective current draw (A)", kind: "number" , attrs: { min: "0" } },
+    { key: "utilization_factor", label: "Utilization factor (0-1, ~0.85)", kind: "number", default: 0.85 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "y", id: "anode-out-y", label: "Estimated life", value: (r) => fmt(r.life_years, 2) + " yr (" + fmt(r.life_months, 1) + " months)" },
@@ -3689,8 +3689,8 @@ MECHANIC_RENDERERS["engine-bmep"] = _simpleRenderer({
   citation: "Citation: brake mean effective pressure (SAE; Heywood, Internal Combustion Engine Fundamentals): BMEP = 2*pi*n_rev*T/V_d, which for T in lb-ft and V_d in CID is 150.8 x torque / displacement (4-stroke, n_rev=2) or 75.4 (2-stroke, n_rev=1). Evaluated at the torque peak; naturally-aspirated gasoline tops out near 180-190 psi, boost runs higher. A comparison metric; the dyno sheet governs.",
   example: engineBmepExample.inputs,
   fields: [
-    { key: "torque_lb_ft", label: "Peak torque (lb-ft)", kind: "number" },
-    { key: "displacement_cid", label: "Displacement (cubic inches)", kind: "number" },
+    { key: "torque_lb_ft", label: "Peak torque (lb-ft)", kind: "number" , attrs: { min: "0" } },
+    { key: "displacement_cid", label: "Displacement (cubic inches)", kind: "number" , attrs: { min: "0" } },
     { key: "cycle_type", label: "Engine cycle", kind: "select", options: [{ value: "four_stroke", label: "4-stroke (150.8)" }, { value: "two_stroke", label: "2-stroke (75.4)" }] },
   ],
   outputs: [
@@ -3737,7 +3737,7 @@ MECHANIC_RENDERERS["glidepath-descent-rate"] = _simpleRenderer({
     { key: "n", id: "gprd-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeGlidepathDescentRate,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v795: coordinated-turn radius and rate =====================
 // In a coordinated level turn, horizontal lift = centripetal force: L sin(phi) = m V^2 / R and
@@ -3777,7 +3777,7 @@ MECHANIC_RENDERERS["turn-radius-bank"] = _simpleRenderer({
     { key: "n", id: "trb-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeTurnRadiusBank,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v796: climb gradient to required rate of climb =====================
 // A departure gradient is feet of climb per nautical mile of ground track. Ground speed (kt = nm/hr)
@@ -3814,7 +3814,7 @@ MECHANIC_RENDERERS["climb-gradient-roc"] = _simpleRenderer({
     { key: "n", id: "cgr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeClimbGradientRoc,
-});
+ attrs: { min: "0" } });
 
 // =====================================================================
 // spec-v808 tire-contact-patch - contact-patch area from load and pressure.
@@ -3847,7 +3847,7 @@ MECHANIC_RENDERERS["tire-contact-patch"] = _simpleRenderer({
     { key: "n", id: "tcp-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeTireContactPatch,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v928: dynamic compression ratio =====================
 // dims: in { bore_in: L, stroke_in: L, rod_length_in: L, static_cr: dimensionless, ivc_abdc_deg: dimensionless } out: { dynamic_cr: dimensionless, clearance_volume_in3: L^3, effective_volume_in3: L^3 }
@@ -3894,7 +3894,7 @@ MECHANIC_RENDERERS["dynamic-compression-ratio"] = _simpleRenderer({
     { key: "n", id: "dcr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeDynamicCompressionRatio,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v959: driveline U-joint operating angle and cancellation =====================
 // dims: in { input_angle_deg: dimensionless, output_angle_deg: dimensionless } out: { first_joint_variation_pct: dimensionless, second_joint_variation_pct: dimensionless, angle_difference_deg: dimensionless }
@@ -3985,7 +3985,7 @@ MECHANIC_RENDERERS["hull-displacement"] = _simpleRenderer({
     { key: "n", id: "hdp-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeHullDisplacement,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v998: sailboat performance ratios (SA/D and DLR) =====================
 // dims: in { sail_area_sqft: L^2, displacement_lb: M, lwl_ft: L } out: { sa_d_ratio: dimensionless, dl_ratio: dimensionless }
@@ -4026,7 +4026,7 @@ MECHANIC_RENDERERS["sailboat-performance-ratios"] = _simpleRenderer({
     { key: "n", id: "spr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeSailboatPerformanceRatios,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1007: flywheel stored kinetic energy and speed fluctuation =====================
 // dims: in { weight_lb: M, radius_of_gyration_ft: L, rpm: T^-1, energy_fluctuation_ftlb: M L^2 T^-2 } out: { kinetic_energy_ftlb: M L^2 T^-2, speed_fluctuation_pct: dimensionless }
@@ -4068,7 +4068,7 @@ MECHANIC_RENDERERS["flywheel-energy"] = _simpleRenderer({
     { key: "n", id: "fly-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeFlywheelEnergy,
-});
+ attrs: { min: "0" } });
 
 // --- spec-v1037 K: Hydraulic line fluid velocity ---
 // V (ft/s) = 231 in^3/gal / (60 s/min x 12 in/ft) x Q / A = 0.3208333 Q / A, with A = pi/4 d^2.
@@ -4119,7 +4119,7 @@ MECHANIC_RENDERERS["hydraulic-line-velocity"] = _simpleRenderer({
   example: hydraulicLineVelocityExample.inputs,
   fields: [
     { key: "flow_gpm", label: "Flow (gpm)", kind: "number" },
-    { key: "inside_dia_in", label: "Line inside diameter (in, true ID)", kind: "number" },
+    { key: "inside_dia_in", label: "Line inside diameter (in, true ID)", kind: "number" , attrs: { min: "0" } },
     { key: "line_type", label: "Line type", kind: "select", options: [{ value: "pressure", label: "Pressure / discharge (7-18 ft/s)", selected: true }, { value: "return", label: "Return (4-13 ft/s)" }, { value: "suction", label: "Suction / inlet (2-4 ft/s)" }] },
     { key: "max_velocity_override_fps", label: "Velocity ceiling override (ft/s, 0 = default)", kind: "number" },
   ],
@@ -4178,9 +4178,9 @@ MECHANIC_RENDERERS["injector-flow-at-pressure"] = _simpleRenderer({
   citation: "Citation: orifice flow scales with the square root of the pressure differential, flow_new = flow_rated x sqrt(dP_new / dP_rated) - no table and no fitted constant. The differential depends on the fuel system: a RETURN system's manifold-referenced regulator holds the differential constant regardless of boost, while a RETURNLESS system holds the rail pressure constant so the differential is rail minus manifold pressure and boost reduces it. Static (full-open) flow only - not delivered flow at a pulse width, and not injector dead time, which shifts with voltage and pressure. Gasoline at about 0.72 specific gravity for the cc/min to lb/h conversion, matching the injector-size tile. A tuning aid; the injector's flow data and measured fueling govern.",
   example: injectorFlowAtPressureExample.inputs,
   fields: [
-    { key: "rated_flow_ccmin", label: "Rated injector flow (cc/min)", kind: "number" },
-    { key: "rated_pressure_psi", label: "Rated at pressure (psi; 43.5 = 3 bar)", kind: "number", default: 43.5 },
-    { key: "rail_pressure_psi", label: "Actual rail pressure (psi)", kind: "number", whenBlank: 43.5 },
+    { key: "rated_flow_ccmin", label: "Rated injector flow (cc/min)", kind: "number" , attrs: { min: "0" } },
+    { key: "rated_pressure_psi", label: "Rated at pressure (psi; 43.5 = 3 bar)", kind: "number", default: 43.5 , attrs: { min: "0" } },
+    { key: "rail_pressure_psi", label: "Actual rail pressure (psi)", kind: "number", whenBlank: 43.5 , attrs: { min: "0" } },
     { key: "manifold_pressure_psig", label: "Manifold pressure (psig; + boost, - vacuum)", kind: "number", default: 0 },
     { key: "system_type", label: "Fuel system", kind: "select", options: [{ value: "returnless", label: "Returnless (fixed rail pressure)", selected: true }, { value: "return", label: "Return (manifold-referenced regulator)" }] },
   ],
@@ -4266,15 +4266,15 @@ MECHANIC_RENDERERS["belt-deflection-tension"] = _simpleRenderer({
   citation: "Citation: force-deflection tensioning per the belt manufacturers' standard field procedure (Carlisle/Timken, Gates, TB Wood's, Bestorq all publish the same rule) - deflect the midspan 1/64 in for each 1 in of span and compare the force to the maker's recommended range. Span is the external tangent between the sheaves, t = sqrt(C^2 - ((D-d)/2)^2), pure geometry. The static tension follows from statics, not a table: a midspan force F against two half-spans gives F = 4 T x deflection / t, and at deflection = t/64 the span cancels to T = 16 F. The 1.3 multiplier for an unseated new belt is the commonly published run-in allowance and is editable here; the maker's own figure governs. The recommended force range itself is belt-section, sheave-diameter, and speed specific proprietary table data and is an INPUT, not built in. A field aid; the drive manufacturer's instructions govern.",
   example: beltDeflectionTensionExample.inputs,
   fields: [
-    { key: "center_distance_in", label: "Center distance (in)", kind: "number" },
-    { key: "large_sheave_dia_in", label: "Large sheave pitch diameter (in)", kind: "number" },
-    { key: "small_sheave_dia_in", label: "Small sheave pitch diameter (in)", kind: "number" },
-    { key: "measured_force_lb", label: "Measured deflection force (lb)", kind: "number" },
-    { key: "rec_min_force_lb", label: "Maker's recommended min force (lb)", kind: "number" },
-    { key: "rec_max_force_lb", label: "Maker's recommended max force (lb)", kind: "number" },
+    { key: "center_distance_in", label: "Center distance (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "large_sheave_dia_in", label: "Large sheave pitch diameter (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "small_sheave_dia_in", label: "Small sheave pitch diameter (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "measured_force_lb", label: "Measured deflection force (lb)", kind: "number" , attrs: { min: "0" } },
+    { key: "rec_min_force_lb", label: "Maker's recommended min force (lb)", kind: "number" , attrs: { min: "0" } },
+    { key: "rec_max_force_lb", label: "Maker's recommended max force (lb)", kind: "number" , attrs: { min: "0" } },
     { key: "belt_condition", label: "Belt condition", kind: "select", options: [{ value: "used", label: "Run-in (used) belt", selected: true }, { value: "new", label: "New belt (not yet seated)" }] },
-    { key: "new_belt_factor", label: "New-belt factor", kind: "number", whenBlank: 1.3 },
-    { key: "belt_count", label: "Number of belts", kind: "number", whenBlank: 1 },
+    { key: "new_belt_factor", label: "New-belt factor", kind: "number", whenBlank: 1.3 , attrs: { min: "0" } },
+    { key: "belt_count", label: "Number of belts", kind: "number", whenBlank: 1 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "s", id: "bdt-out-s", label: "Belt span", value: (r) => fmt(r.span_in, 2) + " in" },
@@ -4368,13 +4368,13 @@ MECHANIC_RENDERERS["gear-dynamic-tooth-stress"] = _simpleRenderer({
   citation: "Citation: the Barth velocity factor applied to the Lewis bending stress - Kv = (1200 + V)/1200 for cut or milled teeth and (600 + V)/600 for cast or crude teeth, with V the pitch-line velocity in feet per minute, so sigma = (Wt Pd / (F Y)) x Kv. The static Lewis stress is delegated to the landed gear-tooth-bending-stress tile rather than reimplemented. Tangential load comes from horsepower and speed: torque = 63,025 HP / rpm in-lb, Wt = 2 T / D, V = pi D N / 12. The 1.42 idler factor accounts for fully reversed bending in a gear driven on one flank and driving on the other. The Sut/3 allowable is the rough estimate used when no material allowable is available, not a rated endurance limit. Barth is the ancestor of the AGMA dynamic factor and is conservative; the AGMA application, size, load-distribution, rim-thickness, and geometry (J) factors and any surface-durability check are not modeled. A screen; AGMA 2001 and the gear maker govern.",
   example: gearDynamicToothStressExample.inputs,
   fields: [
-    { key: "horsepower", label: "Transmitted horsepower", kind: "number" },
-    { key: "rpm", label: "Gear speed (rpm)", kind: "number" },
-    { key: "number_of_teeth", label: "Number of teeth", kind: "number" },
-    { key: "diametral_pitch_1_in", label: "Diametral pitch Pd (teeth per inch)", kind: "number" },
-    { key: "face_width_in", label: "Face width F (in)", kind: "number" },
+    { key: "horsepower", label: "Transmitted horsepower", kind: "number" , attrs: { min: "0" } },
+    { key: "rpm", label: "Gear speed (rpm)", kind: "number" , attrs: { min: "0" } },
+    { key: "number_of_teeth", label: "Number of teeth", kind: "number" , attrs: { min: "0" } },
+    { key: "diametral_pitch_1_in", label: "Diametral pitch Pd (teeth per inch)", kind: "number" , attrs: { min: "0" } },
+    { key: "face_width_in", label: "Face width F (in)", kind: "number" , attrs: { min: "0" } },
     { key: "tooth_system", label: "Tooth system", kind: "select", options: [{ value: "20-full-depth", label: "20 deg full depth", selected: true }, { value: "14.5-full-depth", label: "14.5 deg full depth" }, { value: "20-stub", label: "20 deg stub" }] },
-    { key: "y_diametral_override", label: "Lewis Y override (0 = derive from the tooth system)", kind: "number", default: 0 },
+    { key: "y_diametral_override", label: "Lewis Y override (0 = derive from the tooth system)", kind: "number", default: 0 , attrs: { min: "0" } },
     { key: "tooth_cut", label: "Tooth quality", kind: "select", options: [{ value: "cut", label: "Cut or milled (Kv base 1200)", selected: true }, { value: "cast", label: "Cast or crude (Kv base 600)" }] },
     { key: "is_idler", label: "Is this gear an idler?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes - reversed bending, 1.42" }] },
     { key: "sut_psi", label: "Material ultimate strength Sut (psi; 0 to skip)", kind: "number" },
@@ -4449,12 +4449,12 @@ MECHANIC_RENDERERS["carburetor-altitude-jetting"] = _simpleRenderer({
   citation: "Citation: the air-density ratio from the absolute pressure ratio times the inverse absolute-temperature ratio, and the carburetor jet-scaling relation in which fuel flow follows jet area times the square root of the venturi depression while required fuel follows air density -- so jet area scales as the square root of the density ratio and jet diameter as its fourth root, by name. A first-order correction for the MAIN circuit only. Altitude-compensating carburetors, forced induction, and closed-loop electronic control invalidate it. The engine manufacturer's altitude kit and specifications govern.",
   example: carburetorAltitudeJettingExample.inputs,
   fields: [
-    { key: "baseline_pressure_inhg", label: "Baseline absolute pressure (in Hg)", kind: "number", whenBlank: 29.92 },
+    { key: "baseline_pressure_inhg", label: "Baseline absolute pressure (in Hg)", kind: "number", whenBlank: 29.92 , attrs: { min: "0" } },
     { key: "baseline_temp_f", required: true, label: "Baseline temperature (F)", kind: "number", default: 59, attrs: { step: "any" } },
-    { key: "actual_pressure_inhg", label: "Actual absolute pressure (in Hg)", kind: "number" },
+    { key: "actual_pressure_inhg", label: "Actual absolute pressure (in Hg)", kind: "number" , attrs: { min: "0" } },
     { key: "actual_temp_f", required: true, label: "Actual temperature (F)", kind: "number", attrs: { step: "any" } },
-    { key: "jet_flow_number", label: "Original jet flow number (0 to skip)", kind: "number" },
-    { key: "jet_diameter_in", label: "Original jet diameter (in, 0 to skip)", kind: "number" },
+    { key: "jet_flow_number", label: "Original jet flow number (0 to skip)", kind: "number" , attrs: { min: "0" } },
+    { key: "jet_diameter_in", label: "Original jet diameter (in, 0 to skip)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "d", id: "cajt-out-d", label: "Density ratio", value: (r) => fmt(r.density_ratio, 3) + " = " + fmt(r.pressure_ratio, 3) + " pressure x " + fmt(r.temperature_ratio, 3) + " temperature" },
@@ -4520,11 +4520,11 @@ MECHANIC_RENDERERS["spray-transfer-efficiency"] = _simpleRenderer({
   citation: "Citation: transfer efficiency = material deposited / material sprayed, so material required = applied material / transfer efficiency, with the balance (1 - TE) becoming overspray. Rated efficiencies are laboratory or standardized-test values (conventional siphon guns commonly 25 to 35%, HVLP 55 to 70%) and achieved efficiency depends heavily on operator technique, part geometry, and gun setup -- a shop's measured consumption is the better basis. It does not compute theoretical coverage (the coating coverage calculator computes it), select equipment, or address the air district rule requiring HVLP or an equivalent demonstrated transfer efficiency and its recordkeeping. The coating manufacturer's technical data sheet, the applicable air quality regulation, and OSHA govern.",
   example: sprayTransferEfficiencyExample.inputs,
   fields: [
-    { key: "applied_material_qt", label: "Applied material the job needs (qt)", kind: "number", attrs: { step: "any" } },
-    { key: "transfer_efficiency", label: "Transfer efficiency of the gun in hand (0 to 1)", kind: "number", attrs: { step: "any" } },
-    { key: "alt_transfer_efficiency", label: "Alternative equipment efficiency (0 to 1, 0 to skip)", kind: "number", attrs: { step: "any" } },
-    { key: "price_per_qt", label: "Material price ($/qt)", kind: "number", attrs: { step: "any" } },
-    { key: "jobs_per_year", label: "Jobs per year", kind: "number", attrs: { step: "any" } },
+    { key: "applied_material_qt", label: "Applied material the job needs (qt)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "transfer_efficiency", label: "Transfer efficiency of the gun in hand (0 to 1)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "alt_transfer_efficiency", label: "Alternative equipment efficiency (0 to 1, 0 to skip)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "price_per_qt", label: "Material price ($/qt)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "jobs_per_year", label: "Jobs per year", kind: "number", attrs: { min: "0", step: "any" } },
   ],
   outputs: [
     { key: "u", id: "ste-out-u", label: "Material sprayed and overspray", value: (r) => r.usage_verdict },
@@ -4601,14 +4601,14 @@ MECHANIC_RENDERERS["adhesive-bond-area"] = _simpleRenderer({
   citation: "Citation: bond area = bond length x bond width and capacity = area x shear strength, with the shear strength taken from the adhesive manufacturer's data sheet AT THE SERVICE TEMPERATURE and for the substrate, surface preparation, bond line thickness, and cure schedule the joint actually has. Surface preparation usually governs the achieved strength and is not represented in this arithmetic. It does not address peel or cleavage loading, stress concentration at the bond ends, or the combination of bonding with welds and rivets. The vehicle manufacturer's body repair manual and position statements, and the adhesive manufacturer's technical data sheet, govern.",
   example: adhesiveBondAreaExample.inputs,
   fields: [
-    { key: "bond_length_in", label: "Bond length (in)", kind: "number", attrs: { step: "any" } },
-    { key: "bond_width_in", label: "Bond (bead) width (in)", kind: "number", attrs: { step: "any" } },
-    { key: "shear_strength_psi", label: "Adhesive shear strength (psi)", kind: "number", attrs: { step: "any" } },
-    { key: "required_load_lb", label: "Required joint capacity (lb, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "bond_length_in", label: "Bond length (in)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "bond_width_in", label: "Bond (bead) width (in)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "shear_strength_psi", label: "Adhesive shear strength (psi)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "required_load_lb", label: "Required joint capacity (lb, 0 to skip)", kind: "number", attrs: { min: "0", step: "any" } },
     { key: "elevated_shear_strength_psi", label: "Shear strength at service temperature (psi, 0 to skip)", kind: "number", attrs: { step: "any" } },
-    { key: "bond_line_in", label: "Bond line thickness (in, 0 to skip)", kind: "number", attrs: { step: "any" } },
-    { key: "bond_line_min_in", label: "Bond line minimum specified (in)", kind: "number", attrs: { step: "any" } },
-    { key: "bond_line_max_in", label: "Bond line maximum specified (in)", kind: "number", attrs: { step: "any" } },
+    { key: "bond_line_in", label: "Bond line thickness (in, 0 to skip)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "bond_line_min_in", label: "Bond line minimum specified (in)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "bond_line_max_in", label: "Bond line maximum specified (in)", kind: "number", attrs: { min: "0", step: "any" } },
   ],
   outputs: [
     { key: "c", id: "aba-out-c", label: "Bond area and capacity", value: (r) => r.capacity_verdict },

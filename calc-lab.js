@@ -1299,5 +1299,5 @@ const renderGelPercentAgarose = _v23SimpleRenderer({
     { key: "g", id: "gpa-out-g", label: "Agarose to weigh", value: (r) => fmt(r.grams_agarose, 2) + " g" },
   ],
   compute: computeGelPercentAgarose,
-});
+ attrs: { min: "0" } });
 LAB_RENDERERS["gel-percent-agarose"] = renderGelPercentAgarose;

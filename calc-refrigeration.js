@@ -287,8 +287,8 @@ REFRIGERATION_RENDERERS["two-stage-interstage-pressure"] = _simpleRenderer({
   citation: "Citation: the equal-stage-ratio optimum for multistage compression as refrigeration practice states it -- P_interstage = sqrt(P_low x P_high) on ABSOLUTE pressures, which makes the ratio equal in both stages and minimizes total compression work. Gauge pressures are converted at the 14.7 psi standard atmosphere the trade uses. It does not select compressors, size the intercooler, or compute discharge temperature; the compressor manufacturer's selection data govern.",
   example: twoStageInterstagePressureExample.inputs,
   fields: [
-    { key: "low_psig", label: "Suction (low-side) pressure (psig)", kind: "number", attrs: { step: "any" } },
-    { key: "high_psig", label: "Discharge (high-side) pressure (psig)", kind: "number", attrs: { step: "any" } },
+    { key: "low_psig", label: "Suction (low-side) pressure (psig)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "high_psig", label: "Discharge (high-side) pressure (psig)", kind: "number", attrs: { min: "0", step: "any" } },
     { key: "intermediate_load_psig", label: "Intermediate load saturation pressure (psig, 0 to skip)", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [
@@ -450,7 +450,7 @@ REFRIGERATION_RENDERERS["freezer-underfloor-heat"] = _simpleRenderer({
     { key: "target_soil_temp_f", label: "Target soil temperature under the slab (°F)", kind: "number", attrs: { step: "any" } },
     { key: "u_factor", label: "Below-slab assembly U-factor (BTU/h per sq ft per °F)", kind: "number" },
     { key: "tube_output_btuh_per_ft", label: "Tube or cable output (BTU/h per ft, 0 to skip)", kind: "number" },
-    { key: "energy_rate_per_kwh", label: "Energy rate ($/kWh)", kind: "number" },
+    { key: "energy_rate_per_kwh", label: "Energy rate ($/kWh)", kind: "number" , attrs: { min: "0" } },
     { key: "hours_per_year", label: "Operating hours per year", kind: "number", default: 8760 },
   ],
   outputs: [
@@ -542,7 +542,7 @@ REFRIGERATION_RENDERERS["condenser-td-head-pressure"] = _simpleRenderer({
     { key: "power_pct_per_deg_f", label: "Compressor power sensitivity (% per °F of condensing)", kind: "number", default: 1.75 },
     { key: "compressor_hp", label: "Compressor power (hp, 0 to skip the cost)", kind: "number" },
     { key: "annual_hours", label: "Annual operating hours", kind: "number" },
-    { key: "energy_rate_per_kwh", label: "Energy rate ($/kWh)", kind: "number" },
+    { key: "energy_rate_per_kwh", label: "Energy rate ($/kWh)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "b", id: "ctd-out-b", label: "TD basis", value: (r) => "measured from the " + r.basis_label },

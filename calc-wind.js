@@ -160,7 +160,7 @@ WIND_RENDERERS["tip-speed-ratio"] = _simpleRenderer({
     { key: "n", id: "tsr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeTipSpeedRatio,
-});
+ attrs: { min: "0" } });
 
 // ============ spec-v1551: wind power density and the Betz limit ============
 
@@ -213,7 +213,7 @@ WIND_RENDERERS["wind-power-density-betz"] = _simpleRenderer({
     { key: "n", id: "wpd-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeWindPowerDensityBetz,
-});
+ attrs: { min: "0" } });
 
 // ============ spec-v1552: wind shear to hub height ============
 

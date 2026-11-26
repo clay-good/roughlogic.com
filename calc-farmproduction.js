@@ -772,7 +772,7 @@ FARMPRODUCTION_RENDERERS["cattle-heart-girth-weight"] = _r({
     { key: "n", id: "chg-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCattleHeartGirthWeight,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v994: pre-harvest corn yield (yield component method) =====================
 // dims: in { ears_per_thousandth_acre: dimensionless, kernel_rows_around: dimensionless, kernels_per_row: dimensionless, kernel_factor: dimensionless } out: { kernels_per_ear: dimensionless, bushels_per_acre: dimensionless }
@@ -810,7 +810,7 @@ FARMPRODUCTION_RENDERERS["corn-yield-estimate"] = _r({
     { key: "n", id: "cye-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCornYieldEstimate,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v995: carcass dressing percentage =====================
 // dims: in { live_weight_lb: M, hot_carcass_weight_lb: M, cutting_yield_pct: dimensionless, chill_shrink_pct: dimensionless } out: { dressing_pct: dimensionless, chilled_carcass_lb: M, boneless_yield_lb: M }
@@ -855,7 +855,7 @@ FARMPRODUCTION_RENDERERS["dressing-percentage"] = _r({
     { key: "n", id: "drp-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeDressingPercentage,
-});
+ attrs: { min: "0" } });
 
 // --- spec-v1265: reference evapotranspiration ET0 (Hargreaves / FAO-56) ---
 // The irrigation tiles (acre-foot ET requirement, irrigation scheduling) CONSUME a reference ET (ET0) but

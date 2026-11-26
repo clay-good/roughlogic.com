@@ -3804,7 +3804,7 @@ HVAC_RENDERERS["assembly-r-value"] = _rEnv({
     { key: "n", id: "arv-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeAssemblyRValue,
-});
+ attrs: { min: "0" } });
 
 // dims: in { area_sqft: L^2, bags_per_1000: dimensionless, r_per_inch: dimensionless, target_r: dimensionless } out: { bags: dimensionless, coverage_per_bag: L^2, min_thickness_in: L }
 export function computeBlownInsulationCoverage({ area_sqft = 0, bags_per_1000 = 0, r_per_inch = 3.5, target_r = 0 } = {}) {
@@ -3837,7 +3837,7 @@ HVAC_RENDERERS["blown-insulation-coverage"] = _rEnv({
     { key: "n", id: "bic-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeBlownInsulationCoverage,
-});
+ attrs: { min: "0" } });
 
 // =====================================================================
 // spec-v233..v235: heat-pump heating-mode batch (Group C). Seasonal
@@ -3887,7 +3887,7 @@ HVAC_RENDERERS["heat-pump-seasonal-energy"] = _rEnv({
     { key: "n", id: "hpse-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeHeatPumpSeasonalEnergy,
-});
+ attrs: { min: "0" } });
 
 // dims: in { rate_kwh: dimensionless, rate_therm: dimensionless, afue: dimensionless, cop_now: dimensionless } out: { gas_per_mmbtu: dimensionless, hp_per_mmbtu: dimensionless, cop_switch: dimensionless }
 export function computeDualFuelBalancePoint({ rate_kwh = 0, rate_therm = 0, afue = 0.95, cop_now = 0 } = {}) {
@@ -3926,7 +3926,7 @@ HVAC_RENDERERS["dual-fuel-balance-point"] = _rEnv({
     { key: "n", id: "dfbp-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeDualFuelBalancePoint,
-});
+ attrs: { min: "0" } });
 
 // dims: in { cap_47_btuh: M L^2 T^-3, cap_17_btuh: M L^2 T^-3, design_temp_f: T, design_load_btuh: M L^2 T^-3 } out: { slope: M L^2 T^-3, cap_design: M L^2 T^-3, shortfall: M L^2 T^-3, aux_kw: M L^2 T^-3 }
 export function computeHeatPumpColdCapacity({ cap_47_btuh = 0, cap_17_btuh = 0, design_temp_f = null, design_load_btuh = 0 } = {}) {
@@ -3965,7 +3965,7 @@ HVAC_RENDERERS["heat-pump-cold-capacity"] = _rEnv({
     { key: "n", id: "hpcc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeHeatPumpColdCapacity,
-});
+ attrs: { min: "0" } });
 
 // =====================================================================
 // spec-v239..v241: compressed-air energy batch (Group C). The three levers
@@ -4017,7 +4017,7 @@ HVAC_RENDERERS["air-leak-cost"] = _rEnv({
     { key: "n", id: "alc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeAirLeakCost,
-});
+ attrs: { min: "0" } });
 
 // dims: in { free_air_cfm: L^3 T^-1, inlet_psia: M L^-1 T^-2, discharge_psig: M L^-1 T^-2, overall_eff: dimensionless, run_hours: T, rate_kwh: dimensionless } out: { theo_hp: M L^2 T^-3, input_kw: M L^2 T^-3, annual_kwh: M L^2 T^-2, annual_cost: dimensionless, p2_abs: M L^-1 T^-2 }
 export function computeCompressedAirPower({ free_air_cfm = 0, inlet_psia = 14.7, discharge_psig = 0, overall_eff = 0.75, run_hours = 4000, rate_kwh = 0 } = {}) {
@@ -4061,7 +4061,7 @@ HVAC_RENDERERS["compressed-air-power"] = _rEnv({
     { key: "n", id: "cap-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCompressedAirPower,
-});
+ attrs: { min: "0" } });
 
 // dims: in { current_psig: M L^-1 T^-2, reduced_psig: M L^-1 T^-2, inlet_psia: M L^-1 T^-2, input_kw: M L^2 T^-3, run_hours: T, rate_kwh: dimensionless } out: { pct_saved: dimensionless, kw_saved: M L^2 T^-3, annual_kwh: M L^2 T^-2, annual_savings: dimensionless }
 export function computeAirPressureSetpointSavings({ current_psig = 0, reduced_psig = 0, inlet_psia = 14.7, input_kw = 0, run_hours = 6000, rate_kwh = 0 } = {}) {
@@ -4109,7 +4109,7 @@ HVAC_RENDERERS["air-pressure-setpoint-savings"] = _rEnv({
     { key: "n", id: "apss-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeAirPressureSetpointSavings,
-});
+ attrs: { min: "0" } });
 
 // =====================================================================
 // spec-v275..v277: ventilation-and-recovery batch (Group C). The three
@@ -4210,7 +4210,7 @@ HVAC_RENDERERS["mua-tempering-load"] = _rEnv({
     { key: "n", id: "mua-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeMuaTemperingLoad,
-});
+ attrs: { min: "0" } });
 
 // dims: in { n: dimensionless, co2_set_ppm: dimensionless, co2_oa_ppm: dimensionless, gen_cfm: L^3 T^-1 } out: { Q_person_cfm: L^3 T^-1, Q_total_cfm: L^3 T^-1, co2_check_ppm: dimensionless }
 export function computeDcvCo2Ventilation({ n = 0, co2_set_ppm = 0, co2_oa_ppm = 400, gen_cfm = 0.0106 } = {}) {
@@ -4246,7 +4246,7 @@ HVAC_RENDERERS["dcv-co2-ventilation"] = _rEnv({
     { key: "n", id: "dcv-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeDcvCo2Ventilation,
-});
+ attrs: { min: "0" } });
 
 // =====================================================================
 // spec-v305..v307: pump-and-fluid fundamentals batch (Group C). The
@@ -4317,7 +4317,7 @@ HVAC_RENDERERS["hydronic-gpm-deltat"] = _rEnv({
     { key: "n", id: "hgd-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeHydronicGpmDeltat,
-});
+ attrs: { min: "0" } });
 
 // dims: in { n_rpm: T^-1, q_gpm: L^3 T^-1, h_ft: L } out: { ns: dimensionless }
 export function computePumpSpecificSpeed({ n_rpm = 0, q_gpm = 0, h_ft = 0 } = {}) {
@@ -4347,7 +4347,7 @@ HVAC_RENDERERS["pump-specific-speed"] = _rEnv({
     { key: "n", id: "pss-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computePumpSpecificSpeed,
-});
+ attrs: { min: "0" } });
 
 // dims: in { n_rpm: T^-1, q_gpm: L^3 T^-1, npshr_ft: L } out: { nss: dimensionless }
 export function computePumpSuctionSpecificSpeed({ n_rpm = 0, q_gpm = 0, npshr_ft = 0 } = {}) {
@@ -4377,7 +4377,7 @@ HVAC_RENDERERS["pump-suction-specific-speed"] = _rEnv({
     { key: "n", id: "psss-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computePumpSuctionSpecificSpeed,
-});
+ attrs: { min: "0" } });
 
 // =====================================================================
 // spec-v329..v331: building-energy batch (Group C). The whole-house
@@ -4581,7 +4581,7 @@ HVAC_RENDERERS["erv-total-enthalpy-recovery"] = _rEnv({
     { key: "n", id: "erv-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeErvTotalEnthalpyRecovery,
-});
+ attrs: { min: "0" } });
 
 // EN 1264's basic characteristic for a heated floor, q = 8.92 (dT_K)^1.1 W/m^2,
 // converted exactly to Btu/hr-ft^2 with dT in F: 1.4812. Until 2026-09-18 this

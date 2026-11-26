@@ -155,7 +155,7 @@ STAGEPRODUCTION_RENDERERS["line-array-splay"] = _r({
     { key: "z", id: "lasp-out-z", label: "Note", value: (r) => r.note },
   ],
   compute: computeLineArraySplay,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1365: delay loudspeaker time and Haas offset =====================
 // dims: in { distance_ft: L, temp_f: T, haas_offset_ms: T, compare_temp_f: T } out: { speed_ft_s: L T^-1, geometric_ms: T, set_delay_ms: T, haas_distance_ft: L, compare_geometric_ms: T, compare_speed_ft_s: L T^-1, drift_ms: T }
@@ -210,7 +210,7 @@ STAGEPRODUCTION_RENDERERS["delay-tower-alignment"] = _r({
     { key: "z", id: "dtal-out-z", label: "Note", value: (r) => r.note },
   ],
   compute: computeDelayTowerAlignment,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1366: end-fire and cardioid subwoofer array spacing =====================
 // dims: in { spacing_ft: L, elements: dimensionless, temp_f: T, target_freq_hz: T^-1 } out: { delay_per_element_ms: T, optimum_freq_hz: T^-1, wavelength_ft: L, array_depth_ft: L, spacing_for_target_ft: L, speed_ft_s: L T^-1, total_delay_ms: T }
@@ -267,7 +267,7 @@ STAGEPRODUCTION_RENDERERS["cardioid-sub-array"] = _r({
     { key: "z", id: "csub-out-z", label: "Note", value: (r) => r.note },
   ],
   compute: computeCardioidSubArray,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1367: driver spacing, lobing, and crossover ceiling =====================
 // dims: in { spacing_ft: L, test_freq_hz: T^-1, temp_f: T } out: { crossover_ceiling_hz: T^-1, wavelength_ft: L, max_spacing_ft: L, null_angle_deg: dimensionless, speed_ft_s: L T^-1 }
@@ -319,7 +319,7 @@ STAGEPRODUCTION_RENDERERS["driver-spacing-lobing"] = _r({
     { key: "z", id: "dslo-out-z", label: "Note", value: (r) => r.note },
   ],
   compute: computeDriverSpacingLobing,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1368: two-transmitter intermodulation screen =====================
 // dims: in { f1_mhz: T^-1, f2_mhz: T^-1, test_freq_mhz: T^-1 } out: { spacing_mhz: T^-1, third_low_mhz: T^-1, third_high_mhz: T^-1, fifth_high_mhz: T^-1, fifth_low_mhz: T^-1, nearest_product_mhz: T^-1, test_margin_mhz: T^-1 }
@@ -379,7 +379,7 @@ STAGEPRODUCTION_RENDERERS["wireless-intermod"] = _r({
     { key: "z", id: "wint-out-z", label: "Note", value: (r) => r.note },
   ],
   compute: computeWirelessIntermod,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1369: RF antenna cable loss and amplifier budget =====================
 // dims: in { length_ft: L, loss_per_100ft_db: dimensionless, connectors: dimensionless, loss_per_connector_db: dimensionless, splitter_loss_db: dimensionless, amplifier_gain_db: dimensionless } out: { cable_loss_db: dimensionless, total_loss_db: dimensionless, net_gain_db: dimensionless, connector_loss_db: dimensionless }
@@ -435,7 +435,7 @@ STAGEPRODUCTION_RENDERERS["rf-antenna-cable-loss"] = _r({
     { key: "z", id: "rfcl-out-z", label: "Note", value: (r) => r.note },
   ],
   compute: computeRfAntennaCableLoss,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1370: chain hoist lift time, power, and duty cycle =====================
 // dims: in { lift_height_ft: L, hoist_speed_fpm: L T^-1, load_lb: M L T^-2, duty_cycle: dimensionless, rating_period_min: T, hoists: dimensionless } out: { lift_time_min: T, hoisting_hp: M L^2 T^-3, allowed_on_time_min: T, lifts_per_period: dimensionless, set_hp: M L^2 T^-3 }
@@ -495,7 +495,7 @@ STAGEPRODUCTION_RENDERERS["chain-hoist-lift-time"] = _r({
     { key: "z", id: "chlt-out-z", label: "Note", value: (r) => r.note },
   ],
   compute: computeChainHoistLiftTime,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1371: gobo projected image size and keystone =====================
 // dims: in { throw_ft: L, field_angle_deg: dimensionless, incidence_deg: dimensionless, gobo_image_mm: L, gate_diameter_mm: L } out: { image_diameter_ft: L, keystone_stretch: dimensionless, stretched_axis_ft: L, relative_illuminance: dimensionless, stops_down: dimensionless }
@@ -553,7 +553,7 @@ STAGEPRODUCTION_RENDERERS["gobo-image-size"] = _r({
     { key: "z", id: "gobo-out-z", label: "Note", value: (r) => r.note },
   ],
   compute: computeGoboImageSize,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1372: color-temperature correction in mireds =====================
 // The standard correction sheets, as mired shifts: Rosco's published figures.
@@ -680,7 +680,7 @@ STAGEPRODUCTION_RENDERERS["haze-machine-sizing"] = _r({
     { key: "z", id: "haze-out-z", label: "Note", value: (r) => r.note },
   ],
   compute: computeHazeMachineSizing,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1374: stage deck and platform live-load check =====================
 // dims: in { length_ft: L, width_ft: L, legs: dimensionless, design_psf: M L^-1 T^-2, deck_dead_lb: M L T^-2, leg_rating_lb: M L T^-2, point_load_lb: M L T^-2, bearing_sqin: L^2, deck_point_rating_lb: M L T^-2 } out: { deck_area_sqft: L^2, live_load_lb: M L T^-2, load_per_leg_lb: M L T^-2, leg_utilization_pct: dimensionless, bearing_psi: M L^-1 T^-2, point_utilization_pct: dimensionless, total_load_lb: M L T^-2 }
@@ -754,7 +754,7 @@ STAGEPRODUCTION_RENDERERS["stage-deck-live-load"] = _r({
     { key: "z", id: "sdll-out-z", label: "Note", value: (r) => r.note },
   ],
   compute: computeStageDeckLiveLoad,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1375: LED wall data rate and processor port count =====================
 // dims: in { width_px: dimensionless, height_px: dimensionless, bit_depth: dimensionless, refresh_hz: T^-1, pixels_per_port: dimensionless } out: { total_pixels: dimensionless, data_rate_gbps: dimensionless, ports_needed: dimensionless, spare_pixels: dimensionless, last_port_used: dimensionless }
@@ -804,7 +804,7 @@ STAGEPRODUCTION_RENDERERS["video-wall-data-rate"] = _r({
     { key: "z", id: "vwdr-out-z", label: "Note", value: (r) => r.note },
   ],
   compute: computeVideoWallDataRate,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1376: outdoor stage and banner wind load with ballast =====================
 // dims: in { banner_height_ft: L, banner_width_ft: L, centroid_height_ft: L, wind_speed_mph: L T^-1, drag_coefficient: dimensionless, base_width_ft: L, safety_factor: dimensionless, available_ballast_lb: M L T^-2 } out: { velocity_pressure_psf: M L^-1 T^-2, wind_force_lb: M L T^-2, overturning_moment_ftlb: M L^2 T^-2, required_ballast_lb: M L T^-2, area_sqft: L^2, capacity_speed_mph: L T^-1, resisting_arm_ft: L }
@@ -867,4 +867,4 @@ STAGEPRODUCTION_RENDERERS["outdoor-stage-wind"] = _r({
     { key: "z", id: "oswd-out-z", label: "Note", value: (r) => r.note },
   ],
   compute: computeOutdoorStageWind,
-});
+ attrs: { min: "0" } });

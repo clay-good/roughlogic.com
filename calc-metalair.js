@@ -708,7 +708,7 @@ METALAIR_RENDERERS["standing-seam-takeoff"] = _simpleRenderer({
     { key: "n", id: "sst-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeStandingSeamTakeoff,
-});
+ attrs: { min: "0" } });
 
 // ============ spec-v1682: metal roof thermal movement ============
 

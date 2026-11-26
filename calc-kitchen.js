@@ -435,7 +435,7 @@ const renderYieldEP = _r({
     { key: "c", id: "ye-out-c", label: "EP cost / lb",       value: (r) => r.ep_cost_per_lb === null ? "-" : "$" + fmt(r.ep_cost_per_lb, 2) },
   ],
   compute: computeYieldEP,
-});
+ attrs: { min: "0" } });
 
 const renderCoolingCurve = _r({
   citation: "Notice: This is a planning aid. The thermometer on the food governs. Citation: per FDA Food Code 2026 §3-501.14(A), unchanged from 2022 (135 F to 70 F within 2 hr, and 135 F to 41 F within a total of 6 hr). Local health code adopts and may modify. Free at fda.gov/food/retail-food-protection/fda-food-code.",
@@ -504,8 +504,8 @@ const renderPanConversion = _r({
   example: panConversionExample.inputs,
   fields: [
     { key: "target_qt",       label: "Target volume (qt, optional)", kind: "number" },
-    { key: "target_servings", label: "Target servings", kind: "number" },
-    { key: "portion_oz",      label: "Portion (oz)", kind: "number" },
+    { key: "target_servings", label: "Target servings", kind: "number" , attrs: { min: "0" } },
+    { key: "portion_oz",      label: "Portion (oz)", kind: "number" , attrs: { min: "0" } },
     { key: "pan_size",        label: "Pan size", kind: "select", options: Object.keys(PAN_CAPACITIES_QT).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
     { key: "pan_depth_in",    label: "Depth (in)", kind: "select", options: [{ value: "2.5", label: "2.5\"" }, { value: "4", label: "4\"" }, { value: "6", label: "6\"" }] },
   ],
@@ -958,7 +958,7 @@ const renderFoodCostPercentage = _r({
     { key: "n", id: "fcp-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeFoodCostPercentage,
-});
+ attrs: { min: "0" } });
 KITCHEN_RENDERERS["food-cost-percentage"] = renderFoodCostPercentage;
 
 // dims: in { food_cost: dimensionless, beverage_cost: dimensionless, labor_cost: dimensionless, total_sales: dimensionless } out: { prime_cost: dimensionless, prime_cost_pct: dimensionless, cogs_pct: dimensionless, labor_pct: dimensionless, cogs_total: dimensionless }
@@ -995,7 +995,7 @@ const renderPrimeCost = _r({
     { key: "n", id: "pcst-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computePrimeCost,
-});
+ attrs: { min: "0" } });
 KITCHEN_RENDERERS["prime-cost"] = renderPrimeCost;
 
 // dims: in { bottle_cost: dimensionless, bottle_size_ml: L^3, pour_size_oz: L^3, target_pour_cost_pct: dimensionless, other_cost_per_drink: dimensionless } out: { pours_per_bottle: dimensionless, suggested_price: dimensionless, cost_per_pour: dimensionless, drink_cost: dimensionless }
@@ -1038,7 +1038,7 @@ const renderPourCost = _r({
     { key: "n", id: "pour-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computePourCost,
-});
+ attrs: { min: "0" } });
 KITCHEN_RENDERERS["pour-cost"] = renderPourCost;
 
 // --- spec-v537 O: Menu engineering matrix (`menu-engineering`) ---
@@ -1092,7 +1092,7 @@ const renderMenuEngineering = _r({
     { key: "n", id: "menu-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeMenuEngineering,
-});
+ attrs: { min: "0" } });
 KITCHEN_RENDERERS["menu-engineering"] = renderMenuEngineering;
 
 // --- spec-v538 O: 3-compartment sink sanitizer dilution (`kitchen-sanitizer-ppm`) ---
@@ -1132,9 +1132,9 @@ const renderKitchenSanitizerPpm = _r({
   example: kitchenSanitizerPpmExample.inputs,
   fields: [
     { key: "sanitizer_type", label: "Sanitizer type", kind: "select", options: [{ value: "chlorine", label: "Chlorine (50-100 ppm)" }, { value: "quat", label: "Quaternary ammonium (150-400 ppm per label)" }, { value: "iodine", label: "Iodine (12.5-25 ppm)" }] },
-    { key: "active_pct", label: "Concentrate active (%)", kind: "number" },
-    { key: "target_ppm", label: "Target concentration (ppm)", kind: "number" },
-    { key: "batch_gallons", label: "Sink compartment volume (gal)", kind: "number" },
+    { key: "active_pct", label: "Concentrate active (%)", kind: "number" , attrs: { min: "0" } },
+    { key: "target_ppm", label: "Target concentration (ppm)", kind: "number" , attrs: { min: "0" } },
+    { key: "batch_gallons", label: "Sink compartment volume (gal)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "o", id: "ksan-out-o", label: "Concentrate per gallon", value: (r) => fmt(r.oz_per_gal, 2) + " fl oz/gal" },
@@ -1180,10 +1180,10 @@ const renderDrinkAbvDilution = _r({
   citation: "Citation: Cocktail dilution model (per Dave Arnold, Liquid Intelligence, by name). pure_alcohol = total_volume x weighted_abv / 100; dilution_water = total_volume x method_pct / 100; final_abv = pure_alcohol / (total + dilution) x 100; standard_drinks = pure_alcohol / 0.6. Ice-melt dilution is not optional (shaken ~28%, stirred ~23%, rocks ~15%, neat 0%); a strength figure that ignores the melt overstates the pour. Responsible-service practice governs.",
   example: drinkAbvDilutionExample.inputs,
   fields: [
-    { key: "total_volume_oz", label: "Total ingredient volume (fl oz)", kind: "number" },
-    { key: "weighted_abv_pct", label: "Volume-weighted ABV (%)", kind: "number" },
+    { key: "total_volume_oz", label: "Total ingredient volume (fl oz)", kind: "number" , attrs: { min: "0" } },
+    { key: "weighted_abv_pct", label: "Volume-weighted ABV (%)", kind: "number" , attrs: { min: "0" } },
     { key: "method", label: "Prep method", kind: "select", options: [{ value: "shaken", label: "Shaken (~28%)" }, { value: "stirred", label: "Stirred (~23%)" }, { value: "rocks", label: "Built on rocks (~15%)" }, { value: "neat", label: "Neat / up, no ice (0%)" }] },
-    { key: "dilution_pct", label: "Explicit dilution % (0 = use method)", kind: "number" },
+    { key: "dilution_pct", label: "Explicit dilution % (0 = use method)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "p", id: "abv-out-p", label: "Pure alcohol", value: (r) => fmt(r.pure_alcohol_oz, 2) + " fl oz" },
@@ -1235,7 +1235,7 @@ const renderOverrunPercent = _r({
     { key: "n", id: "ovr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeOverrunPercent,
-});
+ attrs: { min: "0" } });
 KITCHEN_RENDERERS["overrun-percent"] = renderOverrunPercent;
 
 // --- spec-v787 O: draft beer line balancing (`draft-beer-line-balance`) ---
@@ -1279,7 +1279,7 @@ const renderDraftBeerLineBalance = _r({
   citation: "Citation: draft-beer line balancing (Brewers Association Draught Beer Quality Manual): at balance the applied CO2 pressure = line restriction (R x length) + rise (0.5 psi/ft) + tower (0-8 psi per its maker; couplers and faucets negligible); line = (pressure - 0.5 x rise - tower) / R. Restriction R (psi/ft, DBQM Table 4.1): 3/16\" vinyl 3.0, 1/4\" vinyl 0.85, 5/16\" vinyl 0.4, 1/4\" barrier 0.30, 5/16\" barrier 0.10, 3/8\" barrier 0.06; 3/16\" barrier 2.2 is not in the table (nominal, cellar temp). Set the applied pressure to the carbonation level, then balance the line; measure the pour rate and trim. A design aid; the dispense system governs.",
   example: draftBeerLineBalanceExample.inputs,
   fields: [
-    { key: "applied_pressure_psi", label: "Applied CO2 pressure (psi, = carbonation level)", kind: "number" },
+    { key: "applied_pressure_psi", label: "Applied CO2 pressure (psi, = carbonation level)", kind: "number" , attrs: { min: "0" } },
     { key: "rise_ft", label: "Vertical rise, keg to faucet (ft)", kind: "number" },
     { key: "tubing_type", label: "Beer line", kind: "select", options: [
       { value: "vinyl_316", label: "3/16\" ID vinyl (3.0 psi/ft)" },
@@ -1379,7 +1379,7 @@ KITCHEN_RENDERERS["as-purchased-quantity"] = _r({
     { key: "n", id: "apq-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeAsPurchasedQuantity,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1002: alcohol by volume from gravity =====================
 // dims: in { original_gravity: dimensionless, final_gravity: dimensionless } out: { abv_pct: dimensionless, apparent_attenuation_pct: dimensionless }
@@ -1415,7 +1415,7 @@ KITCHEN_RENDERERS["abv-from-gravity"] = _r({
     { key: "n", id: "abv-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeAbvFromGravity,
-});
+ attrs: { min: "0" } });
 
 // ===========================================================================
 // spec-v1350..v1363: the 2026-08-26 trade-expansion Group O band.
@@ -1463,7 +1463,7 @@ KITCHEN_RENDERERS["ice-machine-sizing"] = _r({
     { key: "n", id: "icems-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeIceMachineSizing,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1351: warewasher hot-water demand and booster sizing =====================
 // dims: in { rinse_gpm: L^3 T^-1, supply_temp_f: T, rinse_temp_f: T, racks_per_hour: T^-1, gal_per_rack: L^3, booster_efficiency: dimensionless } out: { delta_t_f: T, booster_btuh: M L^2 T^-3, booster_kw: M L^2 T^-3, gas_input_btuh: M L^2 T^-3, hourly_hot_water_gal: L^3 }
@@ -1516,7 +1516,7 @@ KITCHEN_RENDERERS["warewasher-hot-water"] = _r({
     { key: "n", id: "wwhw-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeWarewasherHotWater,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1352: freezing time by Plank's equation =====================
 // Plank shape constants: slab P=1/2 R=1/8; cylinder P=1/4 R=1/16; sphere P=1/6 R=1/24.
@@ -1562,14 +1562,14 @@ KITCHEN_RENDERERS["freezing-time-plank"] = _r({
   citation: "Citation: Plank's equation for freezing time, t = (rho Lf / (Tf - Ta)) x (P a / h + R a^2 / k), by name, with the standard shape constants (slab 1/2, 1/8; cylinder 1/4, 1/16; sphere 1/6, 1/24) as published in ASHRAE Handbook Refrigeration, chapter on food freezing times, cited not mirrored. Plank neglects sensible heat above and below the freezing point, so it runs optimistic; a measured product-temperature log governs a food-safety decision.",
   example: freezingTimePlankExample.inputs,
   fields: [
-    { key: "a_ft", label: "Characteristic dimension a (ft)", kind: "number" },
+    { key: "a_ft", label: "Characteristic dimension a (ft)", kind: "number" , attrs: { min: "0" } },
     { key: "shape", label: "Shape", kind: "select", options: Object.keys(PLANK_SHAPE_CONSTANTS).map((k) => ({ value: k, label: PLANK_SHAPE_CONSTANTS[k].label })) },
-    { key: "density_pcf", label: "Product density (lb/ft3)", kind: "number" },
-    { key: "latent_heat_btu_lb", label: "Latent heat of the product (BTU/lb)", kind: "number" },
-    { key: "freezing_point_f", label: "Initial freezing point (F)", kind: "number", default: 28 },
+    { key: "density_pcf", label: "Product density (lb/ft3)", kind: "number" , attrs: { min: "0" } },
+    { key: "latent_heat_btu_lb", label: "Latent heat of the product (BTU/lb)", kind: "number" , attrs: { min: "0" } },
+    { key: "freezing_point_f", label: "Initial freezing point (F)", kind: "number", default: 28 , attrs: { min: "0" } },
     { key: "medium_temp_f", label: "Freezing-medium temperature (F)", kind: "number", required: true, default: -10 },
-    { key: "h_coeff", label: "Surface coefficient h (BTU/hr-ft2-F)", kind: "number" },
-    { key: "k_frozen", label: "Frozen conductivity k (BTU/hr-ft-F)", kind: "number" },
+    { key: "h_coeff", label: "Surface coefficient h (BTU/hr-ft2-F)", kind: "number" , attrs: { min: "0" } },
+    { key: "k_frozen", label: "Frozen conductivity k (BTU/hr-ft-F)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "t", id: "ftpl-out-t", label: "Freezing time", value: (r) => fmt(r.freezing_time_hr, 2) + " hr" },
@@ -1620,14 +1620,14 @@ KITCHEN_RENDERERS["thaw-time"] = _r({
   citation: "Citation: Plank's equation applied to thawing, t = (rho Lf / (Ta - Tf)) x (P a / h + R a^2 / k_unfrozen), by name, with the ASHRAE Handbook Refrigeration shape constants, cited not mirrored. Reported against the four thawing methods permitted by FDA Food Code section 3-501.13, cited by section and not reproduced. A conduction estimate; the Food Code method and a measured product temperature govern.",
   example: thawTimeExample.inputs,
   fields: [
-    { key: "a_ft", label: "Characteristic dimension a (ft)", kind: "number" },
+    { key: "a_ft", label: "Characteristic dimension a (ft)", kind: "number" , attrs: { min: "0" } },
     { key: "shape", label: "Shape", kind: "select", options: Object.keys(PLANK_SHAPE_CONSTANTS).map((k) => ({ value: k, label: PLANK_SHAPE_CONSTANTS[k].label })) },
-    { key: "density_pcf", label: "Product density (lb/ft3)", kind: "number" },
-    { key: "latent_heat_btu_lb", label: "Latent heat of the product (BTU/lb)", kind: "number" },
+    { key: "density_pcf", label: "Product density (lb/ft3)", kind: "number" , attrs: { min: "0" } },
+    { key: "latent_heat_btu_lb", label: "Latent heat of the product (BTU/lb)", kind: "number" , attrs: { min: "0" } },
     { key: "thaw_point_f", label: "Thaw point (F)", kind: "number", default: 28 },
     { key: "cooler_temp_f", label: "Cooler air temperature (F)", kind: "number", whenBlank: 38 },
-    { key: "h_coeff", label: "Surface coefficient h (BTU/hr-ft2-F)", kind: "number" },
-    { key: "k_unfrozen", label: "Unfrozen conductivity k (BTU/hr-ft-F)", kind: "number" },
+    { key: "h_coeff", label: "Surface coefficient h (BTU/hr-ft2-F)", kind: "number" , attrs: { min: "0" } },
+    { key: "k_unfrozen", label: "Unfrozen conductivity k (BTU/hr-ft-F)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "t", id: "thwt-out-t", label: "Thawing time", value: (r) => fmt(r.thaw_time_hr, 1) + " hr (" + fmt(r.thaw_time_days, 2) + " days)" },
@@ -1686,7 +1686,7 @@ KITCHEN_RENDERERS["fryer-oil-turnover"] = _r({
     { key: "n", id: "fryot-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeFryerOilTurnover,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1355: keg yield, pours, and cost per ounce =====================
 export const KEG_SIZES_GAL = {
@@ -1738,10 +1738,10 @@ KITCHEN_RENDERERS["keg-yield"] = _r({
   fields: [
     { key: "keg_size", label: "Keg size", kind: "select", options: Object.keys(KEG_SIZES_GAL).map((k) => ({ value: k, label: KEG_SIZES_GAL[k].label })) },
     { key: "custom_gallons", label: "Custom keg volume (gal, 0 to use the preset)", kind: "number" },
-    { key: "serving_oz", label: "Serving size (oz)", kind: "number", whenBlank: 16 },
-    { key: "loss_fraction", label: "Loss fraction (0-1)", kind: "number", default: 0.15 },
-    { key: "keg_cost", label: "Keg cost ($)", kind: "number" },
-    { key: "menu_price", label: "Menu price per serving ($)", kind: "number" },
+    { key: "serving_oz", label: "Serving size (oz)", kind: "number", whenBlank: 16 , attrs: { min: "0" } },
+    { key: "loss_fraction", label: "Loss fraction (0-1)", kind: "number", default: 0.15 , attrs: { min: "0" } },
+    { key: "keg_cost", label: "Keg cost ($)", kind: "number" , attrs: { min: "0" } },
+    { key: "menu_price", label: "Menu price per serving ($)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "g", id: "kegy-out-g", label: "Gross volume", value: (r) => fmt(r.gross_oz, 0) + " oz (" + fmt(r.gallons, 2) + " gal)" },
@@ -1795,7 +1795,7 @@ KITCHEN_RENDERERS["beverage-co2-duration"] = _r({
     { key: "n", id: "bco2-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeBeverageCo2Duration,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1357: dough ball weight from thickness factor =====================
 // dims: in { pan_shape: dimensionless, diameter_in: L, length_in: L, width_in: L, thickness_factor: M L^-2, reference_weight_oz: M, reference_diameter_in: L } out: { pan_area_sqin: L^2, dough_weight_oz: M, scaled_weight_oz: M, reference_area_sqin: L^2 }
@@ -1840,12 +1840,12 @@ KITCHEN_RENDERERS["dough-ball-scaling"] = _r({
   example: doughBallScalingExample.inputs,
   fields: [
     { key: "pan_shape", label: "Pan shape", kind: "select", options: [{ value: "round", label: "Round" }, { value: "rectangular", label: "Rectangular" }] },
-    { key: "diameter_in", label: "Round pan diameter (in)", kind: "number" },
+    { key: "diameter_in", label: "Round pan diameter (in)", kind: "number" , attrs: { min: "0" } },
     { key: "length_in", label: "Rectangular pan length (in)", kind: "number" },
     { key: "width_in", label: "Rectangular pan width (in)", kind: "number" },
-    { key: "thickness_factor", label: "Thickness factor (oz per sq in)", kind: "number", whenBlank: 0.1 },
-    { key: "reference_weight_oz", label: "Known-good dough ball weight (oz, 0 to skip)", kind: "number" },
-    { key: "reference_diameter_in", label: "Diameter of that known-good pan (in, 0 to skip)", kind: "number" },
+    { key: "thickness_factor", label: "Thickness factor (oz per sq in)", kind: "number", whenBlank: 0.1 , attrs: { min: "0" } },
+    { key: "reference_weight_oz", label: "Known-good dough ball weight (oz, 0 to skip)", kind: "number" , attrs: { min: "0" } },
+    { key: "reference_diameter_in", label: "Diameter of that known-good pan (in, 0 to skip)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "a", id: "dbsc-out-a", label: "Pan area", value: (r) => fmt(r.pan_area_sqin, 1) + " sq in" },
@@ -1902,7 +1902,7 @@ KITCHEN_RENDERERS["fermentation-time-q10"] = _r({
     { key: "n", id: "ferq-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeFermentationTimeQ10,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1359: covers and sales per labor hour =====================
 // dims: in { covers: dimensionless, labor_hours: T, net_sales: dimensionless, labor_cost: dimensionless } out: { cplh: dimensionless, splh: dimensionless, labor_cost_pct: dimensionless, average_check: dimensionless, labor_per_cover: dimensionless }
@@ -1949,7 +1949,7 @@ KITCHEN_RENDERERS["covers-per-labor-hour"] = _r({
     { key: "n", id: "cplh-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCoversPerLaborHour,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1360: par level and order quantity =====================
 // dims: in { daily_usage: T^-1, lead_time_days: T, order_cycle_days: T, safety_factor: dimensionless, on_hand: dimensionless, on_order: dimensionless, units_per_case: dimensionless } out: { coverage_days: T, par_level: dimensionless, order_needed: dimensionless, cases: dimensionless, overshoot: dimensionless, ordered_quantity: dimensionless }
@@ -2006,7 +2006,7 @@ KITCHEN_RENDERERS["par-level-order"] = _r({
     { key: "n", id: "parl-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeParLevelOrder,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1361: time as a public health control window =====================
 export const TPHC_WINDOWS = {
@@ -2090,7 +2090,7 @@ KITCHEN_RENDERERS["tphc-window"] = _r({
     { key: "window_option", label: "Window option", kind: "select", options: Object.keys(TPHC_WINDOWS).map((k) => ({ value: k, label: TPHC_WINDOWS[k].label })) },
     { key: "start_temp_f", label: "Starting product temperature (F)", kind: "number", required: true },
     { key: "ambient_f", label: "Ambient temperature (F)", kind: "number", required: true, default: 75 },
-    { key: "tau_hr", label: "Product time constant tau (hr)", kind: "number", whenBlank: 4 },
+    { key: "tau_hr", label: "Product time constant tau (hr)", kind: "number", whenBlank: 4 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "d", id: "tphc-out-d", label: "Discard time", value: (r) => r.discard_time + " (" + fmt(r.window_hr, 0) + " hr window)" },
@@ -2165,7 +2165,7 @@ KITCHEN_RENDERERS["steam-kettle-heatup"] = _r({
     { key: "n", id: "stkh-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeSteamKettleHeatup,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1363: hot-holding connected load, demand, and kitchen heat gain =====================
 // dims: in { equipment: dimensionless, diversity_factor: dimensionless, voltage: M L^2 T^-3 I^-1, phase: dimensionless } out: { connected_kw: M L^2 T^-3, demand_kw: M L^2 T^-3, demand_amps: I, sensible_btuh: M L^2 T^-3, tons: M L^2 T^-3, diversified_kw: M L^2 T^-3, two_largest_kw: M L^2 T^-3 }

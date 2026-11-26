@@ -1223,7 +1223,7 @@ GAS_RENDERERS["propane-vaporization-rate"] = _simpleRenderer({
   example: propaneVaporizationRateExample.inputs,
   citation: "Citation: wetted surface of a horizontal cylinder at the entered fill (shell arc plus both head segments), with vaporization capacity scaled from the manufacturer's published table by the wetted-area ratio and the temperature-difference ratio. The capacity is NOT derived: the real rate also depends on wind, burial, insulation, paint colour and the duration of the draw. NFPA 58, the tank manufacturer's vaporization table, and the AHJ govern.",
   fields: [
-    { key: "tank_diameter_ft", label: "Tank diameter (ft)" },
+    { key: "tank_diameter_ft", label: "Tank diameter (ft)" , attrs: { min: "0" } },
     { key: "tank_length_ft", label: "Tank length (ft)" },
     { key: "percent_full", label: "Percent full now (%)" },
     { key: "ambient_f", label: "Ambient temperature (degF)", required: true, attrs: { step: "any" } },

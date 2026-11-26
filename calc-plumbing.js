@@ -3252,7 +3252,7 @@ const renderTrapSealLoss = _v23SimpleRenderer({
     { key: "risk", id: "tsl-out-risk", label: "Siphonage risk", value: (r) => r.siphonage_risk ? (r.seal_short ? "Flag - seal below the 2 in IPC 1002 minimum" + (r.within_limit ? "" : ", and the vent distance is over") : "Flag - self-/induced-siphonage risk (vent distance over the table)") : "Adequate seal protection" },
   ],
   compute: computeTrapSealLoss,
-});
+ attrs: { min: "0" } });
 PLUMBING_RENDERERS["trap-seal-loss"] = renderTrapSealLoss;
 
 // =====================================================================
@@ -3286,7 +3286,7 @@ const renderWaterMeterSizing = _v23SimpleRenderer({
     { key: "head", id: "wms-out-h", label: "Headroom", value: (r) => fmt(r.headroom_gpm, 1) + " gpm" },
   ],
   compute: computeWaterMeterSizing,
-});
+ attrs: { min: "0" } });
 PLUMBING_RENDERERS["water-meter-sizing"] = renderWaterMeterSizing;
 
 // ===========================================================================

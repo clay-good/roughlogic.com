@@ -554,7 +554,7 @@ ACCESSIBILITY_RENDERERS["accessible-route-width"] = _simpleRenderer({
   example: accessibleRouteWidthExample.inputs,
   fields: [
     { key: "clear_width_in", label: "Clear width of the route (in)", kind: "number" },
-    { key: "route_length_ft", label: "Route length (ft)", kind: "number" },
+    { key: "route_length_ft", label: "Route length (ft)", kind: "number" , attrs: { min: "0" } },
     { key: "pinch_present", label: "Route has a reduced-width pinch point?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
     { key: "pinch_width_in", label: "Pinch width (in)", kind: "number" },
     { key: "pinch_length_in", label: "Pinch length (in)", kind: "number" },

@@ -1389,7 +1389,7 @@ const renderDryingChamberCO2 = _v23SimpleRenderer({
     { key: "ach", id: "dcc-out-a", label: "Air changes per hour", value: (r) => fmt(r.ach, 2) + " ACH" },
   ],
   compute: computeDryingChamberCO2,
-});
+ attrs: { min: "0" } });
 RESTORATION_RENDERERS["drying-chamber-co2"] = renderDryingChamberCO2;
 
 // ===========================================================================

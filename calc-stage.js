@@ -510,7 +510,7 @@ const renderTimeAlignment = _r({
     { key: "r", id: "ta-out-r", label: "Recommended delay", value: (r) => fmt(r.recommended_delay_ms, 1) + " ms" },
   ],
   compute: computeTimeAlignment,
-});
+ attrs: { min: "0" } });
 
 function renderDMX(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: USITT DMX-512A by name only. Each universe carries 512 channels.";
@@ -569,7 +569,7 @@ const renderNeutralImbalance = _r({
     { key: "w", id: "ni-out-w", label: "Harmonic warning",  value: (r) => r.harmonic_warning || "n/a" },
   ],
   compute: computeNeutralImbalance,
-});
+ attrs: { min: "0" } });
 
 const renderSPL = _r({
   citation: "Citation: Inverse-square law L2 = L1 - 20*log10(d2/d1). Mode factor approximates surface reinforcement.",
@@ -577,8 +577,8 @@ const renderSPL = _r({
   fields: [
     { key: "L1_dB", label: "SPL at reference (dB)", kind: "number" },
     // v593: labeled ft; the compute uses only the d2/d1 ratio, so no conversion.
-    { key: "d1", label: "Reference distance (ft)", kind: "number", whenBlank: 1 },
-    { key: "d2", label: "Target distance (ft)", kind: "number" },
+    { key: "d1", label: "Reference distance (ft)", kind: "number", whenBlank: 1 , attrs: { min: "0" } },
+    { key: "d2", label: "Target distance (ft)", kind: "number" , attrs: { min: "0" } },
     { key: "mode", label: "Mode", kind: "select", options: Object.keys(SPL_MODES).map((k) => ({ value: k, label: SPL_MODES[k].label })) },
     { key: "n_sources", label: "Identical sources", kind: "number", default: 1 },
   ],
@@ -596,9 +596,9 @@ const renderRiggingCheck = _r({
   fields: [
     { key: "hardware", label: "Hardware", kind: "select", options: Object.keys(RIGGING_HARDWARE).map((k) => ({ value: k, label: RIGGING_HARDWARE[k].label })) },
     { key: "configuration", label: "Configuration", kind: "select", options: [{ value: "vertical", label: "Vertical" }, { value: "basket", label: "Basket" }, { value: "bridle", label: "Bridle" }, { value: "choker", label: "Choker" }] },
-    { key: "load_lb", label: "Load (lb)", kind: "number" },
+    { key: "load_lb", label: "Load (lb)", kind: "number" , attrs: { min: "0" } },
     { key: "included_angle_deg", label: "Included angle (deg)", kind: "number", whenBlank: 60 },
-    { key: "n_legs", label: "Legs", kind: "number", whenBlank: 2 },
+    { key: "n_legs", label: "Legs", kind: "number", whenBlank: 2 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "h", id: "rg-out-h", label: "Hardware",          value: (r) => r.hardware_label },
@@ -1242,7 +1242,7 @@ const renderLedVideoWall = _r({
     { key: "n", id: "lvw-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeLedVideoWall,
-});
+ attrs: { min: "0" } });
 STAGE_RENDERERS["led-video-wall"] = renderLedVideoWall;
 
 // dims: in { screen_w_ft: L, screen_h_ft: L, screen_gain: dimensionless, target_foot_lamberts: dimensionless, throw_ratio: dimensionless } out: { area_sqft: L^2, required_lumens: dimensionless, throw_distance_ft: L }
@@ -1278,7 +1278,7 @@ const renderProjectorBrightness = _r({
     { key: "n", id: "pb-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeProjectorBrightness,
-});
+ attrs: { min: "0" } });
 STAGE_RENDERERS["projector-brightness"] = renderProjectorBrightness;
 
 // projector-max-screen-size: inverse of projector-brightness. The forward tile
@@ -1325,7 +1325,7 @@ const renderProjectorMaxScreenSize = _r({
     { key: "n", id: "pms-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeProjectorMaxScreenSize,
-});
+ attrs: { min: "0" } });
 STAGE_RENDERERS["projector-max-screen-size"] = renderProjectorMaxScreenSize;
 
 // ===========================================================================
@@ -1596,11 +1596,11 @@ const renderCounterweightArborLoad = _r({
   citation: "Notice: Load the arbor only when the batten is at the loading rail; the venue rigging inspection and the AHJ govern. Citation: theatrical counterweight rigging (single/double purchase), by name. required = (batten + load) x purchase_ratio (1 single, 2 double); out_of_weight = required - existing; bricks = the whole count nearest |out_of_weight| / brick_weight, with the weight left over shown. A double-purchase arbor needs twice the counterweight and travels half the distance.",
   example: counterweightArborLoadExample.inputs,
   fields: [
-    { key: "batten_weight_lb", label: "Batten pipe weight (lb)", kind: "number" },
-    { key: "attached_load_lb", label: "Attached load (scenery / electrics, lb)", kind: "number" },
+    { key: "batten_weight_lb", label: "Batten pipe weight (lb)", kind: "number" , attrs: { min: "0" } },
+    { key: "attached_load_lb", label: "Attached load (scenery / electrics, lb)", kind: "number" , attrs: { min: "0" } },
     { key: "purchase_type", label: "Purchase type", kind: "select", options: [{ value: "single", label: "Single purchase (1:1)" }, { value: "double", label: "Double purchase (2:1)" }] },
-    { key: "brick_weight_lb", label: "Counterweight brick unit (lb)", kind: "number" },
-    { key: "existing_cw_lb", label: "Counterweight already on arbor (lb)", kind: "number" },
+    { key: "brick_weight_lb", label: "Counterweight brick unit (lb)", kind: "number" , attrs: { min: "0" } },
+    { key: "existing_cw_lb", label: "Counterweight already on arbor (lb)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "req", id: "cwa-out-req", label: "Required counterweight", value: (r) => fmt(r.required_cw_lb, 0) + " lb (" + (r.purchase_ratio === 2 ? "double 2:1" : "single 1:1") + ")" },
@@ -1661,7 +1661,7 @@ const renderLedTapeRun = _r({
     { key: "n", id: "ltr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeLedTapeRun,
-});
+ attrs: { min: "0" } });
 STAGE_RENDERERS["led-tape-run"] = renderLedTapeRun;
 
 // --- spec-v667 N: LED tape max run before the far end dims (inverse of led-tape-run) ---
@@ -1701,7 +1701,7 @@ const renderLedTapeMaxRun = _r({
     { key: "n", id: "ltmr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeLedTapeMaxRun,
-});
+ attrs: { min: "0" } });
 STAGE_RENDERERS["led-tape-max-run"] = renderLedTapeMaxRun;
 
 // --- spec-v673 N: distance at which SPL falls to a target level (inverse of spl-distance) ---
@@ -1735,8 +1735,8 @@ const renderSPLDistanceForLevel = _r({
   example: splDistanceForLevelExample.inputs,
   fields: [
     { key: "L1_dB", label: "SPL at reference (dB)", kind: "number" },
-    { key: "d1", label: "Reference distance (ft)", kind: "number", whenBlank: 1 },
-    { key: "target_L2_dB", label: "Target SPL (dB)", kind: "number" },
+    { key: "d1", label: "Reference distance (ft)", kind: "number", whenBlank: 1 , attrs: { min: "0" } },
+    { key: "target_L2_dB", label: "Target SPL (dB)", kind: "number" , attrs: { min: "0" } },
     { key: "mode", label: "Mode", kind: "select", options: Object.keys(SPL_MODES).map((k) => ({ value: k, label: SPL_MODES[k].label })) },
     { key: "n_sources", label: "Identical sources", kind: "number", whenBlank: 1 },
   ],

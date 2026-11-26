@@ -1676,13 +1676,13 @@ const renderNIOSHLifting = _simpleRendererG({
   citation: "Citation: NIOSH 1991 Lifting Equation, Applications Manual (DHHS/NIOSH 94-110). RWL = LC * HM * VM * DM * AM * FM * CM; FM from Table 5 by lifts per minute, work duration, and V below or at/above 30 in (a frequency between rows takes the next higher row).",
   example: nioshLiftingExample.inputs,
   fields: [
-    { key: "weight_lb", label: "Load weight (lb)", kind: "number" },
-    { key: "H_in", label: "Horizontal distance H (in)", kind: "number", whenBlank: 10 },
-    { key: "V_in", label: "Origin height V (in)", kind: "number", whenBlank: 30 },
-    { key: "D_in", label: "Vertical travel D (in)", kind: "number" },
+    { key: "weight_lb", label: "Load weight (lb)", kind: "number" , attrs: { min: "0" } },
+    { key: "H_in", label: "Horizontal distance H (in)", kind: "number", whenBlank: 10 , attrs: { min: "0" } },
+    { key: "V_in", label: "Origin height V (in)", kind: "number", whenBlank: 30 , attrs: { min: "0" } },
+    { key: "D_in", label: "Vertical travel D (in)", kind: "number" , attrs: { min: "0" } },
     { key: "asymmetry_deg", label: "Asymmetry angle (deg)", kind: "number" },
-    { key: "frequency_per_min", label: "Lifts per minute", kind: "number", whenBlank: 1 },
-    { key: "duration_hr", label: "Duration (hr)", kind: "number", whenBlank: 1 },
+    { key: "frequency_per_min", label: "Lifts per minute", kind: "number", whenBlank: 1 , attrs: { min: "0" } },
+    { key: "duration_hr", label: "Duration (hr)", kind: "number", whenBlank: 1 , attrs: { min: "0" } },
     { key: "coupling", label: "Coupling", kind: "select", options: [{ value: "good", label: "Good" }, { value: "fair", label: "Fair" }, { value: "poor", label: "Poor" }] },
   ],
   outputs: [
@@ -1749,14 +1749,14 @@ const renderLadderAngle = _simpleRendererG({
     { key: "p", id: "la-out-p", label: "Pass / fail", value: (r) => r.pass ? "pass" : "fail (target 75.5 deg)" },
   ],
   compute: computeLadderAngle,
-});
+ attrs: { min: "0" } });
 
 const renderPulleyMAGen = _simpleRendererG({
   citation: "Citation: Public mechanics. actual_MA = sum of efficiency^k over the sheaves (p + p^2 + ... + p^n, plus 1 when the haul part rises from the moving block).",
   example: pulleyMAExample.inputs,
   fields: [
     { key: "rig", label: "Rig", kind: "select", options: Object.keys(PULLEY_RIGS).map((k) => ({ value: k, label: k })) },
-    { key: "efficiency", label: "Pulley efficiency (0-1)", kind: "number", default: 0.95 },
+    { key: "efficiency", label: "Pulley efficiency (0-1)", kind: "number", default: 0.95 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "t", id: "pm-out-t", label: "Theoretical MA", value: (r) => String(r.theoretical_ma) },
@@ -1778,7 +1778,7 @@ const renderRampSlope = _simpleRendererG({
     { key: "f", id: "rs-out-f", label: "Pass 1:12", value: (r) => r.pass_1_to_12 ? "pass" : "fail" },
   ],
   compute: computeRampSlope,
-});
+ attrs: { min: "0" } });
 
 function renderRainwaterYield(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Public engineering form gallons = area * rainfall * 0.6233 * efficiency. Default collection efficiency 0.85 (TWDB Rainwater Harvesting Manual: installers assume 75-90%; 0.62 is the gallons-per-inch-per-ft^2 constant, not an efficiency, and was the default here until 2026-10-02).";
@@ -1893,7 +1893,7 @@ const renderVehicleLoad = _simpleRendererG({
     { key: "fl", id: "vl-out-fl", label: "Flags", value: (r) => Object.entries(r.flags).filter(([_, v]) => v).map(([k]) => k).join(", ") || "ok" },
   ],
   compute: computeVehicleLoad,
-});
+ attrs: { min: "0" } });
 
 export const CROSS_RENDERERS = {
   "unit-converter": renderUnitConverter,
@@ -3207,7 +3207,7 @@ const renderExtensionLadderOverlap = _simpleRendererG({
     { key: "n", id: "elo-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeExtensionLadderOverlap,
-});
+ attrs: { min: "0" } });
 // Registered after the definition: CROSS_RENDERERS is built above this point, so a const
 // declared here cannot be referenced inside that object literal (temporal dead zone).
 CROSS_RENDERERS["extension-ladder-overlap"] = renderExtensionLadderOverlap;
@@ -3313,4 +3313,4 @@ CROSS_RENDERERS["radiant-heat-exchange"] = _simpleRendererG({
     { key: "n", id: "rhx-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeRadiantHeatExchange,
-});
+ attrs: { min: "0" } });

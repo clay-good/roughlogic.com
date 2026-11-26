@@ -569,7 +569,7 @@ SAWMILL_RENDERERS["lumber-weight"] = _simpleRenderer({
     { key: "pieces", label: "Pieces", kind: "number", default: 1, attrs: { step: "1", min: "1" } },
     { key: "thickness_in", label: "Dressed thickness (in; a 2x is 1.5)", kind: "number" },
     { key: "width_in", label: "Dressed width (in; a 2x10 is 9.25)", kind: "number" },
-    { key: "length_ft", label: "Length (ft)", kind: "number" },
+    { key: "length_ft", label: "Length (ft)", kind: "number" , attrs: { min: "0" } },
     { key: "specific_gravity", label: "Specific gravity G (0.30 to 0.70 spans most US species)", kind: "number", attrs: { step: "any", min: "0", max: "1.5" } },
     { key: "moisture_pct", label: "Moisture content (%, 12 kiln-dried / 19 air-dried / 30 and up green)", kind: "number", default: 12, attrs: { step: "any", min: "0", max: "300" } },
   ],

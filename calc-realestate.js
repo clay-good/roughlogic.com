@@ -2408,10 +2408,10 @@ const renderDepreciationRecapture = _v23SimpleRenderer({
       { value: "1250", label: "§1250 real property" },
       { value: "1245", label: "§1245 personal property" },
     ] },
-    { key: "accumulated_depreciation", label: "Accumulated depreciation ($)", kind: "number" },
-    { key: "total_gain", label: "Total gain on sale ($)", kind: "number" },
-    { key: "ordinary_rate_pct", label: "Ordinary income rate (%)", kind: "number" },
-    { key: "straight_line_depreciation", label: "Straight-line depreciation ($, §1250)", kind: "number" },
+    { key: "accumulated_depreciation", label: "Accumulated depreciation ($)", kind: "number" , attrs: { min: "0" } },
+    { key: "total_gain", label: "Total gain on sale ($)", kind: "number" , attrs: { min: "0" } },
+    { key: "ordinary_rate_pct", label: "Ordinary income rate (%)", kind: "number" , attrs: { min: "0" } },
+    { key: "straight_line_depreciation", label: "Straight-line depreciation ($, §1250)", kind: "number" , attrs: { min: "0" } },
     { key: "max_1250_rate_pct", label: "§1250 max rate (%)", kind: "number", whenBlank: 25 },
   ],
   outputs: [
@@ -2456,7 +2456,7 @@ const renderRentRollVacancy = _v23SimpleRenderer({
     { key: "egi", id: "rrv-out-egi", label: "Effective gross income", value: (r) => "$" + fmt(r.effective_gross_income, 0) },
   ],
   compute: computeRentRollVacancy,
-});
+ attrs: { min: "0" } });
 REALESTATE_RENDERERS["rent-roll-vacancy"] = renderRentRollVacancy;
 
 // ===========================================================================

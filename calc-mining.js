@@ -618,7 +618,7 @@ MINING_RENDERERS["screen-efficiency"] = _simpleRenderer({
   fields: [
     { key: "feed_undersize_pct", label: "Feed: % finer than the aperture", kind: "number" },
     { key: "oversize_undersize_pct", label: "Oversize product: % finer than the aperture", kind: "number" },
-    { key: "undersize_undersize_pct", label: "Undersize product: % finer than the aperture", kind: "number", default: 100, attrs: { step: "any", value: "100" } },
+    { key: "undersize_undersize_pct", label: "Undersize product: % finer than the aperture", kind: "number", default: 100, attrs: { min: "0", step: "any", value: "100" } },
     { key: "feed_stph", label: "Feed rate (short tons per hour, blank to skip)", kind: "number" },
   ],
   outputs: [
@@ -666,10 +666,10 @@ MINING_RENDERERS["pulp-density-solids"] = _simpleRenderer({
   citation: "Citation: pulp density and percent solids by volume addition (the Marcy-scale relations, as in Wills' Mineral Processing Technology), by name: 1/SG_pulp = w/SG_s + (1 - w)/SG_l; w = SG_s (SG_p - SG_l)/(SG_p (SG_s - SG_l)); water = dry tons x (1 - w)/w; slurry gpm from mass over pulp density. Fully wetted solids, no air. A screen; plant sampling governs.",
   example: pulpDensitySolidsExample.inputs,
   fields: [
-    { key: "solids_sg", label: "Solids specific gravity (2.7 typical rock)", kind: "number", default: 2.7, attrs: { step: "any", value: "2.7" } },
+    { key: "solids_sg", label: "Solids specific gravity (2.7 typical rock)", kind: "number", default: 2.7, attrs: { min: "0", step: "any", value: "2.7" } },
     { key: "percent_solids_wt", label: "Percent solids by weight (or leave blank and enter the pulp SG)", kind: "number" },
     { key: "pulp_sg", label: "Measured pulp specific gravity (or leave blank and enter % solids)", kind: "number" },
-    { key: "liquid_sg", label: "Liquid specific gravity (1.0 water)", kind: "number", default: 1, attrs: { step: "any", value: "1" } },
+    { key: "liquid_sg", label: "Liquid specific gravity (1.0 water)", kind: "number", default: 1, attrs: { min: "0", step: "any", value: "1" } },
     { key: "dry_solids_stph", label: "Dry solids rate (short tons per hour, blank to skip)", kind: "number" },
   ],
   outputs: [
@@ -1424,7 +1424,7 @@ MINING_RENDERERS["friction-hoist-traction"] = _simpleRenderer({
   example: frictionHoistTractionExample.inputs,
   fields: [
     { key: "loaded_conveyance_lb", label: "Loaded-side conveyance weight, empty (lb)", kind: "number" },
-    { key: "payload_lb", label: "Payload (lb)", kind: "number" },
+    { key: "payload_lb", label: "Payload (lb)", kind: "number" , attrs: { min: "0" } },
     { key: "opposite_side_lb", label: "Opposite side: empty conveyance or counterweight (lb)", kind: "number" },
     { key: "head_rope_lb_ft", label: "Head ropes, all together (lb per ft)", kind: "number" },
     { key: "tail_rope_lb_ft", label: "Tail (balance) ropes, all together (lb per ft, 0 if none)", kind: "number" },

@@ -567,7 +567,7 @@ OILGAS_RENDERERS["cathodic-anode-count-life"] = _simpleRenderer({
   fields: [
     { key: "od_in", label: "Pipe outside diameter (in)", kind: "number" },
     { key: "length_mi", label: "Length (miles)", kind: "number" },
-    { key: "coating_efficiency_pct", label: "Coating efficiency (%)", kind: "number", attrs: { step: "any" } },
+    { key: "coating_efficiency_pct", label: "Coating efficiency (%)", kind: "number", attrs: { min: "0", step: "any" } },
     { key: "current_density_ma_per_ft2", label: "Current density (mA per sq ft of bare steel)", kind: "number" },
     { key: "anode_weight_lb", label: "Anode net weight (lb, 0 to skip life)", kind: "number" },
     { key: "consumption_lb_per_a_yr", label: "ACTUAL consumption rate (lb per A-year; theoretical / current efficiency -- Mg 8.8 / 0.50 = 17.6, UFC 3-570-02A)", kind: "number" },
@@ -1814,7 +1814,7 @@ OILGAS_RENDERERS["cuttings-slip-velocity"] = _simpleRenderer({
     { key: "flow_index_n", label: "Flow behavior index n (power law)", kind: "number" },
     { key: "consistency_k", label: "Consistency index K (equivalent cP, power law)", kind: "number" },
     { key: "hole_dia_in", label: "Hole or casing inside diameter (in)", kind: "number" },
-    { key: "pipe_od_in", label: "Pipe outside diameter (in)", kind: "number" },
+    { key: "pipe_od_in", label: "Pipe outside diameter (in)", kind: "number" , attrs: { min: "0" } },
     { key: "annular_velocity_ft_min", label: "Annular velocity (ft/min)", kind: "number" },
   ],
   outputs: [

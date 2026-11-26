@@ -2609,7 +2609,7 @@ CONCRETE_RENDERERS["concrete-premix-bags"] = _simpleRenderer({
     { key: "n", id: "cpb-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeConcretePremixBags,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1123: T-beam flexural capacity (ACI 318-19) =====================
 

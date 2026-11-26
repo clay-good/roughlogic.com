@@ -2107,9 +2107,9 @@ FAB_RENDERERS["weld-preheat-cet"] = _simpleRenderer({
     { key: "cu", label: "Copper Cu (wt %)", kind: "number" },
     { key: "ni", label: "Nickel Ni (wt %)", kind: "number" },
     { key: "thickness_in", label: "Plate thickness (in)", kind: "number" },
-    { key: "hydrogen_ml_100g", label: "Diffusible hydrogen (ml/100 g; 5 low-hydrogen SMAW, 3 GMAW)", kind: "number", default: 5, attrs: { step: "any", value: "5" } },
+    { key: "hydrogen_ml_100g", label: "Diffusible hydrogen (ml/100 g; 5 low-hydrogen SMAW, 3 GMAW)", kind: "number", default: 5, attrs: { min: "0", step: "any", value: "5" } },
     { key: "arc_energy_kj_in", label: "Arc energy (kJ/in)", kind: "number" },
-    { key: "arc_efficiency", label: "Arc efficiency (EN 1011-1: 0.8 SMAW/GMAW, 0.6 GTAW, 1.0 SAW)", kind: "number", default: 0.8, attrs: { step: "any", value: "0.8" } },
+    { key: "arc_efficiency", label: "Arc efficiency (EN 1011-1: 0.8 SMAW/GMAW, 0.6 GTAW, 1.0 SAW)", kind: "number", default: 0.8, attrs: { min: "0", step: "any", value: "0.8" } },
   ],
   outputs: [
     { key: "t", id: "wpc-out-t", label: "Minimum preheat", value: (r) => fmt(r.preheat_f, 0) + " °F (" + fmt(r.preheat_c, 0) + " °C)" },

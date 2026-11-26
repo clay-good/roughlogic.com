@@ -173,4 +173,4 @@ DISINFECT_RENDERERS["well-shock-chlorination"] = _simpleRenderer({
     { key: "n", id: "wsc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeWellShockChlorination,
-});
+ attrs: { min: "0" } });

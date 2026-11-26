@@ -1504,7 +1504,7 @@ LINEWORKER_RENDERERS["counterpoise-resistance"] = _simpleRenderer({
     { key: "n", id: "cpr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCounterpoiseResistance,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1468: underground duct-bank ampacity derate =====================
 // The mutual-heating geometry uses the standard image method: each loaded duct
@@ -1607,12 +1607,12 @@ LINEWORKER_RENDERERS["duct-bank-ampacity-derate"] = _simpleRenderer({
     { key: "ducts_across", label: "Ducts across", kind: "number" },
     { key: "ducts_down", label: "Ducts down", kind: "number" },
     { key: "loaded_ducts", label: "Ducts actually loaded", kind: "number" },
-    { key: "spacing_in", label: "Duct center-to-center spacing (in)", kind: "number", attrs: { step: "any" } },
-    { key: "depth_to_top_in", label: "Depth to the top duct (in)", kind: "number", attrs: { step: "any" } },
-    { key: "base_table_ampacity_a", label: "Base NEC table ampacity (A)", kind: "number", attrs: { step: "any" } },
-    { key: "derate_factor", label: "Derate factor from Annex B / Neher-McGrath (0 to 1)", kind: "number", attrs: { step: "any" } },
-    { key: "alt_derate_factor", label: "Alternative derate factor to compare (0 to skip)", kind: "number", attrs: { step: "any" } },
-    { key: "target_load_a", label: "Target load per circuit (A, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "spacing_in", label: "Duct center-to-center spacing (in)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "depth_to_top_in", label: "Depth to the top duct (in)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "base_table_ampacity_a", label: "Base NEC table ampacity (A)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "derate_factor", label: "Derate factor from Annex B / Neher-McGrath (0 to 1)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "alt_derate_factor", label: "Alternative derate factor to compare (0 to skip)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "target_load_a", label: "Target load per circuit (A, 0 to skip)", kind: "number", attrs: { min: "0", step: "any" } },
   ],
   outputs: [
     { key: "a", id: "dbad-out-a", label: "Derated ampacity", value: (r) => r.ampacity_verdict },

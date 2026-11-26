@@ -138,7 +138,7 @@ FINISH_RENDERERS["thinset-coverage"] = _simpleRenderer({
       { value: "half", label: "1/2 in (~45 sq ft/bag)" },
     ] },
     { key: "coverage_per_bag", label: "Coverage override (sq ft/bag, optional)", kind: "number" },
-    { key: "bag_weight_lb", label: "Bag weight (lb)", kind: "number", whenBlank: 50 },
+    { key: "bag_weight_lb", label: "Bag weight (lb)", kind: "number", whenBlank: 50 , attrs: { min: "0" } },
     { key: "waste_pct", label: "Waste (%)", kind: "number", default: 10 },
   ],
   outputs: [

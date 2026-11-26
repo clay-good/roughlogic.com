@@ -4969,7 +4969,7 @@ const renderControlJointSpacing = _simpleRenderer({
     { key: "n", id: "cjs-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeControlJointSpacing,
-});
+ attrs: { min: "0" } });
 CONSTRUCTION_RENDERERS["control-joint-spacing"] = renderControlJointSpacing;
 
 const _REBAR_DB_IN = { "#3": 0.375, "#4": 0.5, "#5": 0.625, "#6": 0.75, "#7": 0.875, "#8": 1.0, "#9": 1.128, "#10": 1.270, "#11": 1.410 };
@@ -6592,7 +6592,7 @@ const _renderConcreteEvaporationRate = _simpleRenderer({
   fields: [
     { key: "air_temp_f", label: "Air temperature (°F)", kind: "number", default: 70, required: true, attrs: { step: "any" } },
     { key: "concrete_temp_f", label: "Concrete temperature (°F; enter it, or use the air temperature if unknown)", kind: "number", attrs: { step: "any" }, blankUndefined: true },
-    { key: "rh_pct", label: "Relative humidity (%)", kind: "number", default: 50 },
+    { key: "rh_pct", label: "Relative humidity (%)", kind: "number", default: 50 , attrs: { min: "0" } },
     { key: "wind_mph", label: "Wind speed (mph)", kind: "number" },
   ],
   outputs: [
@@ -6688,7 +6688,7 @@ const _renderConcreteMaturity = _simpleRenderer({
   example: concreteMaturityExample.inputs,
   fields: [
     { key: "concrete_temp_f", label: "Average concrete temperature (°F)", kind: "number", attrs: { step: "any" } },
-    { key: "hours", label: "Elapsed curing time (hours)", kind: "number", attrs: { step: "any" } },
+    { key: "hours", label: "Elapsed curing time (hours)", kind: "number", attrs: { min: "0", step: "any" } },
     { key: "datum_f", label: "Datum temperature T0 (°F)", kind: "number", default: 32, required: true, attrs: { step: "any" } },
     { key: "q_kelvin", label: "Arrhenius constant Q (K)", kind: "number", whenBlank: 5000 },
     { key: "ref_temp_f", label: "Reference temperature Tr (°F)", kind: "number", attrs: { step: "any" }, whenBlank: 68 },
@@ -12343,7 +12343,7 @@ CONSTRUCTION_RENDERERS["membrane-fastener-takeoff"] = _simpleRenderer({
     { key: "perimeter_spacing_in", label: "Perimeter / corner spacing (in o.c.)", kind: "number", whenBlank: 6 },
     { key: "perimeter_fraction_pct", label: "Share of seam in perimeter / corner zones (%)", kind: "number", default: 25 },
     { key: "field_seam_covered", label: "Fasteners in the field of a sheet (need cover tape)?", kind: "select", options: [{ value: "no", label: "No - all fasteners in welded side laps", selected: true }, { value: "yes", label: "Yes - count cover tape" }] },
-    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 5 },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number", default: 5 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "s", id: "mft-out-s", label: "Seam length (the fastener rows)", value: (r) => fmt(r.seam_lf, 0) + " LF on " + aFig(fmt(r.usable_w_ft, 2)) + " ft usable width" },

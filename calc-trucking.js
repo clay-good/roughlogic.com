@@ -703,7 +703,7 @@ const renderPalletLoadout = _simpleRenderer({
     { key: "case_weight_lb",   label: "Case weight (lb)",  kind: "number" },
     { key: "cases_per_pallet", label: "Cases per pallet",  kind: "number", default: 36 },
     { key: "pallet_length_in", label: "Pallet length (in)",kind: "number", whenBlank: 48 },
-    { key: "pallet_width_in",  label: "Pallet width (in)", kind: "number", whenBlank: 40 },
+    { key: "pallet_width_in",  label: "Pallet width (in)", kind: "number", whenBlank: 40 , attrs: { min: "0" } },
     { key: "pallet_height_in", label: "Pallet height (in)",kind: "number", whenBlank: 48 },
     { key: "trailer", label: "Trailer", kind: "select", options: Object.keys(TRAILER_DIMENSIONS_IN).map((k) => ({ value: k, label: k.replace(/_/g, " ") })) },
     { key: "pinwheel", label: "Pinwheel allowed", kind: "checkbox" },

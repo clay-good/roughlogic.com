@@ -274,7 +274,7 @@ STEAMPLANT_RENDERERS["laundry-cost-per-pound"] = _simpleRenderer({
     { key: "chem_cost_per_cwt", label: "Chemical cost ($ per hundredweight)", kind: "number" },
     { key: "labor_hours_per_day", label: "Labor hours per day", kind: "number" },
     { key: "labor_rate_per_hour", label: "Labor rate ($ per hour)", kind: "number" },
-    { key: "days_per_year", label: "Operating days per year", kind: "number", default: 300 },
+    { key: "days_per_year", label: "Operating days per year", kind: "number", default: 300 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "w", id: "lcp-out-w", label: "Water and sewer", value: (r) => "$" + fmt(r.water_cost_per_lb + r.sewer_cost_per_lb, 4) + " per lb -- the line everybody counts" },
@@ -474,7 +474,7 @@ STEAMPLANT_RENDERERS["saturated-steam-properties"] = _simpleRenderer({
   example: saturatedSteamPropertiesExample.inputs,
   fields: [
     { key: "gauge_pressure_psig", label: "Steam pressure (psig; negative for vacuum)", kind: "number", attrs: { step: "any" } },
-    { key: "atmosphere_psia", label: "Atmospheric pressure (psia)", kind: "number", default: 14.696 },
+    { key: "atmosphere_psia", label: "Atmospheric pressure (psia)", kind: "number", default: 14.696 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "t", id: "ssp-out-t", label: "Saturation temperature", value: (r) => fmt(r.sat_temp_f, 1) + " F at " + fmt(r.absolute_pressure_psia, 2) + " psia" },
@@ -772,7 +772,7 @@ STEAMPLANT_RENDERERS["fuel-oil-atomizing-viscosity"] = _simpleRenderer({
     { key: "t2_f", label: "Data sheet temperature 2 (F)", kind: "number", required: true },
     { key: "target_ssu", label: "Target atomizing viscosity (SSU)", kind: "number", default: 150 },
     { key: "pumping_limit_ssu", label: "Pumping viscosity limit (SSU)", kind: "number", default: 4000 },
-    { key: "check_temp_f", label: "Check a heater setpoint (F)", kind: "number", default: 185, required: true, attrs: { step: "any" } },
+    { key: "check_temp_f", label: "Check a heater setpoint (F)", kind: "number", default: 185, required: true, attrs: { min: "0", step: "any" } },
   ],
   outputs: [
     { key: "a", id: "foa-out-a", label: "Atomizing setpoint at the burner", value: (r) => fmt(r.temp_for_target_f, 0) + " F to reach " + fmt(r.target_ssu, 0) + " SSU" },

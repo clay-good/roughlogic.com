@@ -416,8 +416,8 @@ const renderPounds = _r({
   citation: "Citation: Pounds formula by name. lb/day = flow MGD * dose mg/L * 8.34. Adjusted product dose at the selected purity, applied as a weight fraction (the operator-exam convention). Liquid hypochlorite sold at 12.5% trade strength (g per 100 mL) weighs about 20% more per pound of chlorine; pool-chlorine-dose and main-disinfection-chlorine work it by the gallon.",
   example: poundsFormulaExample.inputs,
   fields: [
-    { key: "flow_mgd",   label: "Flow (MGD)", kind: "number" },
-    { key: "dose_mg_l",  label: "Dose (mg/L)", kind: "number" },
+    { key: "flow_mgd",   label: "Flow (MGD)", kind: "number" , attrs: { min: "0" } },
+    { key: "dose_mg_l",  label: "Dose (mg/L)", kind: "number" , attrs: { min: "0" } },
     { key: "chemical",   label: "Chemical", kind: "select", options: Object.keys(CHEMICAL_PURITY).map((k) => ({ value: k, label: CHEMICAL_PURITY[k].label })) },
   ],
   outputs: [
@@ -442,7 +442,7 @@ const renderFilterLoading = _r({
     { key: "c", id: "fl-out-c", label: "Category",     value: (r) => r.category },
   ],
   compute: computeFilterLoading,
-});
+ attrs: { min: "0" } });
 
 const renderFilterAreaForLoading = _r({
   citation: "Citation: AWWA general practice by name only. Filter area = flow / target loading rate. Backwash flow = backwash rate * area.",
@@ -458,7 +458,7 @@ const renderFilterAreaForLoading = _r({
     { key: "c", id: "fal-out-c", label: "Loading band",         value: (r) => r.category },
   ],
   compute: computeFilterAreaForLoading,
-});
+ attrs: { min: "0" } });
 
 const renderDetentionTime = _r({
   citation: "Citation: Detention time = volume / flow. Used for chlorine contact, flocculation, sedimentation.",
@@ -477,7 +477,7 @@ const renderDetentionTime = _r({
     { key: "wor", id: "dt-out-wor", label: "Weir overflow rate", value: (r) => r.weir_overflow_rate_gpd_ft == null ? "(enter weir length)" : fmt(r.weir_overflow_rate_gpd_ft, 0) + " gpd/ft" },
   ],
   compute: computeDetentionTime,
-});
+ attrs: { min: "0" } });
 
 const renderDetentionBasinVolume = _r({
   citation: "Citation: Required basin volume = target detention time x flow (the inverse of detention time = volume / flow). Sizes chlorine-contact, flocculation, and sedimentation basins to a target time (Ten States Standards).",
@@ -491,7 +491,7 @@ const renderDetentionBasinVolume = _r({
     { key: "h", id: "dbv-out-h", label: "Target time",     value: (r) => fmt(r.hours, 2) + " hr" },
   ],
   compute: computeDetentionBasinVolume,
-});
+ attrs: { min: "0" } });
 
 function renderDilution(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: C1V1 = C2V2 dilution form. Serial mode applies the dilution factor at each step.";
@@ -548,7 +548,7 @@ const renderPumpEff = _r({
     { key: "p", id: "pe-out-p", label: "Wire-to-water",    value: (r) => fmt(r.wire_to_water_pct, 1) + " % - " + r.category },
   ],
   compute: computePumpEfficiency,
-});
+ attrs: { min: "0" } });
 
 const renderSRTFM = _r({
   citation: "Citation: Metcalf and Eddy by name only. SRT = aeration solids / waste solids per day. F/M = BOD load / MLVSS in tank.",
@@ -571,7 +571,7 @@ const renderSRTFM = _r({
     { key: "c",  id: "sf-out-c",  label: "CAS check",       value: (r) => r.cas_flag },
   ],
   compute: computeSRTandFM,
-});
+ attrs: { min: "0" } });
 
 // =====================================================================
 // v8 Phase E.5 (utility 257): Coagulant Dose from Jar Test
@@ -1644,9 +1644,9 @@ const renderBackflowTestPSI = _v23SimpleRenderer({
       { value: "rp", label: "RP (reduced-pressure principle)" },
       { value: "dc", label: "DC (double check)" },
     ] },
-    { key: "check1_psid", label: "Check #1 differential (psid)", kind: "number" },
-    { key: "relief_open_psid", label: "RP relief opening point (psid)", kind: "number" },
-    { key: "check2_psi", label: "Check #2 tightness (psi)", kind: "number" },
+    { key: "check1_psid", label: "Check #1 differential (psid)", kind: "number" , attrs: { min: "0" } },
+    { key: "relief_open_psid", label: "RP relief opening point (psid)", kind: "number" , attrs: { min: "0" } },
+    { key: "check2_psi", label: "Check #2 tightness (psi)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "pass", id: "bft-out-p", label: "Verdict", value: (r) => r.pass ? "PASS" : "FAIL - " + (r.failed || "below the field-test threshold") },
@@ -1697,7 +1697,7 @@ const renderChlorineDemand = _v23SimpleRenderer({
     { key: "n", id: "cld-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeChlorineDemand,
-});
+ attrs: { min: "0" } });
 WATER_RENDERERS["chlorine-demand"] = renderChlorineDemand;
 
 // dims: in { intensity_mw_cm2: M T^-3, exposure_time_s: T, target_dose_mj_cm2: M T^-2 } out: { dose_mj_cm2: M T^-2, margin: dimensionless }
@@ -1730,7 +1730,7 @@ const renderUvDose = _v23SimpleRenderer({
     { key: "n", id: "uvd-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeUvDose,
-});
+ attrs: { min: "0" } });
 WATER_RENDERERS["uv-dose"] = renderUvDose;
 
 // dims: in { target_dose_mj_cm2: M T^-2, intensity_mw_cm2: M T^-3, exposure_time_s: T } out: { required_time_s: T, required_intensity_mw_cm2: M T^-3 }
@@ -1766,7 +1766,7 @@ const renderUvRequiredExposure = _v23SimpleRenderer({
     { key: "n", id: "uvr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeUvRequiredExposure,
-});
+ attrs: { min: "0" } });
 WATER_RENDERERS["uv-required-exposure"] = renderUvRequiredExposure;
 
 // --- spec-v570 M: Population equivalent (organic load) ---
@@ -1807,7 +1807,7 @@ const renderPopulationEquivalent = _v23SimpleRenderer({
     { key: "n", id: "pe-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computePopulationEquivalent,
-});
+ attrs: { min: "0" } });
 WATER_RENDERERS["population-equivalent"] = renderPopulationEquivalent;
 
 // --- spec-v571 M: Return activated sludge (RAS) flow rate ---
@@ -1844,7 +1844,7 @@ const renderRasFlowRate = _v23SimpleRenderer({
     { key: "n", id: "ras-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeRasFlowRate,
-});
+ attrs: { min: "0" } });
 WATER_RENDERERS["ras-flow-rate"] = renderRasFlowRate;
 
 // --- spec-v600 M: Settleability-based RAS rate from SVI ---
@@ -1884,7 +1884,7 @@ const renderRasSviSettleability = _v23SimpleRenderer({
     { key: "n", id: "rsvi-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeRasSviSettleability,
-});
+ attrs: { min: "0" } });
 WATER_RENDERERS["ras-svi-settleability"] = renderRasSviSettleability;
 
 // --- spec-v572 M: WAS rate to hold target SRT (sludge age) ---
@@ -1933,7 +1933,7 @@ const renderWasSrtControl = _v23SimpleRenderer({
     { key: "n", id: "was-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeWasSrtControl,
-});
+ attrs: { min: "0" } });
 WATER_RENDERERS["was-srt-control"] = renderWasSrtControl;
 
 // --- spec-v574 M: Activated-sludge oxygen and blower air demand ---
@@ -1996,7 +1996,7 @@ const renderAerationOxygenDemand = _v23SimpleRenderer({
     { key: "n", id: "aod-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeAerationOxygenDemand,
-});
+ attrs: { min: "0" } });
 WATER_RENDERERS["aeration-oxygen-demand"] = renderAerationOxygenDemand;
 
 // ===================== spec-v926: RO recovery, concentrate flow, and concentration factor =====================
@@ -2416,15 +2416,15 @@ WATER_RENDERERS["step-drawdown-efficiency"] = _simpleRenderer({
   citation: "Citation: the step-drawdown relation s = BQ + CQ², where BQ is aquifer (formation) loss and CQ² is turbulent well loss at the screen and pack; well efficiency = BQ / (BQ + CQ²). B and C are fitted by least squares from the entered steps by plotting s/Q against Q. Efficiency depends on the RATE tested, because well loss is quadratic -- a light-duty test finds nothing wrong with a well that is in trouble at its operating rate. It does not design or conduct a step test, determine aquifer transmissivity or storativity (those come from a constant-rate test), diagnose why efficiency is low, design a rehabilitation, or size a pump. AWWA A100, the driller's log and the hydrogeologist govern.",
   example: stepDrawdownEfficiencyExample.inputs,
   fields: [
-    { key: "q1_gpm", label: "Step 1 rate (gpm)", kind: "number", attrs: { step: "any" } },
-    { key: "s1_ft", label: "Step 1 stabilized drawdown (ft)", kind: "number", attrs: { step: "any" } },
-    { key: "q2_gpm", label: "Step 2 rate (gpm)", kind: "number", attrs: { step: "any" } },
-    { key: "s2_ft", label: "Step 2 stabilized drawdown (ft)", kind: "number", attrs: { step: "any" } },
-    { key: "q3_gpm", label: "Step 3 rate (gpm, 0 to skip)", kind: "number", attrs: { step: "any" } },
-    { key: "s3_ft", label: "Step 3 stabilized drawdown (ft, 0 to skip)", kind: "number", attrs: { step: "any" } },
-    { key: "operating_gpm", label: "Operating rate to evaluate (gpm)", kind: "number", attrs: { step: "any" } },
-    { key: "efficiency_threshold_pct", label: "Rehabilitation threshold (%)", kind: "number", default: 65, attrs: { step: "any" } },
-    { key: "previous_efficiency_pct", label: "Previous test efficiency (%, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "q1_gpm", label: "Step 1 rate (gpm)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "s1_ft", label: "Step 1 stabilized drawdown (ft)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "q2_gpm", label: "Step 2 rate (gpm)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "s2_ft", label: "Step 2 stabilized drawdown (ft)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "q3_gpm", label: "Step 3 rate (gpm, 0 to skip)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "s3_ft", label: "Step 3 stabilized drawdown (ft, 0 to skip)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "operating_gpm", label: "Operating rate to evaluate (gpm)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "efficiency_threshold_pct", label: "Rehabilitation threshold (%)", kind: "number", default: 65, attrs: { min: "0", step: "any" } },
+    { key: "previous_efficiency_pct", label: "Previous test efficiency (%, 0 to skip)", kind: "number", attrs: { min: "0", step: "any" } },
   ],
   outputs: [
     { key: "f", id: "sde-out-f", label: "Fitted coefficients", value: (r) => r.fit_verdict },
@@ -2506,14 +2506,14 @@ WATER_RENDERERS["well-casing-purge-volume"] = _simpleRenderer({
   citation: "Citation: casing volume = 0.0408 × diameter(in)² gal/ft × the STANDING COLUMN (depth less the static water level), with the purge at an entered number of casing volumes. Chlorine demand = MG × 8.34 × mg/L, converted to solution volume at the ENTERED trade-percent strength (lb of chlorine per gallon = strength x 8.34), with the entered density giving only the solution weight. The dose treats the CASING; the gravel pack and near-well formation hold a comparable volume. It does not set a purge protocol or sampling method, size the pack volume, specify contact time or purge-water neutralisation, or address the annular seal. AWWA A100 / C654 and the state well code govern.",
   example: wellCasingPurgeVolumeExample.inputs,
   fields: [
-    { key: "casing_diameter_in", label: "Casing inside diameter (in)", kind: "number", attrs: { step: "any" } },
-    { key: "well_depth_ft", label: "Well depth (ft)", kind: "number", attrs: { step: "any" } },
+    { key: "casing_diameter_in", label: "Casing inside diameter (in)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "well_depth_ft", label: "Well depth (ft)", kind: "number", attrs: { min: "0", step: "any" } },
     { key: "static_water_level_ft", label: "Static water level (ft below grade)", kind: "number", attrs: { step: "any" } },
-    { key: "purge_volumes", label: "Casing volumes to purge", kind: "number", default: 3, attrs: { step: "any" } },
-    { key: "purge_rate_gpm", label: "Purge pump rate (gpm, 0 to skip)", kind: "number", attrs: { step: "any" } },
-    { key: "target_dose_mg_l", label: "Disinfection dose (mg/L, 0 to skip)", kind: "number", attrs: { step: "any" } },
-    { key: "solution_strength_pct", label: "Hypochlorite strength (% available chlorine)", kind: "number", default: 12.5, attrs: { step: "any" } },
-    { key: "solution_lb_per_gal", label: "Solution density (lb/gal)", kind: "number", default: 10.0, attrs: { step: "any" } },
+    { key: "purge_volumes", label: "Casing volumes to purge", kind: "number", default: 3, attrs: { min: "0", step: "any" } },
+    { key: "purge_rate_gpm", label: "Purge pump rate (gpm, 0 to skip)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "target_dose_mg_l", label: "Disinfection dose (mg/L, 0 to skip)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "solution_strength_pct", label: "Hypochlorite strength (% available chlorine)", kind: "number", default: 12.5, attrs: { min: "0", step: "any" } },
+    { key: "solution_lb_per_gal", label: "Solution density (lb/gal)", kind: "number", default: 10.0, attrs: { min: "0", step: "any" } },
   ],
   outputs: [
     { key: "v", id: "wcp-out-v", label: "Standing volume", value: (r) => r.volume_verdict },
@@ -2590,14 +2590,14 @@ WATER_RENDERERS["constant-pressure-well-vfd"] = _simpleRenderer({
   citation: "Citation: total head = static lift + friction + setpoint (psi × 2.31 ft/psi), with friction the ONLY speed-sensitive term, falling with the square of flow; the speed follows the affinity relation N₂ = N₁ × √(H₂/H₁). The cube law for power applies to friction-dominated systems, NOT to a well holding a pressure setpoint, where static lift and setpoint are constant. Drawdown adds to the static lift and grows with flow. It does not select a pump or read a real curve, size a drive or motor, compute power or energy, model drawdown against rate (that is a step test), or address minimum flow and submersible motor cooling. The pump manufacturer's curve and the well's test data govern.",
   example: constantPressureWellVfdExample.inputs,
   fields: [
-    { key: "static_lift_ft", label: "Static lift to water (ft)", kind: "number", attrs: { step: "any" } },
-    { key: "friction_at_design_ft", label: "Friction head at design flow (ft)", kind: "number", attrs: { step: "any" } },
-    { key: "design_flow_gpm", label: "Design flow (gpm)", kind: "number", attrs: { step: "any" } },
-    { key: "setpoint_psi", label: "Pressure setpoint (psi)", kind: "number", attrs: { step: "any" } },
-    { key: "reduced_flow_gpm", label: "Reduced flow to evaluate (gpm, 0 to skip)", kind: "number", attrs: { step: "any" } },
-    { key: "full_speed_rpm", label: "Full speed (rpm)", kind: "number", default: 3450, attrs: { step: "any" } },
-    { key: "drawdown_at_design_ft", label: "Drawdown at design flow (ft, 0 to skip)", kind: "number", attrs: { step: "any" } },
-    { key: "pump_max_head_ft", label: "Pump maximum head (ft, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "static_lift_ft", label: "Static lift to water (ft)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "friction_at_design_ft", label: "Friction head at design flow (ft)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "design_flow_gpm", label: "Design flow (gpm)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "setpoint_psi", label: "Pressure setpoint (psi)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "reduced_flow_gpm", label: "Reduced flow to evaluate (gpm, 0 to skip)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "full_speed_rpm", label: "Full speed (rpm)", kind: "number", default: 3450, attrs: { min: "0", step: "any" } },
+    { key: "drawdown_at_design_ft", label: "Drawdown at design flow (ft, 0 to skip)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "pump_max_head_ft", label: "Pump maximum head (ft, 0 to skip)", kind: "number", attrs: { min: "0", step: "any" } },
   ],
   outputs: [
     { key: "d", id: "cpv-out-d", label: "At design flow", value: (r) => r.design_verdict },
@@ -2668,11 +2668,11 @@ WATER_RENDERERS["wet-well-cycle-time"] = _simpleRenderer({
   citation: "Citation: active wet-well volume V = t × Q / 4, where t is the minimum cycle time and Q the pump rate -- the four falls out of the governing case, inflow at exactly HALF the pump rate, where fill time and draw-down time are both short at once. Level differential = V / (π/4 × D² × 7.481 gal/ft³). The cycle limit is a MOTOR rating (permitted starts per hour), not a hydraulic one. It does not size or select the pump, determine inflow or its diurnal pattern, set float elevations or minimum submergence, evaluate the force main, model duplex or variable-speed arrangements, or address wet-well ventilation, entry and corrosion. Ten States Standards, the pump manufacturer's permitted starts and the design engineer govern.",
   example: wetWellCycleTimeExample.inputs,
   fields: [
-    { key: "pump_gpm", label: "Pump rate (gpm)", kind: "number", attrs: { step: "any" } },
-    { key: "well_diameter_ft", label: "Wet well diameter (ft)", kind: "number", attrs: { step: "any" } },
-    { key: "min_cycle_minutes", label: "Minimum cycle time (min, 0 to use starts/hour)", kind: "number", attrs: { step: "any" } },
+    { key: "pump_gpm", label: "Pump rate (gpm)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "well_diameter_ft", label: "Wet well diameter (ft)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "min_cycle_minutes", label: "Minimum cycle time (min, 0 to use starts/hour)", kind: "number", attrs: { min: "0", step: "any" } },
     { key: "max_starts_per_hour", label: "Maximum starts per hour (0 if cycle time given)", kind: "number", attrs: { step: "any" } },
-    { key: "inflow_gpm", label: "Actual inflow to check (gpm, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "inflow_gpm", label: "Actual inflow to check (gpm, 0 to skip)", kind: "number", attrs: { min: "0", step: "any" } },
   ],
   outputs: [
     { key: "v", id: "wwc-out-v", label: "Active volume", value: (r) => r.volume_verdict },
@@ -2741,12 +2741,12 @@ WATER_RENDERERS["main-flushing-volume"] = _simpleRenderer({
   citation: "Citation: pipe volume = 0.0408 × diameter(in)² gal/ft × length; the flow for a scouring velocity is gpm = 2.448 × diameter(in)² × velocity(ft/s), with about 3 ft/s the usual target. Required flow goes with the SQUARE of diameter, so a single hydrant outlet that scours a small main cannot scour a large one -- unidirectional flushing with valves closed to force the path is what makes the velocity. It does not model distribution hydraulics or predict the flow a hydrant delivers at system pressure, plan a unidirectional sequence, evaluate water quality or decide when flushing is warranted, size dechlorination, or address discoloration elsewhere in the system. AWWA M17 and the utility's flushing programme govern.",
   example: mainFlushingVolumeExample.inputs,
   fields: [
-    { key: "main_diameter_in", label: "Main diameter (in)", kind: "number", attrs: { step: "any" } },
-    { key: "run_length_ft", label: "Run length (ft)", kind: "number", attrs: { step: "any" } },
-    { key: "target_velocity_fps", label: "Target scouring velocity (ft/s)", kind: "number", default: 3, attrs: { step: "any" } },
-    { key: "pipe_volumes", label: "Pipe volumes to discharge", kind: "number", default: 3, attrs: { step: "any" } },
-    { key: "hydrant_outlets", label: "Hydrant outlets open (0 to skip)", kind: "number", attrs: { step: "any" } },
-    { key: "outlet_capacity_gpm", label: "Flow per outlet at system pressure (gpm, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "main_diameter_in", label: "Main diameter (in)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "run_length_ft", label: "Run length (ft)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "target_velocity_fps", label: "Target scouring velocity (ft/s)", kind: "number", default: 3, attrs: { min: "0", step: "any" } },
+    { key: "pipe_volumes", label: "Pipe volumes to discharge", kind: "number", default: 3, attrs: { min: "0", step: "any" } },
+    { key: "hydrant_outlets", label: "Hydrant outlets open (0 to skip)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "outlet_capacity_gpm", label: "Flow per outlet at system pressure (gpm, 0 to skip)", kind: "number", attrs: { min: "0", step: "any" } },
     { key: "available_flow_gpm", label: "Or total available flow (gpm, 0 to skip)", kind: "number", attrs: { step: "any" } },
   ],
   outputs: [
@@ -2828,10 +2828,10 @@ WATER_RENDERERS["pressure-zone-hgl"] = _simpleRenderer({
   fields: [
     { key: "hgl_ft", label: "Hydraulic grade line / tank overflow (ft)", kind: "number", attrs: { step: "any" } },
     { key: "service_elevation_ft", label: "Service ground elevation (ft)", kind: "number", attrs: { step: "any" } },
-    { key: "min_pressure_psi", label: "Minimum service pressure (psi)", kind: "number", default: 40, attrs: { step: "any" } },
-    { key: "max_pressure_psi", label: "Maximum service pressure (psi)", kind: "number", default: 80, attrs: { step: "any" } },
-    { key: "service_relief_ft", label: "Service area relief (ft, 0 to skip)", kind: "number", attrs: { step: "any" } },
-    { key: "fire_flow_friction_ft", label: "Friction to this point at fire flow (ft, 0 to skip)", kind: "number", attrs: { step: "any" } },
+    { key: "min_pressure_psi", label: "Minimum service pressure (psi)", kind: "number", default: 40, attrs: { min: "0", step: "any" } },
+    { key: "max_pressure_psi", label: "Maximum service pressure (psi)", kind: "number", default: 80, attrs: { min: "0", step: "any" } },
+    { key: "service_relief_ft", label: "Service area relief (ft, 0 to skip)", kind: "number", attrs: { min: "0", step: "any" } },
+    { key: "fire_flow_friction_ft", label: "Friction to this point at fire flow (ft, 0 to skip)", kind: "number", attrs: { min: "0", step: "any" } },
   ],
   outputs: [
     { key: "s", id: "pzh-out-s", label: "Static pressure", value: (r) => r.static_verdict },

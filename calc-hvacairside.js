@@ -105,7 +105,7 @@ HVACAIRSIDE_RENDERERS["duct-heat-gain"] = _rEnv({
     { key: "n", id: "dhg-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeDuctHeatGain,
-});
+ attrs: { min: "0" } });
 
 // dims: in { mode: dimensionless, cfm: L^3 T^-1, ratio: dimensionless, A_gross_ft2: L^2, V_target: L T^-1 } out: { V_face: L T^-1, A_gross_req_ft2: L^2, A_gross_req_in2: L^2 }
 export function computeGrilleFaceVelocity({ mode = "velocity", cfm = 0, ratio = 0.75, A_gross_ft2 = 0, V_target = 0 } = {}) {
@@ -352,7 +352,7 @@ HVACAIRSIDE_RENDERERS["isolator-deflection"] = _rEnv({
     { key: "n", id: "isod-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeIsolatorDeflection,
-});
+ attrs: { min: "0" } });
 
 // dims: in { elev_ft: L, T_F: T, acfm: L^3 T^-1, rated_sp: dimensionless } out: { DF: dimensionless, SCFM: L^3 T^-1, const_corr: dimensionless, sp_corr: dimensionless, alt_factor: dimensionless, temp_factor: dimensionless }
 export function computeAirDensityCorrection({ elev_ft = 0, T_F = 70, acfm = 0, rated_sp = 0 } = {}) {
@@ -495,7 +495,7 @@ HVACAIRSIDE_RENDERERS["cooling-coil-total-load"] = _rEnv({
     { key: "n", id: "cctl-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeCoolingCoilTotalLoad,
-});
+ attrs: { min: "0" } });
 
 // dims: in { t_ent_f: T, t_lvg_f: T, t_adp_f: T } out: { bf: dimensionless, cf: dimensionless }
 export function computeCoilBypassFactor({ t_ent_f = 0, t_lvg_f = 0, t_adp_f = 0 } = {}) {
@@ -569,7 +569,7 @@ HVACAIRSIDE_RENDERERS["fan-affinity-laws"] = _rEnv({
     { key: "n", id: "fal-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeFanAffinityLaws,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v387: Darcy friction factor (water-system hydraulics trio) =====================
 
@@ -604,7 +604,7 @@ HVACAIRSIDE_RENDERERS["colebrook-friction-factor"] = _rEnv({
     { key: "n", id: "cff-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeColebrookFrictionFactor,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v408: Manual D friction rate (HVAC duct-design trio) =====================
 
@@ -640,7 +640,7 @@ HVACAIRSIDE_RENDERERS["manual-d-friction-rate"] = _rEnv({
     { key: "n", id: "mdf-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeManualDFrictionRate,
-});
+ attrs: { min: "0" } });
 
 // ===================== spec-v1996: sensible heat of an airstream =====================
 // Q (Btu/h) = 1.08 x CFM x dT (F). 1.08 = 60 min/h x 0.075 lb/ft^3 (standard

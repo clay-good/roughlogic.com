@@ -166,13 +166,13 @@ SAFETY_RENDERERS["portable-ladder-setup"] = _simpleRendererG({
   citation: "Citation: OSHA 29 CFR 1926.1053, a US federal regulation in the public domain. 'When portable ladders are used for access to an upper landing surface, the ladder side rails shall extend at least 3 feet above the upper landing surface' - and where that is not possible, the ladder shall be secured at its top to a rigid support that will not deflect, and a grasping device shall be provided. Rungs, cleats, and steps 'shall be spaced not less than 10 inches apart, nor more than 14 inches apart, as measured between center lines of the rungs, cleats, and steps.' 'The minimum clear distance between side rails for all portable ladders shall be 11 1/2 inches.' The rail-budget arithmetic is geometry from the setup ratio, not a code value. Not checked: the 4:1 angle itself (see ladder-angle), duty rating and load, base securing and footing, fixed ladders and ladders on scaffolds, the stepladder top step, section overlap (see extension-ladder-overlap), electrical clearance, or inspection. A screen, not a ladder plan; Subpart X and the competent person govern.",
   example: portableLadderSetupExample.inputs,
   fields: [
-    { key: "ladder_length_ft", label: "Ladder length (ft, as labelled)", kind: "number" },
-    { key: "landing_height_ft", label: "Height of the upper landing surface (ft)", kind: "number" },
-    { key: "extension_above_landing_ft", label: "Rails extend above the landing (ft)", kind: "number" },
+    { key: "ladder_length_ft", label: "Ladder length (ft, as labelled)", kind: "number" , attrs: { min: "0" } },
+    { key: "landing_height_ft", label: "Height of the upper landing surface (ft)", kind: "number" , attrs: { min: "0" } },
+    { key: "extension_above_landing_ft", label: "Rails extend above the landing (ft)", kind: "number" , attrs: { min: "0" } },
     { key: "secured_with_grasping_device", label: "Secured at the top with a grasping device?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes - the 3 ft alternative" }] },
-    { key: "rung_spacing_in", label: "Rung spacing, centre to centre (in)", kind: "number", whenBlank: 12 },
-    { key: "clear_width_in", label: "Clear width between side rails (in)", kind: "number", whenBlank: 12 },
-    { key: "base_ratio", label: "Setup ratio (4 for the 4:1 rule)", kind: "number", default: 4 },
+    { key: "rung_spacing_in", label: "Rung spacing, centre to centre (in)", kind: "number", whenBlank: 12 , attrs: { min: "0" } },
+    { key: "clear_width_in", label: "Clear width between side rails (in)", kind: "number", whenBlank: 12 , attrs: { min: "0" } },
+    { key: "base_ratio", label: "Setup ratio (4 for the 4:1 rule)", kind: "number", default: 4 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "e", id: "pls-out-e", label: "Extension above the landing", value: (r) => r.extension_ok ? (r.extension_by_alternative ? "short, but carried by the secured-and-grasping-device alternative" : "3 ft satisfied") : "SHORT by " + fmt(r.extension_shortfall_ft, 1) + " ft" },
@@ -275,13 +275,13 @@ SAFETY_RENDERERS["hearing-protector-nrr"] = _simpleRendererG({
   citation: "Citation: OSHA 29 CFR 1910.95 Appendix B, Methods for Estimating the Adequacy of Hearing Protector Attenuation, a US federal regulation in the public domain. Where the measurement is C-weighted the NRR is subtracted directly; where it is A-weighted, 'subtract 7 dB from the NRR' and subtract the remainder from the A-weighted TWA. Appendix B also states that calculated attenuation values reflect realistic values only to the extent that the protectors are properly fitted and worn, and that for employees who have experienced a significant threshold shift, attenuation must be sufficient to reduce exposure to a TWA of 85 dB. Derating is NOT Appendix B text: the 50% field adjustment is OSHA enforcement guidance, and the type-specific factors are NIOSH's, and NIOSH subtracts the derated NRR minus 7 dB from an A-weighted exposure, so the 7 dB applies there too - 'earmuffs: subtract 25% from the manufacturers' labeled NRR; slow-recovery formable earplugs: subtract 50%; all other earplugs: subtract 70%' (NIOSH Criteria for a Recommended Standard, Occupational Noise Exposure). The dual-protection bonus is an editable input, defaulted to the 5 dB commonly applied under OSHA Technical Manual guidance; NIOSH recommends double protection above a 100 dBA TWA without quantifying the gain. Not checked: the TWA measurement itself (see noise-dose), the noise spectrum, fit, wearing time, protector condition, or the audiometric testing, training, and recordkeeping the standard also requires. An attenuation estimate, not a hearing conservation program.",
   example: hearingProtectorNrrExample.inputs,
   fields: [
-    { key: "twa_db", label: "Measured 8-hr TWA (dB)", kind: "number" },
+    { key: "twa_db", label: "Measured 8-hr TWA (dB)", kind: "number" , attrs: { min: "0" } },
     { key: "weighting", label: "Weighting of the measurement", kind: "select", options: [{ value: "A", label: "A-weighted (dBA) - the usual dosimeter reading", selected: true }, { value: "C", label: "C-weighted (dBC)" }] },
-    { key: "nrr_db", label: "Noise reduction rating on the package (dB)", kind: "number" },
+    { key: "nrr_db", label: "Noise reduction rating on the package (dB)", kind: "number" , attrs: { min: "0" } },
     { key: "method", label: "Method", kind: "select", options: [{ value: "appendix-b", label: "Appendix B as written (no derating)" }, { value: "osha-50", label: "OSHA field guidance (halve the adjusted value)" }, { value: "niosh-muff", label: "NIOSH earmuffs (NRR less 25%)" }, { value: "niosh-formable", label: "NIOSH formable earplugs (NRR less 50%)" }, { value: "niosh-other", label: "NIOSH all other earplugs (NRR less 70%)", selected: true }] },
     { key: "dual_protection", label: "Plugs and muffs worn together?", kind: "select", options: [{ value: "no", label: "No", selected: true }, { value: "yes", label: "Yes" }] },
-    { key: "dual_bonus_db", label: "Dual-protection bonus (dB; editable, not from Appendix B)", kind: "number", default: 5 },
-    { key: "target_db", label: "Target exposure at the ear (dB)", kind: "number", default: 85 },
+    { key: "dual_bonus_db", label: "Dual-protection bonus (dB; editable, not from Appendix B)", kind: "number", default: 5 , attrs: { min: "0" } },
+    { key: "target_db", label: "Target exposure at the ear (dB)", kind: "number", default: 85 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "s", id: "hpn-out-s", label: "Spectral adjustment", value: (r) => r.spectral_adjustment_db === 0 ? "none applied - the measurement is C-weighted" : "7 dB comes off the NRR because the measurement is A-weighted" },
@@ -407,7 +407,7 @@ SAFETY_RENDERERS["silica-table-1"] = _simpleRendererG({
       { value: "xviii", label: "(xviii) Heavy equipment for grading and excavating" },
     ] },
     { key: "location", label: "Where the work happens", kind: "select", options: [{ value: "outdoors", label: "Outdoors", selected: true }, { value: "indoors", label: "Indoors or an enclosed area" }] },
-    { key: "hours_per_shift", label: "Hours on this task per shift", kind: "number" },
+    { key: "hours_per_shift", label: "Hours on this task per shift", kind: "number" , attrs: { min: "0" } },
     { key: "controls_fully_implemented", label: "Table 1 controls fully and properly implemented?", kind: "select", options: [{ value: "yes", label: "Yes", selected: true }, { value: "no", label: "No" }] },
     { key: "apf_provided", label: "Assigned protection factor of the respirator provided (0 = none)", kind: "number" },
   ],
@@ -515,4 +515,4 @@ SAFETY_RENDERERS["lifeline-tension"] = _simpleRendererG({
     { key: "n", id: "llt-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeLifelineTension,
-});
+ attrs: { min: "0" } });

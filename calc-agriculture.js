@@ -470,14 +470,14 @@ const renderGPA = _r({
     { key: "r", id: "gp-out-r", label: "Required GPM for target", value: (r) => r.required_gpm === null ? "-" : fmt(r.required_gpm, 3) },
   ],
   compute: computeGPA,
-});
+ attrs: { min: "0" } });
 
 const renderTimberCruise = _r({
   citation: "Citation: Public USDA Forest Service technical reports by name only. Doyle: BF = (D-4)^2 * (L/16). International 1/4: BF = 0.905 (0.22 D^2 - 0.71 D) per 4 ft section, D rising 1/2 in per section for taper.",
   example: timberCruiseExample.inputs,
   fields: [
-    { key: "small_end_dib_in", label: "Small-end DIB (in)", kind: "number" },
-    { key: "log_length_ft", label: "Log length (ft)", kind: "number", whenBlank: 16 },
+    { key: "small_end_dib_in", label: "Small-end DIB (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "log_length_ft", label: "Log length (ft)", kind: "number", whenBlank: 16 , attrs: { min: "0" } },
     { key: "rule", label: "Rule", kind: "select", options: [{ value: "doyle", label: "Doyle" }, { value: "scribner", label: "Scribner" }, { value: "international", label: "International 1/4" }] },
     { key: "price_per_bf", label: "Price ($/bf, optional)", kind: "number", attrs: { step: "any", min: "0" } },
   ],
@@ -506,7 +506,7 @@ const renderSeedRate = _r({
     { key: "c", id: "sr-out-c", label: "Cost / acre",  value: (r) => r.cost_per_acre === null ? "-" : "$" + fmt(r.cost_per_acre, 2) },
   ],
   compute: computeSeedRate,
-});
+ attrs: { min: "0" } });
 
 const renderDrawbarPower = _r({
   citation: "Citation: ASAE D497.5 Figure 1 (drawbar-to-PTO power ratio by tractor type and tractive condition). Drawbar HP = (pull * speed) / 375; PTO HP = drawbar HP / ratio.",
@@ -523,15 +523,15 @@ const renderDrawbarPower = _r({
     { key: "e", id: "tp-out-e", label: "Tractive efficiency", value: (r) => fmt(r.tractive_efficiency, 2) },
   ],
   compute: computeDrawbarPower,
-});
+ attrs: { min: "0" } });
 
 const renderDrawbarPull = _r({
   citation: "Citation: ASAE D497.5 Figure 1 (drawbar-to-PTO power ratio by tractor type and tractive condition). Drawbar pull = 375 x drawbar_hp / speed, from drawbar HP = (pull * speed) / 375. A PTO rating converts to drawbar with the tractive efficiency (drawbar_hp = pto_hp x efficiency).",
   example: drawbarPullExample.inputs,
   fields: [
-    { key: "power_hp", label: "Power (hp)", kind: "number" },
+    { key: "power_hp", label: "Power (hp)", kind: "number" , attrs: { min: "0" } },
     { key: "power_basis", label: "Power basis", kind: "select", options: [{ value: "drawbar", label: "Drawbar HP" }, { value: "pto", label: "PTO HP" }] },
-    { key: "speed_mph", label: "Ground speed (mph)", kind: "number" },
+    { key: "speed_mph", label: "Ground speed (mph)", kind: "number" , attrs: { min: "0" } },
     { key: "surface", label: "Surface", kind: "select", options: SURFACE_OPTIONS },
     { key: "tractor_type", label: "Tractor type", kind: "select", options: TRACTOR_TYPE_OPTIONS },
   ],
@@ -586,9 +586,9 @@ const renderBulkDensity = _r({
   citation: "Citation: USDA NRCS Soil Quality Indicators: Bulk Density, Table 2 (bulk density that affects and that restricts root growth, by texture). Bulk density = dry mass / core volume; porosity = 1 - (bulk / particle). Does not apply to red clayey soils or volcanic ash.",
   example: bulkDensityExample.inputs,
   fields: [
-    { key: "dry_mass_g", label: "Dry core mass (g)", kind: "number" },
-    { key: "core_volume_cc", label: "Core volume (cc)", kind: "number" },
-    { key: "particle_density_pcc", label: "Particle density (g/cc)", kind: "number", whenBlank: 2.65 },
+    { key: "dry_mass_g", label: "Dry core mass (g)", kind: "number" , attrs: { min: "0" } },
+    { key: "core_volume_cc", label: "Core volume (cc)", kind: "number" , attrs: { min: "0" } },
+    { key: "particle_density_pcc", label: "Particle density (g/cc)", kind: "number", whenBlank: 2.65 , attrs: { min: "0" } },
     { key: "texture", label: "Texture", kind: "select", options: Object.keys(COMPACTION_THRESHOLDS_PCC).map((k) => ({ value: k, label: k.replace(/_/g, " ") + (k === "clay" ? " (over 45% clay)" : "") })) },
   ],
   outputs: [
@@ -604,11 +604,11 @@ const renderCropYield = _r({
   example: cropYieldExample.inputs,
   fields: [
     { key: "crop", label: "Crop", kind: "select", options: Object.keys(STD_MOISTURE_PCT).map((k) => ({ value: k, label: k })) },
-    { key: "rows_per_pass", label: "Rows per pass", kind: "number", default: 6 },
-    { key: "row_spacing_in", label: "Row spacing (in)", kind: "number" },
-    { key: "measured_length_ft", label: "Measured length (ft)", kind: "number" },
-    { key: "weight_in_strip_lb", label: "Weight in strip (lb)", kind: "number" },
-    { key: "current_moisture_pct", label: "Current moisture %", kind: "number" },
+    { key: "rows_per_pass", label: "Rows per pass", kind: "number", default: 6 , attrs: { min: "0" } },
+    { key: "row_spacing_in", label: "Row spacing (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "measured_length_ft", label: "Measured length (ft)", kind: "number" , attrs: { min: "0" } },
+    { key: "weight_in_strip_lb", label: "Weight in strip (lb)", kind: "number" , attrs: { min: "0" } },
+    { key: "current_moisture_pct", label: "Current moisture %", kind: "number" , attrs: { min: "0" } },
     { key: "ground_loss_lb_in_area", label: "Ground-loss weight (lb, optional)", kind: "number" },
     { key: "ground_loss_area_ft2", label: "Ground-loss area (ft², optional)", kind: "number" },
   ],
@@ -1926,7 +1926,7 @@ const renderPesticideReiPhi = _v23SimpleRenderer({
     { key: "phi", id: "rei-out-phi", label: "PHI status", value: (r) => r.phi_clear ? "CLEAR - harvest permitted" : ("HOLD - " + fmt(r.phi_remaining_days, 1) + " days remaining (early-harvest violation)") },
   ],
   compute: computePesticideReiPhi,
-});
+ attrs: { min: "0" } });
 AGRICULTURE_RENDERERS["pesticide-rei-phi"] = renderPesticideReiPhi;
 
 // ===========================================================================
@@ -2519,7 +2519,7 @@ const renderSprinklerPrecipRate = _v23SimpleRenderer({
     { key: "n", id: "spr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeSprinklerPrecipRate,
-});
+ attrs: { min: "0" } });
 AGRICULTURE_RENDERERS["sprinkler-precip-rate"] = renderSprinklerPrecipRate;
 
 // --- spec-v736: sprinkler zone gpm for a target precip rate (inverse of sprinkler-precip-rate) ---
@@ -2551,7 +2551,7 @@ const renderSprinklerGpmForPrecip = _v23SimpleRenderer({
     { key: "n", id: "sgp-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeSprinklerGpmForPrecip,
-});
+ attrs: { min: "0" } });
 AGRICULTURE_RENDERERS["sprinkler-gpm-for-precip"] = renderSprinklerGpmForPrecip;
 
 // --- spec-v208: irrigation-zone-runtime ---
@@ -2592,7 +2592,7 @@ const renderIrrigationZoneRuntime = _v23SimpleRenderer({
     { key: "n", id: "izr-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeIrrigationZoneRuntime,
-});
+ attrs: { min: "0" } });
 AGRICULTURE_RENDERERS["irrigation-zone-runtime"] = renderIrrigationZoneRuntime;
 
 // --- spec-v209: drip-zone-flow ---
@@ -2629,11 +2629,11 @@ const renderDripZoneFlow = _v23SimpleRenderer({
   example: dripZoneFlowExample.inputs,
   fields: [
     { key: "mode", label: "Input mode", kind: "select", options: [{ value: "inline", label: "Inline (length + spacing)" }, { value: "point", label: "Point-source (emitter count)" }] },
-    { key: "tubing_ft", label: "Dripline length (ft, inline)", kind: "number" },
-    { key: "spacing_in", label: "Emitter spacing (in, inline)", kind: "number" },
+    { key: "tubing_ft", label: "Dripline length (ft, inline)", kind: "number" , attrs: { min: "0" } },
+    { key: "spacing_in", label: "Emitter spacing (in, inline)", kind: "number" , attrs: { min: "0" } },
     { key: "emitter_count", label: "Emitter count (point-source)", kind: "number" },
-    { key: "emitter_gph", label: "Rated flow per emitter (gph)", kind: "number" },
-    { key: "valve_gpm", label: "Valve / lateral limit (gpm)", kind: "number" },
+    { key: "emitter_gph", label: "Rated flow per emitter (gph)", kind: "number" , attrs: { min: "0" } },
+    { key: "valve_gpm", label: "Valve / lateral limit (gpm)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "e", id: "dzf-out-e", label: "Emitters", value: (r) => String(r.emitters) },
@@ -2673,7 +2673,7 @@ const renderPlantSpacingCount = _v23SimpleRenderer({
     { key: "n", id: "psc-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computePlantSpacingCount,
-});
+ attrs: { min: "0" } });
 AGRICULTURE_RENDERERS["plant-spacing-count"] = renderPlantSpacingCount;
 
 // --- spec-v211: sod-takeoff ---
@@ -2710,7 +2710,7 @@ const renderSodTakeoff = _v23SimpleRenderer({
     { key: "n", id: "sod-out-n", label: "Note", value: (r) => r.note },
   ],
   compute: computeSodTakeoff,
-});
+ attrs: { min: "0" } });
 AGRICULTURE_RENDERERS["sod-takeoff"] = renderSodTakeoff;
 
 // --- spec-v338 L.x: Grain drying shrink & net market bushels (`grain-shrink-moisture`) ---

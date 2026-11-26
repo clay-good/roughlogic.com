@@ -174,15 +174,15 @@ USAR_RENDERERS["collapse-floor-load"] = _simpleRenderer({
       { value: "precast_plank", label: "8 in precast hollow plank (60 psf)" },
       { value: "entered", label: "Entered self-weight" },
     ], default: "concrete" },
-    { key: "slab_thickness_in", label: "Concrete slab thickness (in)", default: 6 },
+    { key: "slab_thickness_in", label: "Concrete slab thickness (in)", default: 6 , attrs: { min: "0" } },
     { key: "floor_self_weight_psf", label: "Entered floor self-weight (psf, if chosen)", default: 0 },
-    { key: "rubble_depth_in", label: "Rubble depth on the floor (in)" },
+    { key: "rubble_depth_in", label: "Rubble depth on the floor (in)" , attrs: { min: "0" } },
     { key: "contents_psf", label: "Contents allowance (psf; 10 for home or office furniture)", default: 0 },
     { key: "partitions_psf", label: "Partition allowance (psf; 10 to 15 per floor)", default: 0 },
-    { key: "rescuer_psf", label: "Rescuer live load (psf; 10 to 15)", default: 15 },
+    { key: "rescuer_psf", label: "Rescuer live load (psf; 10 to 15)", default: 15 , attrs: { min: "0" } },
     { key: "floors_bearing", label: "Collapsed floors bearing on the shore", default: 1, attrs: { step: "1", min: "1" } },
-    { key: "shore_spacing_ft", label: "Shore spacing along the shore line (ft)", default: 8 },
-    { key: "tributary_width_ft", label: "Tributary width across the shore (ft)", default: 4 },
+    { key: "shore_spacing_ft", label: "Shore spacing along the shore line (ft)", default: 8 , attrs: { min: "0" } },
+    { key: "tributary_width_ft", label: "Tributary width across the shore (ft)", default: 4 , attrs: { min: "0" } },
     { key: "posts_per_shore", label: "Posts per shore", default: 3, attrs: { step: "1", min: "1" } },
   ],
   outputs: [
@@ -248,7 +248,7 @@ USAR_RENDERERS["usr-vertical-shore-capacity"] = _simpleRenderer({
   citation: "Citation: USACE US&R Structures Specialist Field Operations Guide (2006), Structural Calculations -- Material Properties: Fa = 480,000 psi / (L/D)^2 capped at Fc = 1,100 psi, L/D 25 warning limit and 50 maximum; USACE US&R Shoring Operations Guide, Ed. 5.0 (2021), vertical shore design loads and species factors (85% and 75%); DHS BIPS 08 (2011) lateral bracing at 2% of vertical load, 10% where aftershocks are expected. The US&R Structures Specialist governs.",
   example: usrVerticalShoreCapacityExample.inputs,
   fields: [
-    { key: "shore_height_ft", label: "Shore height, sole to top of header (ft)", default: 10 },
+    { key: "shore_height_ft", label: "Shore height, sole to top of header (ft)", default: 10 , attrs: { min: "0" } },
     { key: "post_size", label: "Post size", kind: "select", options: [
       { value: "4x4", label: "4x4 (3.5 x 3.5 in actual)" },
       { value: "6x6", label: "6x6 (5.5 x 5.5 in actual)" },
@@ -258,7 +258,7 @@ USAR_RENDERERS["usr-vertical-shore-capacity"] = _simpleRenderer({
     { key: "post_depth_in", label: "Custom post actual depth (in)", default: 3.5 },
     { key: "posts", label: "Posts in the shore", default: 3, attrs: { step: "1", min: "1" } },
     { key: "species", label: "Species group", kind: "select", options: _SPECIES_OPTIONS, default: "df" },
-    { key: "load_per_shore_lb", label: "Load per shore (lb, from collapse-floor-load)", default: 12000 },
+    { key: "load_per_shore_lb", label: "Load per shore (lb, from collapse-floor-load)", default: 12000 , attrs: { min: "0" } },
     { key: "aftershock_expected", label: "Aftershocks expected", kind: "select", options: _AFTERSHOCK_OPTIONS, default: "yes" },
   ],
   outputs: [
@@ -338,7 +338,7 @@ USAR_RENDERERS["usr-crib-capacity"] = _simpleRenderer({
     ], default: "3x3" },
     { key: "species", label: "Species group", kind: "select", options: _SPECIES_OPTIONS, default: "syp_hf_spf" },
     { key: "bearing_stress_psi", label: "Allowable cross-grain bearing (psi; SOG 500)", default: 500 },
-    { key: "crib_width_ft", label: "Shortest crib width (ft)", default: 4 },
+    { key: "crib_width_ft", label: "Shortest crib width (ft)", default: 4 , attrs: { min: "0" } },
     { key: "bearing_condition", label: "Bearing condition", kind: "select", options: [
       { value: "all", label: "All contact points bearing (3:1)" },
       { value: "lifting", label: "Lift-and-crib operation (2:1)" },
@@ -414,12 +414,12 @@ USAR_RENDERERS["usr-raker-shore"] = _simpleRenderer({
   citation: "Citation: FEMA Structural Collapse Technician Module 2a (rakers designed for about 10% of the wall and roof weight in their tributary width, 2% minimum); USACE US&R Shoring Operations Guide, Ed. 5.0 (2021), raker length rules (17 in per ft of insertion height at 45 degrees, 14 in at 60), FAQ R-1 rating of 4,000 lb horizontal per raker, and the collapse zone of 1.25 to 1.5 times the wall height; USACE US&R Structures Specialist FOG (2006) rating of 2,500 lb per raker. The US&R Structures Specialist governs.",
   example: usrRakerShoreExample.inputs,
   fields: [
-    { key: "wall_psf", label: "Wall unit weight (psf; 12 in URM about 125)", default: 125 },
-    { key: "wall_height_ft", label: "Wall height (ft)", default: 14 },
-    { key: "raker_spacing_ft", label: "Raker spacing (ft)", default: 8 },
+    { key: "wall_psf", label: "Wall unit weight (psf; 12 in URM about 125)", default: 125 , attrs: { min: "0" } },
+    { key: "wall_height_ft", label: "Wall height (ft)", default: 14 , attrs: { min: "0" } },
+    { key: "raker_spacing_ft", label: "Raker spacing (ft)", default: 8 , attrs: { min: "0" } },
     { key: "roof_depth_ft", label: "Roof tributary depth bearing on the wall (ft)", default: 10 },
-    { key: "roof_psf", label: "Roof unit weight (psf)", default: 15 },
-    { key: "insertion_height_ft", label: "Insertion height above the sole (ft)", default: 12 },
+    { key: "roof_psf", label: "Roof unit weight (psf)", default: 15 , attrs: { min: "0" } },
+    { key: "insertion_height_ft", label: "Insertion height above the sole (ft)", default: 12 , attrs: { min: "0" } },
     { key: "raker_angle_deg", label: "Raker angle from horizontal (degrees, 30 to 75)", default: 45, attrs: { step: "any", min: "30", max: "75" } },
     { key: "aftershock_expected", label: "Aftershocks expected (10% design force; else 2%)", kind: "select", options: _AFTERSHOCK_OPTIONS, default: "yes" },
   ],
@@ -475,7 +475,7 @@ USAR_RENDERERS["picket-anchor-soil"] = _simpleRenderer({
   citation: "Citation: USACE US&R Structures Specialist Field Operations Guide (2006), Approximate Design Load of Pickets (Pins) in Soils, based on FHWA-IP-84-11, Handbook on Design of Piles and Drilled Shafts Under Lateral Load (1984), design load about 50% of capacity for a 48 in picket driven 36 in; USACE US&R Shoring Operations Guide, Ed. 5.0 (2021), picket minimum 1 in x 36 in driven 24 in. The US&R Structures Specialist or the rigging competent person governs.",
   example: picketAnchorSoilExample.inputs,
   fields: [
-    { key: "required_force_lb", label: "Required lateral force (lb)", default: 1520 },
+    { key: "required_force_lb", label: "Required lateral force (lb)", default: 1520 , attrs: { min: "0" } },
     { key: "picket_dia", label: "Picket", kind: "select", options: [
       { value: "1", label: "1 in x 48 in pin" },
       { value: "3", label: "3 in x 48 in pin" },
@@ -488,7 +488,7 @@ USAR_RENDERERS["picket-anchor-soil"] = _simpleRenderer({
       { value: "cohesionless_medium", label: "Cohesionless, medium" },
       { value: "cohesionless_dense", label: "Cohesionless, dense" },
     ], default: "cohesive_average" },
-    { key: "embedment_in", label: "Embedment depth (in; table basis 36)", default: 36 },
+    { key: "embedment_in", label: "Embedment depth (in; table basis 36)", default: 36 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "per", id: "pas-out-per", label: "Design load per picket", value: (r) => fmt(r.design_load_per_picket_lb, 0) + " lb" },
@@ -699,8 +699,8 @@ USAR_RENDERERS["osha-timber-trench-shoring"] = _simpleRenderer({
     { key: "soil_type", label: "Soil type (Appendix A)", kind: "select", options: [
       { value: "A", label: "Type A" }, { value: "B", label: "Type B" }, { value: "C", label: "Type C" },
     ], default: "A" },
-    { key: "depth_ft", label: "Trench depth (ft, 5 to 20)", default: 13 },
-    { key: "width_ft", label: "Trench width (ft, up to 15)", default: 5 },
+    { key: "depth_ft", label: "Trench depth (ft, 5 to 20)", default: 13 , attrs: { min: "0" } },
+    { key: "width_ft", label: "Trench width (ft, up to 15)", default: 5 , attrs: { min: "0" } },
     { key: "table_set", label: "Timber table set", kind: "select", options: [
       { value: "oak", label: "Actual-size mixed oak (Tables C-1)" },
       { value: "fir", label: "Nominal S4S Douglas fir (Tables C-2)" },
@@ -758,13 +758,13 @@ USAR_RENDERERS["relief-storage-floor-load"] = _simpleRenderer({
   citation: "Citation: statics (stack weight over footprint area; area average by coverage fraction) against the floor's design live load, entered from the building's structural drawings or, where unknown, the occupancy's uniform live load in ASCE 7 Table 4.3-1 / IBC Table 1607.1, cited by number and not reproduced. A structural engineer and the building official govern.",
   example: reliefStorageFloorLoadExample.inputs,
   fields: [
-    { key: "pallet_weight_lb", label: "Pallet gross weight (lb)", default: 2300 },
-    { key: "footprint_length_in", label: "Pallet length (in)", default: 48 },
-    { key: "footprint_width_in", label: "Pallet width (in)", default: 40 },
+    { key: "pallet_weight_lb", label: "Pallet gross weight (lb)", default: 2300 , attrs: { min: "0" } },
+    { key: "footprint_length_in", label: "Pallet length (in)", default: 48 , attrs: { min: "0" } },
+    { key: "footprint_width_in", label: "Pallet width (in)", default: 40 , attrs: { min: "0" } },
     { key: "tiers", label: "Tiers stacked", default: 2, attrs: { step: "1", min: "1" } },
     { key: "coverage_fraction", label: "Coverage fraction (pallet area / floor area, aisles included)", default: 0.6, attrs: { step: "any", min: "0", max: "1" } },
-    { key: "floor_area_sqft", label: "Floor area (sq ft)", default: 4800 },
-    { key: "design_live_load_psf", label: "Floor design live load (psf, from the drawings)", default: 100 },
+    { key: "floor_area_sqft", label: "Floor area (sq ft)", default: 4800 , attrs: { min: "0" } },
+    { key: "design_live_load_psf", label: "Floor design live load (psf, from the drawings)", default: 100 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "fp", id: "rsf-out-fp", label: "Pressure under a stack", value: (r) => fmt(r.footprint_psf, 1) + " psf (" + fmt(r.footprint_ratio, 2) + " x design) -- " + r.footprint_verdict },
