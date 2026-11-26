@@ -121,10 +121,15 @@ async function liveCounts() {
   // worth. Recomputed from the schema the door actually serves.
   const { describe: describeTile } = await import(pathToFileURL(resolve(ROOT, "mcp", "catalog.mjs")).href);
   const { RENDERER_MAP } = await import(pathToFileURL(resolve(ROOT, "test", "fixtures", "renderer-map.js")).href);
-  let numericTiles = 0, unboundedTiles = 0;
+  let numericTiles = 0, unboundedTiles = 0, inputTiles = 0;
   for (const id of Object.keys(RENDERER_MAP)) {
     let d;
     try { d = await describeTile({ id }); } catch { continue; }
+    // Tiles that take inputs AT ALL, as distinct from the ones with a numeric
+    // input. The 20 reference cards (OSHA Top-10, the knot and hand-signal
+    // tables, the GFCI/AFCI table) take none, and a claim about "tiles that
+    // take inputs" is about the rest.
+    if ((d.inputs || []).length) inputTiles += 1;
     const nums = (d.inputs || []).filter((f) => f.key && (f.kind === "number" || f.kind == null));
     if (!nums.length) continue;
     numericTiles += 1;
@@ -151,6 +156,7 @@ async function liveCounts() {
     dataFolders: Object.keys(integrity.manifests || {}).length,
     numericTiles,
     unboundedTiles,
+    inputTiles,
   };
 }
 
@@ -443,6 +449,13 @@ async function main() {
   checked += checkPattern(mcpReadme, /For the other ([\d,]+) it projects/g, live.unindexedTiles, "un-indexed tile count (mcp/README.md)", errors);
   checked += checkPattern(mcpReadme, /is \*declared\*, and \*\*([\d,]+)\s*\nof the [\d,]+ calculators with numeric inputs declare none at all\*\*/g, live.unboundedTiles, "calculators declaring no numeric bound (mcp/README.md)", errors);
   checked += checkPattern(mcpReadme, /of the ([\d,]+) calculators with numeric inputs declare none at all\*\*/g, live.numericTiles, "calculators with numeric inputs (mcp/README.md)", errors);
+  // A SUBSET claim is where a count rots unseen. The "all N tiles" rule below
+  // holds a claim to the live TILE count and skips any subset by design, so
+  // "`OK` is the wrong status for all 2,079 tiles that take inputs" sat 189
+  // short while the catalog grew past it -- in the published agent contract,
+  // in a sentence whose whole job is to state the reach of a standing test.
+  // That subset IS derivable, so it is held here rather than exempted.
+  checked += checkPattern(mcpReadme, /wrong\s*\n?status for all ([\d,]+) tiles that take inputs/g, live.inputTiles, "tiles that take inputs (mcp/README.md)", errors);
 
   // docs/architecture.md states the module count in prose too, and it had
   // drifted to 56 against a live 57.

@@ -488,7 +488,7 @@ is named "Fan Affinity Laws"). Spaced queries are still decided by ranking.
 What the corpus cannot see, a standing test now does: **no tile answers a
 question that is only its own name.** A tile's name is what an agent sends when
 it has just read the catalog, and it carries no values, so `OK` is the wrong
-status for all 2,079 tiles that take inputs. One did. `awg-wire-geometry` is
+status for all 2,268 tiles that take inputs. One did. `awg-wire-geometry` is
 named "AWG Conductor Geometry (Diameter, Circular Mils, mm^2)", and the
 extractor read the exponent in `mm^2` as a quantity and returned the geometry of
 **AWG 2**. An exponent is part of a unit; it is no longer read as a value, and
