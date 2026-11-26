@@ -326,6 +326,15 @@ were fixed on 2026-11-26 (a negative trip returned a negative mileage
 deduction, a negative line section a negative refrigerant charge) and the
 surface is now swept by `test/unit/sign-typo-guard.test.js`.
 
+The **maximum** side of a declared bound is in better shape than the minimum
+side was. Of 335 fields that declare a max, 326 refuse a value past it; the nine
+that answer are listed by name in that same test with the reason each is
+acceptable, so a tenth surfaces for review rather than joining them quietly.
+Probing it found one real defect: `braking-distance`'s friction coefficient
+divides, so an impossible value ran the dangerous way -- mu=3 against a declared
+max of 1 returned a 34 ft braking distance where the answer is 144 ft. It now
+refuses.
+
 A curated alias is the other kind of address, and it was reachable only if the
 ranker already agreed. `answer_query`'s rule for the alias corpus has always
 been *"a human wrote that phrase against that tile; nothing here outranks it"* --

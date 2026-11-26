@@ -314,3 +314,80 @@ test("a negative inside a list row does not come back as an impossible magnitude
     `${bad.length} list input(s) answered a negative element with a quantity that cannot exist:\n  ` + bad.join("\n  "),
   );
 });
+
+// The mirror of the declared-min blind spot: a DECLARED MAXIMUM.
+//
+// `pastCeiling` above returns null when a field declares a max, the same
+// exemption `negate` makes for a declared min, and for the same stated reason
+// -- the page's number box enforces it. The agent door enforces neither.
+//
+// The max side turned out far healthier than the min side: of 335 fields that
+// declare one, 326 refuse a value past it. The nine that answer are listed
+// here with the reason each is acceptable, so a TENTH shows up as a failure
+// to be reviewed rather than joining them in silence.
+//
+// It found one real defect. `braking-distance`'s friction coefficient sits in
+// the DENOMINATOR, so an impossible value runs the dangerous way: mu=3 (the box
+// declares max 1; dry asphalt is 0.7-0.9) returned a 34 ft braking distance
+// where the real answer is 144 ft. That one now refuses.
+const PAST_MAX_REVIEWED = [
+  // Arithmetically honest answers to an absurd input: the number moves the way
+  // it should, a reader would see it, and the door's own max warning says the
+  // value is outside the field. None of them understates a safety margin.
+  "concrete::waste_factor",              // 300% waste: triples the material, visibly
+  "material-cost::tax_rate_percent",     // a 41% sales tax; no jurisdiction has one
+  "foam::foam_percentage",               // NFPA concentrates are 1/3/6%; 21% just scales
+  "foam-max-coverage-area::foam_percentage",
+  "piti::apr_percent",                   // a 61% APR; the payment follows correctly
+  "piti::term_years",                    // a 101-year term; likewise
+  "per-diem-interest::annual_rate_pct",
+  // Bounded by something other than the field: the window cannot exceed the
+  // data on hand, so a longer lookback simply returns every point there is.
+  "historical-pricing::lookback_months",
+  // Clamped by code, not ignored: IRC R311.7.5.1 caps a riser at 7-3/4 in, so
+  // computeStairs adds risers until it fits and a 19 in "preference" lands on
+  // the same 14 risers as 7.5 in. A smaller preference still moves the answer,
+  // so this is a clamp rather than a dead input.
+  "stairs::preferred_riser_height_in",
+];
+
+test("a field declaring a max answers past it only where that has been reviewed", async () => {
+  const { rows } = JSON.parse(await readFile(FIXTURE, "utf8"));
+  const first = new Map();
+  for (const r of rows) if (!first.has(r.tile_id)) first.set(r.tile_id, r);
+
+  const answered = [];
+  let probed = 0;
+  for (const [id, row] of first) {
+    const reg = COMPUTE_MAP[id];
+    if (!reg) continue;
+    const fn = (await importCalc(reg.module))[reg.fn];
+    const d = await describe({ id });
+    if (!d || !d.inputs) continue;
+    let base;
+    try { base = fn({ ...row.inputs }); } catch { continue; }
+    if (!base || base.error) continue;
+    for (const f of d.inputs) {
+      if (f.kind !== "number" && !(f.kind == null && typeof row.inputs[f.key] === "number")) continue;
+      const max = declared(f, "max");
+      if (max === null || !Number.isFinite(max)) continue;
+      const v = Number(row.inputs[f.key]);
+      if (!(v > 0) || v > max) continue;        // the example itself must be inside the bound
+      probed += 1;
+      let r;
+      // Comfortably past the bound, and a fixed formula so the set is stable.
+      try { r = fn({ ...row.inputs, [f.key]: max * 2 + 1 }); } catch { continue; }
+      if (!r || r.error) continue;
+      answered.push(`${id}::${f.key}`);
+    }
+  }
+
+  assert.ok(probed > 300, `the declared-max population is swept (${probed} field(s))`);
+  assert.deepEqual(
+    answered.sort(),
+    [...PAST_MAX_REVIEWED].sort(),
+    "a field answering past its declared maximum that is not in PAST_MAX_REVIEWED. Check which way the " +
+    "answer moves: braking-distance understated a stopping distance threefold because its friction " +
+    "coefficient divides. If the answer is merely absurd rather than unsafe, add it with the reason.",
+  );
+});

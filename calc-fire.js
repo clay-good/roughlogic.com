@@ -720,6 +720,18 @@ export function computeBrakingDistance({ speed_mph, friction_coefficient, grade_
   const g_pct = Number(grade_percent) || 0;
   const t = Number(reaction_time_s) || 0;
   if (v <= 0 || mu <= 0) return { error: "Provide positive speed and friction coefficient." };
+  // A tyre-to-pavement friction coefficient has a PHYSICAL ceiling -- dry
+  // asphalt runs about 0.7 to 0.9, and even racing slicks stay near 1.3 -- and
+  // the page box declares max="1". The compute took any positive value, and
+  // because mu sits in the DENOMINATOR the error runs the dangerous way: mu=3
+  // returned a braking distance of 34 ft where the real answer is 144 ft, so
+  // an impossible input understates a stopping distance by a factor of three.
+  //
+  // Found 2026-11-26 by probing past DECLARED maxima, the mirror of the
+  // declared-min sweep: pastCeiling() in sign-typo-guard.test.js skips any
+  // field that declares a max, exactly as negate() skipped a declared min, and
+  // the agent door enforces neither.
+  if (Number(arguments[0]?.friction_coefficient) > 1) return { error: "The friction coefficient cannot exceed 1 (dry asphalt is about 0.7 to 0.9)." };
   const eff = mu + g_pct / 100; // negative grade subtracts
   if (eff <= 0) return { error: "Effective friction is non-positive (downhill on ice)." };
   const braking_ft = (v * v) / (30 * eff);
