@@ -12719,3 +12719,73 @@ test("invariant: the two ISO needed-fire-flow tiles agree on the construction fa
     assert.ok(f.ISO_CONSTRUCTION_FACTORS[name] >= f.ISO_CONSTRUCTION_F[2], `${name} should sit in the Class 1-2 tier`);
   }
 });
+
+import { BOLT_PROOF_LOADS_PSI, OSHA_SOIL_SLOPES } from "../../calc-construction.js";
+import { TRENCH_SLOPES } from "../../calc-cross.js";
+
+// Two more shared tables, found by the instrument that should have been used
+// for the three above: matching tables by their VALUE SET rather than by
+// name. Comparing names finds only one pair in the whole tree; comparing
+// value sets finds the same quantity published twice under DIFFERENT names in
+// different modules, which is how both of these surfaced. Neither table below
+// is exported, so each is recovered through its own compute -- which is the
+// stronger pin anyway, since it is the shipped answer that is checked.
+
+test("invariant: both bolt tensile-area tables match the ANSI/ASME B1.1 formula they cite", () => {
+  // calc-construction.js (bolt torque) and calc-mechanic.js (bolt stretch)
+  // each carry a private 12-entry copy of the unified-coarse tensile stress
+  // area. The comment above one of them states the derivation, so the table
+  // is checked against ITS OWN cited formula rather than frozen at its
+  // current contents: A_t = 0.7854 (D - 0.9743 P)^2, P = 1/n.
+  const UNC_THREADS_PER_IN = {
+    0.25: 20, 0.3125: 18, 0.375: 16, 0.4375: 14, 0.5: 13, 0.5625: 12,
+    0.625: 11, 0.75: 10, 0.875: 9, 1: 8, 1.25: 7, 1.5: 6,
+  };
+  for (const [key, n] of Object.entries(UNC_THREADS_PER_IN)) {
+    const d = Number(key);
+    const formula = 0.7854 * (d - 0.9743 / n) ** 2;
+
+    // Bolt torque: F = proof(grade, d) * A_t * preload, so A_t = F / (proof * preload).
+    // _boltProofPsi drops SAE 5 to 74,000 psi above 1 in.
+    const proof = d > 1 ? 74000 : BOLT_PROOF_LOADS_PSI.SAE_5;
+    const torque = computeBoltTorque({ grade: "SAE_5", diameter_in: d, lubrication: "dry", preload_fraction: 0.75 });
+    assert.ok(!torque.error, `bolt torque at ${d} in: ${torque.error}`);
+    const area_construction = torque.F_lb / (proof * 0.75);
+
+    // Bolt stretch: F = (stretch * A * E) / grip, so A = F * grip / (stretch * E).
+    const stretch = computeBoltStretch({ diameter_in: d, grip_length_in: 3, stretch_thou: 5, material: "steel", k_factor: 0.18 });
+    assert.ok(!stretch.error, `bolt stretch at ${d} in: ${stretch.error}`);
+    const area_mechanic = (stretch.clamp_load_lb * 3) / (0.005 * stretch.modulus_psi);
+
+    assert.ok(
+      Math.abs(area_construction - area_mechanic) < 1e-9,
+      `the two modules disagree on the tensile area at ${d} in: ${area_construction} vs ${area_mechanic}`,
+    );
+    // The tables are the formula rounded to at worst three decimal places
+    // (3/4 in is tabulated 0.334 against a computed 0.33446).
+    assert.ok(
+      Math.abs(area_construction - formula) <= 5e-4,
+      `tabulated tensile area at ${d} in (${area_construction}) is not B1.1's ${formula.toFixed(5)}`,
+    );
+  }
+});
+
+test("invariant: both OSHA trench-slope tables carry the 29 CFR 1926 Subpart P maxima", () => {
+  // calc-construction.js keys them OSHA_SOIL_SLOPES and calc-cross.js keys
+  // them TRENCH_SLOPES. Appendix B Table B-1 maximum allowable slopes:
+  // Type A 3/4:1, Type B 1:1, Type C 1 1/2:1. Both tables had only an "is
+  // positive" sanity check, which a wrong slope would pass.
+  const APPENDIX_B = { A: 0.75, B: 1.0, C: 1.5 };
+  for (const [cls, h_to_v] of Object.entries(APPENDIX_B)) {
+    assert.equal(OSHA_SOIL_SLOPES[cls].ratio_H_to_V, h_to_v, `OSHA_SOIL_SLOPES ${cls}`);
+    assert.equal(TRENCH_SLOPES[cls].H_to_V, h_to_v, `TRENCH_SLOPES ${cls}`);
+    // Each row also prints its ratio as prose; the words and the number must
+    // agree or the page shows one slope and digs another.
+    assert.ok(
+      OSHA_SOIL_SLOPES[cls].ratio_label.startsWith(String(h_to_v)) || OSHA_SOIL_SLOPES[cls].ratio_label.startsWith(`${h_to_v} `),
+      `OSHA_SOIL_SLOPES ${cls} label "${OSHA_SOIL_SLOPES[cls].ratio_label}" does not state ${h_to_v}`,
+    );
+    assert.equal(TRENCH_SLOPES[cls].ratio, `${h_to_v}:1`, `TRENCH_SLOPES ${cls} ratio string`);
+  }
+  assert.deepEqual(Object.keys(OSHA_SOIL_SLOPES).sort(), Object.keys(TRENCH_SLOPES).sort());
+});
