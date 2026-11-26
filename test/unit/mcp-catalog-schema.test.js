@@ -858,3 +858,68 @@ test("an input with no schema label still gets the caption its page prints", asy
     `inputs with no human text may only shrink: ${textless} of ${fields} (was 296 before the captions, 196 after)`,
   );
 });
+
+// The unknown-key warning, and the exemption mcp/README.md claims for it.
+//
+// The README promises `run_calculator` warns when it is handed a key the
+// calculator cannot receive -- "an unrecognised key is dropped silently and the
+// tile answers from its defaults: a confident number built on a value the
+// caller believes it supplied" -- and then states an exemption: "Calculators
+// that legitimately take a shape-dependent key set are exempt, since their
+// accepted keys are not a fixed list."
+//
+// Nothing tested either half. A promise with an exemption is the shape that
+// rots: the exemption is decided by `acceptsOnlyNamedKeys`, which reads the
+// compute's SOURCE for a rest element, so any compute refactored to
+// `({ a, ...rest })` would quietly stop warning and no one would know. This
+// pins the promise, the exemption, and the structural reason for it.
+test("an unknown input key is reported, except where the key set really is shape-dependent", async () => {
+  const { describe, run } = await import("../../mcp/catalog.mjs");
+  const { RENDERER_MAP } = await import("../fixtures/renderer-map.js");
+  const { COMPUTE_MAP, importCalc } = await import("../fixtures/compute-map.js");
+
+  const BOGUS = "zzz_definitely_not_a_key";
+  const falsePositives = [];
+  const silent = [];
+  let tested = 0, reported = 0;
+
+  for (const id of Object.keys(RENDERER_MAP)) {
+    let d;
+    try { d = await describe({ id }); } catch { continue; }
+    const example = (d.example && d.example.inputs) || null;
+    if (!d.runnable || !example || !Object.keys(example).length) continue;
+    tested += 1;
+
+    // The worse direction: a key the tile DOES take, reported as ignored. That
+    // would tell an agent a good value never arrived, and the honest response
+    // to such a warning is to stop trusting the answer.
+    const own = await run({ id, inputs: { ...example } });
+    for (const w of own.warnings || []) {
+      if (w.rule === "unknown") falsePositives.push(`${id}: "${w.key}" is an example key, reported unknown`);
+    }
+
+    const probed = await run({ id, inputs: { ...example, [BOGUS]: 1 } });
+    if ((probed.warnings || []).some((w) => w.rule === "unknown" && w.key === BOGUS)) reported += 1;
+    else silent.push(id);
+  }
+
+  assert.ok(tested > 2200, `the catalog is swept (${tested} tiles)`);
+  assert.deepEqual(falsePositives.slice(0, 10), [], `${falsePositives.length} tile(s) called one of their own example keys unknown`);
+
+  // The exemption, named rather than counted -- and each name has to earn it
+  // from its signature, which is what `acceptsOnlyNamedKeys` actually tests.
+  assert.deepEqual(
+    silent.sort(),
+    ["geometry", "square-footage"],
+    `${silent.length} tile(s) accept an unknown key in silence. A new one here means a compute gained a rest ` +
+    `element: either its key set really is shape-dependent (add it, and say why) or the warning it just lost ` +
+    `is one a caller needed.`,
+  );
+  for (const id of silent) {
+    const reg = COMPUTE_MAP[id];
+    const src = (await importCalc(reg.module))[reg.fn].toString();
+    const params = src.slice(src.indexOf("("), src.indexOf("{", src.indexOf("(")) + 60);
+    assert.match(params, /\.\.\./, `${id} is exempt because its parameters collect a rest element, not by assertion`);
+  }
+  assert.equal(reported, tested - silent.length, "every other tile reports the bogus key");
+});

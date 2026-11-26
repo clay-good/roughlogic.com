@@ -156,7 +156,15 @@ key is dropped silently and the tile answers from its defaults -- a confident
 number built on a value the caller believes it supplied. A misspelling lands
 that way. The warning is advisory and the result still comes back. Calculators
 that legitimately take a shape-dependent key set are exempt, since their
-accepted keys are not a fixed list.
+accepted keys are not a fixed list. That exemption is decided by reading
+the compute's own parameter list for a rest element, and as of 2026-11-26 it
+covers exactly two calculators -- `square-footage` and `geometry`, both
+`({ shape, ...dims })`. `test/unit/mcp-catalog-schema.test.js` pins that set by
+name and requires each member to earn it from its signature, so a compute
+refactored to collect a rest element cannot quietly stop warning. The same test
+checks the opposite direction over the whole catalog: no calculator reports one
+of its own worked-example keys as unknown, which would tell a caller a value it
+really did supply had been ignored.
 
 A number sent as a string (`"150"`) is converted to a number before the
 compute runs, for any numeric field, the same as the page does. A compute
