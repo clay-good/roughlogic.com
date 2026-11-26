@@ -123,7 +123,11 @@ function fakeDb({ globalCount = 0, reporterCount = 0 } = {}) {
   };
 }
 
-test("scheduled cleanup has a fixed 30-day report and 14-day counter boundary", async () => {
+// spec-v1349: the retention boundary the feedback-and-local-agent hardening
+// spec fixes, alongside the bounded-payload limits asserted above. That spec
+// changes no calculator formula and names no tile, so a citation here is what
+// ties it to the behaviour it governs.
+test("spec-v1349: scheduled cleanup has a fixed 30-day report and 14-day counter boundary", async () => {
   const db = fakeDb();
   await cleanupReports(db, new Date("2026-08-23T12:00:00.000Z"));
   assert.equal(REPORT_RETENTION_DAYS, 30);

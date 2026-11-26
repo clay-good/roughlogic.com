@@ -181,6 +181,55 @@ async function main() {
     const v = /\d+/.exec(name)[0];
     for (const e of specStatusErrors(status, specTileIds(text), catalog, headers.has(v), tested.has(v))) errors.push("specs/" + name + ": " + e);
   }
+  // EVERY LANDED SPEC IS ANCHORED TO SOMETHING.
+  //
+  // The rules above check that a spec's STATUS agrees with the catalog, which
+  // is a different question from whether anything in the tree points back at
+  // the spec. A tile spec is anchored by its own ids being live. A platform
+  // spec has no tile, so its only anchors are a `// spec-vN` module header or a
+  // test citing it -- and three had neither: spec-v1851 (the homepage search
+  // snippet), spec-v1852 (explicit landed-spec aliases) and spec-v1853
+  // (complete spec-status coverage). All three were genuinely implemented, and
+  // the last two specify the rules in THIS FILE, so the specs governing this
+  // gate were the ones it could not see. Each is cited now at the assertion
+  // that holds it, and this keeps that true: a platform spec cannot be marked
+  // LANDED with nothing in the tree naming it.
+  //
+  // The anchor is computed over CODE AND TESTS, not prose: a doc mentioning a
+  // spec says someone wrote about it, not that it shipped. `headers` above
+  // reads only calc-*.js and `tested` only test/, which between them miss a
+  // platform spec implemented in mcp/ or scripts/ -- scoring that as unanchored
+  // reported 51 where the true figure is one.
+  const namedInTree = new Set();
+  const noteSpecs = (file) => {
+    let src = "";
+    try { src = readFileSync(file, "utf8"); } catch { return; }
+    for (const m of src.matchAll(/spec-v(\d+)\b/g)) namedInTree.add(m[1]);
+  };
+  for (const name of readdirSync(ROOT)) if (/\.(?:js|mjs)$/.test(name)) noteSpecs(join(ROOT, name));
+  for (const dir of ["mcp", "scripts", "test/unit", "test/integration", "test/fixtures"]) {
+    let names = [];
+    try { names = readdirSync(join(ROOT, dir)); } catch { continue; }
+    for (const name of names) if (/\.(?:js|mjs|json)$/.test(name)) noteSpecs(join(ROOT, dir, name));
+  }
+
+  const unanchored = [];
+  for (const name of specs) {
+    const text = readFileSync(join(ROOT, "specs", name), "utf8");
+    const status = parseStatus(text);
+    if (!status || status.word !== "LANDED") continue;
+    const v = /\d+/.exec(name)[0];
+    if (specTileIds(text).some((id) => catalog.has(id))) continue;
+    if (headers.has(v) || tested.has(v) || namedInTree.has(v)) continue;
+    unanchored.push(name);
+  }
+  for (const name of unanchored) {
+    errors.push(
+      "specs/" + name + ": says LANDED but nothing in the tree names it -- no live tile id of its own, "
+      + "no `// spec-vN` header in a calc module, and no test citing it as `spec-vN:`. Cite it where the "
+      + "behaviour is held, or correct the status.");
+  }
+
   if (errors.length > 0) {
     for (const e of errors.slice(0, 25)) console.error("ERROR: " + e);
     if (errors.length > 25) console.error("ERROR: ... and " + (errors.length - 25) + " more.");

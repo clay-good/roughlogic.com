@@ -1,6 +1,11 @@
 #!/usr/bin/env node
 // spec-v12 Phase G.3: dist/-vs-runtime cross-check.
 //
+// spec-v46: wired into CI. This gate existed and was never invoked, so the
+// dist/ integrity it checks was unenforced; `npm run check:dist` runs in the
+// workflow's test job now. That spec records a wiring change and so names no
+// tile and adds no code -- this line is its only anchor in the tree.
+//
 // After `npm run build` produces dist/, walk every shipped HTML / JS /
 // CSS / JSON file under dist/ and assert that every same-origin reference
 // resolves to a file actually present in dist/. A dangling reference

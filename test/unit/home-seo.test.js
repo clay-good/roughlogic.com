@@ -26,7 +26,38 @@ test("homepage title names the product and matches social titles and the SPA", (
   assert.match(html, /<h1[^>]*>Free calculators for the trades\.<\/h1>/);
 });
 
-test("homepage uses one concise product pitch across search, social, structured, visible, and SPA copy", () => {
+// A REMOVAL NEEDS A GUARD, OR IT COMES BACK -- THIS ONE ALREADY DID.
+//
+// spec-v475 records a deliberate deletion rather than a feature: the
+// `.home-note` paragraph under the home lede that advertised the offline/PWA
+// capability and the local MCP server. The maintainer removed it on purpose,
+// and it "was later restored by mistake while chasing an apparent regression",
+// which is why the spec exists -- its stated purpose is that the removal "is
+// not 'restored' again".
+//
+// Nothing enforced that. A removal is the one kind of landed change no code can
+// name, so it was also the single LANDED spec with no anchor anywhere in the
+// tree, and the only thing standing between the blurb and a third appearance
+// was that nobody had reached for it. The capabilities themselves are
+// unchanged and still documented in the README and the MCP docs; it is the
+// home-page callout that stays gone.
+test("spec-v475: the offline/PWA and MCP home-page blurb stays removed", () => {
+  assert.doesNotMatch(html, /home-note/, "the .home-note element must not return to index.html");
+  // The copy itself, in case it comes back under another class or none.
+  for (const phrase of [
+    "Works offline",
+    "install it as an app",
+    "keeps running with the network off",
+    "local MCP server",
+  ]) {
+    assert.ok(!html.includes(phrase), `index.html must not carry the removed blurb's copy: "${phrase}"`);
+  }
+  // The home lede is still there, so this is not passing because the page is
+  // empty or the fixture failed to load.
+  assert.match(html, /Free calculators for the trades\./, "the home H1 is still present");
+});
+
+test("spec-v1851: homepage uses one concise product pitch across search, social, structured, visible, and SPA copy", () => {
   const description = content("name", "description");
   assert.equal(
     description,

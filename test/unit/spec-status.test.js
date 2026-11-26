@@ -21,7 +21,7 @@ test("tile ids are read from numeric and lettered historical headings", () => {
   assert.deepEqual(specTileIds("### 2.1 `haversine` -- Tile\n### G.2 Center of gravity (`cable-tray-fill`)\n"), ["haversine", "cable-tray-fill"]);
 });
 
-test("legacy status formats are normalized instead of skipped", () => {
+test("spec-v1853: legacy status formats are normalized instead of skipped", () => {
   assert.equal(parseStatus("> **Implementation status: CLOSED 2026-06-13.**").word, "LANDED");
   assert.equal(parseStatus("> **Implementation status: DRAFT 2026-06-09.**").word, "PROPOSED");
   assert.equal(parseStatus("> Status: **SHIPPED (2026-08-20).**").word, "LANDED");
@@ -58,7 +58,7 @@ test("the gate passes on the tree as committed", () => {
   assert.match(out, /check-spec-status OK/);
 });
 
-test("LANDED cannot use incidental live ids or one alias to hide missing tiles", () => {
+test("spec-v1852: LANDED cannot use incidental live ids or one alias to hide missing tiles", () => {
   assert.equal(errors(spec("LANDED, related to `haversine`.", "radiography-boundary")).length, 1);
   const multiple = spec("LANDED, built as `rt-restricted-area`.", "radiography-boundary")
     + "\n### 2.2 `another-missing-tile` -- Another tile\n";
