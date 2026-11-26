@@ -358,6 +358,14 @@ function acceptRpcLine(line) {
   if (Array.isArray(msg)) {
     if (msg.length === 0 || msg.length > MAX_RPC_BATCH_SIZE) {
       process.stderr.write(`[roughlogic-mcp] dropping invalid batch\n`);
+      // A batch this server will not run still has to be ANSWERED. Dropping it
+      // in silence left a client that sent 51 messages -- one over the limit --
+      // waiting on 51 replies that were never coming, with nothing on stdout to
+      // say why. One response with a null id is what JSON-RPC prescribes for a
+      // batch that cannot be processed as sent, and it is not amplified per
+      // item, so a huge batch cannot turn into a huge reply.
+      replyError(null, -32600, `Invalid Request: a batch of ${msg.length} is outside the 1..${MAX_RPC_BATCH_SIZE} this server accepts`)
+        .catch(() => {});
       return;
     }
     for (const item of msg) {
@@ -375,6 +383,22 @@ function enqueueRpc(msg) {
   if (pendingRpc >= MAX_PENDING_RPC) {
     if (!overloadLogged) process.stderr.write(`[roughlogic-mcp] dropping requests while queue is full\n`);
     overloadLogged = true;
+    // Shedding the WORK is the point of the cap and stays. Shedding the
+    // RESPONSE was the bug: a request carries an id because a client is
+    // blocked on that id, and until 2026-11-26 everything past the hundredth
+    // in flight was dropped without a word. stdin arrives in bulk, so a client
+    // that pipelines -- which JSON-RPC permits -- had every message after the
+    // first hundred silently discarded and waited for all of them forever. A
+    // sweep of this repo's own catalog hit it: 101 of 4,585 answered, then
+    // nothing, with no error to read.
+    //
+    // The queue drains in milliseconds and the server is healthy afterwards
+    // (a later request is answered normally), so the advice to retry is true.
+    // A notification has no id and nobody is waiting: it stays dropped.
+    if (msg && msg.id !== undefined && msg.id !== null) {
+      replyError(msg.id, -32000, `Server busy: ${MAX_PENDING_RPC} requests already in flight. Retry this request.`)
+        .catch(() => {});
+    }
     return;
   }
   pendingRpc += 1;

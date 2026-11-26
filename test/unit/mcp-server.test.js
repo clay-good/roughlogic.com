@@ -227,3 +227,92 @@ test("every doc that counts the MCP tools counts them right, and names them all"
   }
   assert.deepEqual(wrong, []);
 });
+
+// Every request carrying an id gets an answer, including the ones this server
+// refuses to run.
+//
+// Shedding WORK under load is deliberate -- MAX_PENDING_RPC caps what runs at
+// once, and MAX_RPC_BATCH_SIZE caps a batch. Shedding the RESPONSE was not: a
+// request carries an id because a client is blocked on that id, and until
+// 2026-11-26 anything past the hundredth in flight, and every message in a
+// batch one item too long, was dropped without a word on stdout.
+//
+// stdin arrives in bulk, so this hit a client that merely pipelined, which
+// JSON-RPC permits. A sweep of this repo's own catalog ran into it: 101 of
+// 4,585 requests answered and then silence, with no error to read and no way
+// to tell a stalled server from a slow one.
+function collect(requests, ms = 4000) {
+  return new Promise((resolve, reject) => {
+    const child = spawn("node", [SERVER], { stdio: ["pipe", "pipe", "ignore"] });
+    const msgs = [];
+    let buf = "";
+    child.stdout.on("data", (chunk) => {
+      buf += chunk;
+      let nl;
+      while ((nl = buf.indexOf("\n")) !== -1) {
+        const line = buf.slice(0, nl).trim();
+        buf = buf.slice(nl + 1);
+        if (!line) continue;
+        try { msgs.push(JSON.parse(line)); } catch { /* not a message */ }
+      }
+    });
+    child.on("error", reject);
+    for (const r of requests) child.stdin.write(JSON.stringify(r) + "\n");
+    setTimeout(() => { child.kill(); resolve(msgs); }, ms);
+  });
+}
+
+test("a pipelined client past the in-flight cap is told so, not left waiting", async () => {
+  const N = 150;                                  // MAX_PENDING_RPC is 100
+  const reqs = Array.from({ length: N }, (_, i) => ({
+    jsonrpc: "2.0", id: i + 1, method: "tools/call",
+    params: { name: "describe_calculator", arguments: { id: "ohms-law" } },
+  }));
+  const msgs = await collect(reqs);
+
+  const answered = new Set(msgs.filter((m) => m.id != null).map((m) => m.id));
+  assert.equal(answered.size, N, `every one of the ${N} ids is answered (was 100, then silence)`);
+
+  const busy = msgs.filter((m) => m.error && m.error.code === -32000);
+  assert.ok(busy.length > 0, "the ones it would not run come back as an error");
+  assert.match(busy[0].error.message, /busy/i);
+  assert.match(busy[0].error.message, /retry/i, "and say retrying is worth it, because the queue drains");
+
+  // The cap still does its job: the server did not run all 150.
+  assert.ok(
+    msgs.filter((m) => m.result).length <= 100,
+    "shedding the work is kept -- only the response is restored",
+  );
+});
+
+test("a batch one item too long is answered with an error, not dropped", async () => {
+  const batch = Array.from({ length: 51 }, (_, i) => ({   // MAX_RPC_BATCH_SIZE is 50
+    jsonrpc: "2.0", id: 1000 + i, method: "tools/call",
+    params: { name: "describe_calculator", arguments: { id: "ohms-law" } },
+  }));
+  const msgs = await collect([batch]);
+
+  assert.equal(msgs.length, 1, "exactly one response -- never one per item, which would amplify a huge batch");
+  assert.equal(msgs[0].id, null, "a null id, as JSON-RPC prescribes for a batch it cannot process as sent");
+  assert.equal(msgs[0].error.code, -32600);
+  assert.match(msgs[0].error.message, /batch of 51/);
+
+  // A batch at the limit still runs.
+  const ok = await collect([batch.slice(0, 50)]);
+  assert.equal(ok.filter((m) => m.result).length, 50, "fifty is accepted and every item answered");
+});
+
+test("a notification over the cap stays silent -- nobody is waiting on it", async () => {
+  // The fix keys on the id. A notification has none, so it is still dropped
+  // without a reply; answering one would itself break the protocol.
+  const reqs = [
+    ...Array.from({ length: 120 }, (_, i) => ({
+      jsonrpc: "2.0", id: i + 1, method: "tools/call",
+      params: { name: "describe_calculator", arguments: { id: "ohms-law" } },
+    })),
+    ...Array.from({ length: 30 }, () => ({ jsonrpc: "2.0", method: "notifications/initialized" })),
+  ];
+  const msgs = await collect(reqs);
+  assert.equal(msgs.filter((m) => m.id === null || m.id === undefined).length, 0, "no reply is addressed to a notification");
+  assert.equal(new Set(msgs.map((m) => m.id)).size, 120, "and all 120 real requests are answered");
+});

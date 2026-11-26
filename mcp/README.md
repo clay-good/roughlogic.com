@@ -45,6 +45,17 @@ NaN. A select value that is not one of its options fails the tool call itself,
 with the allowed values named. Checkbox inputs accept
 true/false, yes/no, on/off and 1/0. Numbers may be sent as strings.
 
+**Load limits, and what you get back when you hit one.** The server runs at
+most 100 requests at a time and accepts a JSON-RPC batch of 1..50 messages.
+Both limits shed WORK, never the RESPONSE: a request past the in-flight cap is
+answered `-32000` ("Server busy ... Retry this request"), and an out-of-range
+batch is answered once with `-32600` and a null id. The queue drains in
+milliseconds, so retrying works. Until 2026-11-26 both were dropped in silence,
+which left a client that merely pipelined -- as JSON-RPC permits -- waiting
+forever on replies that were never coming: a sweep of this catalog got 101
+answers out of 4,585 and no error to read. A notification carries no id and
+nobody is waiting on it, so it is still dropped without a reply.
+
 ### Resources and prompts
 
 The server also implements the MCP `resources/*` and `prompts/*` surfaces, so a
