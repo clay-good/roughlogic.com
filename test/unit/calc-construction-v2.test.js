@@ -190,6 +190,58 @@ test("Footing: rock > sand > clay allowable", () => {
   assert.ok(SOIL_BEARING_PSF.sand > SOIL_BEARING_PSF.clay);
 });
 
+// Five of the seven classes were held by nothing: seeding `rock` to 9,000,
+// `crystalline_bedrock` to 21,000 (a transposition of 12,000), `sandy_gravel`
+// to 8,000, `silty_sand` to 7,000 or `silty_clay` to 1,000 passed this whole
+// file. Only `sand` and `clay` were pinned, and only because a worked example
+// happens to use them -- the ordering test above holds three of them in a
+// relation, which a uniformly wrong table satisfies. These are allowable
+// vertical foundation pressures: a value that is too high undersizes a footing.
+//
+// The tile's own citation names all five figures, so the table is held against
+// that prose rather than frozen at its current contents -- and the prose is
+// held against the table in the same test, so neither surface can be edited
+// alone. The citation is where a reader checks the number, and it has been
+// wrong in this repo before while the code was right.
+test("Footing: every soil class carries its IBC Table 1806.2 pressure, and the citation still says so", async () => {
+  const { CITATIONS } = await import("../../citations.js");
+  // IBC Table 1806.2, as the tile's citation states it (identical in 2021 and
+  // 2027). Several code keys share one table row: the 2,000 psf row covers
+  // sand and silty sand, the 1,500 psf row clay and silty clay.
+  const IBC_1806_2 = {
+    crystalline_bedrock: 12000,
+    rock: 4000,            // sedimentary and foliated rock
+    sandy_gravel: 3000,
+    sand: 2000,
+    silty_sand: 2000,
+    clay: 1500,
+    silty_clay: 1500,
+  };
+  assert.deepEqual(SOIL_BEARING_PSF, IBC_1806_2);
+
+  // The same five figures must still be the ones the citation prints, each
+  // beside the class it belongs to. A bare presence check is NOT enough and
+  // was wrong here first: the editionNote mentions 12,000 a second time, in
+  // the note about a data shard that mapped "rock" to 12,000 until 2026-10-17,
+  // so changing the bedrock figure left an unrelated 12,000 behind and the
+  // check passed. Each figure is tied to its own class name.
+  const prose = [CITATIONS["footing-area"].editionNote, CITATIONS["footing-area"].edition]
+    .filter(Boolean).join(" ");
+  const STATED = [
+    /crystalline bedrock 12,000/,
+    /sedimentary and foliated rock 4,000/,
+    /sandy gravel and gravel 3,000/,
+    /silty and clayey gravel 2,000/,
+    /clays and silts 1,500/,
+  ];
+  for (const re of STATED) {
+    assert.match(
+      prose, re,
+      `the footing-area citation no longer states this class and its pressure together (/${re.source}/); the table and the prose a reader checks it against have drifted apart`,
+    );
+  }
+});
+
 test("Footing: doubled load doubles required area", () => {
   const a = computeFootingArea({ column_load_lb: 6000, soil_class: "clay" });
   const b = computeFootingArea({ column_load_lb: 12000, soil_class: "clay" });
