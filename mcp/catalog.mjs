@@ -1402,16 +1402,25 @@ async function nameThenOwnFields(q, byId) {
     // calculators from answering to their own name).
     try {
       const described = await describe({ id: tool.id });
+      // Same both-forms rule as the labels above: an option value like
+      // `round_4x1.25` cut on non-alphanumerics gives `4x1` and `25`, while the
+      // question's own token is `4x1.25`. 112 option values carry a dot.
       for (const inp of described.inputs || []) for (const o of inp.options || []) {
-        for (const w of String(o && typeof o === "object" ? o.value : o).toLowerCase().split(/[^a-z0-9]+/)) if (w) own.add(w);
+        addWords(o && typeof o === "object" ? o.value : o);
       }
     } catch { /* the field rows alone */ }
     // A comma-separated segment that opens with a dropdown's or checkbox's
     // label carries that field's value after it, whatever its words are.
+    // Cut the SAME way as the segment words below, or a label carrying a dot
+    // never aligns: "Standard box (NEC Table 314.16(A))" gives `314` and `16`
+    // here and `314.16` there, so the prefix match fails and the dropdown's
+    // value is never admitted. 15 choice labels carry a dot.
+    const segWords = (t) => String(t).toLowerCase().split(/[^a-z0-9.]+/).filter(Boolean)
+      .map((x) => (/\d/.test(x) ? x : x.replace(/\./g, "")));
     const choiceLabels = rows.filter((r) => r.k === "select" || r.k === "checkbox" || r.k === "text")
-      .map((r) => String(r.l || "").toLowerCase().split(/[^a-z0-9]+/).filter(Boolean)).filter((w) => w.length);
+      .map((r) => segWords(r.l || "")).filter((w) => w.length);
     for (const seg of String(q).toLowerCase().split(",")) {
-      const w = seg.split(/[^a-z0-9.]+/).filter(Boolean).map((t) => (/\d/.test(t) ? t : t.replace(/\./g, "")));
+      const w = segWords(seg);
       for (const lab of choiceLabels) {
         // the label may follow the calculator's name in the first segment
         for (let at = 0; at + lab.length <= w.length; at++) {
