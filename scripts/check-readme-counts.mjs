@@ -295,6 +295,39 @@ async function checkIndexHtml(expectedTiles, errors) {
   return found;
 }
 
+// The home lede's count is asserted a THIRD time, in the Playwright test that
+// loads the page -- and that assertion is a hardcoded string, not a read of the
+// catalogue. It drifted: the 2,288th calculator landed and the test went on
+// expecting "2,287 free calculators", which the push lane never sees because
+// the integration lane runs nightly. The nightly run went red for one stale
+// number. The test's own comment says "check-readme-counts holds it", and until
+// now that was not true of this copy -- so hold it here, where it costs a
+// millisecond instead of a 17-minute browser run.
+async function checkHomeLedeTest(expectedTiles, errors) {
+  const rel = "test/integration/search-prefill.test.js";
+  const src = await readFile(resolve(ROOT, rel), "utf8");
+  const re = /([\d,]+) free calculators/g;
+  let m, found = 0;
+  while ((m = re.exec(src))) {
+    found++;
+    const n = Number(m[1].replace(/,/g, ""));
+    if (n !== expectedTiles) {
+      errors.push(
+        `${rel}: "${m[0].trim()}" states ${n}, but the live tile count is ${expectedTiles}. ` +
+          `The home-lede assertion is a literal string; bump it with the catalogue.`,
+      );
+    }
+  }
+  if (found === 0) {
+    errors.push(
+      `${rel}: the home-lede count assertion is gone -- nothing there matches ` +
+        `/${re.source}/. It is anchored here so the figure cannot rot; if the assertion moved, ` +
+        `move this anchor with it rather than leaving an anchor that guards nothing.`,
+    );
+  }
+  return found;
+}
+
 
 // The README quotes one calculator's worked example in full -- the first
 // concrete thing a reader sees, and the page it points at is live. Nothing
@@ -362,6 +395,7 @@ async function main() {
   let checked = 0;
 
   checked += await checkIndexHtml(live.tiles, errors);
+  checked += await checkHomeLedeTest(live.tiles, errors);
   checked += await checkHomeDescription(errors);
   checked += await checkMcpManifest(errors);
   checked += await checkReadmeExample(readme, errors);
