@@ -5,11 +5,25 @@
 // browser: layout, CSS, and accessibility stay with the Playwright suite.
 const timers = [];
 let timerId = 1;
+const cancelled = new Set();
 export function installTimers() {
   globalThis.setTimeout = (fn, ms, ...a) => { const id = timerId++; timers.push({ id, fn: () => fn(...a) }); return id; };
   globalThis.clearTimeout = (id) => { const i = timers.findIndex((t) => t.id === id); if (i >= 0) timers.splice(i, 1); };
   globalThis.requestAnimationFrame = (fn) => globalThis.setTimeout(fn, 0);
   globalThis.cancelAnimationFrame = (id) => globalThis.clearTimeout(id);
+  // setInterval was NOT faked until 2026-11-26, so calc-field.js's 1 Hz
+  // readout timer used Node's real one: a live wall-clock interval per
+  // rendered tile, holding the event loop open after a sweep had finished and
+  // firing on real seconds that a synchronous sweep never waits for. An
+  // interval re-queues itself after each fire, so flushTimers drives it the
+  // same way it drives a timeout, bounded by its own cap.
+  globalThis.setInterval = (fn, ms, ...a) => {
+    const id = timerId++;
+    const run = () => { if (!cancelled.has(id)) { timers.push({ id, fn: run }); fn(...a); } };
+    timers.push({ id, fn: run });
+    return id;
+  };
+  globalThis.clearInterval = (id) => { cancelled.add(id); const i = timers.findIndex((t) => t.id === id); if (i >= 0) timers.splice(i, 1); };
 }
 export function flushTimers(max = 200) {
   let n = 0;
@@ -50,7 +64,15 @@ export class Node {
   prepend(...cs) { for (const c of cs.reverse()) this.insertBefore(typeof c === "string" ? this.ownerDocument.createTextNode(c) : c, this.firstChild); }
   insertBefore(c, ref) { if (!ref) return this.appendChild(c); if (c.parentNode) c.parentNode.removeChild(c); const i = this.childNodes.indexOf(ref); c.parentNode = this; this.childNodes.splice(i < 0 ? this.childNodes.length : i, 0, c); return c; }
   removeChild(c) { const i = this.childNodes.indexOf(c); if (i >= 0) this.childNodes.splice(i, 1); c.parentNode = null; return c; }
-  replaceChildren(...cs) { this.childNodes = []; this.append(...cs); }
+  // Detach what it removes. This emptied `childNodes` and left every removed
+  // child still pointing at its old parent, so a node taken off the page went
+  // on looking attached for ever -- and the sweeps clear a tile with exactly
+  // this call. calc-field.js runs a 1 Hz interval that stops itself when its
+  // input region is detached ("the view-region clears between tools"), so with
+  // `isConnected` made faithful on top of this, every tile's interval lived
+  // for ever: 2,288 of them firing on every later flush, which is why defining
+  // isConnected took steps-panel-guard from 2.6s to over 200s.
+  replaceChildren(...cs) { for (const c of this.childNodes) if (c && c.parentNode === this) c.parentNode = null; this.childNodes = []; this.append(...cs); }
   remove() { if (this.parentNode) this.parentNode.removeChild(this); }
   replaceWith(n) { if (this.parentNode) { this.parentNode.insertBefore(n, this); this.remove(); } }
   insertAdjacentElement(pos, el) { if (pos === "afterend" && this.parentNode) this.parentNode.insertBefore(el, this.nextSibling); else if (pos === "beforebegin" && this.parentNode) this.parentNode.insertBefore(el, this); else if (pos === "afterbegin") this.insertBefore(el, this.firstChild); else this.appendChild(el); return el; }
@@ -163,19 +185,21 @@ export class Node {
   get open() { return this.hasAttribute("open"); }
   set open(v) { if (v) this.setAttribute("open", ""); else this.removeAttribute("open"); }
 
-  // `isConnected` is deliberately NOT defined here, and the reason is worth
-  // keeping: it is a real fidelity gap, measured and left open.
+  // Whether the node is still in the document. app.js guards several deferred
+  // updates with it, and calc-field.js clears its 1 Hz timer on it, so with
+  // this undefined -- falsy -- every one of those paths bailed out and the
+  // harness never exercised them.
   //
-  // app.js guards several deferred updates with `if (!node.isConnected) return;`
-  // -- constant notes, the feedback report, the preview row. Undefined reads as
-  // falsy, so every one of those paths bails out and this harness never
-  // exercises them. Defining it (2026-11-26) unblocked them and the render
-  // sweeps stopped finishing: steps-panel-guard went from 2.6s to over 200s,
-  // and the run ended on "Promise resolution is still pending but the event
-  // loop has already resolved" -- an unblocked path awaiting something the
-  // harness does not provide (a fetch, a real event). Closing it properly
-  // means stubbing those, not adding one getter, so the gap stays named rather
-  // than half-fixed.
+  // It could not be defined until `replaceChildren` above detached what it
+  // removed: on top of the old behaviour a tile's interval never saw itself
+  // detached and ran for ever.
+  get isConnected() {
+    const doc = this.ownerDocument;
+    for (let n = this; n; n = n.parentNode) {
+      if (n === doc || (doc && n === doc.body) || n.tagName === "BODY" || n.tagName === "HTML") return true;
+    }
+    return false;
+  }
 
   // Constraint validation, the minimum a caller can observe. length-entry.js
   // sets a custom message for a length outside the box's min/max, and it is

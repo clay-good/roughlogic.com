@@ -178,3 +178,67 @@ test("fake DOM: an option carries its text, as a browser does", async () => {
   assert.equal(o.textContent, "Type C");
   assert.equal(o.text, "Type C");
 });
+
+// A removed node must know it is removed.
+//
+// `replaceChildren` emptied `childNodes` and left every removed child still
+// pointing at its old parent, so a node taken off the page went on looking
+// attached for ever. Nothing noticed while `isConnected` was undefined -- it
+// read as falsy and every path guarded by it bailed out. The two together is
+// what bit: calc-field.js runs a 1 Hz interval that stops itself when its input
+// region is detached ("the view-region clears between tools"), and the render
+// sweeps clear a tile with exactly that call, so defining `isConnected` on top
+// of the old `replaceChildren` left 2,288 intervals alive, firing on every
+// later flush. steps-panel-guard went from 2.6s to over 200s.
+test("fake DOM: a node detached from the document knows it", async () => {
+  const { installDocument } = await import("../fixtures/fake-dom.js");
+  const doc = installDocument();
+
+  const view = doc.createElement("section");
+  const inner = doc.createElement("div");
+  view.appendChild(inner);
+  doc.body.appendChild(view);
+  assert.equal(view.isConnected, true, "attached to the body");
+  assert.equal(inner.isConnected, true, "and so is a descendant");
+
+  // The call the sweeps use between tiles.
+  doc.body.replaceChildren();
+  assert.equal(view.parentNode, null, "replaceChildren detaches what it removes");
+  assert.equal(view.isConnected, false);
+  assert.equal(inner.isConnected, false, "a descendant of a detached node is detached too");
+
+  // removeChild has always detached; this keeps the two consistent.
+  const other = doc.createElement("div");
+  doc.body.appendChild(other);
+  assert.equal(other.isConnected, true);
+  doc.body.removeChild(other);
+  assert.equal(other.isConnected, false);
+
+  // A node that was never attached.
+  assert.equal(doc.createElement("p").isConnected, false);
+});
+
+// The consequence, through the real code that depends on it: a tile's 1 Hz
+// timer must not outlive its tile.
+test("fake DOM: a tile's self-clearing interval stops when its region is cleared", async () => {
+  const { installDocument, installTimers, flushTimers } = await import("../fixtures/fake-dom.js");
+  installTimers();
+  const doc = installDocument();
+
+  const region = doc.createElement("div");
+  doc.body.appendChild(region);
+  let fired = 0;
+  const tick = setInterval(() => {
+    if (!region.isConnected) { clearInterval(tick); return; }
+    fired += 1;
+  }, 1000);
+
+  flushTimers();
+  assert.ok(fired > 0, "it runs while the region is on the page");
+
+  doc.body.replaceChildren();
+  const before = fired;
+  flushTimers();
+  flushTimers();
+  assert.equal(fired, before, "and stops itself once the region is cleared, as calc-field.js intends");
+});
