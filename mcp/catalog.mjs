@@ -1374,10 +1374,27 @@ async function nameThenOwnFields(q, byId) {
     const rows = await fieldRowsFor(tool.id, tool.group);
     if (!rows || !rows.length) return false;
     const own = new Set();
+    // The query's words and the field's words must be normalized the SAME way,
+    // and they were not. A query token keeps its dots while it is cut
+    // (`[^a-z0-9.]+`) and loses them afterwards, so "(in. w.c.)" arrives as
+    // `wc`; a label was cut on `[^a-z0-9]+`, which yields `w` and `c` and never
+    // `wc`. One token the field could not match made `fits` false for the
+    // calculator whose whole name the question opens with, and the match fell
+    // through to a near neighbour: "Pitot Traverse Airflow from Point Readings
+    // (Velocity-Averaged) ... Velocity pressure at each traverse point
+    // (in. w.c.)" was answered by the velocity-pressure-to-CFM screen instead.
+    // Both forms are added, so either normalization matches.
+    const addWords = (s) => {
+      for (const w of String(s).toLowerCase().split(/[^a-z0-9]+/)) if (w) own.add(w);
+      for (const w of String(s).toLowerCase().split(/[^a-z0-9.]+/)) {
+        const t = w.replace(/\./g, "");
+        if (t) own.add(t);
+      }
+    };
     for (const r of rows) {
-      for (const w of String(r.l || "").toLowerCase().split(/[^a-z0-9]+/)) if (w) own.add(w);
+      addWords(r.l || "");
       for (const o of r.o || []) for (const w of String(o).toLowerCase().split(/[^a-z0-9.]+/)) if (w) own.add(w);
-      if (r.u) for (const w of String(r.u).toLowerCase().split(/[^a-z0-9]+/)) if (w) own.add(w);
+      if (r.u) addWords(r.u);
     }
     // Select options the field index does not carry come from the tile's own
     // contract, and a checkbox's value is a boolean word (2026-11-16: "From

@@ -62,28 +62,19 @@ test("door: no worked example asked as a question is answered wrongly or by the 
   assert.ok(total, `no example count in output:\n${stdout}`);
   assert.ok(Number(total[1]) > 2000, `the sweep only reached ${total[1]} examples; it should cover the catalog`);
 
-  // One misroute is reviewed, and it is PRE-EXISTING rather than a regression:
-  // the same question routes the same way at the commit before the schema work
-  // that made it askable. `pitot-traverse-average` and `pitot-traverse-cfm` are
-  // two readings of one instrument, and the question opens with the longer
-  // tile's whole name -- "Pitot Traverse Airflow from Point Readings
-  // (Velocity-Averaged)" -- which `nameThenOwnFields` matches as a whole-name
-  // prefix and then hands to the sibling anyway. It only became visible when
-  // the velocity-pressure field gained a caption, because a question the sweep
-  // could not phrase is a question nobody asked.
-  //
-  // Listed rather than waived away: the count is held at exactly one, and the
-  // entry must still reproduce, so a second misroute fails and so does fixing
-  // this one without removing it from here.
-  const REVIEWED_MISROUTES = ["pitot-traverse-average -> pitot-traverse-cfm"];
+  // Held at ZERO. One misroute was listed here briefly -- two pitot-traverse
+  // calculators, where a question opening with the longer one's whole name was
+  // answered by the shorter -- and it turned out to be a normalization
+  // disagreement rather than a ranking judgement: the query keeps a token's
+  // dots while cutting and drops them after, so "(in. w.c.)" arrives as `wc`,
+  // while a field label was cut on non-alphanumerics into `w` and `c`. One
+  // unmatchable token made the right calculator fail its own name check. Fixed
+  // in nameThenOwnFields rather than waived, so the list is gone again.
   const misrouteLines = stdout.split("\n").filter((l) => /^ {4}\S.* -> /.test(l)).map((l) => l.trim());
-  const unreviewed = misrouteLines.filter((l) => !REVIEWED_MISROUTES.some((r) => l.startsWith(r)));
-  assert.deepEqual(unreviewed, [],
+  assert.deepEqual(misrouteLines, [],
     `the door answered a named question as another calculator:\n${detail}`);
-  const stale = REVIEWED_MISROUTES.filter((r) => !misrouteLines.some((l) => l.startsWith(r)));
-  assert.deepEqual(stale, [], "reviewed misroute no longer reproduces; remove it from REVIEWED_MISROUTES");
-  assert.equal(grab("answered as a DIFFERENT calculator"), REVIEWED_MISROUTES.length,
-    `misroute count moved:\n${detail}`);
+  assert.equal(grab("answered as a DIFFERENT calculator"), 0,
+    `the door answered a named question as another calculator:\n${detail}`);
   assert.equal(grab("of those, returning a number that DISAGREES with the worked example"), 0,
     `the door answered with a number that contradicts its own worked example:\n${detail}`);
 });
