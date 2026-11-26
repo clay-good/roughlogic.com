@@ -1967,6 +1967,12 @@ export function computeFallProtectionClearance({
   actual_clearance_ft = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A DECLARED bound is not an enforced one: the page's number box stops a
+  // negative, the agent door hands it straight to the compute, and the
+  // sign-typo guard skips any field declaring min >= 0 -- so this one was
+  // unguarded on both counts. Checks the SUPPLIED value, so a blank box
+  // still takes its default.
+  if (Number(arguments[0]?.actual_clearance_ft) < 0) return { error: "The actual clearance cannot be negative (ft)." };
   worker_height_ft = Number(worker_height_ft); harness_stretch_ft = Number(harness_stretch_ft); safety_factor_ft = Number(safety_factor_ft);
   const c = FALL_PROTECTION_DECEL[connector];
   if (!c) return { error: "Unknown connector type." };
@@ -2222,6 +2228,12 @@ export function computePumpTdh({
   fittings_equiv_length_ft = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A DECLARED bound is not an enforced one: the page's number box stops a
+  // negative, the agent door hands it straight to the compute, and the
+  // sign-typo guard skips any field declaring min >= 0 -- so this one was
+  // unguarded on both counts. Checks the SUPPLIED value, so a blank box
+  // still takes its default.
+  if (Number(arguments[0]?.static_discharge_head_ft) < 0) return { error: "The static discharge head cannot be negative (ft)." };
   const Q = Number(flow_gpm) || 0;
   const d = Number(internal_diameter_in) || 0;
   const C = Number(hw_c) || 0;

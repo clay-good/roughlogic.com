@@ -651,6 +651,12 @@ export const PDI_WH_ARRESTOR_SIZES = [
 // dims: in { wsfu: dimensionless, length_ft: L, internal_diameter_in: L, system_pressure_psi: M L^-1 T^-2 } out: { pipe_diameter_in: L, precharge_psi: M L^-1 T^-2, wsfu_total: dimensionless }
 export function computeWaterHammerArrestor({ wsfu, length_ft = 0, internal_diameter_in = 0, system_pressure_psi = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A DECLARED bound is not an enforced one: the page's number box stops a
+  // negative, the agent door hands it straight to the compute, and the
+  // sign-typo guard skips any field declaring min >= 0 -- so this one was
+  // unguarded on both counts. Checks the SUPPLIED value, so a blank box
+  // still takes its default.
+  if (Number(arguments[0]?.internal_diameter_in) < 0) return { error: "The pipe internal diameter cannot be negative (in)." };
   internal_diameter_in = Number(internal_diameter_in);
   const w = Number(wsfu) || 0;
   if (w <= 0) return { error: "Provide a positive WSFU total." };
@@ -776,6 +782,12 @@ export const PIPE_EXPANSION_ALPHA_PER_F = {
 // dims: in { material: dimensionless, length_ft: L, delta_T_F: T } out: { delta_L_in: L, delta_T_F: T, length_ft: L, alpha_per_F: T^-1 }
 export function computePipeExpansion({ material, length_ft, delta_T_F }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A DECLARED bound is not an enforced one: the page's number box stops a
+  // negative, the agent door hands it straight to the compute, and the
+  // sign-typo guard skips any field declaring min >= 0 -- so this one was
+  // unguarded on both counts. Checks the SUPPLIED value, so a blank box
+  // still takes its default.
+  if (Number(arguments[0]?.length_ft) < 0) return { error: "The pipe length cannot be negative (ft)." };
   const alpha = PIPE_EXPANSION_ALPHA_PER_F[material];
   if (alpha === undefined) return { error: "Unknown pipe material." };
   const L = Number(length_ft) || 0;

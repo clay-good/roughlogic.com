@@ -78,6 +78,12 @@ export function manualJCooling({
   outdoor_RH_percent = 50,
 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A DECLARED bound is not an enforced one: the page's number box stops a
+  // negative, the agent door hands it straight to the compute, and the
+  // sign-typo guard skips any field declaring min >= 0 -- so this one was
+  // unguarded on both counts. Checks the SUPPLIED value, so a blank box
+  // still takes its default.
+  if (Number(arguments[0]?.window_area_ft2) < 0 || Number(arguments[0]?.wall_area_ft2) < 0 || Number(arguments[0]?.floor_area_ft2) < 0) return { error: "Floor, wall, and window areas cannot be negative (ft^2)." };
   if ([floor_area_ft2].some((x) => Number(x) < 0)) return { error: "Floor area cannot be negative." };
   // A blank outdoor design temperature read as 0 F gave a zero conduction load.
   if (outdoor_design_F === null || outdoor_design_F === undefined || outdoor_design_F === "") return { error: "Enter the outdoor design temperature (F)." };

@@ -986,6 +986,12 @@ export function computeIrrigationRequirement({
   rainfall_in = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A DECLARED bound is not an enforced one: the page's number box stops a
+  // negative, the agent door hands it straight to the compute, and the
+  // sign-typo guard skips any field declaring min >= 0 -- so this one was
+  // unguarded on both counts. Checks the SUPPLIED value, so a blank box
+  // still takes its default.
+  if (Number(arguments[0]?.rainfall_in) < 0) return { error: "Effective rainfall cannot be negative (in)." };
   // An efficiency is a percent; 0 < value < 1 is a fraction typed into a percent field (added 2026-09-26).
   if (["efficiency_pct"].some((k) => { const v = Number(arguments[0]?.[k]); return v > 0 && v < 1; })) return { error: "Enter efficiencies as a percent (85 for 85%), not a fraction." };
   const kc = FAO56_CROP_KC[crop];

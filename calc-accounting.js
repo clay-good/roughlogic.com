@@ -1580,6 +1580,12 @@ export function computeMarkupVsMargin({ cost = 0, price = 0, markup_pct = 0, mar
   let margin = Number(margin_pct) || 0;
   const n = Number(units) || 0;
   if (![C, P, markup, margin, n].every(Number.isFinite)) return { error: "Inputs must be finite numbers." };
+  // A DECLARED bound is not an enforced one: the page's number box stops a
+  // negative, the agent door hands it straight to the compute, and the
+  // sign-typo guard skips any field declaring min >= 0 -- so this one was
+  // unguarded on both counts. Checks the SUPPLIED value, so a blank box
+  // still takes its default.
+  if (Number(arguments[0]?.cost) < 0 || Number(arguments[0]?.price) < 0) return { error: "Cost and price cannot be negative (USD)." };
   if (margin >= 100) return { error: "Gross margin cannot be 100% or more (price would be infinite)." };
   if (C > 0 && markup > 0) { P = C * (1 + markup / 100); }
   else if (C > 0 && margin > 0) { P = C / (1 - margin / 100); }

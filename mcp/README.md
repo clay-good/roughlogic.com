@@ -295,9 +295,13 @@ out of "30 percent", and the tile answered `OK` on a 3000% dip. It now returns
 `run_calculator` directly if it was intended. Swept over all 2,040 curated terms
 carrying a digit (100 of which answer `OK`), that is the only one it refuses.
 
-**How far that reaches.** It fires only where a bound is *declared*, and **1,165
-of the 2,053 calculators with numeric inputs (56.7%) declare none at all** --
-`ohms-law` has four unbounded numeric fields. On those tiles this guard,
+**How far that reaches.** It fires only where a bound is *declared*, and **87
+of the 2,256 calculators with numeric inputs declare none at all** --
+`ohms-law` has four unbounded numeric fields. This paragraph read "1,165 of the
+2,053 (56.7%)" until 2026-11-26, which was the state before the bounds campaign
+and fourteen times the live figure, in the one passage whose whole job is to
+tell a reader how much a clean sweep is worth. Both numbers are now pinned by
+`scripts/check-readme-counts.mjs`, which recomputes them from the schema. On those tiles this guard,
 `run_calculator`'s range warnings, and `scripts/measure-verdict-bounds.mjs` are
 all silent, because there is no stated limit for a value to violate. That is a
 gap in the *catalog's* declarations rather than in the door, and it is worth

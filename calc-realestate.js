@@ -2909,6 +2909,12 @@ REALESTATE_RENDERERS["brrrr-refi"] = renderBrrrrRefi;
 // dims: in { cash_invested_usd: dimensionless, annual_cash_flow_usd: dimensionless, principal_paydown_usd: dimensionless, appreciation_usd: dimensionless, tax_savings_usd: dimensionless } out: { total_usd: dimensionless, total_pct: dimensionless, appr_pct: dimensionless, cf_pct: dimensionless, paydown_pct: dimensionless, tax_pct: dimensionless }
 export function computeRentalTotalReturn({ cash_invested_usd = 0, annual_cash_flow_usd = 0, principal_paydown_usd = 0, appreciation_usd = 0, tax_savings_usd = 0 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A DECLARED bound is not an enforced one: the page's number box stops a
+  // negative, the agent door hands it straight to the compute, and the
+  // sign-typo guard skips any field declaring min >= 0 -- so this one was
+  // unguarded on both counts. Checks the SUPPLIED value, so a blank box
+  // still takes its default.
+  if (Number(arguments[0]?.principal_paydown_usd) < 0) return { error: "Principal paydown cannot be negative (USD)." };
   const cash = Number(cash_invested_usd) || 0;
   const cf = Number(annual_cash_flow_usd) || 0;
   const paydown = Number(principal_paydown_usd) || 0;

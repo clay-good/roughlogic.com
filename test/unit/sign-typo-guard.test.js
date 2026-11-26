@@ -151,3 +151,77 @@ test("no worked-example value or default sits below its field's own minimum", as
   }
   assert.deepEqual(bad, [], "These values load as invalid on their own page; drop the field's min or fix the value:\n  " + bad.join("\n  "));
 });
+
+// The declared-min blind spot: a bound that is declared but enforced nowhere.
+//
+// `negate` above SKIPS any field declaring `min >= 0`, on the reasoning that
+// the page's number box already stops a negative there. The page does -- the
+// AGENT DOOR does not. `run_calculator` hands the value straight to the
+// compute, and 2,169 of the 2,256 calculators with numeric inputs declare a
+// bound, so declaring one quietly removed a field from the only guard that was
+// checking it.
+//
+// 69 such fields answered a negated worked example. Most only shift a number,
+// which the door's out-of-range warning discloses. These 13 handed back a
+// quantity that cannot exist -- a negative pipe diameter, a negative panel
+// thickness, a negative total dynamic head, a negative solar gain, a negative
+// moment -- with no error at all, and one of them (residential-framing's roof
+// pitch) priced 42 more board feet of lumber off a nonsense input because the
+// sign vanishes into the slope formula. All 13 now refuse, naming the field.
+//
+// This is the narrow, unambiguous half of the rule: not "a negative must be
+// refused" but "a negative must not come back as an impossible magnitude".
+const IMPOSSIBLE_EXEMPT = [
+  // The compute DELIBERATELY accepts a negative discount rate ("The discount
+  // rate must be above -100%") -- a negative real rate is a real thing -- and
+  // only echoes the entered value back. Its page box still says min="0", so
+  // the two surfaces disagree about whether a reader may type one; that is a
+  // product question, not a wrong number, and it is left as it stands.
+  "upgrade-roi::discount_rate_percent",
+];
+
+// Output names for which a negative is meaningful in its own right.
+const SIGNED_OUTPUT = /temp|elev|delta|diff|change|profit|loss|margin|savings|net_|_net$|offset|declination|balance|variance|error|residual|skew|correction|adjust|gain|drift/i;
+
+test("a field declaring min >= 0 does not answer a negative with an impossible magnitude", async () => {
+  const { rows } = JSON.parse(await readFile(FIXTURE, "utf8"));
+  const first = new Map();
+  for (const r of rows) if (!first.has(r.tile_id)) first.set(r.tile_id, r);
+
+  const bad = [];
+  let probed = 0;
+  for (const [id, row] of first) {
+    const reg = COMPUTE_MAP[id];
+    if (!reg) continue;
+    const fn = (await importCalc(reg.module))[reg.fn];
+    const d = await describe({ id });
+    if (!d || !d.inputs) continue;
+    const base = fn({ ...row.inputs });
+    if (!base || base.error) continue;
+    for (const f of d.inputs) {
+      if (f.kind !== "number" && !(f.kind == null && typeof row.inputs[f.key] === "number")) continue;
+      const v = Number(row.inputs[f.key]);
+      if (!(v > 0)) continue;
+      const min = f.attrs && f.attrs.min != null && f.attrs.min !== "" ? Number(f.attrs.min) : null;
+      if (min === null || min < 0) continue;        // the first test already covers these
+      if (IMPOSSIBLE_EXEMPT.includes(`${id}::${f.key}`)) continue;
+      probed += 1;
+      const r = fn({ ...row.inputs, [f.key]: -v });
+      if (!r || r.error) continue;
+      for (const [k, val] of Object.entries(r)) {
+        if (typeof val !== "number" || !(val < 0)) continue;
+        if (SIGNED_OUTPUT.test(k)) continue;
+        if (typeof base[k] === "number" && base[k] < 0) continue;   // negative before the probe too
+        bad.push(`${id}::${f.key} -> ${k}=${val} (was ${base[k]})`);
+        break;
+      }
+    }
+  }
+
+  assert.ok(probed > 2000, `the declared-min population really is swept (${probed} field(s))`);
+  assert.deepEqual(
+    bad,
+    [],
+    `${bad.length} field(s) declare a minimum and answer a negative with a quantity that cannot exist:\n  ` + bad.join("\n  "),
+  );
+});

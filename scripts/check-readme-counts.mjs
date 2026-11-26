@@ -113,6 +113,25 @@ async function liveCounts() {
   // been raised (and once lowered) nine times, and deployment.md was claiming
   // the hubs sit "well under" a cap the largest one had exceeded since
   // 2026-06-24. Read them from the gate that enforces them.
+  // mcp/README.md tells a reader how far the out-of-range guards reach: how
+  // many calculators take a number at all, and how many of those declare no
+  // bound for one to violate. It said "1,165 of the 2,053 (56.7%)" until
+  // 2026-11-26 -- the state before the bounds campaign, fourteen times the
+  // live 87, in the one passage whose job is to say how much a clean sweep is
+  // worth. Recomputed from the schema the door actually serves.
+  const { describe: describeTile } = await import(pathToFileURL(resolve(ROOT, "mcp", "catalog.mjs")).href);
+  const { RENDERER_MAP } = await import(pathToFileURL(resolve(ROOT, "test", "fixtures", "renderer-map.js")).href);
+  let numericTiles = 0, unboundedTiles = 0;
+  for (const id of Object.keys(RENDERER_MAP)) {
+    let d;
+    try { d = await describeTile({ id }); } catch { continue; }
+    const nums = (d.inputs || []).filter((f) => f.key && (f.kind === "number" || f.kind == null));
+    if (!nums.length) continue;
+    numericTiles += 1;
+    const bounded = nums.some((f) => f.attrs && ((f.attrs.min != null && f.attrs.min !== "") || (f.attrs.max != null && f.attrs.max !== "")));
+    if (!bounded) unboundedTiles += 1;
+  }
+
   const shellsSrc = await readFile(resolve(ROOT, "scripts", "check-shells.mjs"), "utf8");
   const capOf = (name) => {
     const m = new RegExp(name + "\\s*=\\s*(\\d+)\\s*\\*\\s*1024").exec(shellsSrc);
@@ -130,6 +149,8 @@ async function liveCounts() {
     unindexedTiles: tiles - indexed.size,
     dataEntries: Object.keys(expectedHashes.hashes || {}).length,
     dataFolders: Object.keys(integrity.manifests || {}).length,
+    numericTiles,
+    unboundedTiles,
   };
 }
 
@@ -420,6 +441,8 @@ async function main() {
   checked += checkPattern(dataSources, /rather than the ([\d,]+) that carry a schema/g, live.schemaTiles, "schema-carrying tile count (docs/data-sources.md)", errors);
   checked += checkPattern(mcpReadme, /descriptors the website reads, which\s*\nexist for ([\d,]+) calculators/g, live.indexedTiles, "field-index tile count (mcp/README.md)", errors);
   checked += checkPattern(mcpReadme, /For the other ([\d,]+) it projects/g, live.unindexedTiles, "un-indexed tile count (mcp/README.md)", errors);
+  checked += checkPattern(mcpReadme, /is \*declared\*, and \*\*([\d,]+)\s*\nof the [\d,]+ calculators with numeric inputs declare none at all\*\*/g, live.unboundedTiles, "calculators declaring no numeric bound (mcp/README.md)", errors);
+  checked += checkPattern(mcpReadme, /of the ([\d,]+) calculators with numeric inputs declare none at all\*\*/g, live.numericTiles, "calculators with numeric inputs (mcp/README.md)", errors);
 
   // docs/architecture.md states the module count in prose too, and it had
   // drifted to 56 against a live 57.

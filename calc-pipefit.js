@@ -148,6 +148,12 @@ PIPEFIT_RENDERERS["pipe-cold-spring"] = _renderColdSpring;
 // dims: in { run_length_ft: L, temp_range_f: T, alpha_per_f: T^-1, fitting_travel_in: L, threshold_in: L } out: { length_change_in: L, per_100ft_in: L, fittings_needed: dimensionless, alpha_per_f: T^-1, fitting_travel_in: L, run_length_ft: L, threshold_in: L, temp_range_f: T }
 export function computeRacewayExpansion({ run_length_ft = 0, temp_range_f = 0, alpha_per_f = 0.0000338, fitting_travel_in = 6, threshold_in = 0.25 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A DECLARED bound is not an enforced one: the page's number box stops a
+  // negative, the agent door hands it straight to the compute, and the
+  // sign-typo guard skips any field declaring min >= 0 -- so this one was
+  // unguarded on both counts. Checks the SUPPLIED value, so a blank box
+  // still takes its default.
+  if (Number(arguments[0]?.fitting_travel_in) < 0) return { error: "The fitting travel cannot be negative (in)." };
   const L = Number(run_length_ft);
   const dT = Number(temp_range_f);
   if (!(L > 0)) return { error: "Run length must be positive (ft)." };
@@ -274,6 +280,12 @@ const _STEAM_TABLE_BASIS_OPTIONS = [{ value: "entered", label: "Enter the steam-
 // dims: in { hf_high: L^2 T^-2, hf_low: L^2 T^-2, hfg_low: L^2 T^-2, high_pressure_psig: M L^-1 T^-2, low_pressure_psig: M L^-1 T^-2 } out: { flash_fraction: dimensionless, flash_pct: dimensionless, hf_high_used_btulb: L^2 T^-2, hf_low_used_btulb: L^2 T^-2, hfg_low_used_btulb: L^2 T^-2 }
 export function computeFlashSteamPct({ hf_high = 0, hf_low = 0, hfg_low = 0, steam_basis = "entered", high_pressure_psig = null, low_pressure_psig = null } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A DECLARED bound is not an enforced one: the page's number box stops a
+  // negative, the agent door hands it straight to the compute, and the
+  // sign-typo guard skips any field declaring min >= 0 -- so this one was
+  // unguarded on both counts. Checks the SUPPLIED value, so a blank box
+  // still takes its default.
+  if (Number(arguments[0]?.hf_low) < 0 || Number(arguments[0]?.hf_high) < 0) return { error: "A liquid enthalpy cannot be negative (Btu/lb)." };
   let hfH = Number(hf_high);
   let hfL = Number(hf_low);
   let hfg = Number(hfg_low);

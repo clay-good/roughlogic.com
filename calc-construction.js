@@ -424,6 +424,12 @@ export const pulloutExample = {
 // dims: in { load_type: dimensionless, load_value: dimensionless, length_ft: L, E_psi: M L^-1 T^-2, b_in: L, d_in: L } out: { M_lbft: M L^2 T^-2, delta_in: L, length_ft: L }
 export function computeBeamLoading({ load_type, load_value, length_ft, E_psi, b_in, d_in }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A DECLARED bound is not an enforced one: the page's number box stops a
+  // negative, the agent door hands it straight to the compute, and the
+  // sign-typo guard skips any field declaring min >= 0 -- so this one was
+  // unguarded on both counts. Checks the SUPPLIED value, so a blank box
+  // still takes its default.
+  if (Number(arguments[0]?.load_value) < 0 || Number(arguments[0]?.length_ft) < 0) return { error: "The load and the span cannot be negative." };
   length_ft = Number(length_ft);
   // DR-04 (RC-1): zero depth -> I = 0 -> deflection 5wL^4/(384 E I) = Infinity;
   // zero E is the same. Guard the section/material geometry before solving.
@@ -2684,6 +2690,12 @@ export function computePlywoodSpan({
   live_load_psf = 0, dead_load_psf = 0, edge_support = "yes",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A DECLARED bound is not an enforced one: the page's number box stops a
+  // negative, the agent door hands it straight to the compute, and the
+  // sign-typo guard skips any field declaring min >= 0 -- so this one was
+  // unguarded on both counts. Checks the SUPPLIED value, so a blank box
+  // still takes its default.
+  if (Number(arguments[0]?.panel_thickness_in) < 0 || Number(arguments[0]?.support_spacing_in) < 0) return { error: "Panel thickness and support spacing cannot be negative (in)." };
   if (arguments[0]?.edge_support !== undefined && !["yes", "no", true, false].includes(arguments[0].edge_support)) return { error: "Edge support must be yes or no." };
   if (Number(arguments[0]?.live_load_psf) < 0 || Number(arguments[0]?.dead_load_psf) < 0) return { error: "Loads cannot be negative (psf)." };
   panel_thickness_in = Number(panel_thickness_in);
@@ -3090,6 +3102,12 @@ export function computeResidentialFraming({
   stud_size = "2x4", joist_size = "2x10", rafter_size = "2x8",
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A DECLARED bound is not an enforced one: the page's number box stops a
+  // negative, the agent door hands it straight to the compute, and the
+  // sign-typo guard skips any field declaring min >= 0 -- so this one was
+  // unguarded on both counts. Checks the SUPPLIED value, so a blank box
+  // still takes its default.
+  if (Number(arguments[0]?.pitch) < 0) return { error: "The roof pitch cannot be negative (rise per 12 in)." };
   if (!(footprint_ft2 > 0)) return { error: "Footprint must be positive." };
   if (!(perimeter_ft > 0)) return { error: "Perimeter must be positive." };
   if (!(wall_height_ft > 0)) return { error: "Wall height must be positive." };

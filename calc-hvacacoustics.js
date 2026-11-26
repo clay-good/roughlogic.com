@@ -188,6 +188,12 @@ export function computeDuctBreakoutNoise({
   room_criterion_db = 0, lagging_improvement_db = 0,
 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // A DECLARED bound is not an enforced one: the page's number box stops a
+  // negative, the agent door hands it straight to the compute, and the
+  // sign-typo guard skips any field declaring min >= 0 -- so this one was
+  // unguarded on both counts. Checks the SUPPLIED value, so a blank box
+  // still takes its default.
+  if (Number(arguments[0]?.lagging_improvement_db) < 0) return { error: "The lagging improvement cannot be negative (dB); it is the benefit the lagging adds." };
   if (!(duct_width_in > 0) || !(duct_height_in > 0)) return { error: "Duct width and height must be greater than zero." };
   if (!(exposed_length_ft > 0)) return { error: "The exposed length must be greater than zero." };
   if (!(sound_power_db > 0)) return { error: "The sound power level in the duct must be greater than zero." };

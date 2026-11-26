@@ -152,3 +152,43 @@ test("the published examples themselves still answer", async () => {
   }
   assert.deepEqual(broken, []);
 });
+
+// The 2026-11-26 round, found when measure-verdict-bounds' reach grew again
+// (1,548 -> 1,874 tiles probed, so its earlier triage had expired). Three of
+// the ten changed conclusions were real: a declared bound that nothing
+// enforced on the agent door's side.
+test("an out-of-range value that used to change the conclusion now refuses", async () => {
+  const { run, describe } = await import("../../mcp/catalog.mjs");
+
+  // A roof pitch of -7 was answered as if it were +7: the sign vanishes into
+  // sqrt(1 + (pitch/12)^2), so the rafter came back LONGER (17.89 -> 18.52 ft)
+  // and the takeoff priced 42 more board feet of lumber. The worst of the
+  // three, because nothing in the answer looked wrong.
+  const framing = (await describe({ id: "residential-framing" })).example.inputs;
+  const negPitch = await run({ id: "residential-framing", inputs: { ...framing, pitch: -7 } });
+  assert.match(negPitch.result.error, /pitch cannot be negative/i);
+  const okPitch = await run({ id: "residential-framing", inputs: { ...framing } });
+  assert.ok(!okPitch.result.error && okPitch.result.total_bf > 0, "and the example still runs");
+
+  // A negative cost fell through every `C > 0` branch and came back as the
+  // markup<->margin ratio alone -- a clean-looking answer that silently
+  // dropped the number the reader typed.
+  const mm = (await describe({ id: "markup-vs-margin" })).example.inputs;
+  const negCost = await run({ id: "markup-vs-margin", inputs: { ...mm, cost: -61 } });
+  assert.match(negCost.result.error, /cannot be negative/i);
+
+  // A negative lagging "improvement" (the benefit lagging adds) raised the
+  // sound level by 1 dB and the required transmission loss with it.
+  const duct = (await describe({ id: "duct-breakout-noise" })).example.inputs;
+  const negLag = await run({ id: "duct-breakout-noise", inputs: { ...duct, lagging_improvement_db: -1 } });
+  assert.match(negLag.result.error, /lagging improvement cannot be negative/i);
+
+  // Each guard reads the SUPPLIED value, so a field left blank still takes its
+  // documented default rather than tripping the guard.
+  for (const [id, key] of [["residential-framing", "pitch"], ["duct-breakout-noise", "lagging_improvement_db"]]) {
+    const ex = (await describe({ id })).example.inputs;
+    const blank = await run({ id, inputs: { ...ex, [key]: undefined } });
+    const err = blank.result && blank.result.error;
+    assert.ok(!(err && /cannot be negative/i.test(err)), `a blank ${id}.${key} must not trip the guard (${err})`);
+  }
+});
