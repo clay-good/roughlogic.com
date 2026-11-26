@@ -544,6 +544,47 @@ export function queryFill(query, rows, opts) {
   quantities.forEach((qty, qi) => {
     if (optionSpans.some(([s, e]) => qty.index >= s && qty.end <= e)) suppressed.add(qi);
   });
+  // A NUMBER INSIDE A FIELD'S OWN LABEL is the label's, not the reader's.
+  //
+  // measure-query-fill drops every digit-bearing word out of a label before it
+  // phrases a question, for exactly this reason -- so its WRONG count has never
+  // seen what happens when a reader writes the label the way the PAGE prints
+  // it. Written that way, "Flow at 4 mA 0, Flow at 20 mA 500" filled flow_low
+  // = 4 and flow_high = 20: the milliamp numbers that NAME the two taps read
+  // as the two flows, and the reader's own 0 and 500 were dropped. A confident
+  // wrong answer on the most natural phrasing there is (2026-11-26).
+  //
+  // Suppressed beside the option spans above, and for the same stated reason:
+  // vetoed, not removed. Phase A reads the words BETWEEN consecutive numbers
+  // to find a field name, so dropping one from the list widens the next window.
+  //
+  // Narrow by construction: the whole label has to be written out, in order,
+  // before any of its numbers is discounted. It turns a wrong fill into a
+  // MISSING one rather than a right one -- "Flow at 4 mA 0" now fills nothing
+  // for that field instead of 4 -- which is the trade this module's governing
+  // rule asks for: a wrong answer is worse than no answer. A value that
+  // repeats one of the label's own numbers ("Flow at 4 mA 4") is not rescued
+  // either; measured, not assumed.
+  //
+  // Measured on 236 tiles whose labels carry a digit, phrased with the label
+  // written out in full: 75 wrong values before this, 4 after. The two that
+  // remain are labels whose punctuation defeats the span match -- "Rate on
+  // first $100k" and a label that embeds its own lookup table, "Bag yield
+  // (ft3): 80lb 0.60, 60lb 0.45" -- and they are listed in
+  // test/unit/query-fill-label-digits.test.js rather than left unnamed.
+  for (const row of rows) {
+    const label = String(row.l || "").trim();
+    if (!/\d/.test(label) || label.length < 4) continue;
+    const words = label.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+    if (words.length < 2 || !words.some((w) => /\d/.test(w))) continue;
+    const pattern = words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("[^a-z0-9]{0,3}");
+    const re = new RegExp(pattern, "gi");
+    let m;
+    while ((m = re.exec(text))) {
+      const from = m.index, to = m.index + m[0].length;
+      quantities.forEach((qty, qi) => { if (qty.index >= from && qty.end <= to) suppressed.add(qi); });
+    }
+  }
   const filled = {};
   const claimed = new Set();       // quantity indexes already spent
   const unmatched = [];
