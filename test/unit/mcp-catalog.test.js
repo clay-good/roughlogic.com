@@ -751,7 +751,13 @@ test("run_calculator: an untyped string input rejects a value it does not know",
       if (!refused) silent.push(id + "::" + key);
     }
   }
-  assert.ok(probed > 30, "expected untyped string inputs to probe");
+  // The floor is a guard against the probe silently emptying, not a target.
+  // It sat at 30 and the population has since FALLEN to exactly 30, because
+  // the schema extractor learned to read selects whose options come from a
+  // local const, a module-level table or a local factory wrapper: a field
+  // that now advertises its options is skipped here, which is the point.
+  // Lowered deliberately rather than left to fail as the extractor improves.
+  assert.ok(probed >= 20, `expected untyped string inputs to probe, got ${probed}`);
   const unlisted = silent.filter((k) => !OPEN_STRING_INPUTS.has(k));
   assert.deepEqual(unlisted, [], "These string inputs answered an unknown value with no error; validate them in the compute or list them in OPEN_STRING_INPUTS:\n  " + unlisted.join("\n  "));
   const stale = [...OPEN_STRING_INPUTS.keys()].filter((k) => !silent.includes(k));

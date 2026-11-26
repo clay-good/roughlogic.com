@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
   "total_tiles": 2288,
-  "covered_count": 2226,
+  "covered_count": 2229,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -831,6 +831,7 @@
     "generator-fuel-runtime",
     "generator-motor-starting",
     "generator-part-load-fuel",
+    "geometry",
     "geothermal-loop",
     "gin-pole-uptower-lift",
     "glass-thickness-wind",
@@ -915,6 +916,7 @@
     "highwall-bench-geometry",
     "hiking-time",
     "hip-valley-rafter",
+    "historical-pricing",
     "hoist-rope-safety-factor",
     "hoistway-venting",
     "home-office",
@@ -1050,6 +1052,7 @@
     "lighting-retrofit-savings",
     "lighting-throw-for-pool",
     "lighting-uniformity-ratio",
+    "lightning-countdown",
     "line-array-splay",
     "line-ground-clearance-nesc",
     "linear-interpolation",

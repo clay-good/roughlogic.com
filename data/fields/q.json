@@ -1,1 +1,1 @@
-{"version":1,"bucket":"q","tiles":{"historical-pricing":[{"d":"commodity","l":"Commodity","k":"select","r":1}]}}
+{"version":1,"bucket":"q","tiles":{"historical-pricing":[{"d":"commodity","l":"Commodity","k":"select","o":["","copper","aluminum","structural-steel","rebar","framing-lumber","osb","drywall","asphalt","diesel","gasoline","natural-gas","wheat","corn","soybeans"],"r":1},{"d":"lookback_months","l":"Lookback","k":"number","u":"mo","r":1,"n":0}]}}

@@ -334,8 +334,8 @@
       "date": "2026-10-17"
     },
     "/tools/area-by-coordinates/": {
-      "sha": "a6dd9b68f077e5df",
-      "date": "2026-10-17"
+      "sha": "c4c7f7616bc6f449",
+      "date": "2026-11-26"
     },
     "/tools/arrhenius-equation/": {
       "sha": "3d4b850f90a72029",
@@ -806,7 +806,7 @@
       "date": "2026-10-17"
     },
     "/tools/box-fill/": {
-      "sha": "7128e6e1cd90572c",
+      "sha": "1a95d329021ff611",
       "date": "2026-11-26"
     },
     "/tools/brake-pad-life/": {
@@ -914,8 +914,8 @@
       "date": "2026-10-17"
     },
     "/tools/building-ua/": {
-      "sha": "5a9e1b49a9d778b4",
-      "date": "2026-10-17"
+      "sha": "2ca40d23fae637a9",
+      "date": "2026-11-26"
     },
     "/tools/bulk-density/": {
       "sha": "05bb8f95100d297c",
@@ -2238,8 +2238,8 @@
       "date": "2026-10-17"
     },
     "/tools/differential-leveling/": {
-      "sha": "4809bae07943ad5f",
-      "date": "2026-10-17"
+      "sha": "fe339afabfe3724b",
+      "date": "2026-11-26"
     },
     "/tools/digester-gas-production/": {
       "sha": "200546d4c1d0e956",
@@ -3842,8 +3842,8 @@
       "date": "2026-10-17"
     },
     "/tools/historical-pricing/": {
-      "sha": "ad2c77f350039728",
-      "date": "2026-10-17"
+      "sha": "da75284005203d52",
+      "date": "2026-11-26"
     },
     "/tools/hoist-rope-safety-factor/": {
       "sha": "1dc20c9432d420a7",
@@ -4414,8 +4414,8 @@
       "date": "2026-10-17"
     },
     "/tools/lightning-countdown/": {
-      "sha": "72960e6a6829e06a",
-      "date": "2026-10-17"
+      "sha": "a9da8fc4d6b2c247",
+      "date": "2026-11-26"
     },
     "/tools/line-array-splay/": {
       "sha": "d4966e270568d91b",
@@ -5566,8 +5566,8 @@
       "date": "2026-10-17"
     },
     "/tools/pitot-traverse-average/": {
-      "sha": "8eb3de18633b6eff",
-      "date": "2026-10-17"
+      "sha": "b1cb89fb1ee32814",
+      "date": "2026-11-26"
     },
     "/tools/pitot-traverse-cfm/": {
       "sha": "047c7423bc3a2c0b",
@@ -8438,8 +8438,8 @@
       "date": "2026-10-17"
     },
     "/tools/traverse-closure/": {
-      "sha": "1eb20edfac42caa8",
-      "date": "2026-10-17"
+      "sha": "475b1b3f378ac5ce",
+      "date": "2026-11-26"
     },
     "/tools/tree-appraisal-ctla/": {
       "sha": "b0156bea269efc1a",
@@ -8858,8 +8858,8 @@
       "date": "2026-10-17"
     },
     "/tools/water-heater-input/": {
-      "sha": "9fab8cf527a6cfae",
-      "date": "2026-10-17"
+      "sha": "4e532474de421300",
+      "date": "2026-11-26"
     },
     "/tools/water-heater-recovery/": {
       "sha": "918280a50c599a80",

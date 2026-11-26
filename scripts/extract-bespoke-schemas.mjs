@@ -605,6 +605,35 @@ function parseComputeCall(body) {
       map.set(m[1], { var: m[3], coerced: Boolean(m[2]), accessor: m[4], boolEq: Boolean(m[5]) });
     }
   }
+  // ONE HOP through a differently-named local. The convention a bespoke
+  // renderer must follow to let an empty box mean "not supplied" rather than
+  // zero is to read it into a local first:
+  //
+  //   const effVal = eff.input.value === "" ? null : readNum(eff.input);
+  //   computeWaterHeaterInput({ ..., efficiency: effVal, ... })
+  //
+  // and `efficiency: effVal` is neither a control reference nor a shorthand, so
+  // the parameter was never mapped. Three of these had been worked around with
+  // hand-written captions (`manual-j-cooling` and `manual-j-heating`'s floor
+  // area, `npsh-a`'s optional NPSHr) -- the same workaround-as-bug-report shape
+  // as the friction loss beside it.
+  //
+  // Followed ONLY when the local is a pass-through: exactly one control, and no
+  // arithmetic or list handling in between. `const x = a.input.value * 2` means
+  // the page sends something other than what the box holds, and `.split(",")`
+  // means the compute wants an array while the box holds text -- advertising
+  // either would hand run() a value the compute reads differently.
+  const TRANSFORMS = /[+*/%]|\.split\(|\.map\(|\.filter\(|JSON\.|\[\s*\]/;
+  for (const m of body.matchAll(/([A-Za-z_$][\w$]*)\s*:\s*([A-Za-z_$][\w$]*)\s*[,}]/g)) {
+    const [, key, local] = m;
+    if (map.has(key) || key === local) continue;
+    const d = new RegExp("\\b(?:const|let|var)\\s+" + local.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s*=\\s*([^;]{0,200});").exec(body);
+    if (!d || TRANSFORMS.test(d[1])) continue;
+    const refs = [...d[1].matchAll(/([A-Za-z_$][\w$]*)\.(input|select)\b/g)];
+    if (refs.length === 0) continue;
+    if (new Set(refs.map((r) => r[1])).size !== 1) continue;   // more than one box
+    map.set(key, { var: refs[0][1], coerced: /\bNumber\(/.test(d[1]), accessor: refs[0][2], boolEq: false });
+  }
   return map;
 }
 

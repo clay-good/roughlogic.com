@@ -70,32 +70,25 @@ export const CURATED_INPUT_LABELS = {
   "square-footage": { length_ft: "Length (ft)", width_ft: "Width (ft)" },
   "concrete": { length_ft: "Length (ft)", width_ft: "Width (ft)", thickness_in: "Thickness (in)" },
   "metal-weight": { thickness_in: "Thickness (in)" },
-  // A select the renderer builds from a data list, so the options are not in the
-  // source for the extractor to read. The caption is.
-  "historical-pricing": { commodity: "Commodity" },
-  // The renderer hands its values to a Web Worker through an `inputs` object
-  // rather than calling the compute directly, and routes the floor area through
-  // a local first (`const floor_ft2 = Number(fa.input.value)`) because the
-  // BTU/hr-per-sq-ft context band needs it again. The extractor follows a field
-  // straight into a compute call, not through the extra hop, so the one input
-  // every load calculation starts from had no caption and could not be filled
-  // from a typed question. Both captions are the renderers' own strings.
-  "manual-j-cooling": { floor_area_ft2: "Floor area (ft²)" },
-  "manual-j-heating": { floor_area_ft2: "Floor area (ft²)" },
-  // Same shape: the optional NPSHr is read through a local so an empty box can
-  // mean "not supplied" rather than zero.
+  // historical-pricing's commodity select was captioned here because "the
+  // renderer builds [it] from a data list, so the options are not in the source
+  // for the extractor to read". The extractor resolves a module-level table
+  // now, so it reads both the caption and the options.
+  // THREE CAPTIONS LIVED HERE AND THE REASON GIVEN FOR EACH WAS THE SAME BUG.
+  // manual-j's floor area: "the extractor follows a field straight into a
+  // compute call, not through the extra hop", the hop being
+  // `const floor_ft2 = Number(fa.input.value)`. npsh-a's optional NPSHr: "read
+  // through a local so an empty box can mean 'not supplied' rather than zero".
+  // npsh-a's friction loss: a parameter hidden behind a comment in the
+  // compute's own destructure -- "the same input whose loss made this tile
+  // report an available NPSH two feet higher, and therefore safer, than the
+  // truth."
   //
-  // The friction loss used to be captioned here as well, and the reason given
-  // was exact: "the parameter it maps to sat behind a comment in the compute's
-  // own destructure, so the extractor never had a key to look it up by" -- the
-  // input whose loss made this tile report an available NPSH two feet higher,
-  // and therefore safer, than the truth. That diagnosis was right and the cure
-  // was a caption. The cause is fixed now (2026-11-26): the signature parser
-  // strips comments, in all three places it is written, so the extractor reads
-  // the renderer's own caption and the curated one is redundant.
-  "npsh-a": {
-    npsh_required_ft: "NPSH required (ft, optional)",
-  },
+  // All three diagnoses were right and all three were worked around with a
+  // caption rather than fixed. Both causes are fixed now (2026-11-26): the
+  // signature parser strips comments in all three places it is written, and the
+  // key-to-control map follows one hop through a pass-through local. The
+  // extractor reads the renderers' own captions, so nothing is curated here.
 };
 
 export const CURATED_OUTPUT_LABELS = {
