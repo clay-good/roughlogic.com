@@ -15,6 +15,36 @@
 // `min` attribute actually present on each number input.
 //
 // Prints a JSON report keyed by tile; a reader passes --tile=<id> for one.
+//
+// TWO THINGS TO KNOW BEFORE DECLARING ANOTHER BOUND FROM A SWEEP LIKE THIS.
+//
+// 1. "The compute errors when I negate this field" DOES NOT mean the field is
+//    non-negative. It was the criterion that declared 2,083 bounds here, and it
+//    holds for those -- every one of them refuses with wording about that field
+//    ("HP must be positive", "Provide positive rise and run", "Relative
+//    humidity is between 0 and 100%"). It does NOT hold generally, and the
+//    remaining hand-built fields are where it breaks:
+//      distance-distance-intersection::n0_ft  negating a survey NORTHING moves
+//        the control points 10,000 ft apart, so the error is "the two distances
+//        are too short to meet" -- about the geometry. A negative northing is
+//        perfectly valid on a local grid.
+//      refrigeration-cop::h4_btulb  negating an ENTHALPY pushes COP past the
+//        Carnot limit, so the error is about the cycle. Refrigerant enthalpies
+//        are reference-state values and go negative; signed-inputs.js lists one
+//        of them for exactly that reason.
+//      edm-slope-reduction::angle_deg  the real bound is 0 to 180 (90 = level),
+//        which the compute states itself.
+//    So an incidental refusal reads exactly like a real one. Check that the
+//    message concerns the FIELD, and for anything signed in principle --
+//    coordinates, enthalpies, angles, arms, elevations -- check the physics
+//    rather than the error.
+//
+// 2. A DECLARED MINIMUM IS THE PROTECTION, so a compute need not also guard it.
+//    `sign-typo-guard` deliberately skips any field that declares a min: the
+//    model is that the schema declares the bound, the browser marks the field
+//    invalid, `run_calculator` warns and `answer_query` refuses. 95 fields
+//    declare min="0" while their compute still accepts a negative, and that is
+//    the documented design rather than 95 defects. Do not "fix" them.
 import * as nodeModule from "node:module";
 
 const { installDocument, installTimers, flushTimers } = await import("./fake-dom.js");
