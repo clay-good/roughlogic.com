@@ -621,11 +621,49 @@ function parseComputeCallLoose(body) {
   return map;
 }
 
+// A comment INSIDE a destructured parameter list hid the parameter after it.
+// `computeRecircLoopSizing` explains its optional cost inputs there:
+//
+//   set_point_delta_F = 10,
+//   // spec-v16 B.3 extension: annual heat-loss energy cost. Optional;
+//   // the cost figure only renders when a fuel price is supplied.
+//   fuel = "gas",
+//
+// and the split on top-level commas handed the next part to the name test with
+// two comment lines glued to the front, so `fuel` failed it and vanished. The
+// tile kept a schema listing its other nine inputs and the agent door
+// advertised no heating fuel at all -- a dropdown with two options, invisible.
+// `mcp/catalog.mjs`'s own introspection strips comments first; this copy never
+// did, and the two have disagreed for as long as both have existed.
+//
+// Strings are respected, or a `//` inside a URL default would eat the rest of
+// the signature.
+function stripSourceComments(s) {
+  let out = "";
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (c === '"' || c === "'" || c === "`") {
+      const q = c;
+      out += c;
+      for (i++; i < s.length; i++) {
+        out += s[i];
+        if (s[i] === "\\") { if (++i < s.length) out += s[i]; continue; }
+        if (s[i] === q) break;
+      }
+      continue;
+    }
+    if (c === "/" && s[i + 1] === "/") { while (i < s.length && s[i] !== "\n") i++; out += "\n"; continue; }
+    if (c === "/" && s[i + 1] === "*") { i += 2; while (i < s.length && !(s[i] === "*" && s[i + 1] === "/")) i++; i++; out += " "; continue; }
+    out += c;
+  }
+  return out;
+}
+
 async function computeParams(reg) {
   const mod = await import(new URL(reg.module, CMAP_URL).href);
   const fn = mod[reg.fn];
   if (typeof fn !== "function") return null;
-  const s = fn.toString();
+  const s = stripSourceComments(fn.toString());
   const o = s.indexOf("("); const b = s.indexOf("{", o);
   if (b < 0 || s.slice(o, b).includes(")")) return [];
   let d = 0, e = -1;

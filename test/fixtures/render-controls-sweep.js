@@ -17,7 +17,7 @@
 // it.
 //
 // UPDATED 2026-11-26 after three of the shapes were fixed: the figure is now
-// 212 on 122 calculators (it was 262 on 158). What moved: makeCheckbox was not
+// 210 on 121 calculators (it was 262 on 158). What moved: makeCheckbox was not
 // modelled at all, a select's options could not come from a const in the
 // renderer body, and a module-local helper could not be used inside a larger
 // expression. See the commit; the split below is from the original measurement

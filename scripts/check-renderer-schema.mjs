@@ -30,8 +30,39 @@ const fail = (msg) => { console.error(`✗ check-renderer-schema: ${msg}`); proc
 
 // Recover a compute function's destructured parameter names (mirror of the
 // parser in mcp/catalog.mjs, kept local so the gate has no import cycle).
+//
+// THREE copies of this parser exist -- here, in mcp/catalog.mjs, and in
+// scripts/extract-bespoke-schemas.mjs -- and only the first stripped comments
+// until 2026-11-26. A comment INSIDE a destructured parameter list therefore
+// hid the parameter after it from two of the three: `computeRecircLoopSizing`
+// explains its optional cost inputs between `set_point_delta_F` and `fuel`, so
+// the extractor never saw `fuel` and the agent door advertised no heating fuel
+// at all. Fixing the extractor then made THIS gate disagree instead, reporting
+// a schema that had become MORE complete as divergent. A mirror that does not
+// mirror is worse than an import cycle.
+function stripSourceComments(s) {
+  let out = "";
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (c === '"' || c === "'" || c === "`") {
+      const q = c;
+      out += c;
+      for (i++; i < s.length; i++) {
+        out += s[i];
+        if (s[i] === "\\") { if (++i < s.length) out += s[i]; continue; }
+        if (s[i] === q) break;
+      }
+      continue;
+    }
+    if (c === "/" && s[i + 1] === "/") { while (i < s.length && s[i] !== "\n") i++; out += "\n"; continue; }
+    if (c === "/" && s[i + 1] === "*") { i += 2; while (i < s.length && !(s[i] === "*" && s[i + 1] === "/")) i++; i++; out += " "; continue; }
+    out += c;
+  }
+  return out;
+}
+
 function introspect(fn) {
-  const s = fn.toString();
+  const s = stripSourceComments(fn.toString());
   const o = s.indexOf("("); if (o < 0) return [];
   const b = s.indexOf("{", o); if (b < 0 || s.slice(o, b).includes(")")) return [];
   let d = 0, e = -1;

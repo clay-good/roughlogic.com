@@ -6,6 +6,18 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **A comment inside a calculator's parameter list made the parameter after it invisible -- and the parser that reads those lists is written three times, two of them wrong.** The recirculation-loop calculator explains its optional cost inputs between two parameters:
+
+  ```
+  set_point_delta_F = 10,
+  // spec-v16 B.3 extension: annual heat-loss energy cost. Optional;
+  // the cost figure only renders when a fuel price is supplied.
+  fuel = "gas",
+  ```
+
+  Splitting that list on commas handed `fuel` to the name test with two comment lines glued to the front, so it failed and vanished. The tile kept a perfectly good schema listing its other nine inputs, and the agent door advertised **no heating fuel at all** -- a dropdown with two options, invisible, on a calculator whose whole point is the annual cost.
+  - The door's own copy of this parser strips comments. The schema extractor's copy never did, and neither does the gate that checks the extractor. **Three copies, two wrong, disagreeing in silence** -- and fixing the extractor made the gate report a schema that had just become *more* complete as divergent, which is how the third copy surfaced. All three strip comments now.
+  - The best evidence this was worth chasing was already in the tree. A curated caption for the NPSH calculator's friction loss carried this note: *"the parameter it maps to sat behind a comment in the compute's own destructure, so the extractor never had a key to look it up by"* -- and it was *"the same input whose loss made this tile report an available NPSH two feet higher, and therefore safer, than the truth."* Somebody diagnosed this exactly and captioned around it. The cause is fixed, so the workaround is gone.
 - **A dropdown built from a table the module keeps to itself was dropped entirely, on 21 more calculators.** The occupancy classes are `Object.keys(LIGHTING_DENSITY_W_PER_FT2).map((k) => ({ value: k, label: LIGHTING_DENSITY_LABELS[k] }))` -- two module-level tables, not exported, so the sandbox that evaluates an options expression saw neither name, found no options, and the assembly step omits a dropdown it cannot list. The agent door advertised no occupancy class at all for the lighting-density check, no crop for the irrigation and fertiliser calculators, and so on. Module-level constants are now resolved from the module source alongside the renderer-body ones. **Bare parameters 237 to 212, on 143 to 122 calculators; schema coverage 2,224 to 2,226.**
   - It shows up where it should: typed-question recall moved to **10,476 of 10,701 (97.9%)** with nothing wrong in either phrasing, and the door answers **2,091** of its own worked examples, up from 2,088 -- a dropdown it can list is a dropdown it can fill.
 - **Checkboxes were never modelled at all, and fixing that found a required-input bug that was refusing real questions.** The schema extractor parsed number boxes and dropdowns and had no case for `makeCheckbox`, so all 28 of them were dropped and their compute parameters reached the agent door as bare keys -- `breaker-sizing` advertised no "Continuous load (3 hours or more)" at all. Two more shapes were dropped with them: a dropdown whose options come from a `const` in the renderer body (the conduit trade sizes), and a module-local helper used inside a larger expression (`awgOptions().filter(...)`). All three are read now: **237 bare parameters on 143 calculators, from 262 on 158**, schema coverage 2,223 to 2,224, and 21 more fields in the index.

@@ -83,14 +83,17 @@ export const CURATED_INPUT_LABELS = {
   "manual-j-cooling": { floor_area_ft2: "Floor area (ft²)" },
   "manual-j-heating": { floor_area_ft2: "Floor area (ft²)" },
   // Same shape: the optional NPSHr is read through a local so an empty box can
-  // mean "not supplied" rather than zero. The friction loss is captioned here
-  // too -- it is mapped straight into the compute call and should have been
-  // read, but the parameter it maps to sat behind a comment in the compute's
-  // own destructure, so the extractor never had a key to look it up by. That
-  // is the same input whose loss made this tile report an available NPSH two
-  // feet higher, and therefore safer, than the truth.
+  // mean "not supplied" rather than zero.
+  //
+  // The friction loss used to be captioned here as well, and the reason given
+  // was exact: "the parameter it maps to sat behind a comment in the compute's
+  // own destructure, so the extractor never had a key to look it up by" -- the
+  // input whose loss made this tile report an available NPSH two feet higher,
+  // and therefore safer, than the truth. That diagnosis was right and the cure
+  // was a caption. The cause is fixed now (2026-11-26): the signature parser
+  // strips comments, in all three places it is written, so the extractor reads
+  // the renderer's own caption and the curated one is redundant.
   "npsh-a": {
-    friction_loss_ft: "Suction friction loss (ft)",
     npsh_required_ft: "NPSH required (ft, optional)",
   },
 };
