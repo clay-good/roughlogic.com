@@ -14,7 +14,12 @@
 // either way, because that harness never writes a label's digits.
 //
 // Measured over every tile whose labels carry a digit, phrased with the label
-// written out in full: 75 wrong values before the rule, 0 after.
+// written out in full: 75 wrong values before the rule, 0 after -- and 1,222
+// values filled rather than 993, because the number a reader writes straight
+// after a field's whole label now binds to that field. Phase A could not use
+// that evidence here: two labels differing only by a digit ("Flow at 4 mA",
+// "Flow at 20 mA") have the same TERMS once digits are stripped, so the window
+// reads as ambiguous and neither bound.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -100,4 +105,27 @@ test("the demonstrated case: the milliamp taps are not the flows", async () => {
   assert.notEqual(filled.flow_low, "4", "the 4 mA naming the tap is not the low flow");
   assert.notEqual(filled.flow_high, "20", "nor is the 20 mA the high flow");
   assert.equal(filled.signal_ma, "12", "and the reader's own signal still binds");
+});
+
+// And the reader's own values land in the right fields, which is the whole
+// point: suppressing the label's digits alone left them MISSING.
+test("the number after a written-out label binds to that field", async () => {
+  const { TOOLS } = await import("../../tools-data.js");
+  const { loadFields, queryFill } = await import("../../query-fill.js");
+  const tool = TOOLS.find((t) => t.id === "dp-flow-signal-scaling");
+  const rows = await loadFields(tool.id, tool.group);
+
+  const { filled } = queryFill(
+    "dp flow signal scaling Loop signal 12 mA, Flow at 4 mA 0, Flow at 20 mA 500",
+    rows, { name: tool.name },
+  );
+  assert.equal(filled.flow_low, "0", "the 0 the reader wrote after the 4 mA label");
+  assert.equal(filled.flow_high, "500", "and the 500 after the 20 mA label");
+  assert.equal(filled.signal_ma, "12");
+
+  // A value that happens to repeat its own label's number still binds: the
+  // span is spent, the number after it is not.
+  const repeat = queryFill("dp flow signal scaling Flow at 4 mA 4, Flow at 20 mA 500", rows, { name: tool.name });
+  assert.equal(repeat.filled.flow_low, "4");
+  assert.equal(repeat.filled.flow_high, "500");
 });

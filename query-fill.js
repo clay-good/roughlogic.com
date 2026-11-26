@@ -541,6 +541,7 @@ export function queryFill(query, rows, opts) {
     if (per) q.rate = { mo: "month", yr: "year", wk: "week", hr: "hour", h: "hour", min: "minute", sec: "second" }[per[1]] || per[1];
   }
   const suppressed = new Set();
+  const labelAdjacent = [];   // [row key, quantity index] -- see the label-span pass below
   quantities.forEach((qty, qi) => {
     if (optionSpans.some(([s, e]) => qty.index >= s && qty.end <= e)) suppressed.add(qi);
   });
@@ -586,6 +587,15 @@ export function queryFill(query, rows, opts) {
         if (before !== " " || after !== " ") continue;
         const lo = at[from], hi = at[afterIdx - 1];
         quantities.forEach((qty, qi) => { if (qty.index >= lo && qty.end <= hi + 1) suppressed.add(qi); });
+        // The reader wrote this field's WHOLE LABEL and then a number. That is
+        // the strongest evidence there is -- the select path says so in as many
+        // words -- and Phase A cannot use it here, because two labels differing
+        // only by a digit ("Flow at 4 mA", "Flow at 20 mA") have the same TERMS
+        // once digits are stripped, so the window reads as ambiguous and
+        // neither field binds. Noted now, applied after the phases, so it can
+        // only fill a field they left empty.
+        const next = quantities.findIndex((qty) => qty.index >= hi + 1);
+        if (next !== -1 && quantities[next].index - (hi + 1) <= 3) labelAdjacent.push([row.d, next]);
       }
     }
   }
@@ -1702,6 +1712,17 @@ export function queryFill(query, rows, opts) {
   quantities.forEach((qty, qi) => {
     if (!claimed.has(qi) && !suppressed.has(qi)) unmatched.push(String(qty.value) + (qty.unit ? " " + qty.unit : ""));
   });
+
+  // The number a reader wrote straight after a field's whole label, where the
+  // phases could not use it (see the label-span pass above). Only an unfilled
+  // field and an unspent number, so this adds readings and overturns none.
+  for (const [key, qi] of labelAdjacent) {
+    if (key in filled || claimed.has(qi)) continue;
+    const qty = quantities[qi];
+    if (!qty || !Number.isFinite(Number(qty.value))) continue;
+    filled[key] = String(qty.value);
+    claimed.add(qi);
+  }
 
   // A LABEL THAT IS A CODE: "C1", "C2", "V2", "A260", "b2".
   //
