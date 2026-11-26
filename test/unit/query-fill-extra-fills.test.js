@@ -14,8 +14,15 @@
 // called "pressure". A reader typing "specific volume at pressure 13.7" would
 // hit the same thing, so this is not only a harness artifact.
 //
-// Catalog-wide there are 11 extra fills and 7 that break an answer. All 7 are
-// listed with their cause; the gate exists so an EIGHTH has to be looked at.
+// Catalog-wide there are 10 extra fills and 6 that break an answer, all listed
+// with their cause, so a SEVENTH has to be looked at.
+//
+// It was 11 and 7 when this landed, and the two extra ones were the harness
+// rather than the extractor -- a correction worth keeping, because the first
+// reading looked like a real misfill. linear-interpolation's "extra" x1 came
+// from the phrasing below dropping the 1 and 2 out of "Point 1 x" and "Point 2
+// x", leaving a question with the same field named twice; given the digit back
+// it fills correctly. Only the steam cluster is a hazard a reader shares.
 // The extractor itself is not changed here: its select path is built from many
 // narrow vetoes, each added for a measured misfill, and the guardrails on a
 // change to it are measure-query-fill's recall and WRONG count rather than
@@ -28,13 +35,18 @@ import { COMPUTE_MAP, importCalc } from "../fixtures/compute-map.js";
 const ROOT = new URL("../../", import.meta.url);
 
 const KNOWN = [
-  // A select option word that is also a word in another field's label. The
-  // mode then demands a pressure the question never carried.
+  // THE ONE THAT IS NOT THE HARNESS. `steam_basis` owns an option called
+  // "pressure", and a sibling field's label reads "Steam specific volume at
+  // pressure". The mode then demands a pressure the question never carried, and
+  // a reader typing "specific volume at pressure 13.7" would hit it too.
   "flash-steam-pct", "steam-pipe-velocity", "steam-pipe-capacity",
   "steam-trap-sizing", "condensate-return-sizing",
-  // One number claimed by two reference fields, which must differ: the tile
-  // refuses a vertical segment / a zero span rather than answering.
-  "linear-interpolation", "dp-flow-signal-scaling",
+  // A tile this harness cannot phrase at all. Its two flow fields are labelled
+  // "Flow at 4 mA" and "Flow at 20 mA": drop the label's number and the two are
+  // indistinguishable, keep it and the 20 is read as the reader's value for the
+  // other field. Both halves of that were measured. Nothing about the tile is
+  // wrong; the example simply cannot be put into words mechanically.
+  "dp-flow-signal-scaling",
 ];
 
 test("a field the question never mentioned is not filled into a broken answer", async () => {
@@ -59,13 +71,27 @@ test("a field the question never mentioned is not filled into a broken answer", 
   // The same phrasing scripts/measure-query-fill.mjs uses: the field's own
   // label lead, its value, and the unit the label declares.
   const grp = (v) => (typeof v === "number" ? v.toLocaleString("en-US") : String(v));
-  const phrase = (rows, inputs) => rows.flatMap((row) => {
-    const v = inputs[row.d];
-    if (v === null || v === undefined || v === "") return [];
-    const label = String(row.l).split(/\s+/).filter((w) => !/\d/.test(w)).join(" ").trim();
-    const isWord = row.k === "select" || row.k === "checkbox";
-    return [`${label} ${isWord ? v : grp(v) + (row.u ? " " + row.u : "")}`.trim()];
-  }).join(", ");
+  // measure-query-fill drops every number inside a label, so a label's own
+  // threshold cannot be read as the reader's value. Right in general -- but
+  // when two labels differ ONLY by that number ("Point 1 x" beside "Point 2
+  // x") dropping it removes the only thing telling them apart, and the
+  // question built from the example is then genuinely ambiguous. That is what
+  // linear-interpolation's "extra" x1 was: not a misfill, a question with two
+  // identical field names in it. Keep the digit exactly where a sibling needs
+  // it, and nowhere else.
+  const bare = (l) => String(l).split(/\s+/).filter((w) => !/\d/.test(w)).join(" ").trim();
+  const phrase = (rows, inputs) => {
+    const collide = new Map();
+    for (const r of rows) { const k = bare(r.l); collide.set(k, (collide.get(k) || 0) + 1); }
+    return rows.flatMap((row) => {
+      const v = inputs[row.d];
+      if (v === null || v === undefined || v === "") return [];
+      const stripped = bare(row.l);
+      const label = collide.get(stripped) > 1 ? String(row.l).trim() : stripped;
+      const isWord = row.k === "select" || row.k === "checkbox";
+      return [`${label} ${isWord ? v : grp(v) + (row.u ? " " + row.u : "")}`.trim()];
+    }).join(", ");
+  };
   const stable = (o) => JSON.stringify(o, (k, v) => (typeof v === "number" && Number.isFinite(v) ? Number(v.toPrecision(10)) : v));
 
   const broke = [];
