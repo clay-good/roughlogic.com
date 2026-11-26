@@ -1570,7 +1570,7 @@ async function loadShard(file) {
 }
 
 // dims: in { shard: dimensionless, state: dimensionless, county_fips: dimensionless, county_name: dimensionless }
-//        out: { conforming_limit: dimensionless, conforming_high_cost_limit: dimensionless, fha_limit: dimensionless, va_no_down_limit: dimensionless, county: dimensionless, source: dimensionless, asOf: dimensionless, year: dimensionless, conforming_one_unit_usd: dimensionless, fha_one_unit_usd: dimensionless }
+//        out: { conforming_limit: dimensionless, conforming_high_cost_limit: dimensionless, fha_limit: dimensionless, va_no_down_limit: dimensionless, county: dimensionless, source: dimensionless, asOf: dimensionless, year: dimensionless, conforming_year: dimensionless, fha_year: dimensionless, conforming_one_unit_usd: dimensionless, fha_one_unit_usd: dimensionless }
 // (FHFA / FHA / VA county-level loan-limit shard lookup. Monetary
 //  caps are dimensionless dollars per the §7.1 monetary
 //  convention; county / source / asOf tokens are categorical.)
@@ -1586,10 +1586,20 @@ export function computeLoanLimits({ shard = null, state = "", county_fips = "", 
       c.state === wantState && c.county_name.toLowerCase() === wantName
     ) || null;
   }
+  // The two columns can sit in different annual cycles: FHFA announces the
+  // conforming limit in November for the next calendar year, HUD publishes the
+  // FHA limits in December. Between those dates the shard legitimately carries
+  // next year's conforming figure beside this year's FHA figure, so every
+  // answer names the cycle each column came from rather than one "year".
+  const cYear = shard.conforming_year || shard.year;
+  const fYear = shard.fha_year || shard.year;
+  const cycles = "FHFA " + cYear + " conforming + HUD CY" + fYear + " FHA";
   if (match) {
     return {
       kind: "high_cost",
       year: shard.year,
+      conforming_year: cYear,
+      fha_year: fYear,
       state: match.state,
       county: match.county_name,
       county_fips: match.county_fips,
@@ -1598,20 +1608,22 @@ export function computeLoanLimits({ shard = null, state = "", county_fips = "", 
       va_note: shard.va.full_entitlement_cap_removed_since
         ? "VA full-entitlement: no cap (removed " + shard.va.full_entitlement_cap_removed_since + ")"
         : "VA: consult lender",
-      source: "FHFA + HUD (per-county lookup matched)",
+      source: cycles + " (per-county lookup matched).",
     };
   }
   // Fallback: baseline.
   return {
     kind: "baseline",
     year: shard.year,
+    conforming_year: cYear,
+    fha_year: fYear,
     state: wantState || "(unknown)",
     county: wantName || "(unknown)",
     county_fips: wantFips || "",
     conforming_one_unit_usd: shard.baseline.conforming_one_unit_usd,
     fha_one_unit_usd: shard.baseline.fha_floor_one_unit_usd,
     va_note: "VA full-entitlement: no cap (removed " + shard.va.full_entitlement_cap_removed_since + ")",
-    source: "Baseline applies (county not in bundled high-cost list).",
+    source: cycles + "; baseline applies (county not in the bundled high-cost list).",
     advisory: shard.unknown_county_message,
   };
 }
@@ -1626,7 +1638,7 @@ export const loanLimitsExample = {
 // (DOM-mount renderer; HTMLElement refs are categorical.)
 export function renderLoanLimits(inputRegion, outputRegion, citationEl) {
   citationEl.textContent =
-    "Citation: 2026 conforming loan limit per FHFA Conforming Loan Limit Values (annual, fhfa.gov). FHA single-family mortgage limit per HUD (entp.hud.gov / idapp / html / hicostlook.cfm). VA full-entitlement cap removed effective 2020-01-01 per the Blue Water Navy Vietnam Veterans Act. Unknown counties fall back to the baseline; verify against the FHFA / HUD lookup or with the lender.";
+    "Citation: 2027 conforming loan limit per FHFA Conforming Loan Limit Values (announced 2026-11-24, effective 2027-01-01; fhfa.gov). FHA single-family mortgage limit per HUD (entp.hud.gov / idapp / html / hicostlook.cfm) for CY2026, the latest cycle HUD has published -- HUD issues the next year's FHA limits in December, so the FHA column trails the conforming column until then. VA full-entitlement cap removed effective 2020-01-01 per the Blue Water Navy Vietnam Veterans Act. Unknown counties fall back to the baseline; verify against the FHFA / HUD lookup or with the lender.";
   const S = makeText("State (2-letter, e.g., CA)", "ll-state", { placeholder: "CA", maxlength: "2" });
   const F = makeText("County FIPS (5-digit, optional)", "ll-fips", { placeholder: "06075", maxlength: "5" });
   const N = makeText("County name (optional)", "ll-name", { placeholder: "San Francisco" });

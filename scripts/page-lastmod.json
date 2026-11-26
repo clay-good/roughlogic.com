@@ -2,8 +2,8 @@
   "_comment": "Per-URL <lastmod> for sitemap.xml. `date` is when that page's bytes last changed, not when the site was last built. Regenerate with `npm run stamp:lastmod` after a build and commit; check-shells fails if dist/ has drifted from it.",
   "pages": {
     "/": {
-      "sha": "3fcdf4e11b25226c",
-      "date": "2026-11-24"
+      "sha": "73217d5577e5c06a",
+      "date": "2026-11-26"
     },
     "/tools/": {
       "sha": "2abc0fb7ee1fd812",
@@ -74,8 +74,8 @@
       "date": "2026-11-24"
     },
     "/groups/real-estate/": {
-      "sha": "d173f7fe703c8cf7",
-      "date": "2026-11-24"
+      "sha": "78040f34234878f3",
+      "date": "2026-11-26"
     },
     "/groups/references/": {
       "sha": "57b6f3b9743a4147",
@@ -4470,8 +4470,8 @@
       "date": "2026-10-17"
     },
     "/tools/loan-limits/": {
-      "sha": "0ab3b344af046150",
-      "date": "2026-10-17"
+      "sha": "875a412fc65c950d",
+      "date": "2026-11-26"
     },
     "/tools/loan-payment/": {
       "sha": "ebe62481e4075bea",

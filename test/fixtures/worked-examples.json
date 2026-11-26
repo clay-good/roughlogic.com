@@ -15279,19 +15279,21 @@
   },
   {
    "tile_id": "loan-limits",
-   "source_publisher": "FHFA / HUD / VA (federal-published, 2026 cycle)",
-   "source_title": "FHFA conforming + HUD FHA + VA loan limits, per county (2026)",
-   "source_edition_or_year": "2026 annual cycle",
-   "source_section_or_page": "Worked example: San Francisco, CA (FIPS 06075) returns the 2026 FHFA high-cost ceiling $1,249,125 (the embedded shard carried the 2025 figures, $806,500 / $1,209,750, under a 2026 label until 2026-11-15)",
+   "source_publisher": "FHFA / HUD / VA (federal-published; 2027 conforming cycle, CY2026 FHA cycle)",
+   "source_title": "FHFA conforming loan limits per county (2027) + HUD FHA single-family limits (CY2026) + VA full-entitlement policy",
+   "source_edition_or_year": "FHFA 2027 annual cycle (announced 2026-11-24); HUD CY2026 (ML 2025-23), the latest FHA cycle published",
+   "source_section_or_page": "Worked example: San Francisco, CA (FIPS 06075) returns the 2027 FHFA high-cost ceiling $1,283,100 beside HUD's CY2026 FHA limit $1,249,125, and names both cycles. Read 2026-11-25 from fullcountyloanlimitlist2027_hera-based_final_flat.csv. The embedded shard carried the 2025 figures ($806,500 / $1,209,750) under a 2026 label until 2026-11-15, and the 2026 figures under that label until 2026-11-25.",
    "verified_by": "rl",
-   "verified_on": "2026-11-15",
+   "verified_on": "2026-11-25",
    "inputs": {
     "state": "CA",
     "county_name": "San Francisco",
     "shard": {
-     "year": 2026,
+     "year": 2027,
+     "conforming_year": 2027,
+     "fha_year": 2026,
      "baseline": {
-      "conforming_one_unit_usd": 832750,
+      "conforming_one_unit_usd": 855400,
       "fha_floor_one_unit_usd": 541287
      },
      "va": {
@@ -15302,7 +15304,7 @@
        "state": "CA",
        "county_name": "San Francisco",
        "county_fips": "06075",
-       "conforming_usd": 1249125,
+       "conforming_usd": 1283100,
        "fha_usd": 1249125
       }
      ]
@@ -15311,6 +15313,30 @@
    "outputs": {
     "kind": {
      "value": "high_cost",
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "conforming_one_unit_usd": {
+     "value": 1283100,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "fha_one_unit_usd": {
+     "value": 1249125,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "conforming_year": {
+     "value": 2027,
+     "tolerance": {
+      "abs": 0
+     }
+    },
+    "fha_year": {
+     "value": 2026,
      "tolerance": {
       "abs": 0
      }

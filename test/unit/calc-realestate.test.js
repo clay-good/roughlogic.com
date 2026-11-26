@@ -813,42 +813,75 @@ test("all nineteen Group X renderers exposed in REALESTATE_RENDERERS after X.2 r
 // verified_on 2026-05-16 while carrying the 2025 baseline throughout -- $806,500
 // conforming, $524,225 FHA floor, a $1,209,750 ceiling. A stamped verification
 // date is not evidence the values were checked, so pin the published 2026 ones.
-test("loan-limits: the shipped shard carries the published 2026 FHFA / HUD baseline", async () => {
+test("loan-limits: the shipped shard carries the published 2027 FHFA conforming baseline", async () => {
   const { readFile } = await import("node:fs/promises");
   const { resolve, dirname } = await import("node:path");
   const { fileURLToPath } = await import("node:url");
   const root = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
   const shard = JSON.parse(await readFile(resolve(root, "data/realestate/loan-limits.json"), "utf8"));
-  assert.equal(shard.year, 2026);
-  assert.equal(shard.baseline.conforming_one_unit_usd, 832750);
-  assert.equal(shard.baseline.conforming_two_unit_usd, 1066250);
-  assert.equal(shard.baseline.conforming_three_unit_usd, 1288800);
-  assert.equal(shard.baseline.conforming_four_unit_usd, 1601750);
-  // HUD sets the floor at 65% and the ceiling at 150% of the conforming baseline.
-  assert.equal(shard.baseline.fha_floor_one_unit_usd, 541287);
-  assert.equal(shard.baseline.fha_ceiling_one_unit_usd, 1249125);
+  // FHFA announced the 2027 values 2026-11-24; read 2026-11-25 from
+  // fullcountyloanlimitlist2027_hera-based_final_flat.csv, where this tuple is
+  // the modal value across 3,235 counties (3,071 of them).
+  assert.equal(shard.year, 2027);
+  assert.equal(shard.conforming_year, 2027);
+  assert.equal(shard.baseline.conforming_one_unit_usd, 855400);
+  assert.equal(shard.baseline.conforming_two_unit_usd, 1095250);
+  assert.equal(shard.baseline.conforming_three_unit_usd, 1323900);
+  assert.equal(shard.baseline.conforming_four_unit_usd, 1645350);
   assert.equal(
     shard.baseline.ceiling_high_cost_one_unit_usd,
     Math.round(shard.baseline.conforming_one_unit_usd * 1.5),
   );
-  // Each bundled county carries its OWN published 2026 limits (FHFA county list
-  // and HUD CY2026 lookup, read 2026-09-24). Until then every row held the
-  // ceiling for both, which was wrong for these:
+  assert.equal(shard.baseline.ceiling_high_cost_one_unit_usd, 1283100);
+  // HUD sets the FHA floor at 65% and the ceiling at 150% of the conforming
+  // baseline, but it publishes its own per-county table in DECEMBER, a month
+  // after FHFA. On 2026-11-25 the HUD lookup still offered CY2026 as its latest
+  // cycle, so the FHA column is deliberately one cycle behind -- and the shard
+  // must SAY so rather than let a 2027 label stand over 2026 money.
+  assert.equal(shard.fha_year, 2026);
+  assert.ok(shard.fha_year < shard.conforming_year, "FHA trails conforming, or this guard is obsolete");
+  assert.equal(shard.baseline.fha_floor_one_unit_usd, 541287);
+  assert.equal(shard.baseline.fha_ceiling_one_unit_usd, 1249125);
+  assert.match(shard.edition, /CY2026/);
+  assert.match(shard.edition, /2027/);
+  // Each bundled county carries its OWN published limits: conforming from the
+  // FHFA 2027 county list (read 2026-11-25), FHA from the HUD CY2026 lookup
+  // (read 2026-09-24). The two columns differ county by county.
   const published = {
-    "06055": [1017750, 1017750], // Napa
-    "36005": [1209750, 1249125], "36047": [1209750, 1249125], "36061": [1209750, 1249125],
-    "36081": [1209750, 1249125], "36085": [1209750, 1249125], // NYC counties
-    "08097": [1209750, 1249125], // Pitkin
+    "06055": [1017750, 1017750], // Napa (flat 2026 -> 2027)
+    "36005": [1224750, 1249125], "36047": [1224750, 1249125], "36061": [1224750, 1249125],
+    "36081": [1224750, 1249125], "36085": [1224750, 1249125], // NYC counties
+    "08097": [1209750, 1249125], // Pitkin (flat 2026 -> 2027)
     "15009": [1299500, 1299500], // Maui (Hawaii may exceed the contiguous ceiling)
-    "15003": [1249125, 828000], // Honolulu
-    "02020": [1249125, 541287], // Anchorage
+    "15003": [1283100, 828000], // Honolulu
+    "02020": [1283100, 541287], // Anchorage
   };
   for (const c of shard.high_cost_counties_one_unit) {
     const want = published[c.county_fips] || [shard.baseline.ceiling_high_cost_one_unit_usd, shard.baseline.fha_ceiling_one_unit_usd];
     assert.equal(c.conforming_usd, want[0], c.county_name + " conforming");
     assert.equal(c.fha_usd, want[1], c.county_name + " FHA");
   }
-  assert.match(shard.unknown_county_message, /between the floor and the ceiling/);
+  assert.match(shard.unknown_county_message, /between the baseline and the ceiling/);
+});
+
+// The two columns can sit in different annual cycles, so the answer must name
+// the cycle each one came from. A single "year" would have let the 2027 label
+// stand over HUD's 2026 money -- the exact shape of the 2025-under-a-2026-label
+// defect this shard already shipped once.
+test("loan-limits: every answer names the cycle the conforming and FHA figures came from", async () => {
+  const { readFileSync } = await import("node:fs");
+  const shard = JSON.parse(readFileSync(new URL("../../data/realestate/loan-limits.json", import.meta.url), "utf8"));
+  for (const inputs of [{ state: "CA", county_name: "San Francisco" }, { state: "ZZ", county_name: "Nowhere" }]) {
+    const r = computeLoanLimits({ shard, ...inputs });
+    assert.equal(r.conforming_year, shard.conforming_year, inputs.county_name + " conforming_year");
+    assert.equal(r.fha_year, shard.fha_year, inputs.county_name + " fha_year");
+    assert.match(r.source, /FHFA 2027 conforming/, inputs.county_name + " source names the conforming cycle");
+    assert.match(r.source, /HUD CY2026 FHA/, inputs.county_name + " source names the FHA cycle");
+  }
+  // A shard with no split stamp degrades to its single year rather than NaN.
+  const flat = computeLoanLimits({ shard: { ...shard, conforming_year: undefined, fha_year: undefined }, state: "ZZ" });
+  assert.equal(flat.conforming_year, shard.year);
+  assert.equal(flat.fha_year, shard.year);
 });
 
 test("DTI: Fannie Mae B3-6-02 has no front-end ratio -- total DTI governs (45% manual ceiling)", () => {
@@ -871,6 +904,9 @@ test("loan-limits / hud-fmr: the worked example's embedded shard matches the bun
   for (const r of rows.filter((x) => x.tile_id === "loan-limits" && x.inputs.shard)) {
     const s = r.inputs.shard;
     assert.equal(s.year, ll.year);
+    for (const k of ["conforming_year", "fha_year"]) {
+      if (k in s || k in ll) assert.equal(s[k], ll[k], k);
+    }
     for (const [k, v] of Object.entries(s.baseline)) assert.equal(v, ll.baseline[k], "baseline." + k);
     for (const c of s.high_cost_counties_one_unit) {
       const b = ll.high_cost_counties_one_unit.find((x) => x.county_fips === c.county_fips);

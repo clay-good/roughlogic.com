@@ -1,15 +1,15 @@
 {
   "name": "realestate",
-  "version": "2026-09-25",
-  "fetched": "2026-09-25",
-  "edition": "FHFA Conforming Loan Limit Values (2026 annual cycle); HUD FHA Single-Family Mortgage Limits (2026 annual); HUD Office of Policy Development and Research Fair Market Rents (FY2026, effective 2025-10-01). VA loan-limit cap removed since 2020-01-01 for full-entitlement borrowers (Blue Water Navy Vietnam Veterans Act). Loan limits re-verified 2026-09-02 against the FHFA 2026 announcement and HUD ML 2025-23; all 19 FMR rows re-verified 2026-09-09 against HUD’s FY2026 Fair Market Rent Documentation System; 18 carried figures HUD does not publish and four named an area HUD does not define.",
-  "asOf": "2026-09-25",
+  "version": "2026-11-25",
+  "fetched": "2026-11-25",
+  "edition": "FHFA Conforming Loan Limit Values (2027 annual cycle, announced 2026-11-24, effective 2027-01-01); HUD FHA Single-Family Mortgage Limits (CY2026 annual, ML 2025-23) -- the latest FHA cycle HUD has published, so the shard's FHA column is deliberately one cycle behind its conforming column and every answer names the cycle each came from; HUD Office of Policy Development and Research Fair Market Rents (FY2026, effective 2025-10-01). VA loan-limit cap removed since 2020-01-01 for full-entitlement borrowers (Blue Water Navy Vietnam Veterans Act). Loan limits re-verified 2026-11-25: the 2027 conforming baseline and every bundled county row read from FHFA's own fullcountyloanlimitlist2027_hera-based_final_flat.csv, and HUD's limit lookup checked the same day, where CY2026 was still the latest cycle offered. All 19 FMR rows re-verified 2026-09-09 against HUD’s FY2026 Fair Market Rent Documentation System; 18 carried figures HUD does not publish and four named an area HUD does not define.",
+  "asOf": "2026-11-25",
   "refresh_cadence": "annual",
   "shards": [
     {
       "file": "loan-limits.json",
-      "name": "FHFA conforming + HUD FHA + VA loan limits (2026)",
-      "gzip_size_bytes": 1516
+      "name": "FHFA conforming loan limits (2027) + HUD FHA single-family limits (CY2026) + VA full-entitlement policy",
+      "gzip_size_bytes": 1856
     },
     {
       "file": "hud-fmr.json",
@@ -18,7 +18,7 @@
     }
   ],
   "hashes": {
-    "loan-limits.json": "4f6f0bb907e2c437657ba517a397905d426de18686f73090d4f3d863824f0d44",
+    "loan-limits.json": "9c11c213bcbbed7a423ca47f8587876b5a8ddf2dde63a33e4e4d7d08628c23c7",
     "hud-fmr.json": "4fc4a6400f5d3028bd16d3e8c8f63fd6cf14a1a1110e8e962fee83f9b9deef7f"
   }
 }

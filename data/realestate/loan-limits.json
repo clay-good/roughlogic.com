@@ -1,18 +1,20 @@
 {
-  "source": "FHFA Conforming Loan Limit Values (annual announcement, published November); HUD FHA Single-Family Mortgage Limits (annual, published December). 2026 conforming baseline is the FHFA-announced one-unit limit applied in 48 contiguous states (Alaska, Hawaii, Guam, and the US Virgin Islands receive the HERA high-cost ceiling as their CONFORMING baseline; FHA limits there are set county by county). The FHA floor is 65 percent of the conforming baseline; the FHA ceiling is 150 percent. VA loan limits were removed for full-entitlement borrowers by the Blue Water Navy Vietnam Veterans Act effective 2020. Bundled county rows are a sample of high-cost counties with their own published 2026 limits, checked row by row against the FHFA county list and the HUD CY2026 lookup on 2026-09-24: the conforming and FHA limits differ county by county (Honolulu FHA $828,000, Anchorage FHA $541,287, Maui $1,299,500 above the ceiling), and until then every row carried the $1,249,125 ceiling for both. Any county not bundled routes to the FHFA / HUD lookup.",
-  "edition": "2026 annual cycle (FHFA announced 2025-11; HUD ML 2025-23)",
-  "fetched": "2026-09-02",
-  "verified_on": "2026-09-02",
+  "source": "FHFA Conforming Loan Limit Values (annual announcement, published November); HUD FHA Single-Family Mortgage Limits (annual, published December). The 2027 conforming baseline is the FHFA-announced one-unit limit applied in the 48 contiguous states (Alaska, Hawaii, Guam, and the US Virgin Islands receive the HERA high-cost ceiling as their CONFORMING baseline; FHA limits there are set county by county). The FHA floor is 65 percent of the conforming baseline; the FHA ceiling is 150 percent. VA loan limits were removed for full-entitlement borrowers by the Blue Water Navy Vietnam Veterans Act effective 2020. CONFORMING figures (baseline and every bundled county) were read on 2026-11-25 from the FHFA 2027 full county list, fullcountyloanlimitlist2027_hera-based_final_flat.csv, whose modal tuple across 3,235 counties is the baseline and whose per-county one-unit value is the row below; the one-unit baseline $855,400 and the $1,283,100 ceiling also match the FHFA release of 2026-11-24. FHA figures are HUD's CY2026 values, checked county by county against the HUD CY2026 lookup on 2026-09-24 and still in force: they differ from the conforming limit county by county (Honolulu FHA $828,000, Anchorage FHA $541,287, Maui $1,299,500). The bundled county rows are a sample of high-cost counties (CA, NY, DC, MA, CO, HI, AK) and are NOT limited to counties at the national ceiling -- Napa, the five New York City boroughs, Pitkin and Maui each carry their own published value. Any county not bundled routes to the FHFA / HUD lookup.",
+  "edition": "Conforming: FHFA Conforming Loan Limit Values for 2027 (announced 2026-11-24, effective 2027-01-01). FHA: HUD FHA Single-Family Mortgage Limits for CY2026 (ML 2025-23) -- HUD had not published CY2027 limits as of 2026-11-25 (the hud.gov limit lookup offered CY2024 / CY2025 / CY2026 only), so the FHA column is the CY2026 value still in force. VA loan-limit policy per Public Law 116-23.",
+  "fetched": "2026-11-25",
+  "verified_on": "2026-11-25",
   "free_access": "FHFA: fhfa.gov/data/conforming-loan-limit. HUD FHA: entp.hud.gov/idapp/html/hicostlook.cfm. VA: benefits.va.gov.",
-  "year": 2026,
+  "year": 2027,
+  "conforming_year": 2027,
+  "fha_year": 2026,
   "baseline": {
-    "conforming_one_unit_usd": 832750,
-    "conforming_two_unit_usd": 1066250,
-    "conforming_three_unit_usd": 1288800,
-    "conforming_four_unit_usd": 1601750,
+    "conforming_one_unit_usd": 855400,
+    "conforming_two_unit_usd": 1095250,
+    "conforming_three_unit_usd": 1323900,
+    "conforming_four_unit_usd": 1645350,
     "fha_floor_one_unit_usd": 541287,
     "fha_ceiling_one_unit_usd": 1249125,
-    "ceiling_high_cost_one_unit_usd": 1249125
+    "ceiling_high_cost_one_unit_usd": 1283100
   },
   "va": {
     "full_entitlement_cap_removed_since": "2020-01-01",
@@ -23,28 +25,28 @@
       "state": "CA",
       "county_name": "Alameda",
       "county_fips": "06001",
-      "conforming_usd": 1249125,
+      "conforming_usd": 1283100,
       "fha_usd": 1249125
     },
     {
       "state": "CA",
       "county_name": "Contra Costa",
       "county_fips": "06013",
-      "conforming_usd": 1249125,
+      "conforming_usd": 1283100,
       "fha_usd": 1249125
     },
     {
       "state": "CA",
       "county_name": "Los Angeles",
       "county_fips": "06037",
-      "conforming_usd": 1249125,
+      "conforming_usd": 1283100,
       "fha_usd": 1249125
     },
     {
       "state": "CA",
       "county_name": "Marin",
       "county_fips": "06041",
-      "conforming_usd": 1249125,
+      "conforming_usd": 1283100,
       "fha_usd": 1249125
     },
     {
@@ -58,98 +60,98 @@
       "state": "CA",
       "county_name": "Orange",
       "county_fips": "06059",
-      "conforming_usd": 1249125,
+      "conforming_usd": 1283100,
       "fha_usd": 1249125
     },
     {
       "state": "CA",
       "county_name": "San Benito",
       "county_fips": "06069",
-      "conforming_usd": 1249125,
+      "conforming_usd": 1283100,
       "fha_usd": 1249125
     },
     {
       "state": "CA",
       "county_name": "San Francisco",
       "county_fips": "06075",
-      "conforming_usd": 1249125,
+      "conforming_usd": 1283100,
       "fha_usd": 1249125
     },
     {
       "state": "CA",
       "county_name": "San Mateo",
       "county_fips": "06081",
-      "conforming_usd": 1249125,
+      "conforming_usd": 1283100,
       "fha_usd": 1249125
     },
     {
       "state": "CA",
       "county_name": "Santa Clara",
       "county_fips": "06085",
-      "conforming_usd": 1249125,
+      "conforming_usd": 1283100,
       "fha_usd": 1249125
     },
     {
       "state": "CA",
       "county_name": "Santa Cruz",
       "county_fips": "06087",
-      "conforming_usd": 1249125,
+      "conforming_usd": 1283100,
       "fha_usd": 1249125
     },
     {
       "state": "NY",
       "county_name": "Bronx",
       "county_fips": "36005",
-      "conforming_usd": 1209750,
+      "conforming_usd": 1224750,
       "fha_usd": 1249125
     },
     {
       "state": "NY",
       "county_name": "Kings",
       "county_fips": "36047",
-      "conforming_usd": 1209750,
+      "conforming_usd": 1224750,
       "fha_usd": 1249125
     },
     {
       "state": "NY",
       "county_name": "New York",
       "county_fips": "36061",
-      "conforming_usd": 1209750,
+      "conforming_usd": 1224750,
       "fha_usd": 1249125
     },
     {
       "state": "NY",
       "county_name": "Queens",
       "county_fips": "36081",
-      "conforming_usd": 1209750,
+      "conforming_usd": 1224750,
       "fha_usd": 1249125
     },
     {
       "state": "NY",
       "county_name": "Richmond",
       "county_fips": "36085",
-      "conforming_usd": 1209750,
+      "conforming_usd": 1224750,
       "fha_usd": 1249125
     },
     {
       "state": "DC",
       "county_name": "District of Columbia",
       "county_fips": "11001",
-      "conforming_usd": 1249125,
+      "conforming_usd": 1283100,
       "fha_usd": 1249125
     },
     {
       "state": "MA",
       "county_name": "Nantucket",
       "county_fips": "25019",
-      "conforming_usd": 1249125,
+      "conforming_usd": 1283100,
       "fha_usd": 1249125
     },
     {
       "state": "MA",
       "county_name": "Dukes",
       "county_fips": "25007",
-      "conforming_usd": 1249125,
+      "conforming_usd": 1283100,
       "fha_usd": 1249125
     },
     {
@@ -163,14 +165,14 @@
       "state": "CO",
       "county_name": "Eagle",
       "county_fips": "08037",
-      "conforming_usd": 1249125,
+      "conforming_usd": 1283100,
       "fha_usd": 1249125
     },
     {
       "state": "HI",
       "county_name": "Honolulu",
       "county_fips": "15003",
-      "conforming_usd": 1249125,
+      "conforming_usd": 1283100,
       "fha_usd": 828000
     },
     {
@@ -184,9 +186,9 @@
       "state": "AK",
       "county_name": "Anchorage Municipality",
       "county_fips": "02020",
-      "conforming_usd": 1249125,
+      "conforming_usd": 1283100,
       "fha_usd": 541287
     }
   ],
-  "unknown_county_message": "Unknown county. The 2026 baseline applies in 48 contiguous states (conforming one-unit $832,750; FHA floor $541,287). Alaska / Hawaii / Guam / USVI receive the high-cost ceiling baseline. Only counties at the national ceiling ($1,249,125) are bundled; a county between the floor and the ceiling carries its own published value. Look yours up at fhfa.gov / entp.hud.gov, or ask your lender."
+  "unknown_county_message": "Unknown county. The 2027 conforming baseline applies in the 48 contiguous states (one-unit $855,400); the FHA floor is HUD's CY2026 $541,287 until HUD publishes CY2027 limits. Alaska / Hawaii / Guam / USVI receive the high-cost ceiling $1,283,100 as their conforming baseline. Only a sample of high-cost counties is bundled, so a county between the baseline and the ceiling may carry its own published value. Look yours up at fhfa.gov / entp.hud.gov, or ask your lender."
 }
