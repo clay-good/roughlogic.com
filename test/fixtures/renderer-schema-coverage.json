@@ -1,7 +1,7 @@
 {
   "note": "spec-v1184 coverage ratchet. Tiles whose renderer exposes a render.schema consistent with the compute function. Grow with `node scripts/check-renderer-schema.mjs --write`; regeneration is intentional.",
   "total_tiles": 2288,
-  "covered_count": 2224,
+  "covered_count": 2226,
   "covered": [
     "aav-install-check",
     "abatement-containment",
@@ -203,6 +203,7 @@
     "building-ua",
     "bulk-density",
     "bunker-silo-capacity",
+    "burial-depth-300-5",
     "cabinet-linear-feet",
     "cable-bend-radius",
     "cable-jetting-distance",
@@ -1353,6 +1354,7 @@
     "polymeric-sand-bags",
     "pon-split-loss-budget",
     "pool-alkalinity-adjust",
+    "pool-bonding-680-26",
     "pool-calcium-hardness-dose",
     "pool-chlorine-dose",
     "pool-cover-evaporation",

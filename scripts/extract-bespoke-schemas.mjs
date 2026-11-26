@@ -480,8 +480,14 @@ function optionsScope(expr, body, modSrc, ns, depth = 0) {
   const names = new Set((String(expr).match(/[A-Za-z_$][\w$]*/g) || []).filter((n) => !(n in scope)));
   for (const name of names) {
     const esc = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    // A const in the renderer body.
-    const c = body && new RegExp("\\b(?:const|let|var)\\s+" + esc + "\\s*=\\s*([\\s\\S]*?);\\s*(?:\\n|$)", "m").exec(body);
+    // A const in the renderer body, then one at MODULE level. The second is how
+    // most of the computed-option selects are written: the occupancy classes are
+    // `Object.keys(LIGHTING_DENSITY_W_PER_FT2).map((k) => ({ value: k, label:
+    // LIGHTING_DENSITY_LABELS[k] }))`, two module-level tables that are not
+    // exported, so the sandbox saw neither name and the select was dropped for
+    // having no options.
+    const c = (body && new RegExp("\\b(?:const|let|var)\\s+" + esc + "\\s*=\\s*([\\s\\S]*?);\\s*(?:\\n|$)", "m").exec(body))
+      || (modSrc && new RegExp("^\\s*(?:export\\s+)?(?:const|let|var)\\s+" + esc + "\\s*=\\s*([\\s\\S]*?);\\s*$", "m").exec(modSrc));
     if (c && !DENIED_TOKENS.test(c[1])) {
       const inner = optionsScope(c[1], body, modSrc, ns, depth + 1);
       try { scope[name] = new Function(...Object.keys(inner), `"use strict"; return (${c[1]});`)(...Object.values(inner)); continue; } catch { /* fall through */ }
