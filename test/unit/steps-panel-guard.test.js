@@ -397,3 +397,49 @@ test("a step row prints a value the way the page does", async () => {
   const area = await rowsFor("area-by-coordinates");
   assert.equal(area.get("Boundary corners, one per line as N,E (>= 3)"), "0,0; 0,100; 100,100; 100,0");
 });
+
+// The page's own "Show the steps" path, end to end -- which this harness could
+// not reach until 2026-11-26.
+//
+// Every test above exercises `stepRows` or `drawSteps` directly. The real page
+// goes through ui-fields.js `makeStepsPanel`, whose draw begins
+// `if (!box.open || !last) return;` -- and `<details>.open` was undefined in
+// the fake DOM, so it read as falsy and the panel NEVER drew, however many
+// tiles a sweep rendered. (ea7cc46c closed the half where `label[for]` matched
+// nothing; this is the half that stopped the panel drawing at all.) So pillar
+// 3's own entry point was the one part of it with no coverage.
+test("the page's steps panel draws when a reader opens it", async () => {
+  const { installDocument, installTimers, flushTimers } = await import("../fixtures/fake-dom.js");
+  installTimers();
+  const doc = installDocument();
+  const { makeStepsPanel } = await import("../../ui-fields.js");
+
+  const parent = doc.createElement("div");
+  const region = doc.createElement("div");
+  doc.body.append(parent, region);
+
+  const panel = makeStepsPanel(parent, region);
+  const box = parent.querySelector("details");
+  assert.ok(box, "the panel is a <details> the reader can open");
+  assert.equal(box.open, false, "and it starts closed, as the page builds it");
+  assert.equal(box.hidden, true, "and hidden until there is something to show");
+
+  const fields = [{ key: "length_ft", label: "Length (ft)" }, { key: "width_ft", label: "Width (ft)" }];
+  panel.update(fields, { length_ft: 10, width_ft: 12 }, { length_ft: 10, width_ft: 12, area_ft2: 120 });
+  assert.equal(box.hidden, false, "a result un-hides it");
+
+  const body = box.querySelector(".steps-body");
+  assert.equal(body.textContent, "", "still blank while it is closed -- the draw is deferred to the toggle");
+
+  // What a reader does. `draw` is async (it imports steps-panel.js and
+  // key-labels.js on first open), so let those settle.
+  box.open = true;
+  box.dispatchEvent(new globalThis.Event("toggle", { bubbles: true }));
+  for (let i = 0; i < 20; i++) { flushTimers(); await Promise.resolve(); }
+
+  const text = body.textContent;
+  assert.match(text, /Inputs used/, "the panel drew its input section");
+  assert.match(text, /Length \(ft\)/, "with the field's own label");
+  assert.match(text, /Worked values/, "and the worked values");
+  assert.match(text, /120/, "including the number the compute returned");
+});

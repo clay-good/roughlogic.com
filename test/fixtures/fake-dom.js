@@ -38,6 +38,11 @@ export class Node {
   get firstChild() { return this.childNodes[0] || null; }
   get lastChild() { return this.childNodes[this.childNodes.length - 1] || null; }
   get firstElementChild() { return this.children[0] || null; }
+  // ui-fields.js's steps panel keeps itself attached with
+  // `if (parent.lastElementChild !== box) parent.appendChild(box)`. Undefined
+  // here, that comparison never held and the panel was re-appended on every
+  // update.
+  get lastElementChild() { const c = this.children; return c[c.length - 1] || null; }
   get nextSibling() { const p = this.parentNode; if (!p) return null; const i = p.childNodes.indexOf(this); return p.childNodes[i + 1] || null; }
   get parentElement() { return this.parentNode; }
   appendChild(c) { if (c.isFragment) { [...c.childNodes].forEach((x) => this.appendChild(x)); return c; } if (c.parentNode) c.parentNode.removeChild(c); c.parentNode = this; this.childNodes.push(c); return c; }
@@ -145,6 +150,41 @@ export class Node {
   set step(v) { this.setAttribute("step", v == null ? "" : String(v)); }
   get hidden() { return this.hasAttribute ? this.hasAttribute("hidden") : this.getAttribute("hidden") != null; }
   set hidden(v) { if (v) this.setAttribute("hidden", ""); else this.removeAttribute("hidden"); }
+
+  // `<details>.open`, reflected like `hidden`.
+  //
+  // This is the OTHER half of the steps-panel reachability gap. ui-fields.js
+  // makeStepsPanel guards its draw with `if (!box.open || !last) return;`, so
+  // with `open` undefined -- falsy -- drawSteps was NEVER reached under this
+  // harness, and the page's own end-to-end "Show the steps" path went
+  // unexercised however many tiles a sweep rendered. (ea7cc46c fixed the half
+  // where `label[for]` matched nothing; this is the half that stopped the
+  // panel drawing at all.)
+  get open() { return this.hasAttribute("open"); }
+  set open(v) { if (v) this.setAttribute("open", ""); else this.removeAttribute("open"); }
+
+  // `isConnected` is deliberately NOT defined here, and the reason is worth
+  // keeping: it is a real fidelity gap, measured and left open.
+  //
+  // app.js guards several deferred updates with `if (!node.isConnected) return;`
+  // -- constant notes, the feedback report, the preview row. Undefined reads as
+  // falsy, so every one of those paths bails out and this harness never
+  // exercises them. Defining it (2026-11-26) unblocked them and the render
+  // sweeps stopped finishing: steps-panel-guard went from 2.6s to over 200s,
+  // and the run ended on "Promise resolution is still pending but the event
+  // loop has already resolved" -- an unblocked path awaiting something the
+  // harness does not provide (a fetch, a real event). Closing it properly
+  // means stubbing those, not adding one getter, so the gap stays named rather
+  // than half-fixed.
+
+  // Constraint validation, the minimum a caller can observe. length-entry.js
+  // sets a custom message for a length outside the box's min/max, and it is
+  // guarded by `typeof input.setCustomValidity === "function"` -- so under this
+  // harness that whole layer was skipped and a sweep could not see that the
+  // page had flagged the value at all.
+  setCustomValidity(msg) { this._validity = msg == null ? "" : String(msg); }
+  get validationMessage() { return this._validity || ""; }
+  checkValidity() { return !(this._validity && this._validity.length); }
   get htmlFor() { return this.getAttribute("for") ?? ""; }
   set htmlFor(v) { this.setAttribute("for", v == null ? "" : String(v)); }
   get valueAsNumber() { return this._value === "" ? NaN : Number(this._value); }
