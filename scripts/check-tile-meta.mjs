@@ -33,7 +33,10 @@ async function main() {
   const warnings = [];
   const toolMeta = await loadToolMeta();
   if (toolMeta.size === 0) {
-    console.error("ERROR: tile-meta lint could not parse TOOLS from app.js.");
+    // Reads tools-data.js; this message said "app.js" until 2026-11-26, from
+    // before the catalog-split moved TOOLS out of it, and would have sent
+    // whoever hit it to the wrong file.
+    console.error("ERROR: tile-meta lint could not parse TOOLS from tools-data.js.");
     process.exit(1);
   }
 
@@ -101,6 +104,45 @@ async function main() {
       errors.push(
         "TOOLS tile '" + id + "' has no entry in tile-meta.js TILE_META. Add an [id, group] row to _TILES (or a SIMPLIFIED / FIELD_METER override).",
       );
+    }
+  }
+
+  // THE HOME VIEW'S OWN GROUP LIST, held to the catalog.
+  //
+  // app.js carries `const GROUPS = [...]` and the home view renders
+  // "Browse all " + GROUPS.length + " trades" from it, so that list is both a
+  // user-visible COUNT and the set of hubs the browse link reaches. Nothing
+  // held it to the catalog: no gate reads the literal, and the two agree today
+  // only because whoever added groups X, Y and Z remembered to. A group added
+  // to tools-data.js without updating app.js would show a reader one trade
+  // fewer and quietly omit a hub, which is a missing way into every tile in it
+  // -- the same shape as the group-hub reachability gap closed in check-shells.
+  //
+  // spec-v106 §5 allows gaps in the letter sequence (S, U, V and W retired with
+  // spec-v107), so the check is set equality against the live catalog, never a
+  // contiguous range.
+  {
+    const appText = await readFile(resolve(ROOT, "app.js"), "utf8");
+    const m = appText.match(/\nconst GROUPS = \[([^\]]*)\];/);
+    if (!m) {
+      errors.push(
+        "app.js no longer carries a `const GROUPS = [...]` literal. Move this check with it "
+        + "rather than letting it match nothing.");
+    } else {
+      const declared = [...m[1].matchAll(/"([A-Z])"/g)].map((x) => x[1]);
+      const live = [...new Set([...toolMeta.values()])].sort();
+      const missing = live.filter((g) => !declared.includes(g));
+      const extra = declared.filter((g) => !live.includes(g));
+      if (missing.length) {
+        errors.push(
+          `app.js's GROUPS omits ${missing.join(", ")}, which the catalog uses: the home view would `
+          + `say "Browse all ${declared.length} trades" and leave ${missing.length} hub(s) out of the list.`);
+      }
+      if (extra.length) {
+        errors.push(
+          `app.js's GROUPS names ${extra.join(", ")}, which no tile uses: the home view would count a `
+          + "trade that has no tiles behind it.");
+      }
     }
   }
 
