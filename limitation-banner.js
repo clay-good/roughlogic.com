@@ -194,9 +194,24 @@ const CANONICAL = {
   // veterinarian governs the prescription and the in-clinic plan.
 };
 
+// A tile that shows ANOTHER tile's banner, because one caveat governs both.
+//
+// calc-septic.js renders the drainfield caveat on two tiles -- it passes
+// getLimitationCopy("septic-drainfield") from both renderers -- but the door
+// looks the copy up by the tile's OWN id, so `describe` reported no limitation
+// at all for septic-drainfield-capacity. A person sizing a drainfield's
+// capacity was told a state-approved soil evaluation and a licensed designer
+// govern; an agent asking the same question was told nothing (2026-11-26).
+//
+// An alias rather than a second copy of the prose: the file's whole point is
+// that the wording lives in exactly one place.
+const ALIASES = {
+  "septic-drainfield-capacity": "septic-drainfield",
+};
+
 export function getLimitationCopy(id) {
   if (typeof id !== "string") return null;
-  return CANONICAL[id] || null;
+  return CANONICAL[id] || CANONICAL[ALIASES[id]] || null;
 }
 
 export function listLimitationCopyIds() {
