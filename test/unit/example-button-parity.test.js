@@ -280,10 +280,13 @@ test("a spec-renderer field whose label states a default is prefilled with that 
 //   written to stop: `crop-yield` answered 48.3 bu/acre against the page's
 //   8.05, and `pallet-loadout` 1,800 pallets by weight against 50.
 //
-// Four of those nine are now fixed by giving the compute the page's own value,
-// which is why they are gone from this list: a "typical starting number" is not
-// a published standard, and a neutral 1 in its place was not a default anyone
-// had chosen. The five that remain are left on purpose and each says why.
+// Six of those nine are now fixed and are gone from this list. Four were a
+// "typical starting number" rather than a published standard, with a neutral 1
+// in the compute that nobody had chosen. The last two were held open on which
+// direction is safe to assume; that question is answered below, and the answers
+// point OPPOSITE ways, which is why neither could be settled by a rule. The
+// three that remain switch the calculator to a different documented mode when
+// the key is absent, rather than mis-answering the same mode.
 const PREFILL_REVIEWED = new Map([
   // The compute REFUSES to run without the value. The page's prefill is a
   // standing published figure; the compute will not assume a code or
@@ -303,12 +306,66 @@ const PREFILL_REVIEWED = new Map([
   ["flocculation-g-value::water_temp_f", "59 F design water; null means use mu directly"],
   ["dyno-correction-sae::baro_inhg", "SAE J1349 standard dry-air pressure"],
 
-  // Still a silent disagreement, and still open: both turn on which direction
-  // is the safe one to assume, which is a product call rather than a parity
-  // fix. Listed so they are not mistaken for the mode switches above.
-  ["srw-geogrid-spacing::base_course_buried_in", "6 in buried base course; OPEN -- silently differs, safety direction undecided"],
-  ["kitchen-makeup-air-deficit::door_closer_force_lbf", "8 lbf closer; OPEN -- silently differs, safety direction undecided"],
 ]);
+
+// WHICH WAY IS THE SAFE ASSUMPTION? The two fields held open above were held
+// open because the answer is not the same for both, and each is pinned here so
+// a later tidy-up cannot quietly reverse it.
+//
+// A door closer is INSIDE the 30 lbf egress limit: NFPA 92 / NFPA 101 make the
+// opening force the closer plus the pressure term, and this calculator learned
+// that on 2026-10-01, when checking the pressure term alone passed a door at
+// 29.8 lbf that a 6-to-14 lb closer puts at 36 to 44. The parameter still
+// defaulted to 0, so a caller who OMITTED it -- the page always sends 8, and so
+// does the worked example -- walked straight back into the fixed defect.
+// Omitting a closer force is not a claim that no closer is fitted, and on an
+// egress door the conservative reading of silence is that one is: an
+// over-assumed closer gives a false "NOT OK", which is the safe failure, where
+// a missing one gives a false "OK" on a door nobody can open.
+test("kitchen-makeup-air-deficit: an omitted closer force does not drop out of the egress check", async () => {
+  const { run } = await import("../../mcp/catalog.mjs");
+  // Tuned so the pressure term ALONE sits just inside the 30 lbf limit: this is
+  // the door the 2026-10-01 note describes, and the only arrangement where the
+  // closer changes the verdict rather than just the number.
+  const base = {
+    hood_exhaust_cfm: 6000, other_exhaust_cfm: 0, dedicated_makeup_cfm: 0,
+    intended_transfer_cfm: 0, building_leakage_cfm_per_pa: 48,
+    door_width_ft: 3, door_height_ft: 7,
+  };
+  const noCloser = (await run({ id: "kitchen-makeup-air-deficit", inputs: { ...base, door_closer_force_lbf: 0 } })).result;
+  assert.ok(noCloser.door_force_lbf > 29 && noCloser.door_force_lbf < 30, `the pressure term alone must sit just inside the limit (got ${noCloser.door_force_lbf})`);
+  assert.equal(noCloser.door_force_ok, true, "stating NO closer is a claim about the door, and it passes on pressure alone");
+
+  const omitted = (await run({ id: "kitchen-makeup-air-deficit", inputs: base })).result;
+  assert.equal(omitted.door_closer_force_lbf, 8, "omitting it assumes a closer, as the page and the worked example do");
+  assert.ok(omitted.door_total_force_lbf > 30, `and the total then exceeds the egress limit (got ${omitted.door_total_force_lbf})`);
+  assert.equal(omitted.door_force_ok, false, "so the door is flagged rather than passed");
+  assert.match(omitted.door_verdict, /EXCEED|NOT OK|above|over/i);
+});
+
+// Burying the base course is the OTHER direction. It changes no spacing, no
+// layer count and no grid length -- the tile's own note says the spacing rules
+// use the full wall height including the buried portion -- it only sets the
+// EXPOSED height reported. So assuming burial the reader may not have can only
+// make the reported exposed height smaller, and zero is the conservative side.
+// Here the PAGE moved to the compute's 0, not the other way about.
+test("srw-geogrid-spacing: burial is reported, not assumed, and changes nothing structural", async () => {
+  const { describe, run } = await import("../../mcp/catalog.mjs");
+  const base = { wall_height_ft: 8, block_depth_in: 9, block_height_in: 8, ncma_suggested_max_in: 24, grid_length_basis: 0.6 };
+  const d = await describe({ id: "srw-geogrid-spacing" });
+  const field = (d.inputs || []).find((f) => f.key === "base_course_buried_in");
+  assert.equal(field.default, 0, "the page opens at 0: nothing is assumed buried");
+
+  const omitted = (await run({ id: "srw-geogrid-spacing", inputs: base })).result;
+  assert.equal(omitted.exposed_ft, 8, "so the whole wall is reported exposed, which is the conservative reading");
+
+  const buried = (await run({ id: "srw-geogrid-spacing", inputs: { ...base, base_course_buried_in: 6 } })).result;
+  assert.equal(buried.exposed_ft, 7.5, "stating burial reduces the exposed height");
+  // The half-foot of burial must not move anything the reinforcement depends on.
+  for (const k of ["spacing_limit_in", "actual_spacing_in", "layer_count", "grid_length_ft", "courses_per_layer"]) {
+    assert.equal(buried[k], omitted[k], `${k} must not depend on burial`);
+  }
+});
 
 test("a prefilled default answers the same as the compute's own default", async () => {
   const { describe } = await import("../../mcp/catalog.mjs");

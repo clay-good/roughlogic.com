@@ -1088,6 +1088,12 @@ export function computeSrwGeogridSpacing({ wall_height_ft = 0, block_depth_in = 
   const length_governed_by_minimum = basis * H_ft < 4;
   const grid_sf_per_lf = layer_count * grid_length_ft;
   const compaction_lifts = Math.ceil(actual_spacing_in / 8 - 1e-9);
+  // Burial changes NO spacing, layer count or grid length -- the note below says
+  // so outright -- it only sets the EXPOSED height this reports. So the page
+  // prefills 0 to match this default and the worked example (2026-11-26; it
+  // prefilled 6, and the door, which omits the key, used 0). Zero is also the
+  // conservative side: assuming burial the reader may not have only makes the
+  // reported exposed height SMALLER.
   const exposed_ft = Math.max(0, H_ft - buried / 12);
 
   const note = "Spacing limit " + spacing_limit_in.toFixed(1) + " in, set by " + governing_rule
@@ -1113,7 +1119,7 @@ FINISH_RENDERERS["srw-geogrid-spacing"] = _simpleRenderer({
     { key: "wall_height_ft", label: "Total wall height, including buried course (ft)", kind: "number" },
     { key: "block_depth_in", label: "Block depth, front face to back face (in)", kind: "number", default: 12 },
     { key: "block_height_in", label: "Block height (in)", kind: "number", whenBlank: 8 },
-    { key: "base_course_buried_in", label: "Base course buried (in)", kind: "number", default: 6 },
+    { key: "base_course_buried_in", label: "Base course buried (in)", kind: "number", default: 0 },
     { key: "ncma_suggested_max_in", label: "Suggested maximum spacing (in)", kind: "number", whenBlank: 24 },
     { key: "grid_length_basis", label: "Grid length as a fraction of wall height", kind: "number", whenBlank: 0.6 },
   ],

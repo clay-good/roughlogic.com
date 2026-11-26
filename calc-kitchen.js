@@ -2445,7 +2445,7 @@ KITCHEN_RENDERERS["walk-in-door-infiltration"] = _simpleRenderer({
 // ============ spec-v1639: kitchen exhaust and makeup air balance ============
 
 // dims: in { hood_exhaust_cfm: L^3 T^-1, other_exhaust_cfm: L^3 T^-1, dedicated_makeup_cfm: L^3 T^-1, intended_transfer_cfm: L^3 T^-1, building_leakage_cfm_per_pa: M^-1 L^4 T, door_width_ft: L, door_height_ft: L, door_closer_force_lbf: M L T^-2 } out: { total_exhaust_cfm: L^3 T^-1, deficit_cfm: L^3 T^-1, deficit_percent: dimensionless, uncontrolled_cfm: L^3 T^-1, makeup_shortfall_cfm: L^3 T^-1, door_force_lbf: M L T^-2, door_total_force_lbf: M L T^-2, dedicated_makeup_cfm: L^3 T^-1, door_area_ft2: L^2, door_closer_force_lbf: M L T^-2, door_height_ft: L, door_width_ft: L, egress_limit_lbf: M L T^-2, hood_exhaust_cfm: L^3 T^-1, intended_transfer_cfm: L^3 T^-1, other_exhaust_cfm: L^3 T^-1, pressure_psf: M L^-1 T^-2, knob_factor: dimensionless, pressure_inwc: M L^-1 T^-2, pressure_pa: M L^-1 T^-2, building_leakage_cfm_per_pa: M^-1 L^4 T }
-export function computeKitchenMakeupAirDeficit({ hood_exhaust_cfm = 0, other_exhaust_cfm = 0, dedicated_makeup_cfm = 0, intended_transfer_cfm = 0, building_leakage_cfm_per_pa = 0, door_width_ft = 3, door_height_ft = 7, door_closer_force_lbf = 0 } = {}) {
+export function computeKitchenMakeupAirDeficit({ hood_exhaust_cfm = 0, other_exhaust_cfm = 0, dedicated_makeup_cfm = 0, intended_transfer_cfm = 0, building_leakage_cfm_per_pa = 0, door_width_ft = 3, door_height_ft = 7, door_closer_force_lbf = 8 } = {}) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   if (door_closer_force_lbf < 0) return { error: "The door closer force cannot be negative (lbf)." };
   if (!(Number(arguments[0]?.door_width_ft ?? 3) > 0.5)) return { error: "Enter the door width in feet (3), wider than the 3 in knob offset." };
@@ -2480,6 +2480,16 @@ export function computeKitchenMakeupAirDeficit({ hood_exhaust_cfm = 0, other_exh
   // NFPA 92 / NFPA 101 put the CLOSER inside the 30 lbf: F = Fdc + the pressure
   // term (CED / Bhatia). Until 2026-10-01 only the pressure term was checked, so
   // 29.8 lbf at 0.50 in wc read OK where a 6 to 14 lb closer makes it 36 to 44.
+  //
+  // Which is why the parameter defaults to 8 lbf and not 0 (2026-11-26). The
+  // page prefills 8 and the worked example sends 8; the parameter defaulted to
+  // 0, so a CALLER WHO OMITTED IT re-opened exactly the defect above -- the
+  // closer dropped out of the sum and a door at 29.8 lbf of pressure read OK.
+  // Omitting a closer force is not a claim that there is no closer, and the
+  // conservative reading of silence on an EGRESS door is that one is fitted: an
+  // over-assumed closer gives a false "NOT OK", which is the safe failure, while
+  // a missing one gives a false "OK" on a door nobody can open. A door with no
+  // closer is stated as 0.
   const door_total_force_lbf = door_force_lbf === null ? null : door_force_lbf + door_closer_force_lbf;
   // NFPA 96 8.3.1 and UMC 511.3 cap the kitchen's negative pressure at 0.02 in wc
   // (about 5 Pa); IMC 508.1 itself only asks makeup air about equal to exhaust.
