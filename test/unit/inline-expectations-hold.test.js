@@ -19,15 +19,19 @@
 // picks the wrong one of two siblings (`computeReadability` and
 // `computeAlternateReadability` both return `sentences`), and matching on
 // shared fixture inputs collapses on the reference tiles, which all take `{}`.
-// So this gate uses the one exact rule, `fooExample` -> `computeFoo`, which
-// reaches most but not all of them, and pins the count it cannot reach. The two
-// pinned counts are held at their measured size, so a new unreachable example
-// or a new declaration shape fails here rather than being skipped quietly.
+// So this gate uses the one exact rule, `fooExample` -> `computeFoo`, plus a
+// recorded exception table for the 35 it cannot reach -- taken from the
+// per-module test that already imports both and calls them together, and from
+// compute-map.js for three whose names differ by an acronym's case
+// (computeGFCIReference) or a suffix. Every claim is now read and enforced, and
+// both counts are held at zero: a new unreachable example or a new declaration
+// shape fails here rather than being skipped quietly.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
+import { EXAMPLE_COMPUTE_EXCEPTIONS } from "../fixtures/example-compute-exceptions.js";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -140,10 +144,12 @@ test("every inline expected / expectedRange this gate can reach holds", async ()
       if (NEEDS_A_SHARD.has(name)) continue;
       examples++;
 
-      // The one exact rule. No relaxation: a near-miss picks a sibling.
+      // The exact rule, then the recorded exception for the 35 that break it.
+      // No fuzzy relaxation: a near-miss picks a sibling.
       const base = name.replace(/Example$/, "");
-      const fnName = "compute" + base[0].toUpperCase() + base.slice(1);
-      if (typeof ns[fnName] !== "function") { unreachable.push(`${file}::${name}`); continue; }
+      let fnName = "compute" + base[0].toUpperCase() + base.slice(1);
+      if (typeof ns[fnName] !== "function") fnName = EXAMPLE_COMPUTE_EXCEPTIONS[name];
+      if (!fnName || typeof ns[fnName] !== "function") { unreachable.push(`${file}::${name}`); continue; }
 
       let result;
       try { result = ns[fnName](structuredClone(example.inputs || {})); } catch (e) {
@@ -201,9 +207,13 @@ test("every inline expected / expectedRange this gate can reach holds", async ()
   //
   // Held at zero: a thirteenth shape is a failure here, not a silent skip.
   assert.equal(unreadable.length, 0, `an inline expectation this schema cannot read -- translate it to a documented convention rather than widening the parser:\n${unreadable.join("\n")}`);
-  // Held at the measured size. An example the naming rule cannot reach is not a
-  // finding -- but a NEW one is, because it would arrive unchecked.
-  assert.equal(unreachable.length, 35, `examples the naming rule cannot reach moved from 35 to ${unreachable.length}:\n${unreachable.join("\n")}`);
+  // Both counts are now ZERO: every inline expectation on every worked example
+  // is read and enforced. The 35 the naming rule could not reach are paired in
+  // test/fixtures/example-compute-exceptions.js, each row taken from where the
+  // repo already records the pairing rather than guessed. None of their claims
+  // failed once reached, which is a clean result for the per-module tests that
+  // had been carrying them.
+  assert.equal(unreachable.length, 0, `an example neither the naming rule nor the recorded exceptions reach -- add it to test/fixtures/example-compute-exceptions.js:\n${unreachable.join("\n")}`);
   assert.ok(claims > 130, `only ${claims} claims were read from ${examples - unreachable.length} reachable examples`);
   // Coverage, printed so the gate's reach is visible rather than implied.
   console.log(`inline expectations: ${examples} examples carry one, ${examples - unreachable.length} reachable by name, ${claims} claims read, ${claims - unreadable.length} enforced`);

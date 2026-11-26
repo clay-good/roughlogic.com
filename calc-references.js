@@ -40,7 +40,14 @@ export const COLOR_CODES = [
 // (Pure categorical color-code reference table.)
 export function computeColorCodes() { return { systems: COLOR_CODES }; }
 
-export const colorCodesExample = { inputs: {}, expected: { count: COLOR_CODES.length } };
+// A reference tile's entry count IS its publisher-facing claim, so these are
+// LITERALS. They read `COLOR_CODES.length` and the like until 2026-11-26, which
+// made every check of them compare a value with itself: the declaration and the
+// compute's output were the same expression, so no test could ever fail, and
+// `thermalDeltaTExample`'s own assertion was literally
+// `assert.equal(X.length, X.length)`. A literal means adding an entry fails a
+// gate until someone confirms the new count is intended, which is the point.
+export const colorCodesExample = { inputs: {}, expected: { count: 4 } };
 
 // --- Utility 115: Knot Reference ---
 
@@ -57,7 +64,7 @@ export const KNOT_REFERENCE = [
 //  text excerpts, not measured aggregates.)
 export function computeKnotReference() { return { knots: KNOT_REFERENCE }; }
 
-export const knotReferenceExample = { inputs: {}, expected: { count: KNOT_REFERENCE.length } };
+export const knotReferenceExample = { inputs: {}, expected: { count: 5 } };
 
 // --- Utility 116: Inspection Prep Checklist ---
 
@@ -98,7 +105,7 @@ export function computeInspectionChecklist() { return { trades: INSPECTION_CHECK
 
 // `count` meant the number of TRADE keys, not an array length, so nothing could
 // read it; normalised 2026-11-26 to the _key_count convention.
-export const inspectionChecklistExample = { inputs: {}, expected: { trades_key_count: Object.keys(INSPECTION_CHECKLISTS).length } };
+export const inspectionChecklistExample = { inputs: {}, expected: { trades_key_count: 4 } };
 
 // --- Utility 117: Utility Locator and Emergency Contacts ---
 
@@ -114,7 +121,7 @@ export const EMERGENCY_CONTACTS = [
 // (Pure categorical universal-emergency-number reference.)
 export function computeEmergencyContacts() { return { contacts: EMERGENCY_CONTACTS }; }
 
-export const emergencyContactsExample = { inputs: {}, expected: { count: EMERGENCY_CONTACTS.length } };
+export const emergencyContactsExample = { inputs: {}, expected: { count: 5 } };
 
 // --- Utility 118: Tool Maintenance Intervals ---
 
@@ -133,7 +140,7 @@ export const TOOL_MAINTENANCE = [
 // (Pure categorical tool-maintenance interval reference.)
 export function computeToolMaintenance() { return { tools: TOOL_MAINTENANCE }; }
 
-export const toolMaintenanceExample = { inputs: {}, expected: { count: TOOL_MAINTENANCE.length } };
+export const toolMaintenanceExample = { inputs: {}, expected: { count: 8 } };
 
 // --- Renderers ---
 
@@ -451,7 +458,7 @@ export const IRS_FORM_INDEX = [
 // dims: in { args: dimensionless } out: { forms: dimensionless }
 // (Pure categorical IRS form quick-read index reference.)
 export function computeIrsFormIndex() { return { forms: IRS_FORM_INDEX }; }
-export const irsFormIndexExample = { inputs: {}, expected: { count: IRS_FORM_INDEX.length } };
+export const irsFormIndexExample = { inputs: {}, expected: { count: 9 } };
 
 // 266: State Sales Tax Nexus Quick-Read (post-Wayfair economic nexus).
 // Per-state thresholds. Original plain-English summary; cite each state's
@@ -538,7 +545,7 @@ export const OSHA_RECORDKEEPING = [
 // dims: in { args: dimensionless } out: { entries: dimensionless }
 // (Pure categorical 29 CFR 1904 OSHA recordkeeping reference.)
 export function computeOshaRecordkeeping() { return { entries: OSHA_RECORDKEEPING }; }
-export const oshaRecordkeepingExample = { inputs: {}, expected: { count: OSHA_RECORDKEEPING.length } };
+export const oshaRecordkeepingExample = { inputs: {}, expected: { count: 7 } };
 
 // 268: Public-Domain Lab Safety Quick-Read.
 // GHS pictograms and signal words plus a one-paragraph spill decision tree.
@@ -568,7 +575,7 @@ export function computeLabSafety() { return { pictograms: GHS_PICTOGRAMS, decisi
 // the _count convention on the real ones. The VALUES were right all along --
 // they are live references to the source lists -- which is exactly how an
 // unreadable claim stays plausible.
-export const labSafetyExample = { inputs: {}, expected: { pictograms_count: GHS_PICTOGRAMS.length, decision_tree_count: SPILL_DECISION_TREE.length } };
+export const labSafetyExample = { inputs: {}, expected: { pictograms_count: 9, decision_tree_count: 4 } };
 
 // --- v5 Renderers ---
 

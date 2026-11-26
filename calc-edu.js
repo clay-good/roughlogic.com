@@ -720,7 +720,7 @@ export function computeCodonTable({ sequence, sequence_type }) {
 export const codonExample = {
   inputs: { sequence: "AUGGCCUAA", sequence_type: "rna" },
   // AUG (Met / START), GCC (Ala), UAA (STOP).
-  expected: { codon_count: 3 },
+  expected: { amino_acid_sequence_count: 3 },
 };
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }

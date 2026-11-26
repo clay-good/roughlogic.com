@@ -685,7 +685,7 @@ export function computeThermalDeltaTReference() {
 
 export const thermalDeltaTExample = {
   inputs: {},
-  expected: { count: THERMAL_DELTA_T_REFERENCE.length },
+  expected: { count: 5 },
 };
 
 // --- v2 view renderers ---
