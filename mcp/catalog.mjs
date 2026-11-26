@@ -1337,7 +1337,7 @@ export async function run({ id, inputs } = {}) {
         new Set((await describe({ id })).inputs?.map((f) => f.name ?? f.key) || []),
       ),
     );
-  const steps = await stepsFor(id, schema, args, result);
+  const steps = await stepsFor(id, schema, args, result, await describe({ id }));
   if (steps) out.steps = steps;
   out.limitation = getLimitationCopy(id) || null;
   return out;
@@ -1352,9 +1352,24 @@ export async function run({ id, inputs } = {}) {
 // which is the door's equivalent of the hand-written panel reading <label for>
 // off the page. An error result has no steps, and a key with no caption is
 // left out rather than guessed.
-async function stepsFor(id, schema, args, result) {
+async function stepsFor(id, schema, args, result, described) {
   if (!result || typeof result !== "object" || result.error) return null;
-  let fields = schema ? schema.inputs : null;
+  // The COMPLETED field list, not the raw schema.
+  //
+  // `describe` completes a partial renderer schema from the compute's own
+  // parameters and the caption the tile prints beside each field; this used
+  // `schema.inputs` alone, so every input the extractor could not map was
+  // missing from the steps even though the door advertises it and knows its
+  // caption. 33 rows on 27 tiles, and they were the rows that matter: the cut
+  // list, the motor schedule, the traverse courses, concrete's own length,
+  // width and thickness. An agent asked to defend an answer could not see the
+  // values it had supplied.
+  let fields = null;
+  if (described && Array.isArray(described.inputs)) {
+    const labelled = described.inputs.filter((f) => f && f.key && typeof f.label === "string" && f.label.trim());
+    if (labelled.length) fields = labelled;
+  }
+  if (!fields) fields = schema ? schema.inputs : null;
   if (!fields) {
     const labels = await inputLabels(id);
     fields = Object.keys(args || {})

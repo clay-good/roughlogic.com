@@ -19,6 +19,32 @@ export function stepNum(v) {
 // note are already printed), non-finite numbers, input echoes, and any key
 // `humanize` (key-labels.js humanizeKey) cannot caption -- a guessed label is
 // worse than none.
+// A LIST input's value is an array -- a fixture schedule, a cut list, a run of
+// readings -- and `String(v)` turns an array of rows into
+// "[object Object],[object Object]". The agent door printed exactly that for
+// area-by-coordinates' boundary corners and category-weighted-grade's
+// categories until 2026-11-26: a steps panel whose whole job is to let a
+// result be defended, printing nothing a reader could check.
+//
+// Rendered the way each tile's own caption describes the shape it wants --
+// "one per line as N,E", "Categories (pct/weight, e.g. 92/20)" -- so a row's
+// values are joined by commas and the rows by semicolons.
+function cellText(x) {
+  if (x === null || x === undefined || x === "") return "";
+  if (typeof x === "number") return Number.isFinite(x) ? stepNum(x) : "";
+  if (typeof x === "boolean") return x ? "yes" : "no";
+  if (typeof x === "object") return "";
+  return String(x);
+}
+function structuredText(v) {
+  const one = (x) => (x && typeof x === "object" && !Array.isArray(x)
+    ? Object.values(x).map(cellText).filter((t) => t !== "").join(",")
+    : cellText(x));
+  const parts = (Array.isArray(v) ? v : [v]).map(one).filter((t) => t !== "");
+  // Nothing readable in it is better reported as no row than as an empty one.
+  return parts.length ? parts.join("; ") : null;
+}
+
 export function stepRows(fields, params, r, humanize) {
   const rows = [];
   if (!r || typeof r !== "object" || r.error) return rows;
@@ -46,7 +72,9 @@ export function stepRows(fields, params, r, humanize) {
     // option's text ("Chlorine gas (Cl2)", "Type B"), so print that.
     const opt = Array.isArray(f.options) ? f.options.find((o) => o && String(o.value) === String(v)) : null;
     const shown = opt && opt.label != null ? String(opt.label)
-      : typeof v === "number" ? (Number.isFinite(v) ? stepNum(v) : null) : String(v);
+      : typeof v === "number" ? (Number.isFinite(v) ? stepNum(v) : null)
+      : (v && typeof v === "object") ? structuredText(v)
+      : String(v);
     if (shown !== null) rows.push({ section: "in", label: String(f.label), value: applied ? shown + " (default, box left blank)" : shown });
   }
   for (const [k, v] of Object.entries(r)) {

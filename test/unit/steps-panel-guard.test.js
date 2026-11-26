@@ -305,3 +305,63 @@ test("the steps panel reads a hand-written renderer through the real fake DOM", 
   assert.ok(fields.every((f) => f.label && f.label.trim()), "every field carries the caption the reader sees");
   assert.deepEqual(fields.map((f) => params[f.key]).slice(0, 2), [12, 2], "and the values the boxes hold");
 });
+
+// The door's steps, swept over the catalog.
+//
+// `run_calculator` builds its steps from the page's own `stepRows`, so the row
+// LOGIC cannot drift between the two surfaces. The FIELD LIST could, and did:
+// `stepsFor` used the raw renderer schema while `describe` completes a partial
+// one from the compute's parameters and the caption each tile prints beside the
+// field. 33 rows on 27 tiles were missing, and they were the rows that matter --
+// the cut list, the motor schedule, the traverse courses, concrete's own
+// length, width and thickness. An agent asked to defend an answer could not see
+// the values it had supplied.
+//
+// Fixing that exposed the other half: a list value is an array, and `String(v)`
+// turns rows of objects into "[object Object],[object Object]". The door was
+// already printing exactly that for area-by-coordinates and
+// category-weighted-grade before any of these rows were added.
+test("every door steps row is readable, and names every input the door can label", async () => {
+  const { describe, run } = await import("../../mcp/catalog.mjs");
+  const { RENDERER_MAP } = await import("../fixtures/renderer-map.js");
+
+  const unreadable = [];
+  const omitted = [];
+  let tiles = 0, rows = 0;
+  for (const id of Object.keys(RENDERER_MAP)) {
+    let d;
+    try { d = await describe({ id }); } catch { continue; }
+    if (!d.runnable || !d.example) continue;
+    const example = d.example.inputs || {};
+    let out;
+    try { out = await run({ id, inputs: { ...example } }); } catch { continue; }
+    if (!out.steps) continue;
+    tiles += 1;
+
+    for (const step of out.steps) {
+      rows += 1;
+      const v = String(step.value);
+      // A row a reader cannot check is worse than no row: the panel exists to
+      // let a result be defended.
+      if (/\[object Object\]|NaN|undefined/.test(v) || v.trim() === "") {
+        unreadable.push(`${id} "${step.label}" = ${JSON.stringify(step.value)}`);
+      }
+      if (!String(step.label || "").trim()) unreadable.push(`${id}: a row with no label`);
+    }
+
+    // Completeness: a field the door can both label and sees a value for has
+    // to appear. Anything else means the steps are quieter than describe().
+    const shown = new Set(out.steps.filter((s) => s.section === "in").map((s) => String(s.label).trim()));
+    for (const f of d.inputs || []) {
+      if (!f.key || typeof f.label !== "string" || !f.label.trim()) continue;
+      const v = example[f.key];
+      if (v === undefined || v === null || v === "") continue;
+      if (typeof v === "object" && !Array.isArray(v) === false && Array.isArray(v) && !v.length) continue;
+      if (!shown.has(f.label.trim())) omitted.push(`${id}::${f.key} ("${f.label}")`);
+    }
+  }
+
+  assert.ok(tiles > 2200 && rows > 10000, `the catalog's steps are swept (${tiles} tiles, ${rows} rows)`);
+  assert.deepEqual(unreadable.slice(0, 10), [], `${unreadable.length} steps row(s) a reader cannot check`);
+  assert.deepEqual(omitted.slice(0, 10), [], `${omitted.length} input(s) the door can label but leaves out of its steps`);
+});
