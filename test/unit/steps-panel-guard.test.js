@@ -262,3 +262,46 @@ test("a whenBlank is only ever claimed where the page really sends undefined", a
   }
   assert.deepEqual(bad, [], "whenBlank claimed where the page does not send undefined: " + bad.join(", "));
 });
+
+// The test above stubs the region, with a `querySelector` that parses `for="…"`
+// out of the selector itself. That is a fair unit test of `domFields` and it is
+// also why a real gap went unseen: under test/fixtures/fake-dom.js, the harness
+// every render sweep drives, `label[for="…"]` matched NOTHING. Labels are built
+// with `lab.htmlFor = id` (ui-fields.js), a browser reflects that property to
+// the `for` attribute, and the fake DOM did not -- so `getAttribute("for")` was
+// null, `domFields` returned no fields at all, and any sweep exercising the
+// steps panel's page path saw an empty panel and could only report a clean
+// zero. (The same class as the `value` attribute this harness failed to reflect
+// until 2026-11-24, which had skewed every render sweep before it.)
+//
+// So this one drives the REAL harness and a REAL renderer, which is the only
+// arrangement that would have caught it.
+test("the steps panel reads a hand-written renderer through the real fake DOM", async () => {
+  const { installDocument, installTimers, flushTimers } = await import("../fixtures/fake-dom.js");
+  const { RENDERER_MAP } = await import("../fixtures/renderer-map.js");
+  installTimers();
+  const doc = installDocument();
+  const reg = RENDERER_MAP["ohms-law"];
+  const mod = await import(new URL(reg.module, new URL("./", import.meta.url)).href);
+  const render = mod[reg.exportName]["ohms-law"];
+  assert.equal(typeof render, "function");
+
+  const view = doc.createElement("section");
+  const inputs = doc.createElement("div"), outputs = doc.createElement("div"), cite = doc.createElement("p");
+  view.append(inputs, outputs, cite);
+  doc.body.appendChild(view);
+  await render(inputs, outputs, cite);
+  flushTimers();
+
+  const boxes = inputs.querySelectorAll("input").filter((el) => el.type === "number");
+  assert.ok(boxes.length >= 2, "the renderer built its number boxes");
+  // The reflection itself: a browser answers this, and so must the harness.
+  assert.ok(inputs.querySelector(`label[for="${boxes[0].id}"]`), "a label is reachable by its control's id");
+
+  boxes[0].value = "12";
+  boxes[1].value = "2";
+  const { fields, params } = domFields(inputs);
+  assert.ok(fields.length >= 2, `domFields found no fields: ${JSON.stringify(fields)}`);
+  assert.ok(fields.every((f) => f.label && f.label.trim()), "every field carries the caption the reader sees");
+  assert.deepEqual(fields.map((f) => params[f.key]).slice(0, 2), [12, 2], "and the values the boxes hold");
+});

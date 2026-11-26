@@ -105,6 +105,16 @@ export class Node {
     if (this.tagName === "SELECT") { const o = this.options; const hit = o.find((x) => x.value === v); o.forEach((x) => { x.selected = x === hit; }); return; }
     this._value = v; this._valueSet = true;
   }
+  // A browser REFLECTS htmlFor to the `for` attribute, and every label here is
+  // built with `lab.htmlFor = id` (ui-fields.js). Without the reflection the
+  // property was a plain field on the fake node, `getAttribute("for")` was
+  // null, and `label[for="..."]` matched nothing -- so steps-panel.js's
+  // domFields(), which pairs a control with its caption that way, returned NO
+  // FIELDS under this harness. Any sweep driving the steps panel's DOM path saw
+  // an empty panel and could only ever report a clean zero. Same class as the
+  // `value` attribute this file failed to reflect until 2026-11-24.
+  get htmlFor() { return this.getAttribute("for") ?? ""; }
+  set htmlFor(v) { this.setAttribute("for", v == null ? "" : String(v)); }
   get valueAsNumber() { return this._value === "" ? NaN : Number(this._value); }
   get selectedOptions() { return this.options.filter((o) => o.selected); }
   get labels() { return []; }
