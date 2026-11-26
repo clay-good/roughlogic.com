@@ -688,7 +688,7 @@ METALAIR_RENDERERS["standing-seam-takeoff"] = _simpleRenderer({
   citation: "Citation: the standing seam takeoff identities by name -- panel count = building width / COVERAGE width rounded up (not the flat sheet width, whose difference goes into the seam); clips per panel = panel length / clip spacing + 1; fasteners = clips x the tested assembly's fasteners per clip. CLIP SPACING IS NOT DETERMINED HERE: it comes from the tested assembly's rated uplift resistance against the design pressure for each roof zone, with corners and edges much closer than the field. A takeoff on a simple rectangular plane; hips, valleys, flashing and trim are not counted. The panel manufacturer's tested assembly and installation instructions, the wind design for the building, and the roofing contractor govern.",
   example: standingSeamTakeoffExample.inputs,
   fields: [
-    { key: "building_width_ft", label: "Building width (ft)", kind: "number" },
+    { key: "building_width_ft", label: "Building width (ft)", kind: "number" , attrs: { min: "0" } },
     { key: "run_length_ft", label: "Eave-to-ridge run (ft)", kind: "number" },
     { key: "coverage_width_in", label: "Panel COVERAGE width (in)", kind: "number" },
     { key: "sheet_width_in", label: "Flat sheet width (in, 0 to skip the comparison)", kind: "number" },
@@ -697,7 +697,7 @@ METALAIR_RENDERERS["standing-seam-takeoff"] = _simpleRenderer({
     { key: "perimeter_panels", label: "Panels in the edge and corner zones", kind: "number" },
     { key: "fasteners_per_clip", label: "Fasteners per clip", kind: "number", default: 2 },
     { key: "eave_ridge_allowance_in", label: "Eave and ridge allowance (in)", kind: "number" },
-    { key: "waste_pct", label: "Waste allowance (%)", kind: "number" },
+    { key: "waste_pct", label: "Waste allowance (%)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "p", id: "sst-out-p", label: "Panels", value: (r) => fmt(r.panel_count, 0) + " at " + fmt(r.panel_length_ft, 2) + " ft each -- " + fmt(r.total_panel_ft, 0) + " linear ft, " + fmt(r.total_panel_with_waste_ft, 0) + " with " + fmt(r.waste_pct, 0) + "% waste" },

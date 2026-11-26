@@ -1487,7 +1487,7 @@ LINEWORKER_RENDERERS["counterpoise-resistance"] = _simpleRenderer({
   citation: "Citation: the buried horizontal electrode (counterpoise) resistance relation by name -- R = rho / (pi L) x [ ln( 2L / sqrt(d x h) ) - 1 ] with rho in ohm-cm and L, d and h in centimetres -- with IEEE 80 and IEEE 81 named. Resistivity is read in ohm-cm to match the driven-rod and four-pin resistivity calculations. The mutual-coupling penalty for multiple radials is ENTERED, not modeled: it depends on radial length and spread. Power-frequency resistance in uniform soil, NOT impulse impedance. IEEE 80, IEEE 81 for measurement, and the utility's grounding standard govern.",
   example: counterpoiseResistanceExample.inputs,
   fields: [
-    { key: "soil_resistivity_ohm_cm", label: "Soil resistivity (ohm-cm)", kind: "number" },
+    { key: "soil_resistivity_ohm_cm", label: "Soil resistivity (ohm-cm)", kind: "number" , attrs: { min: "0" } },
     { key: "length_ft", label: "Length of one radial (ft)", kind: "number" },
     { key: "burial_depth_in", label: "Burial depth (in)", kind: "number" },
     { key: "wire_diameter_in", label: "Conductor diameter (in)", kind: "number" },

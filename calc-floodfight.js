@@ -134,9 +134,9 @@ FLOODFIGHT_RENDERERS["sandbag-levee-quantity"] = _simpleRenderer({
   citation: "Citation: USACE St. Paul District, Flood Fight Handbook (2016), Sections 2.3 and 2.5 and Table 2.1 (bags per linear foot, 1V:3H base of three times the height, 3 ft preferred and 5 ft practical limits), with about 40 lb of sand per bag. The local emergency manager and the USACE district govern.",
   example: sandbagLeveeExample.inputs,
   fields: [
-    { key: "height_ft", label: "Levee height (ft)" },
-    { key: "length_ft", label: "Levee length (ft)" },
-    { key: "fill_weight_lb", label: "Sand per bag (lb)", default: 40 },
+    { key: "height_ft", label: "Levee height (ft)" , attrs: { min: "0" } },
+    { key: "length_ft", label: "Levee length (ft)" , attrs: { min: "0" } },
+    { key: "fill_weight_lb", label: "Sand per bag (lb)", default: 40 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "bpf", id: "sbl-out-bpf", label: "Bags per linear foot", value: (r) => fmt(r.bags_per_ft, 1) + " bags/ft" },
@@ -441,10 +441,10 @@ FLOODFIGHT_RENDERERS["basement-flood-pumpdown"] = _simpleRenderer({
   citation: "Citation: FEMA, Mitigation and Basement Flooding (pumping out a flooded basement: 1 ft, wait overnight, 1 ft more, then 2 to 3 ft per day), with University of Nebraska-Lincoln Extension disaster education guidance; 1 cu ft = 1,728 / 231 gal. The restoration contractor, and a structural engineer where walls show movement, govern.",
   example: basementPumpdownExample.inputs,
   fields: [
-    { key: "floor_area_sqft", label: "Basement floor area (sq ft)" },
-    { key: "water_depth_ft", label: "Water depth (ft)" },
-    { key: "daily_drawdown_ft", label: "Daily drawdown after the test days (ft, 2 to 3)", default: 2.5 },
-    { key: "pump_gpm", label: "Pump rate (gpm)" },
+    { key: "floor_area_sqft", label: "Basement floor area (sq ft)" , attrs: { min: "0" } },
+    { key: "water_depth_ft", label: "Water depth (ft)" , attrs: { min: "0" } },
+    { key: "daily_drawdown_ft", label: "Daily drawdown after the test days (ft, 2 to 3)", default: 2.5 , attrs: { min: "0" } },
+    { key: "pump_gpm", label: "Pump rate (gpm)" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "v", id: "bfp-out-v", label: "Water volume", value: (r) => fmt(r.total_gal, 0) + " gal (" + fmt(r.gal_per_ft, 0) + " gal per ft of depth)" },

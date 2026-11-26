@@ -4955,7 +4955,7 @@ const renderControlJointSpacing = _simpleRenderer({
   citation: "Citation: ACI 302.1R / 360R slab-on-ground joint guidance (by name). Spacing ~ 2-3 ft per inch of thickness (capped); depth >= 1/4 slab; panels kept under ~1.5:1.",
   example: controlJointSpacingExample.inputs,
   fields: [
-    { key: "slab_thickness_in", label: "Slab thickness (in)", kind: "number" },
+    { key: "slab_thickness_in", label: "Slab thickness (in)", kind: "number" , attrs: { min: "0" } },
     { key: "spacing_factor", label: "Spacing factor (ft/in)", kind: "number", whenBlank: 2.5 },
     { key: "max_spacing_ft", label: "Max spacing (ft)", kind: "number", whenBlank: 18 },
     { key: "slab_length_ft", label: "Slab length (ft, optional)", kind: "number" },
@@ -11813,7 +11813,7 @@ CONSTRUCTION_RENDERERS["snow-guard-layout"] = _simpleRenderer({
     { key: "rafter_length_ft", label: "Rafter / slope length, eave to ridge (ft)", kind: "number" },
     { key: "eave_length_ft", label: "Eave length to protect (ft)", kind: "number" },
     { key: "guard_capacity_lb", label: "Guard tested holding capacity (lb each)", kind: "number" },
-    { key: "safety_factor", label: "Safety factor", kind: "number", whenBlank: 2 },
+    { key: "safety_factor", label: "Safety factor", kind: "number", whenBlank: 2 , attrs: { min: "0" } },
     { key: "rows", label: "Rows of guards", kind: "number", whenBlank: 1 },
   ],
   outputs: [

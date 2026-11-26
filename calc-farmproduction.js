@@ -764,8 +764,8 @@ FARMPRODUCTION_RENDERERS["cattle-heart-girth-weight"] = _r({
   citation: "Citation: cattle live weight from heart girth (Schaeffer's formula), by name. weight (lb) = heart girth^2 x body length / 300, both in inches; girth behind the front legs, length shoulder-point to pin bone. Calibrated for mature beef cattle; off for young/dairy/pregnant animals. A certified scale governs a sale weight.",
   example: cattleHeartGirthWeightExample.inputs,
   fields: [
-    { key: "heart_girth_in", label: "Heart girth (in, behind front legs)", kind: "number", whenBlank: 70 },
-    { key: "body_length_in", label: "Body length (in, shoulder to pin bone)", kind: "number", whenBlank: 55 },
+    { key: "heart_girth_in", label: "Heart girth (in, behind front legs)", kind: "number", whenBlank: 70 , attrs: { min: "0" } },
+    { key: "body_length_in", label: "Body length (in, shoulder to pin bone)", kind: "number", whenBlank: 55 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "w", id: "chg-out-w", label: "Estimated live weight", value: (r) => fmt(r.live_weight_lb, 0) + " lb" },
@@ -799,10 +799,10 @@ FARMPRODUCTION_RENDERERS["corn-yield-estimate"] = _r({
   citation: "Citation: pre-harvest corn yield, yield component (ear-count) method (Purdue / Iowa State Extension), by name. bu/ac = ears (per 1/1000 acre) x (rows around x kernels per row) / factor; factor = thousands of kernels per bushel (~90, 75-80 big kernels, 95-100 small). Count ears in 17.5 ft of 30-in row. A pre-harvest estimate; the harvested, moisture-corrected yield governs.",
   example: cornYieldEstimateExample.inputs,
   fields: [
-    { key: "ears_per_thousandth_acre", label: "Ears in 1/1000 acre (17.5 ft of 30-in row)", kind: "number", whenBlank: 32 },
-    { key: "kernel_rows_around", label: "Kernel rows around the ear", kind: "number", whenBlank: 16 },
-    { key: "kernels_per_row", label: "Kernels per row", kind: "number", whenBlank: 35 },
-    { key: "kernel_factor", label: "Kernel factor (1000s kernels/bu, ~90)", kind: "number", default: 90 },
+    { key: "ears_per_thousandth_acre", label: "Ears in 1/1000 acre (17.5 ft of 30-in row)", kind: "number", whenBlank: 32 , attrs: { min: "0" } },
+    { key: "kernel_rows_around", label: "Kernel rows around the ear", kind: "number", whenBlank: 16 , attrs: { min: "0" } },
+    { key: "kernels_per_row", label: "Kernels per row", kind: "number", whenBlank: 35 , attrs: { min: "0" } },
+    { key: "kernel_factor", label: "Kernel factor (1000s kernels/bu, ~90)", kind: "number", default: 90 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "k", id: "cye-out-k", label: "Kernels per ear", value: (r) => fmt(r.kernels_per_ear, 0) },
@@ -843,10 +843,10 @@ FARMPRODUCTION_RENDERERS["dressing-percentage"] = _r({
   citation: "Citation: carcass dressing percentage and freezer yield, by name. dressing % = hot carcass weight / live weight x 100; chilled carcass = hot carcass x (1 - chill shrink); take-home = chilled carcass x cutting yield. Typical dressing: beef 60-64%, pork 72-75%, lamb ~50%; beef cutting yield ~65-70% of the carcass. The processor's certified scale and the cut sheet govern the actual freezer yield.",
   example: dressingPercentageExample.inputs,
   fields: [
-    { key: "live_weight_lb", label: "Live weight (lb)", kind: "number", whenBlank: 1200 },
-    { key: "hot_carcass_weight_lb", label: "Hot carcass weight (lb)", kind: "number", whenBlank: 744 },
-    { key: "cutting_yield_pct", label: "Cutting yield (% of chilled carcass)", kind: "number", whenBlank: 67 },
-    { key: "chill_shrink_pct", label: "Cooler chill shrink (%)", kind: "number", default: 3.5 },
+    { key: "live_weight_lb", label: "Live weight (lb)", kind: "number", whenBlank: 1200 , attrs: { min: "0" } },
+    { key: "hot_carcass_weight_lb", label: "Hot carcass weight (lb)", kind: "number", whenBlank: 744 , attrs: { min: "0" } },
+    { key: "cutting_yield_pct", label: "Cutting yield (% of chilled carcass)", kind: "number", whenBlank: 67 , attrs: { min: "0" } },
+    { key: "chill_shrink_pct", label: "Cooler chill shrink (%)", kind: "number", default: 3.5 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "d", id: "drp-out-d", label: "Dressing percentage", value: (r) => fmt(r.dressing_pct, 1) + " %" },

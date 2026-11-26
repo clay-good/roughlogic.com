@@ -161,9 +161,9 @@ DISINFECT_RENDERERS["well-shock-chlorination"] = _simpleRenderer({
   citation: "Citation: AWWA A100 / state private-well shock-chlorination guidance (by name) - target concentrations of roughly 50 to 200 ppm held overnight, then pumped to waste and retested; 0.0408 gal per ft per in^2, 8.34 lb per gallon. Plain unscented household bleach; the local health department governs.",
   example: wellShockExample.inputs,
   fields: [
-    { key: "casing_diameter_in", label: "Casing inside diameter (in)", kind: "number" },
+    { key: "casing_diameter_in", label: "Casing inside diameter (in)", kind: "number" , attrs: { min: "0" } },
     { key: "water_column_ft", label: "Standing water column (ft)", kind: "number" },
-    { key: "target_ppm", label: "Target concentration (ppm)", kind: "number", default: 100 },
+    { key: "target_ppm", label: "Target concentration (ppm)", kind: "number", default: 100 , attrs: { min: "0" } },
     { key: "bleach_pct", label: "Bleach available chlorine (%)", kind: "number", default: 6 },
   ],
   outputs: [

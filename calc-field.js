@@ -532,7 +532,7 @@ const renderSlope = _r({
   fields: [
     { key: "rise_ft",            label: "Rise (ft, optional)",        kind: "number" },
     { key: "run_ft",             label: "Run (ft, optional)",         kind: "number" },
-    { key: "measured_angle_deg", label: "Measured angle (deg)",       kind: "number" },
+    { key: "measured_angle_deg", label: "Measured angle (deg)",       kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "a", id: "sl-out-a", label: "Slope angle",            value: (r) => fmt(r.angle_deg, 1) + " deg" },
@@ -1355,9 +1355,9 @@ FIELD_RENDERERS["map-scale-conversion"] = _r({
   citation: "Citation: representative fraction to ground units -- ft per map inch = RF / 12, with area scaling as the SQUARE of that -- by name; public map arithmetic. The 1:24,000 USGS 7.5-minute quadrangle at 2,000 ft per inch is named as the familiar case, not reproduced from any table. The map's own scale bar, its datum, and a GIS measurement govern anything that matters.",
   example: mapScaleConversionExample.inputs,
   fields: [
-    { key: "representative_fraction", label: "Representative fraction denominator (24000 for 1:24,000)", kind: "number", default: 24000 },
-    { key: "map_distance_in", label: "Measured map distance (in, 0 to skip)", kind: "number" },
-    { key: "map_area_sqin", label: "Measured map area (sq in, 0 to skip)", kind: "number" },
+    { key: "representative_fraction", label: "Representative fraction denominator (24000 for 1:24,000)", kind: "number", default: 24000 , attrs: { min: "0" } },
+    { key: "map_distance_in", label: "Measured map distance (in, 0 to skip)", kind: "number" , attrs: { min: "0" } },
+    { key: "map_area_sqin", label: "Measured map area (sq in, 0 to skip)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "s", id: "mpsc-out-s", label: "Ground feet per map inch", value: (r) => fmt(r.ft_per_inch, 1) + " ft" },
@@ -1404,10 +1404,10 @@ FIELD_RENDERERS["contour-slope"] = _r({
   citation: "Citation: slope from contour count and map scale -- rise = interval x intervals crossed, run = map inches x RF / 12 -- reported as percent, degrees, ratio, and true slope distance, by name; public map arithmetic and trigonometry. The ground itself, the map's contour accuracy, and the party's judgment govern.",
   example: contourSlopeExample.inputs,
   fields: [
-    { key: "contour_interval_ft", label: "Contour interval (ft)", kind: "number" },
-    { key: "intervals_crossed", label: "Intervals crossed", kind: "number" },
-    { key: "map_distance_in", label: "Measured map distance (in)", kind: "number" },
-    { key: "representative_fraction", label: "Representative fraction denominator", kind: "number", whenBlank: 24000 },
+    { key: "contour_interval_ft", label: "Contour interval (ft)", kind: "number" , attrs: { min: "0" } },
+    { key: "intervals_crossed", label: "Intervals crossed", kind: "number" , attrs: { min: "0" } },
+    { key: "map_distance_in", label: "Measured map distance (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "representative_fraction", label: "Representative fraction denominator", kind: "number", whenBlank: 24000 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "r", id: "cnsl-out-r", label: "Rise and run", value: (r) => fmt(r.rise_ft, 1) + " ft over " + fmt(r.run_ft, 1) + " ft" },
@@ -1469,13 +1469,13 @@ FIELD_RENDERERS["helicopter-lz-sizing"] = _r({
   citation: "Citation: helicopter landing zone screening on three checks -- a clear square keyed to rotor diameter, the aircraft's published slope limit, and an approach path at the stated ratio clearing the tallest obstacle -- by name; the size factor, slope limit, and approach ratio are entered rather than bundled because they belong to the aircraft and the conditions. A screening aid, never a clearance: the aircrew and the pilot in command decide.",
   example: helicopterLzSizingExample.inputs,
   fields: [
-    { key: "rotor_diameter_ft", label: "Rotor diameter (ft)", kind: "number" },
-    { key: "size_factor", label: "Size factor (2 for routine daytime)", kind: "number", default: 2 },
-    { key: "measured_clear_ft", label: "Measured clear area, side (ft)", kind: "number" },
+    { key: "rotor_diameter_ft", label: "Rotor diameter (ft)", kind: "number" , attrs: { min: "0" } },
+    { key: "size_factor", label: "Size factor (2 for routine daytime)", kind: "number", default: 2 , attrs: { min: "0" } },
+    { key: "measured_clear_ft", label: "Measured clear area, side (ft)", kind: "number" , attrs: { min: "0" } },
     { key: "ground_slope_deg", label: "Ground slope (deg)", kind: "number" },
     { key: "slope_limit_deg", label: "Aircraft slope limit (deg)", kind: "number", whenBlank: 8 },
-    { key: "obstacle_height_ft", label: "Tallest obstacle on the approach (ft)", kind: "number" },
-    { key: "approach_ratio", label: "Approach ratio (10 for 10:1)", kind: "number", default: 10 },
+    { key: "obstacle_height_ft", label: "Tallest obstacle on the approach (ft)", kind: "number" , attrs: { min: "0" } },
+    { key: "approach_ratio", label: "Approach ratio (10 for 10:1)", kind: "number", default: 10 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "a", id: "hlz-out-a", label: "Required clear area", value: (r) => fmt(r.required_side_ft, 0) + " x " + fmt(r.required_side_ft, 0) + " ft -- " + (r.area_ok ? "measured area clears it" : "measured area is short") },
@@ -1528,12 +1528,12 @@ FIELD_RENDERERS["litter-carry-team"] = _r({
   citation: "Citation: litter carry staffing from a sustained pace that already assumes rotation, with the team count as the reciprocal of the duty fraction, by name; standard search-and-rescue planning practice. The pace, duty fraction, and rotation interval are entered rather than bundled. A planning aid; the incident commander, the team's condition, and the terrain govern.",
   example: litterCarryTeamExample.inputs,
   fields: [
-    { key: "distance_mi", label: "Carry distance (mi)", kind: "number" },
-    { key: "pace_mph", label: "Sustained pace (mph)", kind: "number", whenBlank: 1 },
-    { key: "carriers_per_litter", label: "Carriers per litter", kind: "number", whenBlank: 6 },
-    { key: "duty_fraction", label: "Duty fraction per team (0.5 = half the time carrying)", kind: "number", default: 0.5 },
-    { key: "rotation_interval_min", label: "Rotation interval (min)", kind: "number", whenBlank: 10 },
-    { key: "support_personnel", label: "Attendants and support personnel", kind: "number", whenBlank: 2 },
+    { key: "distance_mi", label: "Carry distance (mi)", kind: "number" , attrs: { min: "0" } },
+    { key: "pace_mph", label: "Sustained pace (mph)", kind: "number", whenBlank: 1 , attrs: { min: "0" } },
+    { key: "carriers_per_litter", label: "Carriers per litter", kind: "number", whenBlank: 6 , attrs: { min: "0" } },
+    { key: "duty_fraction", label: "Duty fraction per team (0.5 = half the time carrying)", kind: "number", default: 0.5 , attrs: { min: "0" } },
+    { key: "rotation_interval_min", label: "Rotation interval (min)", kind: "number", whenBlank: 10 , attrs: { min: "0" } },
+    { key: "support_personnel", label: "Attendants and support personnel", kind: "number", whenBlank: 2 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "t", id: "ltcy-out-t", label: "Carry time", value: (r) => fmt(r.carry_time_hr, 2) + " hr (" + fmt(r.carry_time_min, 0) + " min)" },

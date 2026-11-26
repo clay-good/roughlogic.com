@@ -429,7 +429,7 @@ CONTROLS_RENDERERS["damper-actuator-torque"] = _simpleRenderer({
     { key: "damper_height_in", label: "Damper height (in)", kind: "number" },
     { key: "torque_factor_in_lb_ft2", label: "Torque factor, unsealed (in-lb per sq ft)", kind: "number", default: 5 },
     { key: "sealed_torque_factor_in_lb_ft2", label: "Torque factor with seals (in-lb per sq ft, 0 to skip)", kind: "number", default: 9 },
-    { key: "safety_factor", label: "Safety factor", kind: "number", default: 1.5 },
+    { key: "safety_factor", label: "Safety factor", kind: "number", default: 1.5 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "a", id: "dat-out-a", label: "Damper area", value: (r) => fmt(r.damper_area_ft2, 2) + " sq ft" },

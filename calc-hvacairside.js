@@ -94,10 +94,10 @@ HVACAIRSIDE_RENDERERS["duct-heat-gain"] = _rEnv({
   citation: "Citation: Conductive duct heat gain Q = U A dT with U = 1/R (ASHRAE Handbook - Fundamentals / duct-design method), and the air temperature change dT_air = Q / (1.08 x cfm). Steady-state conduction, no leakage or radiant gain. A design aid; the ductwork design governs.",
   example: ductHeatGainExample.inputs,
   fields: [
-    { key: "R_duct", label: "Duct insulation R (h-ft2-F/Btu)", kind: "number" },
-    { key: "A_ft2", label: "Duct surface area (ft²)", kind: "number" },
+    { key: "R_duct", label: "Duct insulation R (h-ft2-F/Btu)", kind: "number" , attrs: { min: "0" } },
+    { key: "A_ft2", label: "Duct surface area (ft²)", kind: "number" , attrs: { min: "0" } },
     { key: "dT_F", label: "Ambient minus in-duct temp (F, signed)", kind: "number" },
-    { key: "cfm", label: "Airflow (cfm)", kind: "number" },
+    { key: "cfm", label: "Airflow (cfm)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "q", id: "dhg-out-q", label: "Heat gain (+) / loss (-)", value: (r) => fmt(r.Q_btuh, 0) + " Btu/h" },
@@ -343,8 +343,8 @@ HVACAIRSIDE_RENDERERS["isolator-deflection"] = _rEnv({
   citation: "Citation: ASHRAE / Den Hartog single-DOF isolator inverted -- required static deflection = (3.13/fn)^2 in with fn = (rpm/60)/sqrt(1 + 1/T), T = 1 - efficiency, by name. The frequency ratio always exceeds sqrt(2). Undamped idealization; the isolator selection and floor stiffness are the mechanical engineer's. A design aid, not a stamped design.",
   example: isolatorDeflectionExample.inputs,
   fields: [
-    { key: "equipment_rpm", label: "Running speed (rpm)", kind: "number" },
-    { key: "target_efficiency", label: "Target isolation efficiency (%)", kind: "number" },
+    { key: "equipment_rpm", label: "Running speed (rpm)", kind: "number" , attrs: { min: "0" } },
+    { key: "target_efficiency", label: "Target isolation efficiency (%)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "defl", id: "isod-out-defl", label: "Required static deflection", value: (r) => fmt(r.deflection_in, 2) + " in" },
@@ -385,7 +385,7 @@ HVACAIRSIDE_RENDERERS["air-density-correction"] = _rEnv({
   fields: [
     { key: "elev_ft", label: "Site elevation (ft)", kind: "number" },
     { key: "T_F", label: "Air temperature (°F)", kind: "number", default: 70, required: true },
-    { key: "acfm", label: "Actual airflow ACFM (cfm, optional)", kind: "number" },
+    { key: "acfm", label: "Actual airflow ACFM (cfm, optional)", kind: "number" , attrs: { min: "0" } },
     { key: "rated_sp", label: "Sea-level rated fan static (in-wc, optional)", kind: "number" },
   ],
   outputs: [
@@ -424,7 +424,7 @@ HVACAIRSIDE_RENDERERS["moist-air-enthalpy"] = _rEnv({
   example: moistAirEnthalpyExample.inputs,
   fields: [
     { key: "t_db_f", label: "Dry-bulb temperature (°F)", kind: "number", required: true },
-    { key: "w_lb_lb", label: "Humidity ratio W (lb water / lb dry air)", kind: "number" },
+    { key: "w_lb_lb", label: "Humidity ratio W (lb water / lb dry air)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "h", id: "mae-out-h", label: "Enthalpy h", value: (r) => fmt(r.h, 2) + " Btu/lb dry air" },
@@ -455,7 +455,7 @@ HVACAIRSIDE_RENDERERS["drybulb-from-enthalpy"] = _rEnv({
   example: drybulbFromEnthalpyExample.inputs,
   fields: [
     { key: "enthalpy_btu", label: "Enthalpy h (Btu/lb dry air)", kind: "number" },
-    { key: "w_lb_lb", label: "Humidity ratio W (lb water / lb dry air)", kind: "number" },
+    { key: "w_lb_lb", label: "Humidity ratio W (lb water / lb dry air)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "t", id: "dbe-out-t", label: "Dry-bulb temperature", value: (r) => fmt(r.t_db_f, 1) + " F" },
@@ -485,7 +485,7 @@ HVACAIRSIDE_RENDERERS["cooling-coil-total-load"] = _rEnv({
   citation: "Citation: Cooling-coil total load (ASHRAE Handbook - Fundamentals): Q = 4.5 x CFM x (h_ent - h_lvg) Btu/hr, with 4.5 = 60 x 0.075 (standard air) and enthalpies from moist-air-enthalpy; tons = Q / 12000. Captures the full sensible-plus-latent heat the coil removes, unlike the dry-bulb 1.08 x CFM x deltaT. A leaving enthalpy above entering gives a negative Q (heating). A design aid; equipment ratings govern.",
   example: coolingCoilTotalLoadExample.inputs,
   fields: [
-    { key: "cfm", label: "Airflow across the coil (cfm)", kind: "number" },
+    { key: "cfm", label: "Airflow across the coil (cfm)", kind: "number" , attrs: { min: "0" } },
     { key: "h_ent_btu", label: "Entering-air enthalpy (Btu/lb)", kind: "number" },
     { key: "h_lvg_btu", label: "Leaving-air enthalpy (Btu/lb)", kind: "number" },
   ],
@@ -555,11 +555,11 @@ HVACAIRSIDE_RENDERERS["fan-affinity-laws"] = _rEnv({
   citation: "Citation: Fan affinity laws (AMCA / ASHRAE Handbook - Fundamentals) for a fixed fan at a changed speed: Q2 = Q1 (N2/N1), SP2 = SP1 (N2/N1)^2, BHP2 = BHP1 (N2/N1)^3. The cube-law power relation is the basis of VFD energy savings. Valid for the same fan on the same system curve; it does not capture motor/drive efficiency changes or a shifted system curve. A field aid; the fan curve and equipment ratings govern.",
   example: fanAffinityLawsExample.inputs,
   fields: [
-    { key: "q1_cfm", label: "Baseline airflow Q1 (cfm)", kind: "number" },
-    { key: "sp1_inwg", label: "Baseline static pressure SP1 (in wg)", kind: "number" },
-    { key: "bhp1_hp", label: "Baseline brake horsepower BHP1 (hp)", kind: "number" },
-    { key: "n1", label: "Baseline speed N1 (rpm)", kind: "number" },
-    { key: "n2", label: "New speed N2 (rpm)", kind: "number" },
+    { key: "q1_cfm", label: "Baseline airflow Q1 (cfm)", kind: "number" , attrs: { min: "0" } },
+    { key: "sp1_inwg", label: "Baseline static pressure SP1 (in wg)", kind: "number" , attrs: { min: "0" } },
+    { key: "bhp1_hp", label: "Baseline brake horsepower BHP1 (hp)", kind: "number" , attrs: { min: "0" } },
+    { key: "n1", label: "Baseline speed N1 (rpm)", kind: "number" , attrs: { min: "0" } },
+    { key: "n2", label: "New speed N2 (rpm)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "r", id: "fal-out-r", label: "Speed ratio r = N2/N1", value: (r) => fmt(r.r, 4) },
@@ -595,8 +595,8 @@ HVACAIRSIDE_RENDERERS["colebrook-friction-factor"] = _rEnv({
   citation: "Citation: Darcy friction factor -- laminar f = 64/Re, and the Swamee-Jain (1976) explicit approximation to the Colebrook-White equation f = 0.25 / [log10(eps/D / 3.7 + 5.74 / Re^0.9)]^2 for turbulent flow (within ~1% of the Colebrook/Moody value over 5000 < Re < 1e8, eps/D <= 0.05). The 2300-4000 transition is indeterminate. Feeds the Darcy-Weisbach head loss h = f (L/D) V^2/(2g). A design aid; the system analysis governs.",
   example: colebrookFrictionFactorExample.inputs,
   fields: [
-    { key: "reynolds", label: "Reynolds number Re", kind: "number" },
-    { key: "rel_roughness", label: "Relative roughness eps/D", kind: "number" },
+    { key: "reynolds", label: "Reynolds number Re", kind: "number" , attrs: { min: "0" } },
+    { key: "rel_roughness", label: "Relative roughness eps/D", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "f", id: "cff-out-f", label: "Darcy friction factor f", value: (r) => fmt(r.f, 4) },
@@ -630,9 +630,9 @@ HVACAIRSIDE_RENDERERS["manual-d-friction-rate"] = _rEnv({
   citation: "Citation: ACCA Manual D friction rate: available static pressure ASP = blower rated ESP - total component drops, design friction rate FR = ASP x 100 / total effective length (in wg per 100 ft). The TEL includes the fitting equivalent lengths, not just the physical run. A design aid; the full Manual D layout governs.",
   example: manualDFrictionRateExample.inputs,
   fields: [
-    { key: "blower_esp_inwg", label: "Blower rated ESP at design CFM (in wg)", kind: "number" },
-    { key: "component_drop_inwg", label: "Total component drops (in wg)", kind: "number" },
-    { key: "tel_ft", label: "Total effective length (ft)", kind: "number" },
+    { key: "blower_esp_inwg", label: "Blower rated ESP at design CFM (in wg)", kind: "number" , attrs: { min: "0" } },
+    { key: "component_drop_inwg", label: "Total component drops (in wg)", kind: "number" , attrs: { min: "0" } },
+    { key: "tel_ft", label: "Total effective length (ft)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "asp", id: "mdf-out-asp", label: "Available static pressure", value: (r) => fmt(r.asp_inwg, 2) + " in wg" },

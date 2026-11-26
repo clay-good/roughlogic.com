@@ -176,11 +176,11 @@ DATACENTER_RENDERERS["rack-power-density-airflow"] = _simpleRenderer({
   citation: "Citation: sensible heat Q = 1.08 x CFM x delta-T, with rack heat = electrical kW x 3,412 Btu/h. Equipment airflow data, measured tile delivery, and ASHRAE TC 9.9 inlet limits govern.",
   example: rackAirExample,
   fields: [
-    { key: "rack_load_kw", label: "Rack load (kW)" },
+    { key: "rack_load_kw", label: "Rack load (kW)" , attrs: { min: "0" } },
     { key: "equipment_delta_t_f", label: "Temperature rise across equipment (deg F)" },
-    { key: "standard_tile_cfm", label: "Standard tile delivery (cfm)" },
-    { key: "comparison_rack_kw", label: "Higher-density rack load (kW)" },
-    { key: "high_flow_tile_cfm", label: "High-flow tile delivery (cfm)" },
+    { key: "standard_tile_cfm", label: "Standard tile delivery (cfm)" , attrs: { min: "0" } },
+    { key: "comparison_rack_kw", label: "Higher-density rack load (kW)" , attrs: { min: "0" } },
+    { key: "high_flow_tile_cfm", label: "High-flow tile delivery (cfm)" , attrs: { min: "0" } },
     { key: "alternative_delta_t_f", label: "Alternative temperature rise (deg F)" },
   ],
   outputs: [
@@ -280,7 +280,7 @@ DATACENTER_RENDERERS["crac-sensible-derate"] = _simpleRenderer({
   citation: "Citation: sensible capacity Q = 1.08 x CFM x (return deg F - supply deg F), evaluated at the manufacturer's stated rating condition. Unit performance data and ASHRAE TC 9.9 guidance govern.",
   example: cracExample,
   fields: [
-    { key: "airflow_cfm", label: "Unit airflow (cfm)" },
+    { key: "airflow_cfm", label: "Unit airflow (cfm)" , attrs: { min: "0" } },
     { key: "supply_temp_f", label: "Supply air temperature (deg F)", required: true },
     { key: "return_temp_f", label: "Rated return air temperature (deg F)" },
     { key: "contained_return_temp_f", label: "Contained return air temperature (deg F)" },
@@ -449,13 +449,13 @@ DATACENTER_RENDERERS["chilled-water-ride-through"] = _simpleRenderer({
   citation: "Citation: stored sensible cooling = gallons x 8.34 lb/gal x 1.0 Btu/lb-deg F x allowable temperature rise; ride-through is stored Btu divided by IT heat in Btu/h. Chiller restart sequence, equipment limits, and ASHRAE TC 9.9 govern.",
   example: rideExample,
   fields: [
-    { key: "loop_volume_gal", label: "Chilled-water loop volume (gal)" },
-    { key: "it_load_kw", label: "IT equipment load (kW)" },
+    { key: "loop_volume_gal", label: "Chilled-water loop volume (gal)" , attrs: { min: "0" } },
+    { key: "it_load_kw", label: "IT equipment load (kW)" , attrs: { min: "0" } },
     { key: "supply_temp_f", label: "Chilled-water supply temperature (deg F)", required: true },
     { key: "max_temp_f", label: "Highest tolerable water temperature (deg F)" },
-    { key: "generator_transfer_min", label: "Generator start and transfer (min)" },
-    { key: "chiller_restart_min", label: "Chiller restart and loading (min)" },
-    { key: "smaller_loop_volume_gal", label: "Smaller comparison loop (gal)" },
+    { key: "generator_transfer_min", label: "Generator start and transfer (min)" , attrs: { min: "0" } },
+    { key: "chiller_restart_min", label: "Chiller restart and loading (min)" , attrs: { min: "0" } },
+    { key: "smaller_loop_volume_gal", label: "Smaller comparison loop (gal)" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "stored_cooling_btu", id: "cwrt-store", label: "Stored cooling", unit: "Btu", value: (r) => fmt(r.stored_cooling_btu, 0) + " Btu" },

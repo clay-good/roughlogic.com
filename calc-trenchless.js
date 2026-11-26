@@ -490,7 +490,7 @@ TRENCHLESS_RENDERERS["pipe-bursting-pull-load"] = _simpleRenderer({
   fields: [
     { key: "old_diameter_in", label: "Existing pipe diameter (in)", kind: "number" },
     { key: "new_diameter_in", label: "New pipe diameter (in)", kind: "number" },
-    { key: "run_length_ft", label: "Run length (ft)", kind: "number" },
+    { key: "run_length_ft", label: "Run length (ft)", kind: "number" , attrs: { min: "0" } },
     { key: "cover_depth_ft", label: "Depth of cover (ft)", kind: "number" },
     { key: "expansion_force_lb_per_sqin", label: "Expansion force (lb per sq in displaced)", kind: "number", default: 400 },
     { key: "drag_lb_per_ft", label: "Product pipe drag (lb per ft)", kind: "number", default: 15 },
@@ -555,7 +555,7 @@ TRENCHLESS_RENDERERS["cipp-liner-thickness"] = _simpleRenderer({
     { key: "long_term_modulus_psi", label: "Long-term flexural modulus (psi)", kind: "number" },
     { key: "short_term_modulus_psi", label: "Short-term flexural modulus (psi)", kind: "number" },
     { key: "enhancement_factor", label: "Soil support enhancement factor K", kind: "number", default: 7 },
-    { key: "safety_factor", label: "Safety factor", kind: "number", default: 2 },
+    { key: "safety_factor", label: "Safety factor", kind: "number", default: 2 , attrs: { min: "0" } },
     { key: "alternative_ovality_pct", label: "Alternative ovality to compare (%)", kind: "number" },
   ],
   outputs: [

@@ -694,7 +694,7 @@ REFRIGERATION_RENDERERS["secondary-glycol-loop"] = _simpleRenderer({
     { key: "coil_approach_f", label: "Coil approach penalty (°F)", kind: "number" },
     { key: "compressor_pct_per_deg_f", label: "Compressor power sensitivity (% per °F of suction)", kind: "number", default: 2.2 },
     { key: "annual_hours", label: "Annual pump hours", kind: "number" },
-    { key: "energy_rate_per_kwh", label: "Energy rate ($/kWh)", kind: "number" },
+    { key: "energy_rate_per_kwh", label: "Energy rate ($/kWh)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "w", id: "sgl-out-w", label: "On a water basis", value: (r) => fmt(r.water_gpm, 0) + " gpm for " + fmt(r.tons, 0) + " " + (fmt(r.tons, 0) === "1" ? "ton" : "tons") + " at the entered delta-T" },

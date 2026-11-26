@@ -2644,7 +2644,7 @@ SHOP_RENDERERS["rotor-balance-grade"] = _simpleRenderer({
   example: rotorBalanceGradeExample.inputs,
   fields: [
     { key: "balance_grade", label: "Balance grade G (6.3 general, 2.5 machine tool)", kind: "number", default: 6.3 },
-    { key: "rpm", label: "Operating speed (rpm)", kind: "number" },
+    { key: "rpm", label: "Operating speed (rpm)", kind: "number" , attrs: { min: "0" } },
     { key: "rotor_mass_kg", label: "Rotor mass (kg)", kind: "number" },
     { key: "planes", label: "Correction planes", kind: "number", whenBlank: 2 },
     { key: "correction_radius_mm", label: "Correction radius (mm)", kind: "number" },
@@ -2968,7 +2968,7 @@ SHOP_RENDERERS["pneumatic-cylinder-scfm"] = _simpleRenderer({
   fields: [
     { key: "bore_in", label: "Bore diameter (in)", kind: "number" },
     { key: "rod_in", label: "Rod diameter (in)", kind: "number" },
-    { key: "stroke_in", label: "Stroke (in)", kind: "number" },
+    { key: "stroke_in", label: "Stroke (in)", kind: "number" , attrs: { min: "0" } },
     { key: "cycles_per_min", label: "Cycles per minute", kind: "number" },
     { key: "pressure_psig", label: "Operating pressure (psig)", kind: "number" },
     { key: "cylinders", label: "Number of cylinders", kind: "number", whenBlank: 1 },

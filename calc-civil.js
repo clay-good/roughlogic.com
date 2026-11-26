@@ -1085,7 +1085,7 @@ CIVIL_RENDERERS["skip-line-layout"] = _simpleRenderer({
   fields: [
     { key: "stripe_length_ft", label: "Stripe length (ft)", kind: "number" },
     { key: "gap_length_ft", label: "Gap length (ft)", kind: "number" },
-    { key: "run_length_ft", label: "Run length (ft)", kind: "number" },
+    { key: "run_length_ft", label: "Run length (ft)", kind: "number" , attrs: { min: "0" } },
     { key: "start_offset_ft", label: "First stripe offset from the reference point (ft)", kind: "number", default: 0 },
     { key: "counted_stripes", label: "Stripes counted on an existing run (0 to skip)", kind: "number" },
     { key: "counted_length_ft", label: "Length that count was measured over (ft, 0 to skip)", kind: "number" },
@@ -1470,7 +1470,7 @@ CIVIL_RENDERERS["esal-traffic-loading"] = _simpleRenderer({
     { key: "lane_factor", label: "Lane distribution factor (0 to 1)", kind: "number", default: 1.0 },
     { key: "esals_per_truck", label: "ESALs per truck", kind: "number" },
     { key: "growth_percent", label: "Annual traffic growth (%)", kind: "number" },
-    { key: "design_life_years", label: "Design life (years)", kind: "number" },
+    { key: "design_life_years", label: "Design life (years)", kind: "number" , attrs: { min: "0" } },
     { key: "car_axle_lb", label: "Car axle load for the comparison (lb)", kind: "number", default: 2000 },
     { key: "overload_axle_lb", label: "Overload axle to test (lb, 0 to skip)", kind: "number" },
   ],

@@ -1697,7 +1697,7 @@ const renderHeatStress = _simpleRendererG({
   example: heatStressExample.inputs,
   fields: [
     { key: "T_F", required: true, label: "Dry-bulb temp (°F)", kind: "number" },
-    { key: "RH_percent", label: "Relative humidity (%)", kind: "number" },
+    { key: "RH_percent", label: "Relative humidity (%)", kind: "number" , attrs: { min: "0" } },
     { key: "solar", label: "Direct sun exposure", kind: "checkbox" },
   ],
   outputs: [
@@ -1713,7 +1713,7 @@ const renderWindChill = _simpleRendererG({
   example: windChillExample.inputs,
   fields: [
     { key: "T_F", required: true, label: "Ambient temp (°F)", kind: "number" },
-    { key: "wind_mph", label: "Wind (mph)", kind: "number" },
+    { key: "wind_mph", label: "Wind (mph)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "wc", id: "wc-out-wc", label: "Wind chill", value: (r) => _fmtG(r.wind_chill_F, 1) + " F" },
@@ -1740,8 +1740,8 @@ const renderLadderAngle = _simpleRendererG({
   citation: "Citation: OSHA 1926.1053 by section number only. 4:1 rule; pass/fail at 75.5 deg +/- 3 deg.",
   example: ladderAngleExample.inputs,
   fields: [
-    { key: "ladder_length_ft", label: "Ladder length (ft)", kind: "number" },
-    { key: "working_height_ft", label: "Working height (ft)", kind: "number" },
+    { key: "ladder_length_ft", label: "Ladder length (ft)", kind: "number" , attrs: { min: "0" } },
+    { key: "working_height_ft", label: "Working height (ft)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "b", id: "la-out-b", label: "Base distance", value: (r) => _fmtG(r.base_distance_ft, 2) + " ft" },
@@ -1769,8 +1769,8 @@ const renderRampSlope = _simpleRendererG({
   citation: "Citation: Public 1:12 maximum (ADA reference). Companion to slope utility.",
   example: rampSlopeExample.inputs,
   fields: [
-    { key: "rise_in", label: "Rise (in)", kind: "number" },
-    { key: "run_in", label: "Run (in)", kind: "number" },
+    { key: "rise_in", label: "Rise (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "run_in", label: "Run (in)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "r", id: "rs-out-r", label: "Slope ratio", value: (r) => r.ratio },
@@ -1877,14 +1877,14 @@ const renderVehicleLoad = _simpleRendererG({
   citation: "Citation: Public static-balance equations. Rear axle = payload * (position / wheelbase); front = payload - rear; flagged against user-supplied GVWR / GAWR.",
   example: vehicleLoadExample.inputs,
   fields: [
-    { key: "wheelbase_in", label: "Wheelbase (in)", kind: "number" },
-    { key: "payload_lb", label: "Payload (lb)", kind: "number" },
-    { key: "payload_position_from_cab_in", label: "Payload center behind the front axle (in)", kind: "number" },
-    { key: "curb_front_lb", label: "Curb front axle (lb)", kind: "number" },
-    { key: "curb_rear_lb", label: "Curb rear axle (lb)", kind: "number" },
-    { key: "gvwr_lb", label: "GVWR (lb, optional)", kind: "number" },
-    { key: "front_gawr_lb", label: "Front GAWR (lb, optional)", kind: "number" },
-    { key: "rear_gawr_lb", label: "Rear GAWR (lb, optional)", kind: "number" },
+    { key: "wheelbase_in", label: "Wheelbase (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "payload_lb", label: "Payload (lb)", kind: "number" , attrs: { min: "0" } },
+    { key: "payload_position_from_cab_in", label: "Payload center behind the front axle (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "curb_front_lb", label: "Curb front axle (lb)", kind: "number" , attrs: { min: "0" } },
+    { key: "curb_rear_lb", label: "Curb rear axle (lb)", kind: "number" , attrs: { min: "0" } },
+    { key: "gvwr_lb", label: "GVWR (lb, optional)", kind: "number" , attrs: { min: "0" } },
+    { key: "front_gawr_lb", label: "Front GAWR (lb, optional)", kind: "number" , attrs: { min: "0" } },
+    { key: "rear_gawr_lb", label: "Rear GAWR (lb, optional)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "f", id: "vl-out-f", label: "Front axle total", value: (r) => _fmtG(r.front_axle_lb, 0) + " lb" },
@@ -3196,8 +3196,8 @@ const renderExtensionLadderOverlap = _simpleRendererG({
   citation: "Citation: extension-ladder section overlap and working length - each section of a multi-section ladder must overlap the adjacent section by at least 3 ft for ladders up to 36 ft and 4 ft for 40 ft or longer (US Office of Congressional Workplace Rights extension-ladder fast facts, restating the OSHA/ANSI requirement), so the working length is the nominal length minus the overlap at each joint; a 24-ft ladder gives 21 ft. The non-self-supporting ladder is set at 4:1, which makes the working length the hypotenuse: top support height = L / sqrt(1 + 1/16), base offset = height / 4. A ladder used to reach a landing must extend at least 3 ft above it. The 36-40 ft range is not stated in the federal wording, so this tile takes the conservative 4 ft above 36 ft and the overlap is overridable. Geometry only - the duty rating is a separate limit. OSHA/ANSI and your employer's program govern.",
   example: extensionLadderOverlapExample.inputs,
   fields: [
-    { key: "nominal_length_ft", label: "Nominal ladder length (ft, as labeled)", kind: "number" },
-    { key: "sections", label: "Sections", kind: "number", whenBlank: 2 },
+    { key: "nominal_length_ft", label: "Nominal ladder length (ft, as labeled)", kind: "number" , attrs: { min: "0" } },
+    { key: "sections", label: "Sections", kind: "number", whenBlank: 2 , attrs: { min: "0" } },
     { key: "overlap_override_ft", label: "Overlap override (ft, 0 = rule)", kind: "number" },
   ],
   outputs: [
@@ -3253,8 +3253,8 @@ const renderSwingFallGeometry = _simpleRendererG({
   example: swingFallGeometryExample.inputs,
   fields: [
     { key: "horizontal_offset_ft", label: "Horizontal offset from under the anchor (ft)", kind: "number" },
-    { key: "anchor_height_ft", label: "Anchor height above the attachment point (ft)", kind: "number" },
-    { key: "base_required_clearance_ft", label: "Vertical clearance already required (ft, from fall-protection-clearance)", kind: "number", default: 0 },
+    { key: "anchor_height_ft", label: "Anchor height above the attachment point (ft)", kind: "number" , attrs: { min: "0" } },
+    { key: "base_required_clearance_ft", label: "Vertical clearance already required (ft, from fall-protection-clearance)", kind: "number", default: 0 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "a", id: "sfg-out-a", label: "Swing angle off vertical", value: (r) => fmt(r.swing_angle_deg, 1) + " deg" + (r.over_30_deg ? " - past the 30 deg guidance" : "") },
@@ -3302,11 +3302,11 @@ CROSS_RENDERERS["radiant-heat-exchange"] = _simpleRendererG({
   citation: "Citation: Stefan-Boltzmann net radiant exchange q = eps F sigma A (T_s^4 - T_surr^4), sigma = 0.1714e-8 BTU/(hr ft^2 R^4), temperatures in absolute Rankine (NIST / first-principles radiation), by name. Radiation only -- add convection and conduction for the total. eps ~ 0.05 bright metal, ~0.9 paint/nonmetals; F = 1 for a small object in a large room. The real emissivity, geometry, and full heat balance govern.",
   example: radiantHeatExchangeExample.inputs,
   fields: [
-    { key: "area_ft2", label: "Radiating surface area (ft²)", kind: "number" },
-    { key: "emissivity", label: "Surface emissivity (shiny metal ~0.05, paint/nonmetal ~0.9)", kind: "number", default: 0.9 },
+    { key: "area_ft2", label: "Radiating surface area (ft²)", kind: "number" , attrs: { min: "0" } },
+    { key: "emissivity", label: "Surface emissivity (shiny metal ~0.05, paint/nonmetal ~0.9)", kind: "number", default: 0.9 , attrs: { min: "0" } },
     { key: "surface_temp_f", required: true, label: "Surface temperature (°F)", kind: "number" },
     { key: "surroundings_temp_f", required: true, label: "Surroundings / facing-surface temperature (°F)", kind: "number" },
-    { key: "view_factor", label: "View factor to surroundings (1 = fully surrounded)", kind: "number", default: 1 },
+    { key: "view_factor", label: "View factor to surroundings (1 = fully surrounded)", kind: "number", default: 1 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "q", id: "rhx-out-q", label: "Net radiant heat", value: (r) => fmt(r.heat_rate_btu_hr, 0) + " BTU/hr (" + fmt(r.heat_rate_w, 0) + " W) - " + r.direction },

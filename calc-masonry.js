@@ -687,7 +687,7 @@ MASONRY_RENDERERS["masonry-joint-reinforcement"] = _simpleRenderer({
   example: masonryJointReinforcementExample.inputs,
   fields: [
     { key: "wall_length_ft", label: "Wall length (ft)", kind: "number", whenBlank: 40 },
-    { key: "wall_height_ft", label: "Wall height (ft)", kind: "number", whenBlank: 12 },
+    { key: "wall_height_ft", label: "Wall height (ft)", kind: "number", whenBlank: 12 , attrs: { min: "0" } },
     { key: "vertical_spacing_in", label: "Vertical spacing (in, code cap 16)", kind: "number", default: 16 },
     { key: "piece_length_ft", label: "Wire piece length (ft)", kind: "number", whenBlank: 10 },
     { key: "lap_in", label: "Lap between pieces (in, 6 min; 9 for 3/16 in wire)", kind: "number", default: 6, required: true },

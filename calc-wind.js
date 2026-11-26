@@ -198,7 +198,7 @@ WIND_RENDERERS["wind-power-density-betz"] = _simpleRenderer({
   citation: "Citation: the power in a free stream by name -- P = 0.5 x rho x A x v cubed, with the mass density taken as the entered weight density over g = 32.174 ft/s squared -- and the Betz limit of 16/27 = 0.593 as the theoretical maximum fraction any rotor can extract. Real machines reach 0.35 to 0.48 including drivetrain losses. The manufacturer's warranted power curve and a site-specific energy assessment govern any production estimate.",
   example: windPowerDensityBetzExample.inputs,
   fields: [
-    { key: "wind_speed_mph", label: "Wind speed (mph)", kind: "number" },
+    { key: "wind_speed_mph", label: "Wind speed (mph)", kind: "number" , attrs: { min: "0" } },
     { key: "air_density_pcf", label: "Air density (lb/cu ft; 0.0765 at sea level, 59 degF)", kind: "number", default: 0.0765 },
     { key: "rotor_diameter_ft", label: "Rotor diameter (ft)", kind: "number" },
     { key: "power_coefficient", label: "Power coefficient Cp (0.35 to 0.48 real)", kind: "number", default: 0.45 },

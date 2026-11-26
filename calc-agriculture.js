@@ -460,10 +460,10 @@ const renderGPA = _r({
   citation: "Notice: Read and follow the product label. The label is the law. Citation: GPA = (5940 * GPM) / (speed * spacing).",
   example: gpaExample.inputs,
   fields: [
-    { key: "gpm", label: "Nozzle GPM", kind: "number" },
-    { key: "spacing_in", label: "Nozzle spacing (in)", kind: "number" },
-    { key: "speed_mph", label: "Ground speed (mph)", kind: "number" },
-    { key: "target_gpa", label: "Target GPA (optional)", kind: "number" },
+    { key: "gpm", label: "Nozzle GPM", kind: "number" , attrs: { min: "0" } },
+    { key: "spacing_in", label: "Nozzle spacing (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "speed_mph", label: "Ground speed (mph)", kind: "number" , attrs: { min: "0" } },
+    { key: "target_gpa", label: "Target GPA (optional)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "g", id: "gp-out-g", label: "GPA", value: (r) => fmt(r.gpa, 2) + " gal/acre" },
@@ -493,12 +493,12 @@ const renderSeedRate = _r({
   citation: "Citation: Public agronomy practice. seeds/acre = 6,272,640 / (row * spacing) or population / germination.",
   example: seedRateExample.inputs,
   fields: [
-    { key: "row_width_in", label: "Row width (in)", kind: "number" },
+    { key: "row_width_in", label: "Row width (in)", kind: "number" , attrs: { min: "0" } },
     { key: "in_row_spacing_in", label: "In-row spacing (in, optional)", kind: "number" },
-    { key: "target_pop_per_acre", label: "Target population / acre", kind: "number" },
-    { key: "seeds_per_lb", label: "Seeds per lb", kind: "number" },
-    { key: "germination_pct", label: "Germination %", kind: "number", whenBlank: 100 },
-    { key: "seed_price_per_lb", label: "Seed price ($/lb, optional)", kind: "number" },
+    { key: "target_pop_per_acre", label: "Target population / acre", kind: "number" , attrs: { min: "0" } },
+    { key: "seeds_per_lb", label: "Seeds per lb", kind: "number" , attrs: { min: "0" } },
+    { key: "germination_pct", label: "Germination %", kind: "number", whenBlank: 100 , attrs: { min: "0" } },
+    { key: "seed_price_per_lb", label: "Seed price ($/lb, optional)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "s", id: "sr-out-s", label: "Seeds / acre", value: (r) => fmt(r.seeds_per_acre, 0) },
@@ -512,8 +512,8 @@ const renderDrawbarPower = _r({
   citation: "Citation: ASAE D497.5 Figure 1 (drawbar-to-PTO power ratio by tractor type and tractive condition). Drawbar HP = (pull * speed) / 375; PTO HP = drawbar HP / ratio.",
   example: drawbarPowerExample.inputs,
   fields: [
-    { key: "pull_lb", label: "Drawbar pull (lb)", kind: "number" },
-    { key: "speed_mph", label: "Ground speed (mph)", kind: "number" },
+    { key: "pull_lb", label: "Drawbar pull (lb)", kind: "number" , attrs: { min: "0" } },
+    { key: "speed_mph", label: "Ground speed (mph)", kind: "number" , attrs: { min: "0" } },
     { key: "surface", label: "Surface", kind: "select", options: SURFACE_OPTIONS },
     { key: "tractor_type", label: "Tractor type", kind: "select", options: TRACTOR_TYPE_OPTIONS },
   ],
@@ -1916,10 +1916,10 @@ const renderPesticideReiPhi = _v23SimpleRenderer({
   citation: "Citation: Per the EPA Worker Protection Standard 40 CFR 170 (restricted-entry interval) and the product label's pre-harvest interval - the label is the law (FIFRA). REI/PHI values are user-supplied from the label; the label always governs over any default. Free at epa.gov and ecfr.gov.",
   example: pesticideReiPhiExample.inputs,
   fields: [
-    { key: "rei_hours", label: "Restricted-entry interval (hr, from label)", kind: "number" },
-    { key: "phi_days", label: "Pre-harvest interval (days, from label)", kind: "number" },
-    { key: "hours_since_application", label: "Hours since application", kind: "number" },
-    { key: "days_since_application", label: "Days since application", kind: "number" },
+    { key: "rei_hours", label: "Restricted-entry interval (hr, from label)", kind: "number" , attrs: { min: "0" } },
+    { key: "phi_days", label: "Pre-harvest interval (days, from label)", kind: "number" , attrs: { min: "0" } },
+    { key: "hours_since_application", label: "Hours since application", kind: "number" , attrs: { min: "0" } },
+    { key: "days_since_application", label: "Days since application", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "rei", id: "rei-out-rei", label: "REI status", value: (r) => r.rei_clear ? "CLEAR - early-entry restriction lifted" : ("RESTRICTED - " + fmt(r.rei_remaining_hours, 1) + " hr remaining (early-entry violation)") },
@@ -2511,8 +2511,8 @@ const renderSprinklerPrecipRate = _v23SimpleRenderer({
   citation: "Citation: first-principles precipitation-rate relation with the Irrigation Association design references and the Rain Bird / Hunter design manuals (by name). PR = 96.3 x zone gpm / zone area (ft^2), in in/hr. The 96.3 constant is the standard irrigation conversion. Head flows come from the nozzle chart at the operating pressure; this is a design-rate estimate, not a system audit.",
   example: sprinklerPrecipRateExample.inputs,
   fields: [
-    { key: "zone_gpm", label: "Zone flow, all heads (gpm)", kind: "number" },
-    { key: "zone_ft2", label: "Zone area covered (ft²)", kind: "number" },
+    { key: "zone_gpm", label: "Zone flow, all heads (gpm)", kind: "number" , attrs: { min: "0" } },
+    { key: "zone_ft2", label: "Zone area covered (ft²)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "pr", id: "spr-out-pr", label: "Precipitation rate", value: (r) => fmt(r.precip_in_hr, 2) + " in/hr" },
@@ -2543,8 +2543,8 @@ const renderSprinklerGpmForPrecip = _v23SimpleRenderer({
   citation: "Citation: first-principles precipitation-rate relation with the Irrigation Association design references and the Rain Bird / Hunter design manuals (by name), solved for the flow: gpm = PR x zone area (ft^2) / 96.3. The 96.3 constant is the standard irrigation conversion. Head flows come from the nozzle chart at the operating pressure; this is a design-rate estimate, not a system audit.",
   example: sprinklerGpmForPrecipExample.inputs,
   fields: [
-    { key: "target_precip_in_hr", label: "Target precipitation rate (in/hr)", kind: "number" },
-    { key: "zone_ft2", label: "Zone area covered (ft²)", kind: "number" },
+    { key: "target_precip_in_hr", label: "Target precipitation rate (in/hr)", kind: "number" , attrs: { min: "0" } },
+    { key: "zone_ft2", label: "Zone area covered (ft²)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "gpm", id: "sgp-out-gpm", label: "Required zone flow", value: (r) => fmt(r.required_gpm, 1) + " gpm" },
@@ -2580,10 +2580,10 @@ const renderIrrigationZoneRuntime = _v23SimpleRenderer({
   citation: "Citation: first-principles runtime and cycle-and-soak relations with the Irrigation Association scheduling references (by name). Net = depth / rate x 60; gross = net x RTM, RTM = 1 / (0.4 + 0.6 DU_LQ) (IA Recommended Audit Guidelines, 2009, Eq. 3-11); cycles = ceil(gross / max-cycle); per cycle = gross / cycles. DU from a catch-can audit, the max-cycle from the soil; this is a program aid, not a guaranteed schedule.",
   example: irrigationZoneRuntimeExample.inputs,
   fields: [
-    { key: "target_in", label: "Target depth this run (in)", kind: "number" },
-    { key: "precip_in_hr", label: "Precipitation rate (in/hr)", kind: "number" },
-    { key: "du", label: "Distribution uniformity (0-1)", kind: "number", default: 1.0 },
-    { key: "max_cycle_min", label: "Max cycle before runoff (min)", kind: "number" },
+    { key: "target_in", label: "Target depth this run (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "precip_in_hr", label: "Precipitation rate (in/hr)", kind: "number" , attrs: { min: "0" } },
+    { key: "du", label: "Distribution uniformity (0-1)", kind: "number", default: 1.0 , attrs: { min: "0" } },
+    { key: "max_cycle_min", label: "Max cycle before runoff (min)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "net", id: "izr-out-net", label: "Net runtime", value: (r) => fmt(r.net_min, 1) + " min" },
@@ -2664,8 +2664,8 @@ const renderPlantSpacingCount = _v23SimpleRenderer({
   citation: "Citation: first-principles square- and triangular-grid relations with nursery / landscape estimating references for the staggered-grid 0.866 = sqrt(3)/2 factor (by name). square = area / spacing^2; triangular = area / (0.866 x spacing^2), about 15% more. Spacing from the mature spread or planting plan; this is a takeoff aid, not a horticultural plan.",
   example: plantSpacingCountExample.inputs,
   fields: [
-    { key: "bed_ft2", label: "Bed area to plant (ft²)", kind: "number" },
-    { key: "spacing_in", label: "On-center spacing (in)", kind: "number" },
+    { key: "bed_ft2", label: "Bed area to plant (ft²)", kind: "number" , attrs: { min: "0" } },
+    { key: "spacing_in", label: "On-center spacing (in)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "sq", id: "psc-out-sq", label: "Square grid", value: (r) => String(r.square_n) + " " + (String(r.square_n) === "1" ? "plant" : "plants") },
@@ -2698,10 +2698,10 @@ const renderSodTakeoff = _v23SimpleRenderer({
   citation: "Citation: first-principles area-plus-waste takeoff relation with turfgrass producer / landscape estimating references (by name). order = lawn x (1 + waste/100); slabs = ceil(order / slab); pallets = ceil(order / pallet). Slab/pallet coverage vary by farm (defaults ~10 / ~450 ft^2, editable); this is an ordering aid, not an agronomic spec.",
   example: sodTakeoffExample.inputs,
   fields: [
-    { key: "lawn_ft2", label: "Lawn area to sod (ft²)", kind: "number" },
-    { key: "waste_pct", label: "Cut / edge waste (%)", kind: "number" },
-    { key: "slab_ft2", label: "Slab coverage (ft²)", kind: "number", whenBlank: 10 },
-    { key: "pallet_ft2", label: "Pallet coverage (ft²)", kind: "number", whenBlank: 450 },
+    { key: "lawn_ft2", label: "Lawn area to sod (ft²)", kind: "number" , attrs: { min: "0" } },
+    { key: "waste_pct", label: "Cut / edge waste (%)", kind: "number" , attrs: { min: "0" } },
+    { key: "slab_ft2", label: "Slab coverage (ft²)", kind: "number", whenBlank: 10 , attrs: { min: "0" } },
+    { key: "pallet_ft2", label: "Pallet coverage (ft²)", kind: "number", whenBlank: 450 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "o", id: "sod-out-o", label: "Order area", value: (r) => fmt(r.order_ft2, 0) + " ft^2 (" + fmt(r.order_syd, 1) + " syd)" },

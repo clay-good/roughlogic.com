@@ -468,9 +468,9 @@ RELIEFWATER_RENDERERS["first-flush-diverter"] = _simpleRenderer({
   citation: "Citation: Texas Water Development Board, The Texas Manual on Rainwater Harvesting, 3rd ed. (2005), Chapter 2, First-Flush Diverters (1 to 2 gal per 100 sq ft of roof footprint; 10 gal per 1,000 sq ft minimum); standpipe length per gallon = 231 in^3 / (pi/4 x d^2). The local health department (potable use) and the AHJ govern.",
   example: firstFlushDiverterExample.inputs,
   fields: [
-    { key: "roof_footprint_sqft", label: "Roof footprint draining to the downspout (sq ft, plan)" },
-    { key: "diversion_rate_gal_per_100sqft", label: "Diversion rate (gal per 100 sq ft, 1 to 2)", default: 1 },
-    { key: "standpipe_diameter_in", label: "Standpipe nominal diameter (in)", default: 6 },
+    { key: "roof_footprint_sqft", label: "Roof footprint draining to the downspout (sq ft, plan)" , attrs: { min: "0" } },
+    { key: "diversion_rate_gal_per_100sqft", label: "Diversion rate (gal per 100 sq ft, 1 to 2)", default: 1 , attrs: { min: "0" } },
+    { key: "standpipe_diameter_in", label: "Standpipe nominal diameter (in)", default: 6 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "vol", id: "ffd-out-v", label: "Diversion volume", unit: "gal", value: (r) => fmt(r.diversion_gal, 1) + " gal -- " + r.range_verdict },

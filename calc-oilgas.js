@@ -674,7 +674,7 @@ OILGAS_RENDERERS["corroded-pipe-b31g"] = _simpleRenderer({
     { key: "smys_psi", label: "Specified minimum yield strength SMYS (psi)", kind: "number" },
     { key: "defect_depth_in", label: "Maximum metal loss depth (in)", kind: "number" },
     { key: "defect_length_in", label: "Defect axial length (in)", kind: "number" },
-    { key: "safety_factor", label: "Safety factor", kind: "number", default: 1.39 },
+    { key: "safety_factor", label: "Safety factor", kind: "number", default: 1.39 , attrs: { min: "0" } },
     { key: "maop_psig", label: "MAOP (psig, 0 to skip the verdict)", kind: "number" },
   ],
   outputs: [
@@ -1568,7 +1568,7 @@ OILGAS_RENDERERS["tank-strapping-volume"] = _simpleRenderer({
   example: tankStrappingVolumeExample.inputs,
   citation: "Citation: barrels per foot = (pi/4) D^2 / 5.615 for an ideal vertical cylinder, times the gauge height, with an ENTERED volume correction factor and sediment-and-water deduction. The certified strapping table is the legal document for custody transfer and this formula is not a substitute for it. API MPMS and the purchaser's measurement procedures govern.",
   fields: [
-    { key: "tank_diameter_ft", label: "Tank diameter (ft)" },
+    { key: "tank_diameter_ft", label: "Tank diameter (ft)" , attrs: { min: "0" } },
     { key: "gauge_ft", label: "Opening gauge (ft)" },
     { key: "gauge_in", label: "Opening gauge (in)" },
     { key: "closing_gauge_ft", label: "Closing gauge (ft, 0 to skip)" },

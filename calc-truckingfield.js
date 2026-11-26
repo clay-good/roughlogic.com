@@ -560,7 +560,7 @@ TRUCKINGFIELD_RENDERERS["idle-fuel-cost"] = _simpleRenderer({
   example: idleFuelCostExample.inputs,
   fields: [
     { key: "idle_hours_per_day", label: "Idle hours per day", kind: "number" },
-    { key: "operating_days", label: "Operating days per year", kind: "number" },
+    { key: "operating_days", label: "Operating days per year", kind: "number" , attrs: { min: "0" } },
     { key: "idle_gph", label: "Idle fuel rate (gal/hr)", kind: "number", whenBlank: 0.8 },
     { key: "fuel_price", label: "Fuel price ($/gal)", kind: "number" },
     { key: "trucks", label: "Trucks in the fleet", kind: "number", whenBlank: 1 },

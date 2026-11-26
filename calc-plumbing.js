@@ -3242,9 +3242,9 @@ const renderTrapSealLoss = _v23SimpleRenderer({
   citation: "Citation: Per the adopted plumbing code's trap-seal-protection and trap-to-vent distance provisions (IPC §1002 (trap seals) and §906 / Table 906.1 (trap-to-vent distance); UPC §1002 / Table 1002.2). The permitted maximum distance is user-supplied from the adopted table; no proprietary table is reproduced. S-traps are out of scope. The AHJ-adopted edition governs. Free read-only at codes.iccsafe.org.",
   example: trapSealLossExample.inputs,
   fields: [
-    { key: "developed_distance_ft", label: "Developed trap-to-vent distance (ft)", kind: "number" },
-    { key: "table_max_ft", label: "Permitted maximum (ft, from adopted table)", kind: "number" },
-    { key: "trap_seal_in", label: "Trap-seal depth (in)", kind: "number", default: 2 },
+    { key: "developed_distance_ft", label: "Developed trap-to-vent distance (ft)", kind: "number" , attrs: { min: "0" } },
+    { key: "table_max_ft", label: "Permitted maximum (ft, from adopted table)", kind: "number" , attrs: { min: "0" } },
+    { key: "trap_seal_in", label: "Trap-seal depth (in)", kind: "number", default: 2 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "pass", id: "tsl-out-pass", label: "Within limit", value: (r) => r.within_limit ? "PASS - within permitted distance" : "FAIL - trap arm exceeds the table maximum" },
@@ -3276,8 +3276,8 @@ const renderWaterMeterSizing = _v23SimpleRenderer({
   citation: "Citation: Per AWWA M22 (Sizing Water Service Lines and Meters) and the AWWA C700-series meter standards. Meter flow ranges are user-supplied for the candidate size. Free guidance summaries at awwa.org.",
   example: waterMeterSizingExample.inputs,
   fields: [
-    { key: "peak_demand_gpm", label: "Peak demand (gpm)", kind: "number" },
-    { key: "normal_rating_gpm", label: "Meter normal-flow rating (gpm)", kind: "number" },
+    { key: "peak_demand_gpm", label: "Peak demand (gpm)", kind: "number" , attrs: { min: "0" } },
+    { key: "normal_rating_gpm", label: "Meter normal-flow rating (gpm)", kind: "number" , attrs: { min: "0" } },
     { key: "peak_rating_gpm", label: "Meter peak-flow rating (gpm, optional)", kind: "number" },
   ],
   outputs: [

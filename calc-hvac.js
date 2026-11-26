@@ -3783,12 +3783,12 @@ HVAC_RENDERERS["assembly-r-value"] = _rEnv({
   citation: "Citation: ASHRAE Handbook of Fundamentals parallel-path (isothermal-planes) method (by name). U_assembly = ff x U_framing + (1-ff) x U_cavity; R = 1/U. Framing ~1.25 R/inch.",
   example: assemblyRValueExample.inputs,
   fields: [
-    { key: "cavity_r", label: "Cavity insulation R", kind: "number" },
+    { key: "cavity_r", label: "Cavity insulation R", kind: "number" , attrs: { min: "0" } },
     { key: "continuous_r", label: "Continuous insulation R", kind: "number" },
-    { key: "stud_depth_in", label: "Stud depth (in)", kind: "number" },
-    { key: "framing_factor", label: "Framing factor (0-1)", kind: "number", default: 0.25 },
-    { key: "air_films_r", label: "Air films R", kind: "number", default: 0.85 },
-    { key: "finish_layers_r", label: "Finish layers R", kind: "number", default: 1.05 },
+    { key: "stud_depth_in", label: "Stud depth (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "framing_factor", label: "Framing factor (0-1)", kind: "number", default: 0.25 , attrs: { min: "0" } },
+    { key: "air_films_r", label: "Air films R", kind: "number", default: 0.85 , attrs: { min: "0" } },
+    { key: "finish_layers_r", label: "Finish layers R", kind: "number", default: 1.05 , attrs: { min: "0" } },
     // spec-v1505 was cut into this compute (the area-weighted-R error, and two fixes side
     // by side), but the page never asked for or showed it until 2026-11-15.
     { key: "alt_framing_factor", label: "Compare: advanced-framing fraction (0-1, optional)", kind: "number" },
@@ -3825,9 +3825,9 @@ HVAC_RENDERERS["blown-insulation-coverage"] = _rEnv({
   citation: "Citation: Manufacturer blown-insulation coverage charts (bags per 1,000 sq ft and minimum settled thickness at the target R, by name). Cellulose ~R-3.5/in, blown FG ~R-2.5/in.",
   example: blownInsulationCoverageExample.inputs,
   fields: [
-    { key: "area_sqft", label: "Attic area (sq ft)", kind: "number" },
-    { key: "bags_per_1000", label: "Bags per 1,000 sq ft", kind: "number" },
-    { key: "r_per_inch", label: "R per inch", kind: "number", whenBlank: 3.5 },
+    { key: "area_sqft", label: "Attic area (sq ft)", kind: "number" , attrs: { min: "0" } },
+    { key: "bags_per_1000", label: "Bags per 1,000 sq ft", kind: "number" , attrs: { min: "0" } },
+    { key: "r_per_inch", label: "R per inch", kind: "number", whenBlank: 3.5 , attrs: { min: "0" } },
     { key: "target_r", label: "Target R-value", kind: "number" },
   ],
   outputs: [
@@ -3874,11 +3874,11 @@ HVAC_RENDERERS["heat-pump-seasonal-energy"] = _rEnv({
   citation: "Citation: AHRI 210/240 HSPF (season Btu delivered per Wh) and the standard fuel-cost comparison gas therms = load / AFUE, resistance at COP 1 (by name). HSPF is the rated regional value; the gas side uses the delivered AFUE. An operating-cost estimate, not a metered bill.",
   example: heatPumpSeasonalEnergyExample.inputs,
   fields: [
-    { key: "seasonal_load_mmbtu", label: "Seasonal heating load (MMBtu)", kind: "number" },
-    { key: "hspf", label: "Heat-pump HSPF", kind: "number" },
-    { key: "rate_kwh", label: "Electric rate ($/kWh)", kind: "number" },
-    { key: "afue", label: "Furnace AFUE (0-1)", kind: "number", whenBlank: 0.95 },
-    { key: "rate_therm", label: "Gas rate ($/therm, 0 = skip gas)", kind: "number" },
+    { key: "seasonal_load_mmbtu", label: "Seasonal heating load (MMBtu)", kind: "number" , attrs: { min: "0" } },
+    { key: "hspf", label: "Heat-pump HSPF", kind: "number" , attrs: { min: "0" } },
+    { key: "rate_kwh", label: "Electric rate ($/kWh)", kind: "number" , attrs: { min: "0" } },
+    { key: "afue", label: "Furnace AFUE (0-1)", kind: "number", whenBlank: 0.95 , attrs: { min: "0" } },
+    { key: "rate_therm", label: "Gas rate ($/therm, 0 = skip gas)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "hp", id: "hpse-out-hp", label: "Heat pump", value: (r) => fmt(r.hp_kwh, 0) + " kWh = $" + fmt(r.hp_cost, 0) + "/season" },
@@ -3913,9 +3913,9 @@ HVAC_RENDERERS["dual-fuel-balance-point"] = _rEnv({
   citation: "Citation: delivered-Btu fuel-cost comparison heat-pump $/MMBtu = 293.07 / COP x rate_kwh, gas $/MMBtu = 10 / AFUE x rate_therm, switchover COP where equal (by name). The switchover COP maps to a temperature only through the unit's COP curve. An economic setpoint aid, not a controls procedure.",
   example: dualFuelBalancePointExample.inputs,
   fields: [
-    { key: "rate_kwh", label: "Electric rate ($/kWh)", kind: "number" },
-    { key: "rate_therm", label: "Gas rate ($/therm)", kind: "number" },
-    { key: "afue", label: "Furnace AFUE (0-1)", kind: "number", whenBlank: 0.95 },
+    { key: "rate_kwh", label: "Electric rate ($/kWh)", kind: "number" , attrs: { min: "0" } },
+    { key: "rate_therm", label: "Gas rate ($/therm)", kind: "number" , attrs: { min: "0" } },
+    { key: "afue", label: "Furnace AFUE (0-1)", kind: "number", whenBlank: 0.95 , attrs: { min: "0" } },
     { key: "cop_now", label: "Heat-pump COP at current temp", kind: "number" },
   ],
   outputs: [
@@ -3953,10 +3953,10 @@ HVAC_RENDERERS["heat-pump-cold-capacity"] = _rEnv({
   citation: "Citation: AHRI 210/240 low-temperature rating points (47 F and 17 F integrated heating capacities) and a linear capacity-versus-temperature interpolation (by name). Prefer a published low-temperature data point over extrapolation. A sizing check, not a performance guarantee.",
   example: heatPumpColdCapacityExample.inputs,
   fields: [
-    { key: "cap_47_btuh", label: "Rated capacity at 47 F (Btu/h)", kind: "number" },
-    { key: "cap_17_btuh", label: "Rated capacity at 17 F (Btu/h)", kind: "number" },
+    { key: "cap_47_btuh", label: "Rated capacity at 47 F (Btu/h)", kind: "number" , attrs: { min: "0" } },
+    { key: "cap_17_btuh", label: "Rated capacity at 17 F (Btu/h)", kind: "number" , attrs: { min: "0" } },
     { key: "design_temp_f", label: "Outdoor design temp (°F)", kind: "number", required: true },
-    { key: "design_load_btuh", label: "Design heating load (Btu/h)", kind: "number" },
+    { key: "design_load_btuh", label: "Design heating load (Btu/h)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "cap", id: "hpcc-out-cap", label: "Delivered capacity at design", value: (r) => fmt(r.cap_design, 0) + " Btu/h" + (r.clamped ? " (clamped to 0)" : "") },
@@ -4002,12 +4002,12 @@ HVAC_RENDERERS["air-leak-cost"] = _rEnv({
   citation: "Citation: US DOE Compressed Air Challenge load/unload leak test (leak fraction = t_load / (t_load + t_unload), leak flow = fraction x cfm) and the ~16-22 kW per 100 cfm specific-power convention (CAC Sourcebook) (by name). Run with production off. An estimate from a stopwatch test, not a metered audit.",
   example: airLeakCostExample.inputs,
   fields: [
-    { key: "compressor_cfm", label: "Compressor delivered capacity (cfm)", kind: "number" },
-    { key: "load_min", label: "Loaded time over test cycles (min)", kind: "number" },
-    { key: "unload_min", label: "Unloaded time over test cycles (min)", kind: "number" },
-    { key: "specific_power", label: "Specific power (kW/100cfm)", kind: "number", whenBlank: 22 },
-    { key: "run_hours", label: "Run hours/yr (energized)", kind: "number", whenBlank: 8760 },
-    { key: "rate_kwh", label: "Energy rate ($/kWh)", kind: "number" },
+    { key: "compressor_cfm", label: "Compressor delivered capacity (cfm)", kind: "number" , attrs: { min: "0" } },
+    { key: "load_min", label: "Loaded time over test cycles (min)", kind: "number" , attrs: { min: "0" } },
+    { key: "unload_min", label: "Unloaded time over test cycles (min)", kind: "number" , attrs: { min: "0" } },
+    { key: "specific_power", label: "Specific power (kW/100cfm)", kind: "number", whenBlank: 22 , attrs: { min: "0" } },
+    { key: "run_hours", label: "Run hours/yr (energized)", kind: "number", whenBlank: 8760 , attrs: { min: "0" } },
+    { key: "rate_kwh", label: "Energy rate ($/kWh)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "frac", id: "alc-out-frac", label: "Leak fraction", value: (r) => fmt(r.leak_fraction * 100, 1) + "%" },
@@ -4046,12 +4046,12 @@ HVAC_RENDERERS["compressed-air-power"] = _rEnv({
   citation: "Citation: single-stage adiabatic (isentropic) compression power hp = 0.004364 x P1 x Q x (k/(k-1)) x [(P2/P1)^((k-1)/k) - 1], P in psia, Q in cfm free air, k = 1.4 (by name). Ideal work divided by the overall efficiency; multi-stage beats single stage above ~100 psig. A sizing and cost estimate, not a compressor selection.",
   example: compressedAirPowerExample.inputs,
   fields: [
-    { key: "free_air_cfm", label: "Free-air flow at intake (cfm)", kind: "number" },
-    { key: "inlet_psia", label: "Inlet pressure (psia)", kind: "number", whenBlank: 14.7 },
-    { key: "discharge_psig", label: "Discharge pressure (psig)", kind: "number" },
-    { key: "overall_eff", label: "Overall wire-to-air efficiency (0-1)", kind: "number", whenBlank: 0.75 },
-    { key: "run_hours", label: "Run hours/yr", kind: "number", whenBlank: 4000 },
-    { key: "rate_kwh", label: "Energy rate ($/kWh)", kind: "number" },
+    { key: "free_air_cfm", label: "Free-air flow at intake (cfm)", kind: "number" , attrs: { min: "0" } },
+    { key: "inlet_psia", label: "Inlet pressure (psia)", kind: "number", whenBlank: 14.7 , attrs: { min: "0" } },
+    { key: "discharge_psig", label: "Discharge pressure (psig)", kind: "number" , attrs: { min: "0" } },
+    { key: "overall_eff", label: "Overall wire-to-air efficiency (0-1)", kind: "number", whenBlank: 0.75 , attrs: { min: "0" } },
+    { key: "run_hours", label: "Run hours/yr", kind: "number", whenBlank: 4000 , attrs: { min: "0" } },
+    { key: "rate_kwh", label: "Energy rate ($/kWh)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "hp", id: "cap-out-hp", label: "Theoretical power", value: (r) => fmt(r.theo_hp, 1) + " hp" },
@@ -4094,12 +4094,12 @@ HVAC_RENDERERS["air-pressure-setpoint-savings"] = _rEnv({
   citation: "Citation: isentropic compression-power ratio percent saved = 1 - [(P_reduced/P1)^((k-1)/k) - 1] / [(P_current/P1)^((k-1)/k) - 1], reproducing the DOE ~0.5 percent per psi rule (by name). The reduced setpoint must still hold the minimum tool pressure. An energy-savings estimate, not a metered result.",
   example: airPressureSetpointSavingsExample.inputs,
   fields: [
-    { key: "current_psig", label: "Current discharge setpoint (psig)", kind: "number" },
-    { key: "reduced_psig", label: "Proposed lower setpoint (psig)", kind: "number" },
-    { key: "inlet_psia", label: "Inlet pressure (psia)", kind: "number", whenBlank: 14.7 },
-    { key: "input_kw", label: "Current compressor input (kW)", kind: "number" },
-    { key: "run_hours", label: "Run hours/yr", kind: "number", whenBlank: 6000 },
-    { key: "rate_kwh", label: "Energy rate ($/kWh)", kind: "number" },
+    { key: "current_psig", label: "Current discharge setpoint (psig)", kind: "number" , attrs: { min: "0" } },
+    { key: "reduced_psig", label: "Proposed lower setpoint (psig)", kind: "number" , attrs: { min: "0" } },
+    { key: "inlet_psia", label: "Inlet pressure (psia)", kind: "number", whenBlank: 14.7 , attrs: { min: "0" } },
+    { key: "input_kw", label: "Current compressor input (kW)", kind: "number" , attrs: { min: "0" } },
+    { key: "run_hours", label: "Run hours/yr", kind: "number", whenBlank: 6000 , attrs: { min: "0" } },
+    { key: "rate_kwh", label: "Energy rate ($/kWh)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "pct", id: "apss-out-pct", label: "Percent energy saved", value: (r) => fmt(r.pct_saved, 2) + "%" },
@@ -4148,7 +4148,7 @@ HVAC_RENDERERS["erv-sensible-recovery"] = _rEnv({
     { key: "cfm", label: "Balanced ventilation airflow (cfm)", kind: "number" },
     { key: "t_oa_F", label: "Outdoor air temperature (°F)", kind: "number", required: true },
     { key: "t_ra_F", label: "Return/exhaust air temperature (°F)", kind: "number", required: true },
-    { key: "eps_s", label: "Rated sensible effectiveness (0-1)", kind: "number", default: 0.75 },
+    { key: "eps_s", label: "Rated sensible effectiveness (0-1)", kind: "number", default: 0.75 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "dt", id: "esr-out-dt", label: "Available temperature difference", value: (r) => fmt(r.dT_F, 1) + " F" },
@@ -4194,10 +4194,10 @@ HVAC_RENDERERS["mua-tempering-load"] = _rEnv({
   citation: "Citation: ASHRAE Fundamentals sensible Q_s = 1.08 x CFM x dT and latent Q_l = 0.68 x CFM x dW (gr/lb) tempering loads with the IMC 508 makeup-air-equals-exhaust requirement (by name). Sea-level constants, neutral supply target, no duct losses. A design aid, not the engineer's stamped design.",
   example: muaTemperingLoadExample.inputs,
   fields: [
-    { key: "cfm", label: "Makeup airflow (cfm, = exhaust)", kind: "number" },
+    { key: "cfm", label: "Makeup airflow (cfm, = exhaust)", kind: "number" , attrs: { min: "0" } },
     { key: "t_oa_F", label: "Outdoor air temperature (°F)", kind: "number", required: true },
     { key: "t_target_F", label: "Target supply temperature (°F)", kind: "number", required: true },
-    { key: "eta", label: "Heater thermal efficiency (0-1)", kind: "number", whenBlank: 0.8 },
+    { key: "eta", label: "Heater thermal efficiency (0-1)", kind: "number", whenBlank: 0.8 , attrs: { min: "0" } },
     { key: "w_oa_gr", label: "Outdoor humidity ratio (gr/lb, optional)", kind: "number" },
     { key: "w_target_gr", label: "Target humidity ratio (gr/lb, optional)", kind: "number" },
   ],
@@ -4234,10 +4234,10 @@ HVAC_RENDERERS["dcv-co2-ventilation"] = _rEnv({
   citation: "Citation: steady-state single-zone CO2 mass balance C_in = C_oa + N/Q, solved as Q = N / (C_set - C_oa), with the ASHRAE 62.1 CO2-as-indicator note and a sedentary generation of about 0.0106 cfm/person (by name). Equilibrium airflow, one fully mixed zone. The ASHRAE 62.1 rate procedure governs the minimum.",
   example: dcvCo2VentilationExample.inputs,
   fields: [
-    { key: "n", label: "Occupancy (people)", kind: "number" },
-    { key: "co2_set_ppm", label: "Indoor CO2 setpoint (ppm)", kind: "number" },
-    { key: "co2_oa_ppm", label: "Outdoor CO2 (ppm)", kind: "number", default: 400 },
-    { key: "gen_cfm", label: "CO2 generation per person (cfm)", kind: "number", whenBlank: 0.0106 },
+    { key: "n", label: "Occupancy (people)", kind: "number" , attrs: { min: "0" } },
+    { key: "co2_set_ppm", label: "Indoor CO2 setpoint (ppm)", kind: "number" , attrs: { min: "0" } },
+    { key: "co2_oa_ppm", label: "Outdoor CO2 (ppm)", kind: "number", default: 400 , attrs: { min: "0" } },
+    { key: "gen_cfm", label: "CO2 generation per person (cfm)", kind: "number", whenBlank: 0.0106 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "qp", id: "dcv-out-qp", label: "Outdoor airflow per person", value: (r) => fmt(r.Q_person_cfm, 1) + " cfm/person" },
@@ -4274,8 +4274,8 @@ HVAC_RENDERERS["reynolds-number-pipe"] = _rEnv({
   example: reynoldsNumberPipeExample.inputs,
   fields: [
     { key: "v_fps", label: "Mean flow velocity (ft/s)", kind: "number" },
-    { key: "d_in", label: "Inside diameter (in)", kind: "number" },
-    { key: "nu", label: "Kinematic viscosity (ft²/s)", kind: "number", default: 1.21e-5 },
+    { key: "d_in", label: "Inside diameter (in)", kind: "number" , attrs: { min: "0" } },
+    { key: "nu", label: "Kinematic viscosity (ft²/s)", kind: "number", default: 1.21e-5 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "re", id: "rnp-out-re", label: "Reynolds number", value: (r) => fmt(r.re, 0) },
@@ -4306,10 +4306,10 @@ HVAC_RENDERERS["hydronic-gpm-deltat"] = _rEnv({
   citation: "Citation: hydronic flow GPM = Q / (500 dT) from Q = 500 GPM dT (500 = 8.33 x 60 x 1.0 for water), the chilled-water form GPM = 24 tons/dT, and the glycol-lowered factor, by name. Pure water, full load on the delta-T; the pump head is pump-tdh. A design aid; the mechanical engineer of record governs.",
   example: hydronicGpmDeltatExample.inputs,
   fields: [
-    { key: "load", label: "Load (Btu/h, or tons if unit set to 1)", kind: "number" },
-    { key: "unit_tons", label: "Load unit (0 = Btu/h, 1 = tons)", kind: "number", default: 0 },
+    { key: "load", label: "Load (Btu/h, or tons if unit set to 1)", kind: "number" , attrs: { min: "0" } },
+    { key: "unit_tons", label: "Load unit (0 = Btu/h, 1 = tons)", kind: "number", default: 0 , attrs: { min: "0" } },
     { key: "dt_f", label: "Design delta-T (degF)", kind: "number" },
-    { key: "factor", label: "Fluid factor (500 water, about 470 for 30% PG)", kind: "number", default: 500 },
+    { key: "factor", label: "Fluid factor (500 water, about 470 for 30% PG)", kind: "number", default: 500 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "q", id: "hgd-out-q", label: "Load", value: (r) => fmt(r.q_btuh, 0) + " Btu/h" },
@@ -4337,9 +4337,9 @@ HVAC_RENDERERS["pump-specific-speed"] = _rEnv({
   citation: "Citation: US pump specific speed Ns = N sqrt(Q) / H^(3/4) (rpm, gpm at BEP, ft/stage) and the impeller-type bands (radial below ~2,000, mixed ~2,000-4,500, axial above ~4,500), Hydraulic Institute convention, by name. US dimensional form; the suction specific speed Nss is separate. An engineering aid; the manufacturer's curves govern.",
   example: pumpSpecificSpeedExample.inputs,
   fields: [
-    { key: "n_rpm", label: "Pump speed N (rpm)", kind: "number" },
-    { key: "q_gpm", label: "Flow at BEP Q (gpm)", kind: "number" },
-    { key: "h_ft", label: "Head per stage H (ft)", kind: "number" },
+    { key: "n_rpm", label: "Pump speed N (rpm)", kind: "number" , attrs: { min: "0" } },
+    { key: "q_gpm", label: "Flow at BEP Q (gpm)", kind: "number" , attrs: { min: "0" } },
+    { key: "h_ft", label: "Head per stage H (ft)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "ns", id: "pss-out-ns", label: "Specific speed Ns", value: (r) => fmt(r.ns, 0) },
@@ -4367,9 +4367,9 @@ HVAC_RENDERERS["pump-suction-specific-speed"] = _rEnv({
   citation: "Citation: US pump suction specific speed Nss = N sqrt(Q) / NPSHr^(3/4) (rpm, gpm at BEP, ft) and the Hydraulic Institute design guidelines (~8,500 traditional limit, ~11,000 reliability threshold), by name. Q is the BEP flow (half the total for a double-suction impeller); US dimensional form. A screening index, not an NPSH-margin calculation; the manufacturer's curves govern.",
   example: pumpSuctionSpecificSpeedExample.inputs,
   fields: [
-    { key: "n_rpm", label: "Pump speed N (rpm)", kind: "number" },
-    { key: "q_gpm", label: "Flow at BEP Q (gpm, half total if double-suction)", kind: "number" },
-    { key: "npshr_ft", label: "Required NPSH at that flow (ft)", kind: "number" },
+    { key: "n_rpm", label: "Pump speed N (rpm)", kind: "number" , attrs: { min: "0" } },
+    { key: "q_gpm", label: "Flow at BEP Q (gpm, half total if double-suction)", kind: "number" , attrs: { min: "0" } },
+    { key: "npshr_ft", label: "Required NPSH at that flow (ft)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "nss", id: "psss-out-nss", label: "Suction specific speed Nss", value: (r) => fmt(r.nss, 0) },
@@ -4535,7 +4535,7 @@ HVAC_RENDERERS["wall-condensation-gradient"] = _rEnv({
     { key: "r_outside", label: "R-value beyond the plane", kind: "number" },
     { key: "t_in_f", label: "Indoor air temperature (°F)", kind: "number", required: true },
     { key: "t_out_f", label: "Outdoor air temperature (°F)", kind: "number", required: true },
-    { key: "rh_in_pct", label: "Indoor relative humidity (%)", kind: "number" },
+    { key: "rh_in_pct", label: "Indoor relative humidity (%)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "tp", id: "wcg-out-tp", label: "Condensation-plane temperature", value: (r) => fmt(r.t_plane_f, 1) + " F" },
@@ -4570,8 +4570,8 @@ HVAC_RENDERERS["erv-total-enthalpy-recovery"] = _rEnv({
   citation: "Citation: ERV total (enthalpy) recovery (ASHRAE Handbook - Fundamentals / AHRI 1060): Q = 4.5 x CFM x effectiveness x (h_outdoor - h_return) Btu/hr, supply enthalpy = h_outdoor - effectiveness x (h_outdoor - h_return). Positive Q is a summer cooling recovery, negative a winter heating recovery. A design aid; the ERV's rated effectiveness governs.",
   example: ervTotalEnthalpyRecoveryExample.inputs,
   fields: [
-    { key: "cfm", label: "Ventilation airflow through the ERV (cfm)", kind: "number" },
-    { key: "effectiveness", label: "Enthalpy (total-energy) effectiveness (0-1)", kind: "number" },
+    { key: "cfm", label: "Ventilation airflow through the ERV (cfm)", kind: "number" , attrs: { min: "0" } },
+    { key: "effectiveness", label: "Enthalpy (total-energy) effectiveness (0-1)", kind: "number" , attrs: { min: "0" } },
     { key: "h_outdoor", label: "Outdoor-air enthalpy (Btu/lb)", kind: "number" },
     { key: "h_return", label: "Return/exhaust-air enthalpy (Btu/lb)", kind: "number" },
   ],

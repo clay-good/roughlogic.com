@@ -2555,7 +2555,7 @@ CONCRETE_RENDERERS["slab-dowel-schedule"] = _simpleRenderer({
   example: slabDowelScheduleExample.inputs,
   fields: [
     { key: "joint_length_ft", label: "Joint length (ft)", kind: "number", whenBlank: 40 },
-    { key: "slab_thickness_in", label: "Slab thickness (in)", kind: "number", whenBlank: 6 },
+    { key: "slab_thickness_in", label: "Slab thickness (in)", kind: "number", whenBlank: 6 , attrs: { min: "0" } },
     { key: "dowel_spacing_in", label: "Dowel spacing (in o.c.)", kind: "number", whenBlank: 12 },
     { key: "edge_clearance_in", label: "Edge clearance (in)", kind: "number", default: 6 },
     { key: "num_joints", label: "Number of dowelled joints", kind: "number", whenBlank: 5 },
@@ -2597,8 +2597,8 @@ CONCRETE_RENDERERS["concrete-premix-bags"] = _simpleRenderer({
   citation: "Citation: bagged (premix) concrete count for a small pour, by name. volume = L x W x (thickness_in/12); bags = ceil(volume x (1 + waste) / bag yield). Bag yield ~0.0075 ft^3/lb: 80 lb ~0.60 ft^3, 60 lb ~0.45, 50 lb ~0.375, 40 lb ~0.30. Round up; past ~1 cu yd (~45 of the 80 lb bags) ready-mix is cheaper. The printed bag yield, the real formwork, and the mix design govern.",
   example: concretePremixBagsExample.inputs,
   fields: [
-    { key: "length_ft", label: "Length (ft)", kind: "number", whenBlank: 4 },
-    { key: "width_ft", label: "Width (ft)", kind: "number", whenBlank: 4 },
+    { key: "length_ft", label: "Length (ft)", kind: "number", whenBlank: 4 , attrs: { min: "0" } },
+    { key: "width_ft", label: "Width (ft)", kind: "number", whenBlank: 4 , attrs: { min: "0" } },
     { key: "thickness_in", label: "Thickness (in)", kind: "number", whenBlank: 4 },
     { key: "bag_yield_ft3", label: "Bag yield (ft³): 80lb 0.60, 60lb 0.45, 50lb 0.375, 40lb 0.30", kind: "number", default: 0.6 },
     { key: "waste_pct", label: "Waste (percent)", kind: "number", default: 10 },

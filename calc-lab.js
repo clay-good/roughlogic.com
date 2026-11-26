@@ -1290,9 +1290,9 @@ const renderGelPercentAgarose = _v23SimpleRenderer({
   citation: "Citation: Per Sambrook & Russell, Molecular Cloning, gel-electrophoresis resolution tables (agarose percent vs. fragment-size range). Complements the pcr-master-mix tile. Very small/large fragments fall outside standard agarose (PAGE / pulsed-field). Lab SOP governs.",
   example: gelPercentAgaroseExample.inputs,
   fields: [
-    { key: "target_bp_high", label: "Largest fragment to resolve (bp)", kind: "number" },
+    { key: "target_bp_high", label: "Largest fragment to resolve (bp)", kind: "number" , attrs: { min: "0" } },
     { key: "gel_percent", label: "Gel percent override (optional)", kind: "number" },
-    { key: "buffer_volume_ml", label: "Buffer / gel volume (mL)", kind: "number" },
+    { key: "buffer_volume_ml", label: "Buffer / gel volume (mL)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "pct", id: "gpa-out-pct", label: "Gel percent", value: (r) => fmt(r.used_percent, 1) + "%" + (r.recommended_percent !== null ? " (recommended " + fmt(r.recommended_percent, 1) + "% for the range)" : "") + (r.out_of_standard ? " - outside standard agarose; consider PAGE / pulsed-field" : "") },

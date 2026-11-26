@@ -2028,7 +2028,7 @@ HVACSYSTEMS_RENDERERS["pump-impeller-trim"] = _simpleRenderer({
     { key: "min_trim_fraction", label: "Minimum practical trim (fraction of maximum)", kind: "number", default: 0.75 },
     { key: "motor_hp", label: "Motor power (hp, 0 to skip the saving)", kind: "number" },
     { key: "annual_hours", label: "Annual operating hours", kind: "number" },
-    { key: "energy_rate_per_kwh", label: "Energy rate ($/kWh)", kind: "number" },
+    { key: "energy_rate_per_kwh", label: "Energy rate ($/kWh)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "d", id: "pit-out-d", label: "Required diameter", value: (r) => fmt(r.required_diameter_in, 2) + " in, " + aFig(fmt(r.trim_in, 2)) + " in trim (" + fmt(r.trim_pct, 1) + "%)" },
@@ -2824,7 +2824,7 @@ HVACSYSTEMS_RENDERERS["cryogenic-boiloff"] = _simpleRenderer({
   example: cryogenicBoiloffExample.inputs,
   citation: "Citation: boil-off = tank contents x the manufacturer's rated normal evaporation rate, with the heat leak that rate implies through the latent heat of vaporization; hold time from the ideal gas law, as the vapour mass needed to raise the vapour space from its current pressure to the relief setting divided by the boil-off rate. The hold time is a SCREENING estimate -- it holds the vapour temperature constant and ignores liquid stratification and the saturated liquid-vapour coupling, so the manufacturer's published hold-time data governs. It does not size relief devices, which must also cover the fire case, and does not address the asphyxiation, cold burn, or embrittlement hazards. CGA standards, NFPA 55, and the tank manufacturer govern.",
   fields: [
-    { key: "tank_volume_gal", label: "Tank volume (gal)" },
+    { key: "tank_volume_gal", label: "Tank volume (gal)" , attrs: { min: "0" } },
     { key: "ner_pct_per_day", label: "Normal evaporation rate (% per day)" },
     { key: "liquid_density_lb_gal", label: "Liquid density (lb/gal)" },
     { key: "latent_heat_btu_lb", label: "Latent heat of vaporization (BTU/lb, 0 to skip)" },

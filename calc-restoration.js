@@ -1379,10 +1379,10 @@ const renderDryingChamberCO2 = _v23SimpleRenderer({
   citation: "Citation: Per the ASHRAE 62.1 ventilation-rate mass-balance basis (Q_fresh = generation / (C_indoor - C_outdoor); ACH = Q*60 / V). Complements the chamber-turnover tile (which sizes air movers, not fresh air). IICRC S500 governs the drying plan.",
   example: dryingChamberCO2Example.inputs,
   fields: [
-    { key: "containment_volume_ft3", label: "Containment volume (ft³)", kind: "number" },
-    { key: "co2_generation_cfm", label: "CO2 generation (cfm of CO2)", kind: "number" },
-    { key: "target_indoor_ppm", label: "Target indoor CO2 (ppm)", kind: "number", whenBlank: 1000 },
-    { key: "outdoor_ppm", label: "Outdoor CO2 (ppm)", kind: "number", default: 420 },
+    { key: "containment_volume_ft3", label: "Containment volume (ft³)", kind: "number" , attrs: { min: "0" } },
+    { key: "co2_generation_cfm", label: "CO2 generation (cfm of CO2)", kind: "number" , attrs: { min: "0" } },
+    { key: "target_indoor_ppm", label: "Target indoor CO2 (ppm)", kind: "number", whenBlank: 1000 , attrs: { min: "0" } },
+    { key: "outdoor_ppm", label: "Outdoor CO2 (ppm)", kind: "number", default: 420 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "fresh", id: "dcc-out-f", label: "Required fresh air", value: (r) => fmt(r.fresh_air_cfm, 1) + " cfm" + (r.above_target ? " (target > 1000 ppm - increase fresh air)" : "") },

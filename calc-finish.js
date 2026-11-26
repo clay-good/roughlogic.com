@@ -1322,7 +1322,7 @@ FINISH_RENDERERS["texture-material-takeoff"] = _simpleRenderer({
     { key: "openings_sqft", label: "Openings to deduct (sq ft)", kind: "number" },
     { key: "coverage_per_bag_sqft", label: "Coverage per bag, from the product (sq ft)", kind: "number" },
     { key: "waste_pct", label: "Waste factor (%)", kind: "number", default: 10 },
-    { key: "bag_weight_lb", label: "Bag weight (lb)", kind: "number", whenBlank: 40 },
+    { key: "bag_weight_lb", label: "Bag weight (lb)", kind: "number", whenBlank: 40 , attrs: { min: "0" } },
     { key: "water_gal_per_bag", label: "Mix water per bag (gal)", kind: "number" },
   ],
   outputs: [

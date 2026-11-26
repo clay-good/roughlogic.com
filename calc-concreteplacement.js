@@ -404,7 +404,7 @@ CONCRETEPLACEMENT_RENDERERS["tilt-up-lift-stress"] = _simpleRenderer({
   fields: [
     { key: "panel_width_ft", label: "Panel width (ft)", kind: "number" },
     { key: "panel_height_ft", label: "Panel height (ft)", kind: "number" },
-    { key: "thickness_in", label: "Panel thickness (in)", kind: "number" },
+    { key: "thickness_in", label: "Panel thickness (in)", kind: "number" , attrs: { min: "0" } },
     { key: "unit_weight_pcf", label: "Concrete unit weight (pcf)", kind: "number", default: 150 },
     { key: "lift_day_strength_psi", label: "Day-of-lift compressive strength (psi)", kind: "number" },
     { key: "insert_rows", label: "Insert rows (across the height)", kind: "number", default: 2 },

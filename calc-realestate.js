@@ -2446,9 +2446,9 @@ const renderRentRollVacancy = _v23SimpleRenderer({
   citation: "Citation: Per the Appraisal Institute income-approach EGI definition (EGI = potential rent x (1 - vacancy% - credit%) + other income). Other income is not vacancy-adjusted. Feeds the cap-rate-dscr tile. Appraiser and lender govern the underwritten figures.",
   example: rentRollVacancyExample.inputs,
   fields: [
-    { key: "potential_gross_rent", label: "Potential gross rent ($/yr)", kind: "number" },
-    { key: "vacancy_rate_pct", label: "Vacancy rate (%)", kind: "number" },
-    { key: "credit_loss_pct", label: "Credit-loss rate (%)", kind: "number" },
+    { key: "potential_gross_rent", label: "Potential gross rent ($/yr)", kind: "number" , attrs: { min: "0" } },
+    { key: "vacancy_rate_pct", label: "Vacancy rate (%)", kind: "number" , attrs: { min: "0" } },
+    { key: "credit_loss_pct", label: "Credit-loss rate (%)", kind: "number" , attrs: { min: "0" } },
     { key: "other_income", label: "Other income ($/yr)", kind: "number" },
   ],
   outputs: [

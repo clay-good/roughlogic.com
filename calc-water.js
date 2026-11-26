@@ -432,9 +432,9 @@ const renderFilterLoading = _r({
   citation: "Citation: AWWA general practice by name only. Loading rate = flow / area. Backwash flow = backwash rate * area.",
   example: filterLoadingExample.inputs,
   fields: [
-    { key: "filter_area_ft2",       label: "Filter area (ft²)", kind: "number" },
-    { key: "flow_gpm",              label: "Flow (GPM)", kind: "number" },
-    { key: "backwash_rate_gpm_ft2", label: "Backwash rate (gpm/ft²)", kind: "number", default: 15 },
+    { key: "filter_area_ft2",       label: "Filter area (ft²)", kind: "number" , attrs: { min: "0" } },
+    { key: "flow_gpm",              label: "Flow (GPM)", kind: "number" , attrs: { min: "0" } },
+    { key: "backwash_rate_gpm_ft2", label: "Backwash rate (gpm/ft²)", kind: "number", default: 15 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "l", id: "fl-out-l", label: "Loading rate", value: (r) => fmt(r.loading_gpm_per_ft2, 2) + " gpm/ft^2" },
@@ -448,9 +448,9 @@ const renderFilterAreaForLoading = _r({
   citation: "Citation: AWWA general practice by name only. Filter area = flow / target loading rate. Backwash flow = backwash rate * area.",
   example: filterAreaForLoadingExample.inputs,
   fields: [
-    { key: "flow_gpm",               label: "Design flow (GPM)", kind: "number" },
-    { key: "target_loading_gpm_ft2", label: "Target loading rate (gpm/ft²)", kind: "number" },
-    { key: "backwash_rate_gpm_ft2",  label: "Backwash rate (gpm/ft²)", kind: "number", default: 15 },
+    { key: "flow_gpm",               label: "Design flow (GPM)", kind: "number" , attrs: { min: "0" } },
+    { key: "target_loading_gpm_ft2", label: "Target loading rate (gpm/ft²)", kind: "number" , attrs: { min: "0" } },
+    { key: "backwash_rate_gpm_ft2",  label: "Backwash rate (gpm/ft²)", kind: "number", default: 15 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "a", id: "fal-out-a", label: "Required filter area", value: (r) => fmt(r.required_area_ft2, 1) + " ft^2" },
@@ -464,9 +464,9 @@ const renderDetentionTime = _r({
   citation: "Citation: Detention time = volume / flow. Used for chlorine contact, flocculation, sedimentation.",
   example: detentionTimeExample.inputs,
   fields: [
-    { key: "tank_volume_gal", label: "Tank volume (gal)", kind: "number" },
-    { key: "flow_gpm",        label: "Flow (GPM)", kind: "number" },
-    { key: "target_minutes",  label: "Target (min, optional)", kind: "number" },
+    { key: "tank_volume_gal", label: "Tank volume (gal)", kind: "number" , attrs: { min: "0" } },
+    { key: "flow_gpm",        label: "Flow (GPM)", kind: "number" , attrs: { min: "0" } },
+    { key: "target_minutes",  label: "Target (min, optional)", kind: "number" , attrs: { min: "0" } },
     { key: "surface_area_ft2", label: "Surface area (ft², optional)", kind: "number" },
     { key: "weir_length_ft",  label: "Weir length (ft, optional)", kind: "number" },
   ],
@@ -483,8 +483,8 @@ const renderDetentionBasinVolume = _r({
   citation: "Citation: Required basin volume = target detention time x flow (the inverse of detention time = volume / flow). Sizes chlorine-contact, flocculation, and sedimentation basins to a target time (Ten States Standards).",
   example: detentionBasinVolumeExample.inputs,
   fields: [
-    { key: "target_minutes", label: "Target detention time (min)", kind: "number" },
-    { key: "flow_gpm",       label: "Flow (GPM)", kind: "number" },
+    { key: "target_minutes", label: "Target detention time (min)", kind: "number" , attrs: { min: "0" } },
+    { key: "flow_gpm",       label: "Flow (GPM)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "v", id: "dbv-out-v", label: "Required volume", value: (r) => fmt(r.tank_volume_gal, 0) + " gal (" + fmt(r.tank_volume_ft3, 1) + " ft^3)" },
@@ -536,11 +536,11 @@ const renderPumpEff = _r({
   citation: "Citation: Hydraulic Institute by name only. WHP = (GPM * TDH) / 3960. Wire-to-water % = WHP / motor_HP.",
   example: pumpEfficiencyExample.inputs,
   fields: [
-    { key: "flow_gpm",   label: "Flow (GPM)", kind: "number" },
-    { key: "tdh_ft",     label: "Total dynamic head (ft)", kind: "number" },
-    { key: "motor_kW",   label: "Motor input (kW)", kind: "number" },
-    { key: "motor_eff",  label: "Motor efficiency (0-1)", kind: "number", whenBlank: 0.92 },
-    { key: "drive_eff",  label: "Drive efficiency (0-1)", kind: "number", default: 1 },
+    { key: "flow_gpm",   label: "Flow (GPM)", kind: "number" , attrs: { min: "0" } },
+    { key: "tdh_ft",     label: "Total dynamic head (ft)", kind: "number" , attrs: { min: "0" } },
+    { key: "motor_kW",   label: "Motor input (kW)", kind: "number" , attrs: { min: "0" } },
+    { key: "motor_eff",  label: "Motor efficiency (0-1)", kind: "number", whenBlank: 0.92 , attrs: { min: "0" } },
+    { key: "drive_eff",  label: "Drive efficiency (0-1)", kind: "number", default: 1 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "w", id: "pe-out-w", label: "Water HP",         value: (r) => fmt(r.whp, 2) + " hp" },
@@ -554,14 +554,14 @@ const renderSRTFM = _r({
   citation: "Citation: Metcalf and Eddy by name only. SRT = aeration solids / waste solids per day. F/M = BOD load / MLVSS in tank.",
   example: srtFMExample.inputs,
   fields: [
-    { key: "aeration_volume_gal", label: "Aeration volume (gal)", kind: "number" },
-    { key: "mlss_mg_l",           label: "MLSS (mg/L)", kind: "number" },
-    { key: "mlvss_mg_l",          label: "MLVSS (mg/L)", kind: "number" },
-    { key: "was_flow_mgd",        label: "WAS flow (MGD)", kind: "number" },
-    { key: "was_tss_mg_l",        label: "WAS TSS (mg/L)", kind: "number" },
-    { key: "bod_load_lb_day",     label: "BOD load (lb/day)", kind: "number" },
-    { key: "effluent_tss_mg_l",   label: "Effluent TSS (mg/L)", kind: "number" },
-    { key: "effluent_flow_mgd",   label: "Effluent flow (MGD)", kind: "number" },
+    { key: "aeration_volume_gal", label: "Aeration volume (gal)", kind: "number" , attrs: { min: "0" } },
+    { key: "mlss_mg_l",           label: "MLSS (mg/L)", kind: "number" , attrs: { min: "0" } },
+    { key: "mlvss_mg_l",          label: "MLVSS (mg/L)", kind: "number" , attrs: { min: "0" } },
+    { key: "was_flow_mgd",        label: "WAS flow (MGD)", kind: "number" , attrs: { min: "0" } },
+    { key: "was_tss_mg_l",        label: "WAS TSS (mg/L)", kind: "number" , attrs: { min: "0" } },
+    { key: "bod_load_lb_day",     label: "BOD load (lb/day)", kind: "number" , attrs: { min: "0" } },
+    { key: "effluent_tss_mg_l",   label: "Effluent TSS (mg/L)", kind: "number" , attrs: { min: "0" } },
+    { key: "effluent_flow_mgd",   label: "Effluent flow (MGD)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "ml", id: "sf-out-ml", label: "MLSS in tank",    value: (r) => fmt(r.mlss_lb, 1) + " lb" },
@@ -1687,9 +1687,9 @@ const renderChlorineDemand = _v23SimpleRenderer({
   citation: "Citation: Standard Methods 4500-Cl / AWWA M14 (by name, not reproduced). Demand = applied - residual; dose for a target = demand + target. A high demand suggests ammonia / organics - check breakpoint. The state primacy agency sets the compliance residual and method.",
   example: chlorineDemandExample.inputs,
   fields: [
-    { key: "applied_mg_l", label: "Applied chlorine (mg/L)", kind: "number" },
-    { key: "measured_residual_mg_l", label: "Measured residual (mg/L)", kind: "number" },
-    { key: "target_residual_mg_l", label: "Target residual (mg/L)", kind: "number" },
+    { key: "applied_mg_l", label: "Applied chlorine (mg/L)", kind: "number" , attrs: { min: "0" } },
+    { key: "measured_residual_mg_l", label: "Measured residual (mg/L)", kind: "number" , attrs: { min: "0" } },
+    { key: "target_residual_mg_l", label: "Target residual (mg/L)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "d", id: "cld-out-d", label: "Chlorine demand", value: (r) => fmt(r.demand_mg_l, 2) + " mg/L" + (r.high_demand ? " (high - check ammonia / breakpoint)" : "") },
@@ -1720,9 +1720,9 @@ const renderUvDose = _v23SimpleRenderer({
   citation: "Citation: USEPA UV Disinfection Guidance Manual (by name, not reproduced). Dose = intensity x time (mW.s/cm^2 = mJ/cm^2); common validated target 40 mJ/cm^2 (editable). The validated reactor dose and the state primacy agency govern.",
   example: uvDoseExample.inputs,
   fields: [
-    { key: "intensity_mw_cm2", label: "UV intensity (mW/cm²)", kind: "number" },
-    { key: "exposure_time_s", label: "Exposure time (s)", kind: "number" },
-    { key: "target_dose_mj_cm2", label: "Target dose (mJ/cm²)", kind: "number", whenBlank: 40 },
+    { key: "intensity_mw_cm2", label: "UV intensity (mW/cm²)", kind: "number" , attrs: { min: "0" } },
+    { key: "exposure_time_s", label: "Exposure time (s)", kind: "number" , attrs: { min: "0" } },
+    { key: "target_dose_mj_cm2", label: "Target dose (mJ/cm²)", kind: "number", whenBlank: 40 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "d", id: "uvd-out-d", label: "Delivered dose", value: (r) => fmt(r.dose_mj_cm2, 1) + " mJ/cm^2" },
@@ -1756,8 +1756,8 @@ const renderUvRequiredExposure = _v23SimpleRenderer({
   citation: "Citation: USEPA UV Disinfection Guidance Manual (by name, not reproduced). Dose = intensity x time (mW.s/cm^2 = mJ/cm^2) solved for the missing operand: required time = dose / intensity, or required intensity = dose / time; common validated target 40 mJ/cm^2 (editable). The validated reactor dose and the state primacy agency govern.",
   example: uvRequiredExposureExample.inputs,
   fields: [
-    { key: "target_dose_mj_cm2", label: "Target dose (mJ/cm²)", kind: "number", whenBlank: 40 },
-    { key: "intensity_mw_cm2", label: "UV intensity (mW/cm², 0 = solve for it)", kind: "number" },
+    { key: "target_dose_mj_cm2", label: "Target dose (mJ/cm²)", kind: "number", whenBlank: 40 , attrs: { min: "0" } },
+    { key: "intensity_mw_cm2", label: "UV intensity (mW/cm², 0 = solve for it)", kind: "number" , attrs: { min: "0" } },
     { key: "exposure_time_s", label: "Exposure time (s, 0 = solve for it)", kind: "number" },
   ],
   outputs: [
@@ -1796,9 +1796,9 @@ const renderPopulationEquivalent = _v23SimpleRenderer({
   citation: "Citation: population equivalent (organic load), standard sanitary engineering, by name. bod_load = MGD x BOD x 8.34; PE_bod = bod_load / 0.17; PE_flow = gpd / 100; PE_ss = ss_load / 0.20; governing PE = max of the three. The largest of BOD, flow, and SS governs, not BOD alone. The per-capita bases are editable conventions; the pretreatment ordinance and the authority govern.",
   example: populationEquivalentExample.inputs,
   fields: [
-    { key: "flow_mgd", label: "Discharge flow (MGD)", kind: "number" },
-    { key: "bod_mg_l", label: "BOD concentration (mg/L)", kind: "number" },
-    { key: "ss_mg_l", label: "Suspended solids (mg/L, 0 to skip)", kind: "number", default: 0 },
+    { key: "flow_mgd", label: "Discharge flow (MGD)", kind: "number" , attrs: { min: "0" } },
+    { key: "bod_mg_l", label: "BOD concentration (mg/L)", kind: "number" , attrs: { min: "0" } },
+    { key: "ss_mg_l", label: "Suspended solids (mg/L, 0 to skip)", kind: "number", default: 0 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "b", id: "pe-out-b", label: "PE from BOD", value: (r) => fmt(r.pe_bod, 0) + " people (" + fmt(r.bod_load_lb, 0) + " lb/day)" },
@@ -1834,9 +1834,9 @@ const renderRasFlowRate = _v23SimpleRenderer({
   citation: "Citation: RAS flow from the solids mass balance (WEF / Sacramento activated-sludge manuals), by name. Q_RAS = Q x MLSS / (RAS_SS - MLSS); ratio = Q_RAS / Q x 100. The clarifier only thickens sludge 3-4x, so the return solids are capped - the mass balance, not the pump maximum, sets the rate. The settleability and clarifier performance govern.",
   example: rasFlowRateExample.inputs,
   fields: [
-    { key: "plant_flow_mgd", label: "Plant influent flow Q (MGD)", kind: "number" },
-    { key: "mlss_mg_l", label: "Mixed-liquor solids MLSS (mg/L, target)", kind: "number" },
-    { key: "ras_ss_mg_l", label: "Return solids RAS_SS (mg/L, > MLSS)", kind: "number" },
+    { key: "plant_flow_mgd", label: "Plant influent flow Q (MGD)", kind: "number" , attrs: { min: "0" } },
+    { key: "mlss_mg_l", label: "Mixed-liquor solids MLSS (mg/L, target)", kind: "number" , attrs: { min: "0" } },
+    { key: "ras_ss_mg_l", label: "Return solids RAS_SS (mg/L, > MLSS)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "q", id: "ras-out-q", label: "RAS flow rate", value: (r) => fmt(r.q_ras_mgd, 2) + " MGD" },
@@ -1873,9 +1873,9 @@ const renderRasSviSettleability = _v23SimpleRenderer({
   citation: "Citation: settleability-based RAS from the sludge volume index (WEF / Sacramento activated-sludge manuals), by name. Xr = 1,000,000 / SVI; R = MLSS / (Xr - MLSS); Q_RAS = R x Q. The achievable return concentration is the settleability ceiling, not a guaranteed value; poor settling forces a higher return rate and a bulking sludge can make a target MLSS unreachable within the pump capacity. The settleability and clarifier performance govern.",
   example: rasSviSettleabilityExample.inputs,
   fields: [
-    { key: "plant_flow_mgd", label: "Plant influent flow Q (MGD)", kind: "number" },
-    { key: "mlss_mg_l", label: "Mixed-liquor solids MLSS (mg/L, target)", kind: "number" },
-    { key: "svi_ml_g", label: "Sludge volume index SVI (mL/g, from the settleometer)", kind: "number" },
+    { key: "plant_flow_mgd", label: "Plant influent flow Q (MGD)", kind: "number" , attrs: { min: "0" } },
+    { key: "mlss_mg_l", label: "Mixed-liquor solids MLSS (mg/L, target)", kind: "number" , attrs: { min: "0" } },
+    { key: "svi_ml_g", label: "Sludge volume index SVI (mL/g, from the settleometer)", kind: "number" , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "xr", id: "rsvi-out-xr", label: "Achievable return solids (settleability ceiling)", value: (r) => fmt(r.achievable_ras_ss_mg_l, 0) + " mg/L" },
@@ -1920,12 +1920,12 @@ const renderWasSrtControl = _v23SimpleRenderer({
   citation: "Citation: WAS rate for a target SRT (MCRT/SRT control; WEF operator training), by name. system_solids = V x MLSS x 8.34; solids_to_waste = system_solids / SRT; effluent_solids = Qeff x TSSeff x 8.34; Q_WAS = (solids_to_waste - effluent_solids) / (WAS x 8.34); Q_WAS_gpm = Q_WAS x 1e6/1440. SRT responds over ~one SRT, so change gradually; effluent solids count as wasted. The process trend and the operator govern.",
   example: wasSrtControlExample.inputs,
   fields: [
-    { key: "aeration_volume_mg", label: "Aeration volume (MG)", kind: "number" },
-    { key: "mlss_mg_l", label: "Mixed-liquor solids MLSS (mg/L)", kind: "number" },
-    { key: "target_srt_days", label: "Target SRT (days)", kind: "number" },
-    { key: "was_conc_mg_l", label: "WAS concentration (mg/L)", kind: "number" },
-    { key: "effluent_flow_mgd", label: "Effluent flow (MGD)", kind: "number", default: 0 },
-    { key: "effluent_tss_mg_l", label: "Effluent TSS (mg/L)", kind: "number", default: 0 },
+    { key: "aeration_volume_mg", label: "Aeration volume (MG)", kind: "number" , attrs: { min: "0" } },
+    { key: "mlss_mg_l", label: "Mixed-liquor solids MLSS (mg/L)", kind: "number" , attrs: { min: "0" } },
+    { key: "target_srt_days", label: "Target SRT (days)", kind: "number" , attrs: { min: "0" } },
+    { key: "was_conc_mg_l", label: "WAS concentration (mg/L)", kind: "number" , attrs: { min: "0" } },
+    { key: "effluent_flow_mgd", label: "Effluent flow (MGD)", kind: "number", default: 0 , attrs: { min: "0" } },
+    { key: "effluent_tss_mg_l", label: "Effluent TSS (mg/L)", kind: "number", default: 0 , attrs: { min: "0" } },
   ],
   outputs: [
     { key: "s", id: "was-out-s", label: "System solids / to waste", value: (r) => fmt(r.system_solids_lb, 0) + " lb / " + fmt(r.solids_to_waste_lb, 0) + " lb-day (" + fmt(r.effluent_solids_lb, 0) + " lb-day over the weir)" },
@@ -1977,10 +1977,10 @@ const renderAerationOxygenDemand = _v23SimpleRenderer({
   citation: "Citation: activated-sludge oxygen and air demand (WEF aeration design), by name. O2_demand (AOR) = factor x BOD_removed + 4.6 x NH3_nitrified; SOR = AOR / [alpha F 1.024^(T-20) (beta Cs,T - C) / Cs,20]; air_scfm = SOR / (0.075 x 0.232 x (SOTE/100) x 1440). Nitrification adds 4.6 lb O2 per lb ammonia-N (easy to forget). Diffused-aeration SOTE is only ~10-35%, so the air demand far exceeds the oxygen pounds. The aeration equipment and field transfer efficiency govern.",
   example: aerationOxygenDemandExample.inputs,
   fields: [
-    { key: "bod_removed_lb_day", label: "BOD removed (lb/day)", kind: "number" },
-    { key: "oxygen_factor", label: "Oxygen factor (lb O2 / lb BOD, 0.9-1.5)", kind: "number" },
-    { key: "nh3_nitrified_lb_day", label: "Ammonia-N nitrified (lb/day, 0 to skip)", kind: "number", default: 0 },
-    { key: "sote_pct", label: "SOTE (%, ~10-35 diffused)", kind: "number" },
+    { key: "bod_removed_lb_day", label: "BOD removed (lb/day)", kind: "number" , attrs: { min: "0" } },
+    { key: "oxygen_factor", label: "Oxygen factor (lb O2 / lb BOD, 0.9-1.5)", kind: "number" , attrs: { min: "0" } },
+    { key: "nh3_nitrified_lb_day", label: "Ammonia-N nitrified (lb/day, 0 to skip)", kind: "number", default: 0 , attrs: { min: "0" } },
+    { key: "sote_pct", label: "SOTE (%, ~10-35 diffused)", kind: "number" , attrs: { min: "0" } },
     { key: "alpha", label: "Alpha (process / clean water, ~0.4-0.8 fine bubble)", kind: "number", default: 0.5 },
     { key: "fouling_f", label: "Diffuser fouling factor F (~0.65-0.9)", kind: "number", default: 0.9 },
     { key: "beta", label: "Beta (salinity factor, ~0.95-0.98)", kind: "number", default: 0.95 },
