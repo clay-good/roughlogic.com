@@ -5158,8 +5158,8 @@
       "date": "2026-10-17"
     },
     "/tools/ohms-law/": {
-      "sha": "b9a2b07099b2a49d",
-      "date": "2026-10-17"
+      "sha": "70e1adc2ff108582",
+      "date": "2026-11-26"
     },
     "/tools/oil-burner-firing-rate/": {
       "sha": "adacad8d7453db94",
@@ -8114,8 +8114,8 @@
       "date": "2026-10-17"
     },
     "/tools/termination-temp-ampacity/": {
-      "sha": "8add89051acc1831",
-      "date": "2026-10-27"
+      "sha": "91624cd2e2543c25",
+      "date": "2026-11-26"
     },
     "/tools/texture-material-takeoff/": {
       "sha": "ae7c6da615577255",
@@ -8402,8 +8402,8 @@
       "date": "2026-10-17"
     },
     "/tools/transformer-voltage-regulation/": {
-      "sha": "f507ed7a0f02df7e",
-      "date": "2026-10-27"
+      "sha": "220e52137fd18e45",
+      "date": "2026-11-26"
     },
     "/tools/transmitter-span-scaling/": {
       "sha": "e2bb7b771aecb0b0",
