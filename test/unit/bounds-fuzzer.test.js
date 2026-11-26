@@ -24716,6 +24716,29 @@ test("bounds: spec-v516 computeAircraftWeightBalance pins the moment sum, the CG
   assert.ok("error" in _v516({ empty_weight_lb: 1500, max_gross_lb: 0, fwd_cg_limit_in: 35, aft_cg_limit_in: 47 }));
   assert.ok("error" in _v516({ empty_weight_lb: 1500, baggage_weight_lb: -10, max_gross_lb: 2300, fwd_cg_limit_in: 35, aft_cg_limit_in: 47 }));
   assert.ok("error" in _v516({ empty_weight_lb: 1500, max_gross_lb: 2300, fwd_cg_limit_in: 47, aft_cg_limit_in: 35 }));
+
+  // A CG LIMIT TYPED WITH THE WRONG SIGN WIDENED THE ENVELOPE AND CALLED A
+  // DANGEROUS LOAD LEGAL. This nose-heavy load has a 29.66 in CG against a
+  // 35 in forward limit, so it is correctly out of envelope; entering that
+  // limit as -35 made the SAME aeroplane read in envelope. The pair check
+  // above only orders the limits, and -35 < 47 passes.
+  const nose = { empty_weight_lb: 1500, empty_arm_in: 30, front_weight_lb: 340, front_arm_in: 28, fuel_weight_lb: 180, fuel_arm_in: 30, max_gross_lb: 2300, fwd_cg_limit_in: 35, aft_cg_limit_in: 47 };
+  const honest = _v516(nose);
+  assert.ok(Math.abs(honest.cg_in - 29.66) < 0.01, "nose-heavy CG");
+  assert.ok(honest.cg_out === true && honest.in_envelope === false, "forward of the limit is out of envelope");
+  assert.ok("error" in _v516({ ...nose, fwd_cg_limit_in: -35 }), "a negative forward limit beside positive arms is refused");
+  assert.ok("error" in _v516({ ...nose, aft_cg_limit_in: -47, fwd_cg_limit_in: -60 }), "and so is a negative aft limit");
+
+  // But the guard is on MIXING datum conventions, not on the sign itself: arms
+  // are measured from the aircraft datum, and an aircraft whose datum sits aft
+  // of its stations has genuinely negative arms AND negative limits. That must
+  // still compute, or the guard has broken a real aeroplane to catch a typo.
+  const aftDatum = _v516({ empty_weight_lb: 1500, empty_arm_in: -30, front_weight_lb: 340, front_arm_in: -28, fuel_weight_lb: 180, fuel_arm_in: -30, max_gross_lb: 2300, fwd_cg_limit_in: -47, aft_cg_limit_in: -25 });
+  assert.ok(!("error" in aftDatum), "an aft-datum aircraft still computes");
+  assert.ok(Math.abs(aftDatum.cg_in + 29.66) < 0.01, "its CG is the mirror of the same load");
+  assert.ok(aftDatum.in_envelope === true, "and it sits inside its own envelope");
+  // The mirror of the typo is caught too: positive limits against negative arms.
+  assert.ok("error" in _v516({ empty_weight_lb: 1500, empty_arm_in: -30, fuel_weight_lb: 180, fuel_arm_in: -30, max_gross_lb: 2300, fwd_cg_limit_in: 25, aft_cg_limit_in: 47 }));
 });
 
 import { computeAbycDcWire as _v517 } from "../../calc-mechanic.js";

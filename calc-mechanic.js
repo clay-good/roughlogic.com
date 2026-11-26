@@ -3464,6 +3464,24 @@ export function computeAircraftWeightBalance({ empty_weight_lb = 0, empty_arm_in
   if (!(mgw > 0)) return { error: "Maximum gross weight must be positive (lb)." };
   if (!(fwd < aft)) return { error: "Forward CG limit must be below the aft CG limit (in)." };
   for (const [w] of stations) if (w < 0) return { error: "Station weights cannot be negative (lb)." };
+  // A CG limit typed with the wrong sign WIDENS the envelope and flips the
+  // verdict that matters. A nose-heavy load with a 29.7 in CG against a 35 in
+  // forward limit is correctly out of envelope; enter that limit as -35 and the
+  // same aeroplane reads IN envelope, with a dangerously forward CG called
+  // legal. The pair check above only orders the two limits, so -35 < 47 passed.
+  //
+  // The guard cannot simply be "a limit is positive": arms are measured from
+  // the aircraft datum, and on an aircraft whose datum sits aft of a station
+  // that arm -- and its limits -- are genuinely negative. What is never right
+  // is MIXING the conventions inside one calculation, so the limits are held to
+  // the sign of the arms actually loaded rather than to zero.
+  const loadedArms = stations.filter(([w]) => w > 0).map(([, arm]) => arm);
+  if (loadedArms.length && loadedArms.every((a) => a > 0) && (fwd < 0 || aft < 0)) {
+    return { error: "Every loaded station has a positive arm, so a negative CG limit is measured from a different datum; check the sign on the CG limits (in)." };
+  }
+  if (loadedArms.length && loadedArms.every((a) => a < 0) && (fwd > 0 || aft > 0)) {
+    return { error: "Every loaded station has a negative arm, so a positive CG limit is measured from a different datum; check the sign on the CG limits (in)." };
+  }
   let total_weight_lb = 0, total_moment_inlb = 0;
   for (const [w, arm] of stations) { total_weight_lb += w; total_moment_inlb += w * arm; }
   const cg_in = total_moment_inlb / total_weight_lb;
