@@ -1033,7 +1033,7 @@ export function renderStoppingSightDistance(inputRegion, outputRegion, citationE
   const cond = makeSelect("Pavement condition", "ssd-cond",
     Object.keys(SSD_FRICTION_DEFAULTS).map((k) => ({ value: k, label: SSD_FRICTION_DEFAULTS[k].label, selected: k === "dry" })),
   );
-  const f = makeNumber("Friction coefficient f (set from condition or enter directly)", "ssd-f", { step: "any", value: String(SSD_AASHTO_F) });
+  const f = makeNumber("Friction coefficient f (set from condition or enter directly)", "ssd-f", { min: "0", step: "any", value: String(SSD_AASHTO_F) });
   f.input.value = String(SSD_AASHTO_F);
   const g = makeNumber("Grade (decimal; + uphill, - downhill)", "ssd-g", { step: "any", value: "0" });
   g.input.value = "0";
@@ -1094,7 +1094,7 @@ export function renderSsdDesignSpeed(inputRegion, outputRegion, citationEl) {
   const cond = makeSelect("Pavement condition", "sds-cond",
     Object.keys(SSD_FRICTION_DEFAULTS).map((k) => ({ value: k, label: SSD_FRICTION_DEFAULTS[k].label, selected: k === "dry" })),
   );
-  const f = makeNumber("Friction coefficient f (set from condition or enter directly)", "sds-f", { step: "any", value: "0.348" });
+  const f = makeNumber("Friction coefficient f (set from condition or enter directly)", "sds-f", { min: "0", step: "any", value: "0.348" });
   f.input.value = "0.348";
   const g = makeNumber("Grade (decimal; + uphill, - downhill)", "sds-g", { step: "any", value: "0" });
   g.input.value = "0";

@@ -516,7 +516,7 @@ export function renderStairs(inputRegion, outputRegion, citationEl) {
 export function renderRoofPitch(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Pitch geometry. Rise/run = tan(angle); 6/12 corresponds to roughly 26.6 degrees and 50 percent.";
   const rise = makeNumber("Rise (in)", "rp-r", { step: "any" });
-  const run = makeNumber("Run (in)", "rp-rn", { step: "any", value: "12" });
+  const run = makeNumber("Run (in)", "rp-rn", { min: "0", step: "any", value: "12" });
   run.input.value = "12";
   for (const f of [rise, run]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { rise.input.value = "6"; run.input.value = "12"; update(); });

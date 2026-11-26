@@ -1573,8 +1573,8 @@ export function renderExpansionTank(inputRegion, outputRegion, citationEl) {
   const sv = makeNumber("System water volume (gal)", "et-sv", { step: "any", min: "0" });
   const ft = makeNumber("Fill temp (°F)", "et-ft", { step: "any", value: "60" }); ft.input.value = "60";
   const mt = makeNumber("Max water temp (°F)", "et-mt", { step: "any", value: "200" }); mt.input.value = "200";
-  const fp = makeNumber("Fill pressure (psi)", "et-fp", { step: "any", value: "12" }); fp.input.value = "12";
-  const rp = makeNumber("Relief pressure (psi)", "et-rp", { step: "any", value: "30" }); rp.input.value = "30";
+  const fp = makeNumber("Fill pressure (psi)", "et-fp", { min: "0", step: "any", value: "12" }); fp.input.value = "12";
+  const rp = makeNumber("Relief pressure (psi)", "et-rp", { min: "0", step: "any", value: "30" }); rp.input.value = "30";
   for (const f of [sv, ft, mt, fp, rp]) inputRegion.appendChild(f.wrap);
   const oV = makeOutputLine(outputRegion, "Required tank volume", "et-out-v");
   // v8 §C.2: pre-charge pressure + placement note.
