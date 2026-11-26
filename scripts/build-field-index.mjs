@@ -99,9 +99,10 @@ const KINDS = new Set(["number", "select", "checkbox", "text", "textarea"]);
 // The renderers carry no `required` flag, and the obvious proxy -- a field
 // with no `default` -- is a guess dressed as data: plenty of fields default to
 // 0 precisely because 0 means absent ("Height above insulation (in; 0 = no
-// insulation below)"). So it is derived by experiment instead. Every one of
-// the 1,709 tiles has a publisher-verified worked example, so: run the tile on
-// its own example, then blank one field at a time and run it again.
+// insulation below)"). So it is derived by experiment instead. Every tile has
+// a publisher-verified worked example -- check-both-doors.mjs asserts it -- so:
+// run the tile on its own example, then blank one field at a time and run it
+// again. (This said "the 1,709 tiles" until 2026-11-26, against a live 2,288.)
 //
 // The test is "can it still ANSWER", not "did the answer change". On ohms-law
 // every input changes the answer, because the tile solves for whichever one

@@ -843,7 +843,7 @@ async function main() {
     // Two things bound that risk, and they are both already in place. A bad KEY
     // cannot survive: `schemaIfConsistent` drops any schema whose keys are not
     // real compute params, and check-both-doors asserts every advertised name is
-    // sendable and every example key is advertised, on all 1,804 tiles. What is
+    // sendable and every example key is advertised, on every tile. What is
     // left is a bad LABEL on a good key, and that is measurable -- so it was
     // measured rather than assumed:
     //

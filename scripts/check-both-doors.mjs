@@ -3,8 +3,11 @@
 //
 // A calculator in this catalog is reachable two ways: a person types into the
 // search box on the website, and an agent calls the local MCP server. Every
-// one of the 1,804 tiles is reachable both ways -- but nothing in the gate
+// tile in the catalog is reachable both ways -- but nothing in the gate
 // chain asserted it, so it was true by luck rather than by construction. A
+// (The count is left out on purpose: it read 1,804 here until 2026-11-26,
+// when the catalog had reached 2,288, so a reader was told this gate covered
+// a fifth fewer tiles than it does. The claim is EVERY, not a number.)
 // tile added without a COMPUTE_MAP row, a renamed compute export, or a tile
 // name that collides its way out of the top twelve would all pass CI while
 // leaving a calculator unreachable.
