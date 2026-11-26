@@ -41,6 +41,27 @@ function resolveFields(region, rows) {
         try { el = region.querySelector("#" + CSS.escape(domId)); } catch { el = null; }
       }
     }
+    // Last resort: the control whose id is this field's key behind a tile
+    // prefix (`r4` -> `fm-r4`), and ONLY when exactly one control fits, so a
+    // key that happens to end another id cannot capture it.
+    //
+    // Needed because the indexed label is not always one the page prints.
+    // fineness-modulus is indexed as "Cumulative retained on #4" -- the caption
+    // the tile publishes for an agent -- while the page's own label reads
+    // "Cumulative % retained, #4" and then bare "#8", "#16". Neither the id nor
+    // the label matched, so a reader arriving from a search with every value in
+    // their question got SIX EMPTY BOXES and no answer, on that tile and on
+    // fine-aggregate-grading and transformer-k-factor too. 23 of the 25
+    // unresolvable rows in the catalog are this shape.
+    if (!el) {
+      const want = String(row.d);
+      const hits = [];
+      for (const c of region.querySelectorAll("input, select, textarea")) {
+        if (!c.id || taken.has(c.id)) continue;
+        if (c.id.endsWith("-" + want) || c.id.endsWith("_" + want)) hits.push(c);
+      }
+      if (hits.length === 1) el = hits[0];
+    }
     if (!el || taken.has(el.id)) continue;
     taken.add(el.id);
     out.set(row.d, el);

@@ -3,6 +3,27 @@
 // Used by render-text-sweep.js, which test/unit/render-text-guard.test.js runs
 // in a child process so these globals never touch the test runner. Not a
 // browser: layout, CSS, and accessibility stay with the Playwright suite.
+// `installFetch` serves the repo's own files, so page code that loads a
+// bundled shard can run here at all. query-fill.js's loadFields does
+// `fetch("data/fields/<bucket>.json")`, integrity.js verifies it against the
+// shard manifest, and tile-prefill.js gives up silently when either fails --
+// so the whole query-prefill path (a reader arriving from a search with values
+// in the question) was unreachable under this harness and its only coverage is
+// two seed tiles in the nightly Playwright lane.
+import { readFileSync } from "node:fs";
+import { resolve, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..", "..");
+export function installFetch(root = REPO_ROOT) {
+  globalThis.fetch = async (url) => {
+    const rel = String(url).split("?")[0].split("#")[0].replace(/^\.?\//, "");
+    let text = null;
+    try { text = readFileSync(resolve(root, rel), "utf8"); } catch { text = null; }
+    if (text === null) return { ok: false, status: 404, url: String(url), text: async () => "", json: async () => null };
+    return { ok: true, status: 200, url: String(url), text: async () => text, json: async () => JSON.parse(text) };
+  };
+}
+
 const timers = [];
 let timerId = 1;
 const cancelled = new Set();
