@@ -1662,6 +1662,52 @@ export function queryFill(query, rows, opts) {
     if (!claimed.has(qi) && !suppressed.has(qi)) unmatched.push(String(qty.value) + (qty.unit ? " " + qty.unit : ""));
   });
 
+  // A LABEL THAT IS A CODE: "C1", "C2", "V2", "A260", "A280".
+  //
+  // Both label terms and query words have their digits stripped, so every one
+  // of those reduces to a bare letter -- and then c1 and c2 reduce to the SAME
+  // letter, so there is no term that can tell them apart. molarity-dilution
+  // and nucleic-acid-a260 recovered NOTHING from a question phrased out of
+  // their own worked examples (2026-11-26).
+  //
+  // The single-letter rule above is the precedent: a letter is admitted only
+  // where the reader clearly wrote it as a name, standing alone immediately
+  // before its own number. The same evidence is required here, and three more
+  // things, because a code is a stronger claim than a letter:
+  //   -- the whole label IS the code, not a phrase containing one, so this
+  //      cannot fire on "Point 1 x" or "Flow at 20 mA";
+  //   -- the code is UNIQUE among this tile's number fields, so a tile that
+  //      writes the same code twice is left alone;
+  //   -- the field is still unfilled, so this can only add a reading, never
+  //      overturn one an earlier rule arrived at with better evidence.
+  {
+    const codeOf = (l) => {
+      const flat = String(l || "").toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+      if (flat.length !== 1) return null;
+      return /^[a-z]{1,2}\d{1,3}$/.test(flat[0]) ? flat[0] : null;
+    };
+    const seen = new Map();
+    for (const r of numberRows) {
+      const code = codeOf(r.l);
+      if (!code) continue;
+      seen.set(code, (seen.get(code) || 0) + 1);
+    }
+    for (const r of numberRows) {
+      if (r.d in filled) continue;
+      const code = codeOf(r.l);
+      if (!code || seen.get(code) !== 1) continue;
+      // Only "=" or ":" may sit between the code and its number. A HYPHEN must
+      // not: the single-letter rule allows one, and borrowing that here read
+      // "b2 -1" as the separator plus 1 and filled +1 for a coefficient of -1
+      // (linear-system-2x2, caught by the targeted check below -- the catalog
+      // sweep cannot see this rule at all, because its phrasing drops a label
+      // word containing a digit).
+      const re = new RegExp("(?:^|[^a-z0-9])" + code + "\\s*(?:[=:]\\s*)?(-?\\d+(?:\\.\\d+)?)", "i");
+      const m = re.exec(text);
+      if (m) filled[r.d] = m[1];
+    }
+  }
+
   return {
     filled,
     converted: [...converted].filter((k) => k in filled),
