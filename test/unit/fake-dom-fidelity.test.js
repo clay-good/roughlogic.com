@@ -84,3 +84,57 @@ test("fake DOM: value, checked and selected do NOT write back to the attribute",
   assert.equal(opt.getAttribute("selected"), null, "selecting does not set the selected attribute");
   assert.equal(opt.selected, true);
 });
+
+// The third gap, and the one that fails most quietly: a selector the matcher
+// cannot honor. `matchSel` read only the LAST compound of a selector, so
+// `tbody tr` matched every row on the page. That over-matches -- it finds more
+// than a browser would and nothing throws -- which is how a sweep built on this
+// harness returns a confident wrong count. Driven through csvFromTable, the
+// real page function that asks for exactly that selector.
+test("fake DOM: a descendant selector matches only inside its ancestor", async () => {
+  const { installDocument } = await import("../fixtures/fake-dom.js");
+  const { csvFromTable } = await import("../../v5-platform.js");
+  const doc = installDocument();
+
+  const table = doc.createElement("table");
+  const thead = doc.createElement("thead");
+  const hrow = doc.createElement("tr");
+  for (const h of ["Size", "Amps"]) {
+    const c = doc.createElement("th");
+    c.textContent = h;
+    hrow.appendChild(c);
+  }
+  thead.appendChild(hrow);
+  table.appendChild(thead);
+  const tbody = doc.createElement("tbody");
+  for (const row of [["12 AWG", "20"], ["10 AWG", "30"]]) {
+    const tr = doc.createElement("tr");
+    for (const v of row) {
+      const c = doc.createElement("td");
+      c.textContent = v;
+      tr.appendChild(c);
+    }
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+
+  assert.equal(table.querySelectorAll("tr").length, 3, "three rows in all");
+  assert.equal(
+    table.querySelectorAll("tbody tr").length,
+    2,
+    "but only two are inside the body -- the header row is not one of them",
+  );
+  // And the consequence, in the function that asks: the header must appear
+  // once, as the header, and never again as a data row.
+  assert.equal(csvFromTable(table), "Size,Amps\r\n12 AWG,20\r\n10 AWG,30");
+
+  // The child combinator, so the same mistake cannot return through `>`.
+  const outer = doc.createElement("div");
+  const mid = doc.createElement("section");
+  const leaf = doc.createElement("span");
+  mid.appendChild(leaf);
+  outer.appendChild(mid);
+  assert.ok(leaf.matches("section > span"), "its direct parent satisfies `>`");
+  assert.equal(leaf.matches("div > span"), false, "a grandparent does not");
+  assert.ok(leaf.matches("div span"), "but it does satisfy a descendant selector");
+});

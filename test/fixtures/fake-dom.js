@@ -141,10 +141,10 @@ export class Node {
   get selectedOptions() { return this.options.filter((o) => o.selected); }
   get labels() { return []; }
 }
-function matchSel(n, sel) {
-  if (!sel || !(n instanceof Node) || n.isText) return false;
-  const last = sel.trim().split(/\s+/).pop();
-  const m = last.match(/^([a-zA-Z0-9]*)((?:[.#][\w-]+|\[[^\]]+\])*)(:checked)?$/);
+// One compound: a tag, any number of .class / #id / [attr] parts, :checked.
+// No combinator -- matchSel below walks those itself.
+function matchCompound(n, sel) {
+  const m = sel.match(/^([a-zA-Z0-9]*)((?:[.#][\w-]+|\[[^\]]+\])*)(:checked)?$/);
   if (!m) return false;
   if (m[1] && n.tagName !== m[1].toUpperCase()) return false;
   for (const part of m[2].match(/[.#][\w-]+|\[[^\]]+\]/g) || []) {
@@ -153,6 +153,42 @@ function matchSel(n, sel) {
     else { const [k, v] = part.slice(1, -1).split("="); const val = k === "type" ? n.type : n.getAttribute(k); if (v === undefined ? val == null : String(val) !== v.replace(/["']/g, "")) return false; }
   }
   if (m[3] && !n.checked) return false;
+  return true;
+}
+
+// A selector is a chain of compounds joined by combinators, and the chain is
+// the point: `tbody tr` means a row INSIDE a table body.
+//
+// This read only the last compound until 2026-11-26 -- `sel.split(/\s+/).pop()`
+// -- so it answered `tbody tr` with every `tr` on the page, header rows
+// included. v5-platform.js's csvFromTable asks exactly that to collect its
+// data rows, so under this harness it emitted its own header a second time as
+// data. Nothing drove that path here (its coverage is a real-browser test), so
+// the harness was wrong without being caught, which is how a sweep built on it
+// later reports a clean number that is not clean. Over-matching is the quiet
+// failure: the selector finds MORE than a browser would and nothing throws.
+function matchSel(n, sel) {
+  if (!sel || !(n instanceof Node) || n.isText) return false;
+  const parts = sel.trim().split(/\s+/);
+  if (!matchCompound(n, parts.pop())) return false;
+  let cur = n;
+  while (parts.length) {
+    const prev = parts.pop();
+    if (prev === ">") {
+      const comp = parts.pop();
+      if (!comp) return false;
+      cur = cur.parentNode;
+      if (!(cur instanceof Node) || !matchCompound(cur, comp)) return false;
+      continue;
+    }
+    // Descendant: any ancestor may satisfy it.
+    let hit = null;
+    for (let a = cur.parentNode; a instanceof Node; a = a.parentNode) {
+      if (matchCompound(a, prev)) { hit = a; break; }
+    }
+    if (!hit) return false;
+    cur = hit;
+  }
   return true;
 }
 class Event { constructor(type, o = {}) { this.type = type; this.bubbles = !!o.bubbles; this.defaultPrevented = false; } preventDefault() { this.defaultPrevented = true; } stopPropagation() {} }
