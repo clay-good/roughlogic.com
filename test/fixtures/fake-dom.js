@@ -31,7 +31,7 @@ export class Node {
     this.childNodes = []; this.parentNode = null; this.attributes = {}; this.listeners = [];
     this.style = new Proxy({}, { get: (o, k) => (k in o ? o[k] : ""), set: (o, k, v) => { o[k] = v; return true; } });
     this.dataset = {}; this.classList = new ClassList(this); this.className = ""; this.id = "";
-    this._text = ""; this.hidden = false; this.disabled = false; this.type = ""; this.checked = false; this.selected = false;
+    this._text = ""; this.disabled = false; this.type = ""; this.checked = false; this.selected = false;
     this._value = "";
   }
   get children() { return this.childNodes.filter((c) => c instanceof Node && !c.isText); }
@@ -113,6 +113,28 @@ export class Node {
   // FIELDS under this harness. Any sweep driving the steps panel's DOM path saw
   // an empty panel and could only ever report a clean zero. Same class as the
   // `value` attribute this file failed to reflect until 2026-11-24.
+  // min / max / step and hidden are REFLECTED IDL attributes: in a browser
+  // `el.min = "0"` sets the attribute, and `getAttribute("min")` reads it back.
+  // Most boxes here get theirs through makeNumber's `setAttribute` loop, but a
+  // few are hand-built and assign the PROPERTY -- cost-output.js, which many
+  // tiles share, does `input.step = "any"; input.min = "0"` -- and those were
+  // invisible to anything reading the attribute, including this project's own
+  // declared-minimum sweep. `hidden` matters for a different reason:
+  // steps-panel.js skips a control with `closest("[hidden]")`, which can only
+  // match an attribute.
+  //
+  // NOT reflected, correctly: `value`, `checked` and `selected`. A browser does
+  // not write those back to the attribute either -- the attribute is the
+  // DEFAULT and the property is the current state, which is the distinction
+  // this file learned the hard way on 2026-11-24.
+  get min() { return this.getAttribute("min") ?? ""; }
+  set min(v) { this.setAttribute("min", v == null ? "" : String(v)); }
+  get max() { return this.getAttribute("max") ?? ""; }
+  set max(v) { this.setAttribute("max", v == null ? "" : String(v)); }
+  get step() { return this.getAttribute("step") ?? ""; }
+  set step(v) { this.setAttribute("step", v == null ? "" : String(v)); }
+  get hidden() { return this.hasAttribute ? this.hasAttribute("hidden") : this.getAttribute("hidden") != null; }
+  set hidden(v) { if (v) this.setAttribute("hidden", ""); else this.removeAttribute("hidden"); }
   get htmlFor() { return this.getAttribute("for") ?? ""; }
   set htmlFor(v) { this.setAttribute("for", v == null ? "" : String(v)); }
   get valueAsNumber() { return this._value === "" ? NaN : Number(this._value); }
