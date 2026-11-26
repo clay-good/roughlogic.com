@@ -89,7 +89,10 @@ test("door: a kind-less, witness-less param answers the same sent as a string", 
     }
   }
 
-  assert.ok(probed.length > 40, `the sweep must reach the params it claims to (probed ${probed.length})`);
+  // 54 before 2026-11-26, 24 after: the conditional-kinds extractor typed the
+  // rest by driving the page, so they are no longer witness-less. The floor
+  // guards against the sweep reaching nothing.
+  assert.ok(probed.length > 15, `the sweep must reach the params it claims to (probed ${probed.length})`);
   assert.deepEqual(diverged, [], `a witness-less param must not answer differently sent as a string:\n${diverged.join("\n")}`);
 });
 

@@ -821,7 +821,13 @@ test("an input with no schema label still gets the caption its page prints", asy
 
   const concrete = await describe({ id: "concrete" });
   const len = concrete.inputs.find((f) => f.key === "length_ft");
-  assert.equal(len.kind, null, "the extractor could not resolve this one's control");
+  // Was null here until 2026-11-26 -- "the extractor could not resolve this
+  // one's control" -- because extract-bespoke-schemas.mjs reads the render
+  // function's source and so reads one branch of concrete's shape select.
+  // extract-conditional-kinds.mjs resolves it by driving the page. The LABEL is
+  // what this test is about, and it is unchanged; the kind is asserted so the
+  // two surfaces cannot drift apart again.
+  assert.equal(len.kind, "number", "the conditional-kinds extractor resolves this one's control now");
   assert.equal(len.label, "Length (ft)", "but the page names it, so the door does too");
 
   // The payoff case: a list input whose format an agent cannot guess.
@@ -849,7 +855,13 @@ test("an input with no schema label still gets the caption its page prints", asy
       fields++;
       const hasText = typeof f.label === "string" && !!f.label.trim();
       if (!hasText) textless++;
-      else if (f.kind == null) captioned++;
+      // `kind == null` was the proxy for "the schema could not describe this
+      // input" until 2026-11-26, when extract-conditional-kinds.mjs published a
+      // kind for 134 of them by driving the page. The proxy then counted 38
+      // where it had counted over 100 -- the subject moved, not the invariant.
+      // The invariant is that the page's own caption map reaches the door, so
+      // it is measured directly now.
+      else if (labelKeys.has(f.key)) captioned++;
       // A key that exists ONLY in the label map, and is neither a compute
       // parameter nor a key the worked example sends, would be invented text.
       if (!exKeys.has(f.key) && labelKeys.has(f.key) && f.kind == null && !COMPUTE_MAP[id]) {

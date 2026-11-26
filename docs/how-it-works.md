@@ -4,7 +4,7 @@ The engineering detail behind [the README](../README.md): the gates that keep ev
 
 ## Why you can trust the answers
 
-The hard part of a calculator catalog is not the arithmetic. It is proving, at scale, that every tile stays correct as the catalog grows. That is a build problem here: `npm run lint` runs 68 static gates before a change can land. Sixty-one of them run for anyone who clones this repository; the sixty-second, `check-ngrams`, compares text against a private hash list of licensed code spans that is deliberately not published, and skips with a message when the list is absent.
+The hard part of a calculator catalog is not the arithmetic. It is proving, at scale, that every tile stays correct as the catalog grows. That is a build problem here: `npm run lint` runs 69 static gates before a change can land. Sixty-one of them run for anyone who clones this repository; the sixty-second, `check-ngrams`, compares text against a private hash list of licensed code spans that is deliberately not published, and skips with a message when the list is absent.
 
 | Gate | What it guarantees |
 |---|---|
@@ -57,7 +57,7 @@ See [docs/architecture.md](architecture.md) and [docs/seo.md](seo.md).
 npm ci             # exact locked dev tooling; the site has zero runtime deps
 npm run dev        # build, then serve only dist/ on loopback
 npm run build      # emit dist/ (SPA + static shells + sitemap)
-npm run lint       # the full static-gate chain (68 checks) -- 67 run without the private n-gram list
+npm run lint       # the full static-gate chain (69 checks) -- 68 run without the private n-gram list
 npm test           # recursively discover unit tests with Node's test runner
 npm run test:e2e   # Playwright integration suite (needs a browser)
 ```

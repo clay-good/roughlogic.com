@@ -925,6 +925,8 @@ function pageCaption(id, key) {
   return typeof l === "string" && l.trim() ? l.trim() : null;
 }
 
+const { CONDITIONAL_KINDS } = await import(new URL("../test/fixtures/conditional-kinds.js", import.meta.url).href);
+
 export async function describe({ id } = {}) {
   const { COMPUTE_MAP, RENDERER_MAP, examples, byId, modCache } = await load();
   const meta = byId.get(id);
@@ -994,6 +996,28 @@ export async function describe({ id } = {}) {
           ? { key: k, label: null, kind: null, options: null, default: null, attrs: null }
           : { name: k, default: undefined }));
       if (fromExample.length) out.inputs = [...(out.inputs || []), ...fromExample];
+    }
+    // The kind of an input the renderer builds inside a MODE BRANCH.
+    // extract-bespoke-schemas.mjs reads a render function's source and so reads
+    // one branch of a mode select, which left concrete's column and footing
+    // dimensions, metal-weight's per-profile dimensions and 30 params in all
+    // with no kind -- and no other witness could reach them either, since the
+    // worked example exercises one shape and they carry no literal default.
+    // scripts/extract-conditional-kinds.mjs recovers them by DRIVING the page.
+    // Merged only where there is no kind already, so nothing the schema, the
+    // example or a default already types can move.
+    // The generator must see this list BEFORE the merge, or it is not
+    // idempotent: publishing a kind removes that param from its own target
+    // list, so a second run would emit an empty fixture and --check would call
+    // a freshly written file stale. scripts/extract-conditional-kinds.mjs sets
+    // this for the child process that dumps the targets, and nothing else does.
+    if (Array.isArray(out.inputs) && CONDITIONAL_KINDS[id] && !process.env.ROUGHLOGIC_RAW_KINDS) {
+      const extra = CONDITIONAL_KINDS[id];
+      out.inputs = out.inputs.map((f) => {
+        const key = f && (f.key ?? f.name);
+        if (!f || f.kind || !key || !(key in extra)) return f;
+        return { ...f, kind: extra[key] };
+      });
     }
     // One name for the key, on every descriptor. Two shapes reach this point:
     // a renderer schema names its field `key`, and an input recovered from a

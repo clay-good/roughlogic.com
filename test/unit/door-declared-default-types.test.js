@@ -117,7 +117,11 @@ test("door: no kind-less parameter answers differently sent as a string", async 
       if (a !== b) diverged.push(`${t.id}::${f.key} (${typeof v}) sent as "${v}"\n    typed: ${String(a).slice(0, 150)}\n    string: ${String(b).slice(0, 150)}`);
     }
   }
-  assert.ok(probed > 100, `the sweep must actually reach the parameters it claims to (probed ${probed})`);
+  // 131 before 2026-11-26, 56 after: extract-conditional-kinds.mjs published a
+  // kind for 134 params that had none, which is the sweep's own subject
+  // shrinking for a good reason. The floor still guards against it reaching
+  // nothing at all.
+  assert.ok(probed > 40, `the sweep must actually reach the parameters it claims to (probed ${probed})`);
   assert.deepEqual(diverged, [], `a string must answer as its own type:\n${diverged.join("\n")}`);
 });
 
