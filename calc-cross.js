@@ -644,6 +644,19 @@ export const loanPaymentExample = {
 // dims: in { incremental_cost: dimensionless, annual_savings: dimensionless, discount_rate_percent: dimensionless, years: T } out: { npv: dimensionless, years: T, discount_rate_percent: dimensionless, npv_dollars: dimensionless, simple_payback_yr: T }
 export function computeUpgradeROI({ incremental_cost, annual_savings, discount_rate_percent = 0, years = 10 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
+  // Left at -100% on purpose, though the page's box declares min="0". The door
+  // serves an out-of-box value and keeps the min/max warning ADVISORY -- that is
+  // its documented contract, and this tile is the exemplar of it in
+  // mcp-catalog.test.js, because a small negative REAL discount rate is
+  // arithmetically meaningful. A blanket `>= 0` here was tried on 2026-11-26 and
+  // reverted: it refused -2%, which a caller can mean.
+  //
+  // What is NOT meaningful is the far tail. The rate below zero weights future
+  // savings MORE than present ones, so it runs the flattering way: -20% returns
+  // $28,253 and -90% returns $8.9 trillion on a $5,000 upgrade. Where the line
+  // between "meaningful" and "absurd" falls is a product call about this tile's
+  // audience rather than a page-vs-compute parity fix, so it is recorded here
+  // and not guessed.
   if (!(Number(discount_rate_percent) > -100)) return { error: "The discount rate must be above -100%." };
   if (Number(years) > 200) return { error: "The analysis period cannot exceed 200 years." };
   const C = Number(incremental_cost) || 0;

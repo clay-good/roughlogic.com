@@ -33,6 +33,37 @@ const CASES = [
   ["duct-static-pressure-total", "rated_esp_in_wc", -0.5], ["cutting-speed-rpm", "chip_load_in", -0.002], ["drill-point-depth", "full_depth_in", -1],
   ["bound-water", "mc_goal_pct", -5], ["dry-time-projection", "goal_mc_pct", -5], ["reducer-offset", "lay_length_in", -5],
   ["pv-circuit-ampacity", "ocpd_a", -15], ["masonry-cleaning-dilution", "acid_safe_unit", 2],
+  // 2026-11-26. Both of these have a guard already, just a LOOSER one than the
+  // page's box, which is why the min-0 sweep above did not reach them and why
+  // the sign-typo guard skips them -- it negates only a field that declares no
+  // `min >= 0`, on the premise that the page's box stops the rest. The agent
+  // door hands the value straight to the compute, so the premise does not hold.
+  //
+  // upgrade-roi looked like the same finding and is NOT one. Its box declares
+  // min="0" while the compute refuses only below -100%, but the door's contract
+  // is to SERVE an out-of-box value with the min warning advisory, and
+  // mcp-catalog.test.js uses this very tile as the exemplar of that, because a
+  // small negative real discount rate is arithmetically meaningful. A blanket
+  // `>= 0` was tried here and reverted: it refused -2%, which a caller can mean.
+  // The far tail is still absurd (-90% returns $8.9 trillion on a $5,000
+  // upgrade), but where the line falls is a product call, noted in the compute.
+  //
+  // steel-panel-zone-shear guarded the flange WIDTH (`bcf < 0`) and not the
+  // thickness on the line beside it, which is the whole tell: the asymmetry was
+  // an oversight, not a judgement. tcf enters the flange term SQUARED
+  // (`bonus = 1 + 3*bcf*tcf*tcf / (db*dc*tw)`), so a negative is read as its
+  // positive twin and an impossible magnitude sails through: tcf = -90 in
+  // reported a 441,000 kip panel-zone strength against the example's 241.
+  //
+  // The pass/fail verdict was safe throughout -- the flange term only reaches
+  // rn_kip when panel-zone deformation is in the analysis, and that path already
+  // demands tcf > 0 -- but rn_pz_kip and the bonus factor are returned and
+  // displayed either way, so the nonsense was published even where it could not
+  // change the answer. The reasoning lives here rather than in the compute
+  // because calc-steelpanelzone.js ships to the browser against an 8,000 B
+  // gzip cap and the first draft of this note pushed it to 8,157 B.
+  ["steel-panel-zone-shear", "col_flange_tcf_in", -0.75],
+  ["steel-panel-zone-shear", "col_flange_tcf_in", -90],
 ];
 const ROWS = JSON.parse(readFileSync(new URL("../fixtures/worked-examples.json", import.meta.url), "utf8")).rows;
 

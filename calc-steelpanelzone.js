@@ -107,6 +107,7 @@ export function computeSteelPanelZoneShear({ fy_ksi = 50, col_depth_dc_in = 0, c
   if (!(dc > 0)) return { error: "Column depth must be positive (in)." };
   if (!(tw > 0)) return { error: "Column web thickness must be positive (in)." };
   if (bcf < 0) return { error: "Column flange width cannot be negative (in)." };
+  if (tcf < 0) return { error: "Column flange thickness cannot be negative (in)." };
   if (included && !(bcf > 0 && tcf > 0)) return { error: "With panel-zone deformation in the analysis the flange term needs the column flange width and thickness (in)." };
   if (tf < 0) return { error: "Beam flange thickness cannot be negative (in)." };
   if (!(db > tf)) return { error: "Beam depth must exceed the flange thickness (in)." };
