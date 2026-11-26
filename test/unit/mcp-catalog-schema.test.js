@@ -1078,3 +1078,39 @@ test("an advertised default is the one the tile actually applies", async () => {
   assert.ok(probed > 400, `the defaults are swept (${probed} fields)`);
   assert.deepEqual(disagree.slice(0, 8), [], `${disagree.length} advertised default(s) are not the one in force`);
 });
+
+// A free-text input cannot be filled from a question, and the refusal has to
+// be useful rather than a dead end.
+//
+// `answer_query` reads NUMBERS out of a question. 15 calculators take free
+// text instead -- a chemical formula, a primer or codon sequence, a paragraph
+// to score, a close date, a list of numbers typed as one blob -- so a question
+// naming one of them carries nothing this surface will bind. "molecular weight
+// of C6H12O6" picks the right calculator and still cannot fill it.
+//
+// Widening that is deliberately NOT done. catalog.mjs records what happened
+// the last time this path was loosened on a proxy: 22 tiles that did not
+// qualify ran their OWN DEFAULTS and came back as `status: "OK"`, so "Rent vs
+// Buy" answered a question carrying no numbers with a $400,000 purchase price
+// nobody had supplied. The governing rule beside it -- a wrong answer is worse
+// than no answer -- is why the refusal stands.
+//
+// What this pins is that the refusal is RECOVERABLE: it names the calculator,
+// so an agent needs exactly one more call, and that call works.
+test("a free-text calculator refuses a question by name, and the named id then runs", async () => {
+  const { answerQuery, run, describe } = await import("../../mcp/catalog.mjs");
+
+  const asked = await answerQuery({ query: "molecular weight of C6H12O6" });
+  assert.equal(asked.status, "NO_VALUES", "it will not read a word out of a question as a value");
+  assert.equal(asked.id, "molecular-weight", "but it names the calculator it identified");
+  assert.match(asked.message, /describe_calculator/, "and points at the call that lists the inputs");
+
+  // The one further call an agent makes from that answer.
+  const d = await describe({ id: asked.id });
+  const key = d.inputs.find((f) => f.key === "formula");
+  assert.ok(key, "the input it needs is advertised");
+  const out = await run({ id: asked.id, inputs: { formula: "C6H12O6" } });
+  assert.ok(!out.result.error, `and the value runs: ${out.result.error || ""}`);
+  assert.ok(Number(out.result.molecular_weight) > 180 && Number(out.result.molecular_weight) < 181,
+    `glucose is about 180.16 g/mol, got ${out.result.molecular_weight}`);
+});
