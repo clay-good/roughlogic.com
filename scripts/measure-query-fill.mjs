@@ -74,6 +74,38 @@ for (const name of await readdir(FIELD_DIR)) {
 // them in measures the harness rather than the extractor: every one of the 11
 // wrong values this found on its first run was the label's number being read
 // as the reader's.
+// WHAT THIS HARNESS CANNOT SEE, measured 2026-11-26.
+//
+// Dropping a label's numbers is the right default -- the eleven wrong values
+// above are the argument -- but it means the questions built here never write
+// a label's digits, and three rules in query-fill.js live exactly there. All
+// three were found by hand and none of them moves the figures below, so a
+// green run here is not evidence that any of them works:
+//
+//   a label that IS a code   "C1", "A260", "b2". Label terms and query words
+//                            both strip digits, so c1 and c2 reduce to the same
+//                            letter. Guarded by query-fill-code-labels.test.js.
+//   a label's own digits     a reader who writes a label the way the PAGE
+//                            prints it includes its numbers: "Flow at 4 mA 0,
+//                            Flow at 20 mA 500" once filled 4 and 20 and
+//                            dropped the reader's 0 and 500. 75 wrong values
+//                            across 236 digit-labelled tiles, now 0, and 1,222
+//                            values filled rather than 993 once the number
+//                            AFTER a written-out label was bound to it.
+//                            Guarded by query-fill-label-digits.test.js.
+//   an option word quoted    `steam_basis` offers "pressure" and a sibling
+//   from a sibling's label   field is labelled "Steam specific volume at
+//                            pressure". Guarded by
+//                            query-fill-extra-fills.test.js.
+//
+// A second phrasing was measured and NOT adopted. Writing the unit the way the
+// page prints it -- "Length one-way (ft) 150" rather than "Length one-way 150
+// ft" -- recovers about 1.2% fewer fields (10,318 against 10,444 of 10,707 on a
+// like-for-like A/B, no more wrong values). It is a real phrasing a reader who
+// copies labels off the page would use, and it is left unfixed on purpose:
+// query-fill.js ships to the browser against a gzip cap, comments included, so
+// a rule that recovers 1% on a secondary phrasing is not obviously worth its
+// bytes. Recorded rather than silently dropped.
 function phrase(rows, inputs) {
   const parts = [];
   for (const row of rows) {
