@@ -14,7 +14,7 @@
     {
       "file": "b.json",
       "name": "Field descriptors, b runtime shard (generated)",
-      "gzip_size_bytes": 13011
+      "gzip_size_bytes": 13139
     },
     {
       "file": "c.json",
@@ -129,7 +129,7 @@
   ],
   "hashes": {
     "a.json": "5afc976c83d14921a66910ff9799740e19cd223ea533428b96f0e30016f789ad",
-    "b.json": "2f0fd29bdccae5497aab931525ee0818f4864f7c4e5fe3fd5932bf9359676dad",
+    "b.json": "3aaccadd6b44af2989ededb669fadfeb83ce96f7e53e781e8ced4fca48520dea",
     "c.json": "67d0815f96bf3d1e82145a429342ed702697e07721cd1503a30ffdbcc960d4d7",
     "d.json": "084e0675dc455cdc9a7f013e5f9b371eb7997eda4a3a5c903bc3140252683dee",
     "e-1.json": "abb49d441ea393d90b5e8e514295cba4bed31f92e7653ccf3e0928ca0efa21fe",

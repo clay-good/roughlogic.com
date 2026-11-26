@@ -6,6 +6,8 @@ All notable changes to roughlogic.com are recorded here. The project follows sem
 
 ### Changed
 
+- **A stormwater calculator with eleven inputs and not one label an agent could read.** TR-55's time-of-concentration screen declares its near-identical boxes through a local helper -- `const mk = (label, id, val) => { const f = makeNumber(label, id, { step: "any", min: "0" }); ... }` -- and the extractor's factory matching handles a *renamed import* but not a *local wrapper*, so all eleven were invisible. The sheet-flow Manning n, the 2-year rainfall, the channel slope: a bare key each. The wrapper is read now, but only when it passes its first two parameters straight through as the factory's label and id, in that order; anything else means its arguments are something other than a caption and an id, and reading them as such would advertise a label the page never shows. **210 bare parameters to 200**, and the eleven come with the bounds the wrapper sets.
+  - One wrapper of this shape exists in the whole tree, so this is deliberately a reading of the code rather than a rule the code must follow. The alternative was to rewrite the renderer to satisfy the tool, which is the wrong way round.
 - **A comment inside a calculator's parameter list made the parameter after it invisible -- and the parser that reads those lists is written three times, two of them wrong.** The recirculation-loop calculator explains its optional cost inputs between two parameters:
 
   ```

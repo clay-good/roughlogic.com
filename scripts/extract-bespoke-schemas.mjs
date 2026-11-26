@@ -533,6 +533,34 @@ function parseFields(body, ns, aliases = DEFAULT_ALIASES, modSrc = null) {
     const kind = attrs && attrs.type === "text" ? "text" : "number";
     fields.set(m[1], { kind, label: JSON.parse(m[2]), attrs });
   }
+  // A renderer-local wrapper around a factory. TR-55's time-of-concentration
+  // screen declares eleven near-identical boxes through one:
+  //
+  //   const mk = (label, id, val) => { const f = makeNumber(label, id,
+  //                                      { step: "any", min: "0" }); ... };
+  //   const sN = mk("Sheet: Manning n (overland)", "tr-sn");
+  //
+  // The factory alternation matches a RENAMED import (`_v26makeNumber`) but
+  // not a local wrapper, so all eleven inputs were invisible and the agent door
+  // advertised a stormwater calculator with no labelled inputs at all.
+  //
+  // Admitted only when the wrapper passes its first two parameters straight
+  // through as the factory's label and id, in that order -- otherwise its
+  // arguments mean something else and reading them as (label, id) would
+  // advertise a caption the page never shows. The attrs come from the literal
+  // inside the wrapper, which is where a wrapper like this puts them.
+  const WRAP_RE = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*\(\s*([A-Za-z_$][\w$]*)\s*,\s*([A-Za-z_$][\w$]*)\s*[,)][^=]*=>\s*\{?[\s\S]{0,160}?\bmakeNumber\(\s*([A-Za-z_$][\w$]*)\s*,\s*([A-Za-z_$][\w$]*)\s*(?:,\s*(\{[^}]*\}))?/g;
+  for (const w of body.matchAll(WRAP_RE)) {
+    const [, name, p1, p2, a1, a2, attrsSrc] = w;
+    if (a1 !== p1 || a2 !== p2) continue;             // not a straight pass-through
+    let attrs = null;
+    if (attrsSrc) { try { attrs = JSON.parse(attrsSrc.replace(/([{,]\s*)([A-Za-z_]\w*):/g, '$1"$2":').replace(/'/g, '"')); } catch { attrs = null; } }
+    const CALL = new RegExp("\\b([A-Za-z_$][\\w$]*)\\s*=\\s*" + name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\(\\s*(\"(?:[^\"\\\\]|\\\\.)*\")\\s*,\\s*\"(?:[^\"\\\\]|\\\\.)*\"", "g");
+    for (const m of body.matchAll(CALL)) {
+      if (fields.has(m[1])) continue;
+      fields.set(m[1], { kind: "number", label: JSON.parse(m[2]), attrs });
+    }
+  }
   // makeCheckbox(label, id[, checked]) -- a real boolean control. Its third
   // argument is whether the box STARTS TICKED, which is a page prefill and NOT
   // the compute's default: `breaker-sizing`'s continuous-load box is ticked,
