@@ -129,7 +129,7 @@ test("cattle-stocking-rate: unknown class and out-of-range inputs are rejected",
   assert.ok("error" in computeStockingRate({ area_acres: 100, forage_lb_per_acre: 1000, utilization_pct: 0, animal_class: "cow_calf" }));
 });
 
-// --- L.4 Grain bin capacity (6 tests) --------------------------------
+// --- L.4 Grain bin capacity (8 tests) --------------------------------
 
 test("grain-bin-capacity: 30 ft x 20 ft eave + 8 ft cone, corn -> 14,137 + 1,885 ft^3, ~12,875 bu", () => {
   const r = computeGrainBin(grainBinExample.inputs);
@@ -168,6 +168,25 @@ test("grain-bin-capacity: unknown grain and non-positive geometry are rejected",
   assert.ok("error" in computeGrainBin({ diameter_ft: 30, eave_height_ft: 20, grain: "quinoa" }));
   assert.ok("error" in computeGrainBin({ diameter_ft: 0, eave_height_ft: 20, grain: "corn" }));
   assert.ok("error" in computeGrainBin({ diameter_ft: 30, eave_height_ft: 0, grain: "corn" }));
+});
+
+test("grain-bin-capacity: the bundled test weights are the standard legal bushel weights", () => {
+  // Nothing held this table until 2026-11-26: the only test reading it derived
+  // the bin weight FROM it (`r.total_bushels * GRAIN_TEST_WEIGHT_LB_BU.corn`),
+  // so it checked the formula and not the figures -- corn at 65 lb/bu would
+  // have shipped a bin 16% heavy with every test green. These are the standard
+  // weights-per-bushel, NOT the 7 CFR 810 grade minimums the table's own source
+  // comment distinguishes (oats legal 32, FGIS No. 1 36 / No. 2 33).
+  assert.deepEqual(GRAIN_TEST_WEIGHT_LB_BU, {
+    corn: 56, wheat: 60, soybeans: 60, oats: 32,
+  });
+});
+
+test("grain-bin-capacity: 0.8036 bu/ft^3 is the statutory bushel, independently derived", () => {
+  // The conversion is pinned as a literal above; this derives the same figure
+  // from the definition of the US (Winchester) bushel, 2150.42 cubic inches,
+  // so neither copy is the other's witness.
+  assert.ok(close(1728 / 2150.42, 0.8036, 5e-5));
 });
 
 // --- L.2 NPK blend from soil test ------------------------------------
@@ -227,6 +246,22 @@ test("npk-blend: a soil test at or above demand recommends no fertilizer", () =>
 test("npk-blend: unknown crop and non-positive area are rejected", () => {
   assert.ok("error" in computeNpkBlend({ crop: "kelp", area_acres: 10 }));
   assert.ok("error" in computeNpkBlend({ crop: "corn", area_acres: 0 }));
+});
+
+test("npk-blend: the bundled crop nutrient demands are the shipped defaults", () => {
+  // Only `soybeans.n` was held until 2026-11-26; the other 17 figures were
+  // read back out of the table by the tests that used them. These are starting
+  // defaults (the tile says a soil test and the local Extension recommendation
+  // govern), pinned here so a typo cannot ride in silently -- and so the two
+  // legume zeros, which the warning path depends on, stay zero.
+  assert.deepEqual(CROP_NUTRIENT_DEMAND, {
+    corn:       { n: 150, p: 60, k: 40 },
+    wheat:      { n: 100, p: 50, k: 30 },
+    cotton:     { n: 90,  p: 50, k: 60 },
+    soybeans:   { n: 0,   p: 45, k: 80 },
+    alfalfa:    { n: 0,   p: 60, k: 200 },
+    vegetables: { n: 120, p: 80, k: 100 },
+  });
 });
 
 // --- L.5 Pesticide tank-mix and acres-per-tank -----------------------
