@@ -587,7 +587,7 @@ function _renderPipePressureRating(inputRegion, outputRegion, citationEl) {
   const S = makeNumber("Allowable stress S at temperature (psi)", "pp-s", { step: "any", min: "0" });
   const E = makeNumber("Joint factor E (seamless = 1.0)", "pp-e", { step: "any", min: "0", max: "1", value: "1" });
   E.input.value = "1";
-  const y = makeNumber("y-coefficient (ferritic <= 900F = 0.4)", "pp-y", { step: "any", value: "0.4" });
+  const y = makeNumber("y-coefficient (ferritic <= 900F = 0.4)", "pp-y", { min: "0", step: "any", value: "0.4" });
   y.input.value = "0.4";
   const mt = makeNumber("Mill under-tolerance fraction", "pp-mt", { step: "any", min: "0", value: "0.125" });
   mt.input.value = "0.125";

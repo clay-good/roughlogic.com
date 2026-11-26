@@ -1223,7 +1223,7 @@ export const wellDrawdownExample = {
 function _v16w_renderWellDrawdown(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: drawdown = pumping level - static level; specific capacity = discharge / drawdown (GPM per ft); recommended pump setting = pumping level + offset (default 20 ft). Per the AWWA A100 (Water Wells) standard and USGS well-testing methods (Open-File Report 02-197). Free at awwa.org for the A100 TOC and pubs.usgs.gov.";
   const stat = makeNumber("Static water level (ft below ground)", "wd-stat", { step: "any", value: "50" });
-  const pump = makeNumber("Pumping water level (ft below ground)", "wd-pump", { step: "any", value: "80" });
+  const pump = makeNumber("Pumping water level (ft below ground)", "wd-pump", { min: "0", step: "any", value: "80" });
   const q = makeNumber("Discharge rate (GPM)", "wd-q", { step: "any", min: "0", value: "30" });
   const offset = makeNumber("Pump-setting offset below pumping level (ft)", "wd-offset", { step: "any", value: "20" });
   // v23 EN.17: Cooper-Jacob transmissivity (ds per log cycle) + recovery level.

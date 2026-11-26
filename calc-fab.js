@@ -1861,7 +1861,7 @@ export function computeSheetMetalGauge({ gauge = 0, material = "steel" } = {}) {
 export const sheetMetalGaugeExample = { inputs: { gauge: 16, material: "steel" } };
 function _renderSheetMetalGauge(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: sheet-metal gauge to decimal thickness - standard (uncoated) steel by the Manufacturers' Standard Gage (MSG, U.S. Act of Congress March 3, 1893; thickness = weight/41.82); galvanized (GSG) = MSG plus the zinc coating; aluminum/brass/copper by the Brown & Sharpe geometric formula t = 0.005 x 92^((36 - n)/39) in (the same relation the awg-wire-geometry tile uses), by name; public-domain. Stainless is commonly MSG but some mills differ. A reference; the material spec and a caliper govern the delivered sheet.";
-  const g = makeNumber("Gauge number", "smg-g", { step: "1" });
+  const g = makeNumber("Gauge number", "smg-g", { min: "0", step: "1" });
   const mat = makeSelect("Material", "smg-mat", [
     { value: "steel", label: "Standard steel (MSG)", selected: true },
     { value: "galvanized", label: "Galvanized steel (GSG)" },

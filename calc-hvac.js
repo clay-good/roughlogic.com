@@ -4849,16 +4849,16 @@ export const pipeInsulationForCondensationExample = { inputs: { pipe_od_in: 1, p
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function renderPipeInsulationForCondensation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: minimum condensation-control thickness for a cold pipe: the outer-surface energy balance h (2 pi r2/12)(Tamb - Tdp) = 2 pi (k/12) (Tdp - Tpipe)/ln(r2/r1) with k per inch, solved for the radius where the jacket sits exactly at the ambient dew point (dew point from the saturation-vapor-pressure psychrometrics this catalog already pins). The industry practice is to round UP to the next stock wall: a surface at the dew point is on the edge of sweating. Assumes still air and an intact vapor retarder; design-day RH governs, not the average. Manufacturer condensation tables (e.g. the insulation maker's design guide) and the mechanical code govern - a sizing aid, not a substitute for them.";
-  const od = makeNumber("Pipe OD (in)", "pifc-od", { step: "any" });
+  const od = makeNumber("Pipe OD (in)", "pifc-od", { min: "0", step: "any" });
   const tp = makeNumber("Cold-pipe surface temp (°F)", "pifc-tp", { step: "any" });
   const ta = makeNumber("Ambient dry-bulb (°F)", "pifc-ta", { step: "any" });
   const rh = makeNumber("Ambient RH (%, design-day)", "pifc-rh", { step: "any", min: "1", max: "99" });
-  const k = makeNumber("Insulation k (BTU-in/hr-ft²-F)", "pifc-k", { step: "any" });
+  const k = makeNumber("Insulation k (BTU-in/hr-ft²-F)", "pifc-k", { min: "0", step: "any" });
   const fm = makeSelect("Outside film coefficient", "pifc-fm", [
     { value: "entered", label: "Entered below" },
     { value: "computed", label: "Computed: still-air convection + radiation at the jacket" },
   ]);
-  const h = makeNumber("Outside film coeff (BTU/hr-ft²-F)", "pifc-h", { step: "any" });
+  const h = makeNumber("Outside film coeff (BTU/hr-ft²-F)", "pifc-h", { min: "0", step: "any" });
   const je = makeNumber("Jacket emissivity (computed film; 0.9 painted or PVC, 0.1 aluminum)", "pifc-je", { step: "any", min: "0", max: "1", value: "0.9" });
   je.input.value = "0.9";
   for (const f of [od, tp, ta, rh, k, fm, h, je]) inputRegion.appendChild(f.wrap);
@@ -4939,12 +4939,12 @@ export const compressedAirPressureDropExample = { inputs: { scfm: 100, pipe_id_i
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function renderCompressedAirPressureDrop(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Darcy-Weisbach pressure drop dP = f (L/D) rho V^2 / (2 gc) with the friction factor from the Colebrook-White relation, air density at line conditions from the ideal gas law rho = P_abs x 144 / (R_air T) with R_air = 53.35 ft-lbf/lb-R, and the standard-to-actual volume conversion Q_actual = scfm x (14.7/P_abs) x (T/528 R) from the same gas law. Air dynamic viscosity is taken as the standard 1.81e-5 Pa-s at 68 F converted to imperial units. No empirical compressed-air constant is used. Isothermal single-phase flow; the inlet density is used throughout, which under-predicts a large drop. Fitting equivalent lengths must be added to the run length by the user.";
-  const q = makeNumber("Airflow (scfm)", "capd-q", { step: "any" });
-  const d = makeNumber("Pipe inside diameter (in, actual ID)", "capd-d", { step: "any" });
-  const L = makeNumber("Run length incl. fitting equiv. (ft)", "capd-l", { step: "any" });
-  const p = makeNumber("Line pressure (psig)", "capd-p", { step: "any" });
+  const q = makeNumber("Airflow (scfm)", "capd-q", { min: "0", step: "any" });
+  const d = makeNumber("Pipe inside diameter (in, actual ID)", "capd-d", { min: "0", step: "any" });
+  const L = makeNumber("Run length incl. fitting equiv. (ft)", "capd-l", { min: "0", step: "any" });
+  const p = makeNumber("Line pressure (psig)", "capd-p", { min: "0", step: "any" });
   const t = makeNumber("Air temperature (°F)", "capd-t", { step: "any" });
-  const e = makeNumber("Pipe roughness (ft)", "capd-e", { step: "any" });
+  const e = makeNumber("Pipe roughness (ft)", "capd-e", { min: "0", step: "any" });
   for (const f of [q, d, L, p, t, e]) inputRegion.appendChild(f.wrap);
   const oDp = makeOutputLine(outputRegion, "Pressure drop", "capd-out-dp");
   const oV = makeOutputLine(outputRegion, "Actual flow / velocity", "capd-out-v");
@@ -5014,14 +5014,14 @@ export const fanSheaveForTargetCfmExample = { inputs: { current_cfm: 8000, targe
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
 function renderFanSheaveForTargetCfm(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: fan affinity laws (AMCA / ASHRAE Handbook - Fundamentals) solved for the DRIVE sheave rather than for a known speed: Q scales with rpm, so the required fan speed is the current speed times the airflow ratio; on a belt drive fan rpm = motor rpm x (drive sheave / driven sheave), so with the fan sheave fixed the required drive sheave scales with the same ratio. Static pressure follows the square and brake horsepower the CUBE, so the motor check is the point: a 20% airflow increase is a 73% horsepower increase. Pitch diameter, not outside diameter; sheaves come in fixed increments. Same fan on the same system curve. Verify airflow after the change; the fan curve and equipment ratings govern.";
-  const q1 = makeNumber("Current airflow (cfm, measured)", "fsc-q1", { step: "any" });
-  const q2 = makeNumber("Target airflow (cfm)", "fsc-q2", { step: "any" });
-  const n1 = makeNumber("Current fan speed (rpm)", "fsc-n1", { step: "any" });
-  const nm = makeNumber("Motor speed (rpm)", "fsc-nm", { step: "any" });
-  const ds = makeNumber("Current drive (motor) sheave pitch dia (in)", "fsc-ds", { step: "any" });
-  const bh = makeNumber("Current brake horsepower (0 = skip)", "fsc-bh", { step: "any" });
-  const mh = makeNumber("Motor nameplate hp (0 = skip)", "fsc-mh", { step: "any" });
-  const sp = makeNumber("Current static pressure (in w.c., 0 = skip)", "fsc-sp", { step: "any" });
+  const q1 = makeNumber("Current airflow (cfm, measured)", "fsc-q1", { min: "0", step: "any" });
+  const q2 = makeNumber("Target airflow (cfm)", "fsc-q2", { min: "0", step: "any" });
+  const n1 = makeNumber("Current fan speed (rpm)", "fsc-n1", { min: "0", step: "any" });
+  const nm = makeNumber("Motor speed (rpm)", "fsc-nm", { min: "0", step: "any" });
+  const ds = makeNumber("Current drive (motor) sheave pitch dia (in)", "fsc-ds", { min: "0", step: "any" });
+  const bh = makeNumber("Current brake horsepower (0 = skip)", "fsc-bh", { min: "0", step: "any" });
+  const mh = makeNumber("Motor nameplate hp (0 = skip)", "fsc-mh", { min: "0", step: "any" });
+  const sp = makeNumber("Current static pressure (in w.c., 0 = skip)", "fsc-sp", { min: "0", step: "any" });
   for (const f of [q1, q2, n1, nm, ds, bh, mh, sp]) inputRegion.appendChild(f.wrap);
   const oR = makeOutputLine(outputRegion, "Speed ratio / required fan rpm", "fsc-out-r");
   const oS = makeOutputLine(outputRegion, "New drive sheave (pitch dia)", "fsc-out-s");
@@ -5108,13 +5108,13 @@ function renderEconomicInsulationThickness(inputRegion, outputRegion, citationEl
   citationEl.textContent = "Citation: economic (least-cost) insulation thickness. Total annual cost = energy through the assembly plus the annualized installed cost of the insulation: energy $ = dT/(R0 + t/k) x hours x $/MMBtu / (1e6 x efficiency), capital $ = price per inch per ft^2 x t x CRF, with the capital recovery factor CRF = i/(1-(1+i)^-n). Setting the derivative to zero gives the closed form t_opt = k(sqrt(C/(k x price x CRF)) - R0) where C = dT x hours x $/MMBtu / (1e6 x efficiency); this was verified against a brute-force scan. A COST optimum, not a performance requirement - it is thinner than a surface-temperature or condensation limit would require, and those are separate tiles. Flat-surface geometry; a pipe optimum runs thinner (approaching this as the pipe gets larger), because each added inch on a curve costs more insulation and adds less resistance. Installed cost, fuel price, and the owner's hurdle rate govern.";
   const dt = makeNumber("Temperature difference (°F)", "eit-dt", { step: "any" });
   const r0 = makeNumber("Bare surface R-value (film, ~0.5)", "eit-r0", { step: "any" });
-  const kk = makeNumber("Insulation k (BTU-in/hr-ft²-F)", "eit-k", { step: "any" });
-  const hr = makeNumber("Operating hours (h/yr)", "eit-hr", { step: "any" });
-  const en = makeNumber("Energy cost ($/MMBtu)", "eit-en", { step: "any" });
-  const ef = makeNumber("System efficiency (0-1)", "eit-ef", { step: "any" });
-  const pr = makeNumber("Installed cost ($ per in per ft²)", "eit-pr", { step: "any" });
-  const lf = makeNumber("Service life (years)", "eit-lf", { step: "any" });
-  const dr = makeNumber("Discount rate (0.08 = 8%, 0 = straight line)", "eit-dr", { step: "any" });
+  const kk = makeNumber("Insulation k (BTU-in/hr-ft²-F)", "eit-k", { min: "0", step: "any" });
+  const hr = makeNumber("Operating hours (h/yr)", "eit-hr", { min: "0", step: "any" });
+  const en = makeNumber("Energy cost ($/MMBtu)", "eit-en", { min: "0", step: "any" });
+  const ef = makeNumber("System efficiency (0-1)", "eit-ef", { min: "0", step: "any" });
+  const pr = makeNumber("Installed cost ($ per in per ft²)", "eit-pr", { min: "0", step: "any" });
+  const lf = makeNumber("Service life (years)", "eit-lf", { min: "0", step: "any" });
+  const dr = makeNumber("Discount rate (0.08 = 8%, 0 = straight line)", "eit-dr", { min: "0", step: "any" });
   for (const f of [dt, r0, kk, hr, en, ef, pr, lf, dr]) inputRegion.appendChild(f.wrap);
   const oT = makeOutputLine(outputRegion, "Economic thickness", "eit-out-t");
   const oC = makeOutputLine(outputRegion, "Annual cost at the optimum", "eit-out-c");

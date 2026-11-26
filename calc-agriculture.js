@@ -2037,9 +2037,9 @@ export const pearsonSquareRationExample = { inputs: { feed_a_pct: 9, feed_b_pct:
 
 function renderPearsonSquareRation(inputRegion, outputRegion, citationEl) {
   citationEl.textContent = "Citation: Pearson square method - standard land-grant animal-science ration formulation (USDA / university extension; Ensminger 'Feeds & Nutrition'), by name. The square is public arithmetic. Single nutrient only. Free at university extension sites.";
-  const a = makeNumber("Feed A nutrient %", "psr-a", { step: "any" });
-  const b = makeNumber("Feed B nutrient %", "psr-b", { step: "any" });
-  const target = makeNumber("Target %", "psr-t", { step: "any" });
+  const a = makeNumber("Feed A nutrient %", "psr-a", { min: "0", step: "any" });
+  const b = makeNumber("Feed B nutrient %", "psr-b", { min: "0", step: "any" });
+  const target = makeNumber("Target %", "psr-t", { min: "0", step: "any" });
   const batch = makeNumber("Total batch (lb, optional)", "psr-batch", { step: "any", min: "0" });
   for (const f of [a, b, target, batch]) inputRegion.appendChild(f.wrap);
   attachExampleButton(inputRegion, () => { a.input.value = "9"; b.input.value = "44"; target.input.value = "16"; batch.input.value = ""; update(); });
