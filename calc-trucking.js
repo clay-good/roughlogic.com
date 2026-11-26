@@ -169,7 +169,7 @@ export const TRAILER_DIMENSIONS_IN = {
 //  surface as `L^3`; status flag is a categorical token.)
 export function computePalletLoadout({
   case_length_in = 0, case_width_in = 0, case_height_in = 0, case_weight_lb = 0,
-  cases_per_pallet = 1,
+  cases_per_pallet = 36,
   pallet_length_in = 48, pallet_width_in = 40, pallet_height_in = 48,
   trailer = "dry_van_53", pinwheel = false,
 }) {

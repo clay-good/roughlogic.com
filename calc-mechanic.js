@@ -353,7 +353,7 @@ export function parseTireSize(str) {
 // ratios; target RPM is `T^-1`; cruise mph is length / time;
 // revolutions-per-mile is one revolution (dimensionless) per length,
 // so `L^-1` per spec-v14 §7.1.)
-export function computeTireGearing({ original_size = "", new_size = "", axle_ratio = 0, top_gear_ratio = 1, target_rpm = 1800, indicated_mph = 0 }) {
+export function computeTireGearing({ original_size = "", new_size = "", axle_ratio = 0, top_gear_ratio = 0.69, target_rpm = 1800, indicated_mph = 0 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const od_orig = parseTireSize(original_size);
   const od_new = parseTireSize(new_size);
@@ -409,7 +409,7 @@ export const PAD_WEAR_RATE = {
 // `M L^2 T^-2`; pad thickness and miles-until-worn are lengths;
 // temperature rise is `T` per spec-v14 §7.1's T/temperature shortcut;
 // pad-set cost is monetary and therefore dimensionless.)
-export function computeBrakePadLife({ vehicle_weight_lb = 0, speed_delta_mph = 0, stops_per_mile = 1, pad_thickness_mm = 12, pad_material = "ceramic", rotor_mass_lb = 18, pad_set_cost_usd = 0, wear_rate_mm_per_kj = 0, front_bias_pct = 50 }) {
+export function computeBrakePadLife({ vehicle_weight_lb = 0, speed_delta_mph = 0, stops_per_mile = 0.4, pad_thickness_mm = 12, pad_material = "ceramic", rotor_mass_lb = 18, pad_set_cost_usd = 0, wear_rate_mm_per_kj = 0, front_bias_pct = 50 }) {
   const _g = _finiteGuard(arguments[0]); if (_g) return _g;
   const w = PAD_WEAR_RATE[pad_material];
   if (!w) return { error: "Unknown pad material." };

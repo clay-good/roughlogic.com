@@ -1456,7 +1456,7 @@ cross-check.
 | calc-accounting.js | `computeSumOfYearsDigitsDepreciation` | `{ cost = 0, salvage = 0, life_yr = 0, year = 1 } = {}` | _ | _ | _ |
 | calc-agriculture.js | `computeBulkDensity` | `{ dry_mass_g = 0, core_volume_cc = 0, particle_density_pcc = 2.65, texture = ...` | _ | _ | _ |
 | calc-agriculture.js | `computeBunkerSiloCapacity` | `{ bottom_width_ft = 0, top_width_ft = 0, average_depth_ft = 0, length_ft = 0,...` | _ | _ | _ |
-| calc-agriculture.js | `computeCropYield` | `{ crop = "corn", rows_per_pass = 1, row_spacing_in, measured_length_ft = 0, w...` | _ | _ | _ |
+| calc-agriculture.js | `computeCropYield` | `{ crop = "corn", rows_per_pass = 6, row_spacing_in, measured_length_ft = 0, w...` | _ | _ | _ |
 | calc-agriculture.js | `computeDrawbarPower` | `{ pull_lb = 0, speed_mph = 0, surface = "firm_soil", tractor_type = "2wd" }` | _ | _ | _ |
 | calc-agriculture.js | `computeDrawbarPull` | `{ power_hp = 0, power_basis = "drawbar", speed_mph = 0, surface = "firm_soil"...` | _ | _ | _ |
 | calc-agriculture.js | `computeDripZoneFlow` | `{ mode = "inline", tubing_ft = 0, spacing_in = 0, emitter_gph = 0, emitter_co...` | _ | _ | _ |
@@ -2907,7 +2907,7 @@ cross-check.
 | calc-mechanic.js | `computeBandBrakeTorque` | `{ slack_tension_lbf = 0, wrap_angle_deg = 0, friction_coefficient = 0, drum_r...` | _ | _ | _ |
 | calc-mechanic.js | `computeBeltDeflectionTension` | `{ center_distance_in = 0, large_sheave_dia_in = 0, small_sheave_dia_in = 0, m...` | _ | _ | _ |
 | calc-mechanic.js | `computeBoltStretch` | `{ diameter_in = 0, grip_length_in = 0, stretch_thou = 0, material = "steel", ...` | _ | _ | _ |
-| calc-mechanic.js | `computeBrakePadLife` | `{ vehicle_weight_lb = 0, speed_delta_mph = 0, stops_per_mile = 1, pad_thickne...` | _ | _ | _ |
+| calc-mechanic.js | `computeBrakePadLife` | `{ vehicle_weight_lb = 0, speed_delta_mph = 0, stops_per_mile = 0.4, pad_thick...` | _ | _ | _ |
 | calc-mechanic.js | `computeBrakePedalHydraulic` | `{ pedal_force_lb = 0, pedal_ratio = 0, booster_factor = 1, mc_bore_in = 0, ca...` | _ | _ | _ |
 | calc-mechanic.js | `computeCarburetorAltitudeJetting` | `{ baseline_pressure_inhg = 29.92, baseline_temp_f = 59, actual_pressure_inhg ...` | _ | _ | _ |
 | calc-mechanic.js | `computeCentrifugalForce` | `{ weight_lb = 0, radius_in = 0, speed_rpm = 0 } = {}` | _ | _ | _ |
@@ -2968,7 +2968,7 @@ cross-check.
 | calc-mechanic.js | `computeSpringWireStress` | `{ wire_diameter_in = 0, mean_coil_diameter_in = 0, force_lb = 0, total_coils ...` | _ | _ | _ |
 | calc-mechanic.js | `computeTerminalVelocity` | `{ weight_lb = 0, frontal_area_ft2 = 0, drag_coefficient = 0, air_density_lb_f...` | _ | _ | _ |
 | calc-mechanic.js | `computeTireContactPatch` | `{ corner_load_lb = 0, inflation_pressure_psi = 0 } = {}` | _ | _ | _ |
-| calc-mechanic.js | `computeTireGearing` | `{ original_size = "", new_size = "", axle_ratio = 0, top_gear_ratio = 1, targ...` | _ | _ | _ |
+| calc-mechanic.js | `computeTireGearing` | `{ original_size = "", new_size = "", axle_ratio = 0, top_gear_ratio = 0.69, t...` | _ | _ | _ |
 | calc-mechanic.js | `computeToggleMechanismForce` | `{ input_force_lb = 0, toggle_angle_deg = 0 } = {}` | _ | _ | _ |
 | calc-mechanic.js | `computeTorqueAdapterCorrection` | `{ target_torque_ftlb = 0, wrench_length_in = 0, adapter_length_in = 0, adapte...` | _ | _ | _ |
 | calc-mechanic.js | `computeTorsionSpringRate` | `{ wire_diameter_in = 0, mean_coil_diameter_in = 0, active_coils = 0, deflecti...` | _ | _ | _ |

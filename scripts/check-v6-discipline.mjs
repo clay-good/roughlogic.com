@@ -122,7 +122,7 @@ async function reportInlineCitationStrings() {
     }
   }
   if (total > 0) {
-    warnings.push("v6 citation-string lint summary (advisory): " + total + " inline reference strings across " + files + " calc-*.js modules. Track per-group audit progress in docs/v6-audit.md; re-run with --verbose for the per-module counts.");
+    warnings.push("v6 citation-string lint summary (advisory): " + total + " inline reference strings across " + files + " calc-*.js modules. The invariant is held by check-citation-coverage (every tile carries a structured CITATIONS entry), not by a checklist -- docs/v6-audit.md is the historical record of the original 385-utility pass, not a live worklist. Re-run with --verbose for the per-module counts.");
   }
 }
 

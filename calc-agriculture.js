@@ -358,7 +358,7 @@ export const TEST_WEIGHT_LB_PER_BU = { corn: 56, soy: 60, wheat: 60 };
 //  volume 2150.42 in^3). The 43560 ft^2/acre and test-weight
 //  lb/bu constants absorb the unit conversions at the source level.)
 export function computeCropYield({
-  crop = "corn", rows_per_pass = 1, row_spacing_in, measured_length_ft = 0,
+  crop = "corn", rows_per_pass = 6, row_spacing_in, measured_length_ft = 0,
   weight_in_strip_lb = 0, current_moisture_pct = 0, ground_loss_lb_in_area = 0,
   ground_loss_area_ft2 = 0,
 }) {

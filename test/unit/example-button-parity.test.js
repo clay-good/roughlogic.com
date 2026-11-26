@@ -261,27 +261,53 @@ test("a spec-renderer field whose label states a default is prefilled with that 
 // show the compute's own default instead.
 //
 // Checked by behavior: the first worked example with the field omitted must
-// answer exactly as with the field set to its prefill. The reviewed entries are
-// standing published values the page shows and the compute does not encode
-// (the door requires them).
+// answer exactly as with the field set to its prefill.
+//
+// 2026-11-26: the reviewed list held two different things under one heading,
+// and only one of them is defensible. Measured, by omitting each key and
+// reading what the door actually does:
+//
+//   EIGHT of them the compute REFUSES to run without. The page shows a
+//   standing published value and the compute declines to assume it, so the
+//   door demands it -- loudly, with its own message. Nothing silently
+//   disagrees, and the exemption is doing real work.
+//
+//   NINE of them the door answered DIFFERENTLY and said nothing. The compute
+//   parameter defaulted to a neutral placeholder -- neither the prefill nor
+//   absent -- so the `missing` warning (which fires only for a parameter with
+//   NO default) stayed quiet. The page used its prefill, an agent omitting the
+//   key got another number, and that is the exact failure this test was
+//   written to stop: `crop-yield` answered 48.3 bu/acre against the page's
+//   8.05, and `pallet-loadout` 1,800 pallets by weight against 50.
+//
+// Four of those nine are now fixed by giving the compute the page's own value,
+// which is why they are gone from this list: a "typical starting number" is not
+// a published standard, and a neutral 1 in its place was not a default anyone
+// had chosen. The five that remain are left on purpose and each says why.
 const PREFILL_REVIEWED = new Map([
+  // The compute REFUSES to run without the value. The page's prefill is a
+  // standing published figure; the compute will not assume a code or
+  // engineering value on the reader's behalf, and the door says so.
+  ["wallpaper-rolls::roll_width_in", "standard American single roll, 27 in; compute refuses without it"],
+  ["wallpaper-rolls::roll_len_in", "standard American single roll, 27 ft; compute refuses without it"],
+  ["pool-heater-size::target_hours", "the published heat-up planning time; compute refuses without it"],
+  ["seismic-design-spectral-acceleration::fa", "Site Class B, Fa = 1.0; refuses rather than assume a site class"],
+  ["seismic-design-spectral-acceleration::fv", "Site Class B, Fv = 1.0; refuses rather than assume a site class"],
+  ["grout-lift-pour-height::max_pour_height_ft", "TMS 602 5 ft 4 in lift; refuses rather than assume a code max"],
+  ["grout-lift-pour-height::max_lift_height_ft", "TMS 602 5 ft 4 in lift; refuses rather than assume a code max"],
+  ["lead-dust-clearance::clearance_limit_ug_ft2", "EPA floor clearance 5 ug/ft2 (2024 rule); the limit differs by surface, so it refuses to pick one"],
+
+  // Omitting the key switches the calculator to a different documented mode
+  // rather than producing a wrong number for the same mode.
   ["time-alignment::ambient_F", "68 F standard; the compute's null means ask"],
   ["flocculation-g-value::water_temp_f", "59 F design water; null means use mu directly"],
   ["dyno-correction-sae::baro_inhg", "SAE J1349 standard dry-air pressure"],
-  ["brake-pad-life::stops_per_mile", "typical urban stop rate shown as a starting point"],
-  ["pallet-loadout::cases_per_pallet", "standard GMA-pallet case count"],
-  ["tire-gearing::top_gear_ratio", "common overdrive ratio"],
-  ["crop-yield::rows_per_pass", "six-row head"],
-  ["wallpaper-rolls::roll_width_in", "standard American single roll, 27 in"],
-  ["wallpaper-rolls::roll_len_in", "standard American single roll, 27 ft"],
-  ["pool-heater-size::target_hours", "the published heat-up planning time"],
-  ["seismic-design-spectral-acceleration::fa", "Site Class B, Fa = 1.0"],
-  ["seismic-design-spectral-acceleration::fv", "Site Class B, Fv = 1.0"],
-  ["srw-geogrid-spacing::base_course_buried_in", "6 in buried base course"],
-  ["grout-lift-pour-height::max_pour_height_ft", "TMS 602 5 ft 4 in lift"],
-  ["grout-lift-pour-height::max_lift_height_ft", "TMS 602 5 ft 4 in lift"],
-  ["kitchen-makeup-air-deficit::door_closer_force_lbf", "8 lbf closer"],
-  ["lead-dust-clearance::clearance_limit_ug_ft2", "EPA floor clearance 5 ug/ft2 (2024 rule)"],
+
+  // Still a silent disagreement, and still open: both turn on which direction
+  // is the safe one to assume, which is a product call rather than a parity
+  // fix. Listed so they are not mistaken for the mode switches above.
+  ["srw-geogrid-spacing::base_course_buried_in", "6 in buried base course; OPEN -- silently differs, safety direction undecided"],
+  ["kitchen-makeup-air-deficit::door_closer_force_lbf", "8 lbf closer; OPEN -- silently differs, safety direction undecided"],
 ]);
 
 test("a prefilled default answers the same as the compute's own default", async () => {
