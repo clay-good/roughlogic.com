@@ -5292,6 +5292,10 @@ renderVoltageDrop.schema = {
   scope: null,
 };
 
+// The output formats below mirror the page's own lines (fmt(x, 3)): the page
+// and this schema are written separately, and they disagreed at 2 vs 3 decimals
+// until 2026-11-26 -- an agent quoting "12.00 ohm" where the reader saw
+// "12.000 ohm".
 renderOhmsLaw.schema = {
   inputs: [
     { key: "V", label: "Voltage (V)", kind: "number", options: null, default: null, attrs: { step: "any" } },
@@ -5300,10 +5304,10 @@ renderOhmsLaw.schema = {
     { key: "P", label: "Power (W)", kind: "number", options: null, default: null, attrs: { step: "any" } },
   ],
   outputs: [
-    { key: "V", label: "Voltage", unit: "V", format: (r) => (r.V == null ? "-" : fmt(r.V, 2) + " V") },
-    { key: "I", label: "Current", unit: "A", format: (r) => (r.I == null ? "-" : fmt(r.I, 2) + " A") },
-    { key: "R", label: "Resistance", unit: "ohm", format: (r) => (r.R == null ? "-" : fmt(r.R, 2) + " ohm") },
-    { key: "P", label: "Power", unit: "W", format: (r) => (r.P == null ? "-" : fmt(r.P, 2) + " W") },
+    { key: "V", label: "Voltage", unit: "V", format: (r) => (r.V == null ? "-" : fmt(r.V, 3) + " V") },
+    { key: "I", label: "Current", unit: "A", format: (r) => (r.I == null ? "-" : fmt(r.I, 3) + " A") },
+    { key: "R", label: "Resistance", unit: "ohm", format: (r) => (r.R == null ? "-" : fmt(r.R, 3) + " ohm") },
+    { key: "P", label: "Power", unit: "W", format: (r) => (r.P == null ? "-" : fmt(r.P, 3) + " W") },
   ],
   citation: "Citation: Ohm's Law (V = I*R) and power equations (P = V*I).",
   scope: null,

@@ -421,8 +421,14 @@ test("outputUnits reads as a unit, never as part of the number", async () => {
 test("outputDisplays returns the string the calculator prints", async () => {
   const { outputDisplays } = await import("../../mcp/catalog.mjs");
   const ohm = await outputDisplays("ohms-law", { V: 120, I: 10, R: null, P: null });
-  assert.equal(ohm.R, "12.00 ohm");
-  assert.equal(ohm.P, "1,200.00 W");
+  // These expectations read "12.00 ohm" and "1,200.00 W" until 2026-11-26,
+  // while the page printed "12.000 ohm" -- this test pinned the door's string
+  // against itself and called that the string the calculator prints. The page
+  // formats with fmt(x, 3) and the hand-authored schema beside it had been
+  // written with fmt(x, 2). door-display-matches-page.test.js now compares the
+  // two surfaces for every tile rather than one trusting the other.
+  assert.equal(ohm.R, "12.000 ohm");
+  assert.equal(ohm.P, "1,200.000 W");
   // A bespoke renderer has no format closure and reports nothing rather than
   // guessing.
   assert.deepEqual(await outputDisplays("abrasive-blast", {}), {});
