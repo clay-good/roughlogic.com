@@ -86,12 +86,15 @@
 //                            is the degrade-to-a-prompt bucket, not a false
 //                            all-clear.
 //
-// Noted, not fixed, because it is a per-field domain call this mode does not
-// make: fuel-oil-atomizing-viscosity at a check temperature of -185 F returns
-// 3.43e+54 SSU. The verdict direction stays correct (ABOVE the atomizing
-// target), so nothing permissive follows from it, but the printed figure is
-// nonsense and a sane lower bound on that field would be worth someone's
-// judgement.
+// FIXED 2026-11-25, and it was not the domain call it looked like.
+// fuel-oil-atomizing-viscosity returned 3.43e+54 SSU at a check temperature of
+// -185 F. Chasing it found a worse defect underneath: the SSU -> cSt direction
+// is a BISECTION whose ceiling was never declared, so a data-sheet viscosity
+// entered as 1e8, 1e9 or 1e12 SSU all bisected to the same 1e7 cSt bound and
+// returned the IDENTICAL fit -- same slope, same 193.8 F setpoint, no warning.
+// Both halves are refused now. The cold-end bound is on the VISCOSITY rather
+// than on a temperature chosen here, so it follows each oil's own fitted line:
+// no constant had to be invented, which is why this needed no domain call.
 //
 // AND IT WAS THE ONLY ONE. Of the 118 conclusions that change in this mode,
 // **zero** go from a baseline that reads as a problem to a negated verdict that

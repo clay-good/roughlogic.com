@@ -683,11 +683,20 @@ const _RANKINE_OFFSET = 459.67;
 // 1 + 0.000061 (t - 100), moves SSU under 1% across a heater's range and is
 // left out). Until 2026-09-19 SSU went into the Walther form directly.
 const _ssuFromCst = (v) => 4.6324 * v + (1 + 0.03264 * v) / ((3930.2 + 262.7 * v + 23.97 * v * v + 1.646 * v * v * v) * 1e-5);
+// The SSU -> cSt direction is a bisection, so it has a ceiling, and that
+// ceiling was UNDECLARED: a viscosity above it saturated silently. Entered as
+// 1e8, 1e9 and 1e12 SSU, three different oils all returned the SAME fit (slope
+// 9.8826, atomizing setpoint 193.8 F), because every one of them bisected to
+// the same 1e7 cSt bound. Named here so the compute can refuse the range
+// instead of quietly flattening it.
+const _CST_CEILING = 1e7;
 const _cstFromSsu = (ssu) => {
-  let lo = 0.1, hi = 1e7;
+  let lo = 0.1, hi = _CST_CEILING;
   for (let i = 0; i < 200; i++) { const mid = (lo + hi) / 2; if (_ssuFromCst(mid) < ssu) lo = mid; else hi = mid; }
   return (lo + hi) / 2;
 };
+// The largest Saybolt reading the conversion above can represent, ~4.63e7 SSU.
+const _SSU_CEILING = _ssuFromCst(_CST_CEILING);
 const _walther = (ssu) => Math.log10(Math.log10(_cstFromSsu(ssu) + _WALTHER_OFFSET));
 const _unWalther = (x) => _ssuFromCst(Math.pow(10, Math.pow(10, x)) - _WALTHER_OFFSET);
 
@@ -701,6 +710,14 @@ export function computeFuelOilAtomizingViscosity({ v1_ssu = 0, t1_f = 0, v2_ssu 
   if (!(v2_ssu >= 32)) return { error: "The second viscosity must be at least 32 SSU (the Saybolt scale's floor)." };
   if (!(target_ssu >= 32)) return { error: "The target atomizing viscosity must be at least 32 SSU." };
   if (!(pumping_limit_ssu >= 32)) return { error: "The pumping viscosity limit must be at least 32 SSU." };
+  // Above the conversion's ceiling every value bisects to the same bound, so
+  // three different oils returned one answer. Refuse the range instead.
+  for (const [k, v] of [["first viscosity", v1_ssu], ["second viscosity", v2_ssu],
+    ["target atomizing viscosity", target_ssu], ["pumping viscosity limit", pumping_limit_ssu]]) {
+    if (Number(v) > _SSU_CEILING) {
+      return { error: "The " + k + " is above " + fmt(_SSU_CEILING, 0) + " SSU, the largest reading the Saybolt / centistokes conversion here can represent; check the units." };
+    }
+  }
   if (!(t1_f > -_RANKINE_OFFSET)) return { error: "The first temperature must be above absolute zero (F)." };
   if (!(t2_f > -_RANKINE_OFFSET)) return { error: "The second temperature must be above absolute zero (F)." };
   if (!(check_temp_f > -_RANKINE_OFFSET)) return { error: "The check temperature must be above absolute zero (F)." };
@@ -722,6 +739,15 @@ export function computeFuelOilAtomizingViscosity({ v1_ssu = 0, t1_f = 0, v2_ssu 
   const setpoint_spread_f = temp_for_target_f - temp_for_pumping_f;
   const outs = [slope_b, intercept_a, temp_for_target_f, temp_for_pumping_f, viscosity_at_check_ssu, setpoint_spread_f];
   if (!outs.every(Number.isFinite)) return { error: "The viscosity-temperature fit is not a finite value -- check the two data points." };
+  // The fit is log-log, so reading it well below the data points runs away:
+  // this oil's line gives 3.43e+54 SSU at -185 F, a finite number the tile
+  // printed as though it meant something. Past the conversion's own ceiling
+  // there is no Saybolt reading to report, and the oil is a solid long before
+  // it anyway. The bound follows from the oil's own fitted line rather than
+  // from a temperature chosen here, so a lighter delivery keeps more range.
+  if (viscosity_at_check_ssu > _SSU_CEILING) {
+    return { error: "At " + fmt(check_temp_f, 0) + " F this oil's fitted line is past " + fmt(_SSU_CEILING, 0) + " SSU, beyond the Saybolt / centistokes conversion here and far below the data points the fit came from. Check a setpoint nearer the oil's working range." };
+  }
   // The SSU/cSt round trip carries float noise: 150 SSU at 200 F read back
   // as 150.0000000000006 and "well outside" until 2026-10-01.
   const check_in_band = viscosity_at_check_ssu <= target_ssu * (1 + 1e-9);

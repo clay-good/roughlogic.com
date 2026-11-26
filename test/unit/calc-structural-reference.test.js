@@ -237,6 +237,46 @@ test("fuel oil viscosity: the fitted line passes through both data-sheet points 
   within(back.viscosity_at_check_ssu, 150, 1e-6, "round trip through the fit");
 });
 
+// The SSU -> cSt direction is a bisection with a ceiling, and that ceiling was
+// undeclared. Two consequences, found by the out-of-range sweep on 2026-11-25.
+test("fuel oil viscosity: the conversion's ceiling is refused, not silently saturated", () => {
+  // THE WORSE ONE. Entered as 1e8, 1e9 and 1e12 SSU, three different oils all
+  // bisected to the same 1e7 cSt bound and returned the SAME fit -- slope
+  // 9.8826 and a 193.8 F atomizing setpoint for every one of them, with no
+  // warning. A wrong answer dressed as a fit to the user's own data.
+  const answers = new Set();
+  for (const v1 of [1e8, 1e9, 1e12]) {
+    const r = computeFuelOilAtomizingViscosity({ ...FOA_CASE, v1_ssu: v1 });
+    assert.match(r.error, /largest reading the Saybolt/, `v1_ssu ${v1} must be refused`);
+    answers.add(r.error);
+  }
+  assert.equal(answers.size, 1, "one refusal, not three different stories");
+  // Each of the four viscosity inputs is held to it, not just the first.
+  for (const k of ["v1_ssu", "v2_ssu", "target_ssu", "pumping_limit_ssu"]) {
+    const r = computeFuelOilAtomizingViscosity({ ...FOA_CASE, [k]: 1e9 });
+    assert.match(r.error, /largest reading the Saybolt/, k);
+  }
+
+  // THE RUNAWAY. The fit is log-log, so reading it well below the data points
+  // explodes: this oil's line gave 3.43e+54 SSU at -185 F, a finite number the
+  // tile printed as though it meant something.
+  const cold = computeFuelOilAtomizingViscosity({ ...FOA_CASE, check_temp_f: -185 });
+  assert.match(cold.error, /past .* SSU/, "an absurd extrapolation is refused");
+  assert.ok(!/e\+5\d/.test(String(cold.viscosity_at_check_ssu)), "and no nonsense figure is reported");
+
+  // The bound comes from the OIL'S OWN fitted line, not from a temperature
+  // chosen here, so the working range is untouched: this heavy oil still
+  // answers down to 0 F, where it is already 4.2e7 SSU and a solid in practice.
+  for (const t of [0, 20, 40, 100, 185, 250]) {
+    const r = computeFuelOilAtomizingViscosity({ ...FOA_CASE, check_temp_f: t });
+    assert.ok(!r.error, `${t} F is inside the working range: ${r.error}`);
+  }
+  // And the published example is unchanged by either guard.
+  const ex = computeFuelOilAtomizingViscosity(FOA_CASE);
+  within(ex.temp_for_target_f, 214.9, 0.1, "atomizing setpoint");
+  within(ex.viscosity_at_check_ssu, 298.0, 0.1, "viscosity at the entered setpoint");
+});
+
 test("fuel oil viscosity: hotter oil is thinner, and the atomizing setpoint is far above the pumping setpoint", () => {
   const r = computeFuelOilAtomizingViscosity(FOA_CASE);
   assert.ok(r.temp_for_target_f > r.temp_for_pumping_f, "150 SSU needs more heat than 4,000 SSU");

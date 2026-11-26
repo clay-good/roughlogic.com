@@ -261,7 +261,13 @@ export const SIGNED_INPUTS = [
   "turbine-density-correction::alt_air_temp_f",
   "laundry-cost-per-pound::incoming_temp_f",
   "fuel-oil-atomizing-viscosity::t1_f",
-  "fuel-oil-atomizing-viscosity::check_temp_f",
+  // check_temp_f was listed here until 2026-11-25: a setpoint in F is signed in
+  // principle, so a negative was waived. The tile now refuses one whose fitted
+  // viscosity runs past the Saybolt / centistokes conversion's ceiling, which
+  // for this oil is anything below about 0 F -- it had been reporting 3.43e+54
+  // SSU at -185 F. The bound is on the VISCOSITY, not the temperature, so a
+  // light enough oil still reads below zero; the waiver simply no longer
+  // waives anything for the example oil, and a dead waiver hides the next find.
   "conductor-sag-at-temperature::temp1_f",
   "conductor-sag-at-temperature::temp2_f",
   "conductor-uplift-check::back_span_rise_ft",
