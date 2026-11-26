@@ -12661,3 +12661,61 @@ test("round-trip: chiller tons -> required_gpm recovers the design flow", async 
     assert.ok(Math.abs(inv.required_gpm - gpm) < 1e-6, `tons->required_gpm round-trip for ${gpm} GPM: got ${inv.required_gpm}`);
   }
 });
+
+// --- Shared constant TABLES, not just shared computations -------------
+//
+// The invariants above pin tiles that share a FUNCTION. These pin tiles
+// that share a physical quantity held in two separately-authored tables.
+// That second copy is what makes the figure checkable at all (a label
+// generated from a constant is not a witness) -- but only while the two
+// are held equal, and nothing held them. One pair has already drifted:
+// the CPVC expansion coefficient was 3.7e-5 in one table and 3.4e-5 in
+// the other until 2026-09-19, and was realigned by hand with no test to
+// stop it happening again. Each of these was seeded to prove it fails.
+
+test("invariant: the two Schedule 40 inside-diameter tables agree at every trade size", async () => {
+  // calc-gas.js sizes fuel-gas pipe and calc-plumbing.js sizes water pipe,
+  // but ANSI B36.10 Schedule 40 bore is one table. Two copies, no gate.
+  const [gas, plumb] = await Promise.all([import("../../calc-gas.js"), import("../../calc-plumbing.js")]);
+  assert.deepEqual(
+    Object.keys(gas.SCH40_ID_IN).sort(), Object.keys(plumb.SCH40_ID_IN).sort(),
+    "the two SCH40_ID_IN tables cover different trade sizes",
+  );
+  for (const size of Object.keys(gas.SCH40_ID_IN)) {
+    assert.equal(gas.SCH40_ID_IN[size], plumb.SCH40_ID_IN[size], `Schedule 40 ID disagrees at ${size} in`);
+  }
+});
+
+test("invariant: both pipe thermal-expansion tables agree on every shared material", async () => {
+  // PIPE_EXPANSION_ALPHA_PER_F keys materials in mixed case ("PEX", "CPVC");
+  // THERMAL_EXPANSION_COEFFICIENTS keys them lowercase and carries E and S_a
+  // beside alpha. The coefficient itself must be one number.
+  const p = await import("../../calc-plumbing.js");
+  let shared = 0;
+  for (const [mat, alpha] of Object.entries(p.PIPE_EXPANSION_ALPHA_PER_F)) {
+    const row = p.THERMAL_EXPANSION_COEFFICIENTS[mat.toLowerCase()];
+    assert.ok(row, `${mat} has an expansion coefficient in one table and no row in the other`);
+    assert.equal(row.alpha_per_F, alpha, `alpha_per_F disagrees for ${mat}`);
+    shared++;
+  }
+  assert.equal(shared, 5, "expected five materials in both expansion tables");
+});
+
+test("invariant: the two ISO needed-fire-flow tiles agree on the construction factor", async () => {
+  // computeRequiredFireFlow keys construction by name, computeIsoNeededFireFlow
+  // by ISO class 1-6. One F per class: 1 frame, 2 joisted masonry, 3-4
+  // non-combustible, 5-6 fire resistive. The named tile's own cap tiers
+  // ("8,000 gpm for Classes 1-2") already assume this mapping.
+  const f = await import("../../calc-fire.js");
+  for (const [name, cls] of [["wood_frame", 1], ["ordinary", 2], ["masonry", 3], ["masonry", 4], ["fire_resistive", 5], ["fire_resistive", 6]]) {
+    assert.equal(
+      f.ISO_CONSTRUCTION_FACTORS[name], f.ISO_CONSTRUCTION_F[cls],
+      `construction factor disagrees: ${name} vs ISO class ${cls}`,
+    );
+  }
+  // The 8,000 gpm C cap belongs to Classes 1-2 and the two named classes
+  // that carry it must be exactly those; a third would silently widen it.
+  for (const name of ["wood_frame", "ordinary"]) {
+    assert.ok(f.ISO_CONSTRUCTION_FACTORS[name] >= f.ISO_CONSTRUCTION_F[2], `${name} should sit in the Class 1-2 tier`);
+  }
+});
