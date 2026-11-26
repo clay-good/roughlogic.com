@@ -150,6 +150,16 @@ key the tile's own example sets must be advertised, and that example must run
 clean through `run_calculator`. All three are checked for all 2,266 tiles on
 every build.
 
+All four warnings are swept over the whole catalog by the unit suite, which is
+newer than the warnings themselves: the two range rules by
+`test/unit/sign-typo-guard.test.js`, and `missing` plus the unknown-key rule by
+`test/unit/mcp-catalog-schema.test.js`. `missing` holds on 716 omissions of a
+required input. Two cases there look like holes and are not, so both are pinned
+rather than left to be rediscovered: deleting a one-input tile's only key leaves
+no inputs at all, which means "run the worked example" (16 tiles read as silent
+for that reason alone), and `historical-pricing`'s `shard` is supplied by the
+door itself, so nothing is missing when a caller omits it.
+
 `run_calculator` also warns when it is handed a key the calculator cannot
 receive. It spreads the caller's object into the compute, so an unrecognised
 key is dropped silently and the tile answers from its defaults -- a confident

@@ -923,3 +923,84 @@ test("an unknown input key is reported, except where the key set really is shape
   }
   assert.equal(reported, tested - silent.length, "every other tile reports the bogus key");
 });
+
+// The fourth door warning: an input left out that has no default.
+//
+// `run_calculator` returns four advisory warnings -- unbounded, missing,
+// out-of-range, unknown-key. The range ones are covered by the bounds work and
+// the unknown-key one by the test above; `missing` had nothing. It guards the
+// same failure as the others: a confident answer computed from a blank the
+// caller believes it supplied.
+//
+// 716 omissions of a required key across the catalog, and the promise holds --
+// every one is named in a warning. Two things look like holes and are not,
+// which is why they are asserted here rather than left to be rediscovered:
+//
+//   THE ONE-INPUT TILE   Deleting the only key leaves `{}`, and `run`
+//                        documents that as "no inputs: the worked example is
+//                        run". So it answers, with no warning, correctly. 16
+//                        tiles read as silent for this reason alone and a
+//                        sweep that misses it reports 16 phantom defects.
+//   THE INJECTED SHARD   historical-pricing's `shard` has no default and the
+//                        example names it, but the door supplies the bundled
+//                        data itself, so nothing is missing when a caller
+//                        leaves it out.
+test("omitting a required input is named in a warning", async () => {
+  const { describe, run } = await import("../../mcp/catalog.mjs");
+  const { RENDERER_MAP } = await import("../fixtures/renderer-map.js");
+  const { COMPUTE_MAP, importCalc } = await import("../fixtures/compute-map.js");
+
+  // Door-supplied, not caller-supplied: the compute takes a data bundle the
+  // door closes over.
+  const INJECTED = ["historical-pricing::shard"];
+
+  const unwarned = [];
+  let probed = 0, warned = 0, singleInput = 0;
+  for (const id of Object.keys(RENDERER_MAP)) {
+    let d;
+    try { d = await describe({ id }); } catch { continue; }
+    const example = (d.example && d.example.inputs) || null;
+    if (!d.runnable || !example) continue;
+    const keys = Object.keys(example);
+    if (keys.length < 2) { if (keys.length === 1) singleInput += 1; continue; }
+
+    const reg = COMPUTE_MAP[id];
+    if (!reg) continue;
+    const fn = (await importCalc(reg.module))[reg.fn];
+    // Required = the schema/compute descriptor carries no default. `describe`
+    // reports `default: null` for a parameter that has none.
+    for (const f of d.inputs || []) {
+      if (!f.key || !(f.key in example)) continue;
+      if (f.default !== null && f.default !== undefined) continue;
+      if (INJECTED.includes(`${id}::${f.key}`)) continue;
+      // Only a parameter the compute really destructures without a default.
+      const src = fn.toString();
+      const head = src.slice(src.indexOf("("), src.indexOf("{", src.indexOf("(")) + 400);
+      if (!new RegExp(`\\b${f.key.replace(/[^\w]/g, "")}\\s*(,|=|\\}|:)`).test(head)) continue;
+      if (new RegExp(`\\b${f.key.replace(/[^\w]/g, "")}\\s*=`).test(head)) continue;   // has a default
+
+      probed += 1;
+      const without = { ...example };
+      delete without[f.key];
+      const out = await run({ id, inputs: without });
+      if ((out.warnings || []).some((w) => w.rule === "missing" && w.key === f.key)) warned += 1;
+      else unwarned.push(`${id}::${f.key}${out.result && out.result.error ? " (refused)" : " (ANSWERED anyway)"}`);
+    }
+  }
+
+  assert.ok(probed > 500, `the catalog's required inputs are swept (${probed} omissions)`);
+  assert.deepEqual(
+    unwarned.slice(0, 12),
+    [],
+    `${unwarned.length} required input(s) can be omitted with no warning. An "(ANSWERED anyway)" case is the ` +
+    `one this warning exists to prevent: a confident number built on a blank.`,
+  );
+  assert.equal(warned, probed);
+
+  // The documented fallback, pinned so the 16 tiles it accounts for are never
+  // read as defects again.
+  assert.ok(singleInput > 10, `single-input tiles exist and are skipped above (${singleInput})`);
+  const only = await run({ id: "readability", inputs: {} });
+  assert.ok(only.usedExample, "no inputs at all means the worked example runs");
+  assert.deepEqual(only.warnings, [], "and a verified example is in-range by construction, so it warns about nothing");
+});
