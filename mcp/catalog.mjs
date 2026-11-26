@@ -925,6 +925,24 @@ export async function describe({ id } = {}) {
           : { name: k, default: undefined }));
       if (fromExample.length) out.inputs = [...(out.inputs || []), ...fromExample];
     }
+    // One name for the key, on every descriptor. Two shapes reach this point:
+    // a renderer schema names its field `key`, and an input recovered from a
+    // compute signature names it `name`. Both ARE the key a caller sends, and
+    // `inputs_source` says which shape it is -- but the published outputSchema
+    // tells an agent to read `key`, so on the 40 tiles that degrade to
+    // signature introspection (105 inputs: pv-performance-ratio's eleven loss
+    // factors, loan-limits' county, bridge-formula's axle arrays) an agent
+    // following the contract read `undefined` and had nothing to send.
+    //
+    // Every reader INSIDE this repo already defended itself with
+    // `field.key ?? field.name` -- build-field-index, check-both-doors -- which
+    // is why no gate ever saw it: the door's own consumers worked around a
+    // contract its outside callers could not. `key` is added here rather than
+    // in introspectInputs so `name` keeps working for anything built on it.
+    if (Array.isArray(out.inputs)) {
+      out.inputs = out.inputs.map((f) =>
+        (f && f.key === undefined && typeof f.name === "string" ? { key: f.name, ...f } : f));
+    }
     // spec-v1185: the cited section + formula shown in the browser, retained on
     // the schema even for the unit-wrapper tiles whose inputs degrade.
     out._citationText = (rawSchema && rawSchema.citation) || RENDERER_CITATIONS[id] || null;

@@ -751,3 +751,52 @@ test("a partly-mapped numeric tile still earns its labels", async () => {
     assert.ok(advertised.has(key), `example key ${key} is still advertised`);
   }
 });
+
+// One name for the key, on every descriptor, for every tile.
+//
+// `describe` builds its input list by two routes -- a renderer's declared
+// schema, which names a field `key`, and recovery from the compute signature,
+// which named it `name` and nothing else. The published outputSchema tells an
+// agent to read `key`. So on the 40 tiles that take the second route (105
+// inputs) an outside caller following the contract read `undefined` and had no
+// name to send: pv-performance-ratio's eleven loss factors, loan-limits'
+// county, bridge-formula's axle arrays.
+//
+// It stayed invisible because every reader inside this repo had already worked
+// around it -- build-field-index's rowFor and check-both-doors both say
+// `field.key ?? field.name`. A contract its own consumers defend themselves
+// against is not a contract, and no gate had ever asked the question from
+// outside. This asks it for the whole catalog.
+test("every advertised input carries a usable `key`, whichever route described it", async () => {
+  const { describe } = await import("../../mcp/catalog.mjs");
+  const { RENDERER_MAP } = await import("../fixtures/renderer-map.js");
+
+  const keyless = [];
+  let tiles = 0, fields = 0, viaCompute = 0;
+  for (const id of Object.keys(RENDERER_MAP)) {
+    let d;
+    try { d = await describe({ id }); } catch { continue; }
+    if (!d.runnable || !Array.isArray(d.inputs) || !d.inputs.length) continue;
+    tiles++;
+    if (d.inputs_source === "compute") viaCompute++;
+    for (const f of d.inputs) {
+      fields++;
+      if (typeof f.key !== "string" || !f.key) keyless.push(`${id}.${f.name ?? "?"}`);
+    }
+  }
+
+  assert.ok(tiles > 2200, `swept the catalog, not a corner of it (${tiles} tiles)`);
+  assert.ok(viaCompute > 0, "and included the signature-introspection route it is about");
+  assert.deepEqual(
+    keyless.slice(0, 12),
+    [],
+    `${keyless.length} of ${fields} advertised inputs have no \`key\` to send`,
+  );
+
+  // `name` stays, because things are built on it. The two must not disagree.
+  const d = await describe({ id: "pv-performance-ratio" });
+  assert.equal(d.inputs_source, "compute", "this tile is described from its signature");
+  assert.equal(d.inputs.length, 11);
+  for (const f of d.inputs) assert.equal(f.key, f.name, "key and its legacy alias agree");
+  assert.ok(d.inputs.some((f) => f.key === "soiling"), "and the keys are the real parameters");
+});

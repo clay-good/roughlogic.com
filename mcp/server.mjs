@@ -88,7 +88,7 @@ const TOOLS = [
         runnable: { type: "boolean" },
         inputs_source: { type: "string", enum: ["renderer", "compute"] },
         outputs_source: { type: ["string", "null"], enum: ["renderer", "captions", null] },
-        inputs: { type: "array", description: "Field descriptors (key, label, kind, options, default, attrs) or compute params." },
+        inputs: { type: "array", description: "Field descriptors. Every entry carries `key` -- the name to send in run_calculator's `inputs` -- plus `default`. A tile whose renderer declares a schema (inputs_source \"renderer\") also carries label, kind, options and attrs; one recovered from the compute signature (inputs_source \"compute\") carries `name` as a legacy alias of `key` and no label." },
         outputs: { type: "array", items: { type: "object", properties: { key: { type: "string" }, label: { type: "string" }, unit: { type: ["string", "null"] } } } },
         example: { type: "object" },
         source: { type: "string" },

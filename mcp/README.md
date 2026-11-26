@@ -165,7 +165,14 @@ straight through the door, warning-free, to the answer the page shows. Send one
 family or the other; where both are given, the US key wins.
 
 `describe_calculator` names the answers as well as the inputs, and says which
-of two key spaces it is using. A calculator with a field schema reports its
+of two key spaces it is using. Every input descriptor carries **`key`** --
+the name to send in `run_calculator`'s `inputs` -- whichever route described it.
+A tile whose renderer declares a field schema (`inputs_source: "renderer"`,
+2,228 of them) also carries the field's label, kind, select options and min/max;
+the 40 described from their compute signature instead carry `name` as a legacy
+alias of `key` and no label. Until 2026-11-26 those 40 carried `name` ALONE, so
+an agent reading the documented `key` -- as the published outputSchema tells it
+to -- got `undefined` for 105 inputs and had no name to send. A calculator with a field schema reports its
 **display lines** -- the rows a person reads down the page -- so `outputs_source`
 is `renderer`, the keys are the renderer's own line ids, and `run_calculator`
 fills each one's `display` with the formatted string the page shows ("24.0 in
