@@ -193,7 +193,21 @@ all, and `motor-vd-starting` answered a caller who sent `lrc_estimated: "false"`
 with the caveat "LRC estimated as 6x FLA (no code letter entered - confirm
 against the nameplate)" against a figure they had read off the nameplate. A
 default types 28 of those 84; the other 56 declare no literal default, and a
-value sent there is passed through as typed. A list or object parameter is
+value sent there is passed through as typed.
+
+Those 56 are mostly **conditionally rendered** boxes -- concrete's column and
+footing dimensions, metal-weight's per-shape dimensions, layout-squaring's
+diagonals -- which the renderer declares per shape and the schema extractor
+reads for the one shape the worked example uses. Sending a number as a string
+there answers identically on every one of them, because the computes read their
+inputs through `Number()`; three echo the caller's own string back in a numeric
+field (`friction-loss::internal_diameter_in`,
+`hydrostatic-test::multiplier`, `dehumidifier::expected_pints_per_day`). That is
+checked rather than assumed, and the check found one place it was not true:
+`magnetic-declination` guarded its bearing conversion with
+`Number.isFinite(bearing_deg)`, stricter than the compute it guards, so a
+caller's `"7"` dropped `converted_bearing_deg` from the answer in silence while
+the declination and intensities came back looking complete. Fixed 2026-11-26. A list or object parameter is
 published with no kind on purpose -- `number | select | checkbox | text` has no
 spelling for a list of rows -- and the worked example returned beside the
 description is what shows its shape.

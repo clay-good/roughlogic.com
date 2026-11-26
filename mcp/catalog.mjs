@@ -668,8 +668,19 @@ function wrapMagneticDeclination(stub) {
       // 2025-2030 and a date outside that window is extrapolated, not refused.
       in_validity_window: decimal_year >= 2025 && decimal_year < 2030,
     };
-    if (Number.isFinite(bearing_deg)) {
-      const conv = computeBearingConversion({ declination_deg: r.D, bearing_deg, direction });
+    // Number()-first, because this guard was STRICTER than the compute it
+    // guards. `bearing_deg` is one of the inputs the worked example does not
+    // set, so nothing types it and a caller's "7" reaches here as a string;
+    // `Number.isFinite("7")` is false, and the conversion was dropped in
+    // silence -- no error, no warning, and the rest of the answer (declination,
+    // intensities, model window) came back looking complete, so an agent asking
+    // to convert a magnetic bearing to true got everything except the bearing.
+    // computeBearingConversion itself coerces on its next line, which is why
+    // the string was never the problem. A guard must test the value the thing
+    // it guards will actually use.
+    const bearing = Number(bearing_deg);
+    if (bearing_deg !== null && bearing_deg !== undefined && bearing_deg !== "" && Number.isFinite(bearing)) {
+      const conv = computeBearingConversion({ declination_deg: r.D, bearing_deg: bearing, direction });
       if (!conv.error) out.converted_bearing_deg = conv.result_deg;
     }
     return out;
