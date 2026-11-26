@@ -546,36 +546,17 @@ export function queryFill(query, rows, opts) {
   });
   // A NUMBER INSIDE A FIELD'S OWN LABEL is the label's, not the reader's.
   //
-  // measure-query-fill drops every digit-bearing word out of a label before it
-  // phrases a question, for exactly this reason -- so its WRONG count has never
-  // seen what happens when a reader writes the label the way the PAGE prints
-  // it. Written that way, "Flow at 4 mA 0, Flow at 20 mA 500" filled flow_low
-  // = 4 and flow_high = 20: the milliamp numbers that NAME the two taps read
-  // as the two flows, and the reader's own 0 and 500 were dropped. A confident
-  // wrong answer on the most natural phrasing there is (2026-11-26).
+  // A reader who writes a label the way the page prints it includes its
+  // numbers. "Flow at 4 mA 0, Flow at 20 mA 500" filled flow_low = 4 and
+  // flow_high = 20 -- the milliamp numbers NAMING the two taps -- and dropped
+  // the reader's own 0 and 500. 75 wrong values across 236 digit-labelled
+  // tiles, now 0.
   //
-  // Suppressed beside the option spans above, and for the same stated reason:
-  // vetoed, not removed. Phase A reads the words BETWEEN consecutive numbers
-  // to find a field name, so dropping one from the list widens the next window.
-  //
-  // Narrow by construction: the whole label has to be written out, in order,
-  // before any of its numbers is discounted. It turns a wrong fill into a
-  // MISSING one rather than a right one -- "Flow at 4 mA 0" now fills nothing
-  // for that field instead of 4 -- which is the trade this module's governing
-  // rule asks for: a wrong answer is worse than no answer. A value that
-  // repeats one of the label's own numbers ("Flow at 4 mA 4") is not rescued
-  // either; measured, not assumed.
-  //
-  // Measured on 236 tiles whose labels carry a digit, phrased with the label
-  // written out in full: 75 wrong values before this, 0 after -- held there by
-  // test/unit/query-fill-label-digits.test.js, which exempts nothing.
-  // Matched on a NORMALISED copy with an index map, rather than a regex over
-  // the raw text with a tolerance for punctuation. The tolerant version read
-  // "Flow at 4 mA" but not "Rate on first $100k" or "Bag yield (ft3): 80lb
-  // 0.60, 60lb 0.45" -- a label that embeds its own lookup table -- and those
-  // were 4 of the 75 wrong values it was written to stop. Collapsing every run
-  // of non-alphanumerics to one space treats all three alike, and keeping the
-  // map means the span still lands on real positions in the real text.
+  // Suppressed, not removed, beside the option spans above and for the reason
+  // recorded there: Phase A reads the words BETWEEN consecutive numbers, so
+  // deleting one widens the next window. It makes such a field MISSING rather
+  // than right, which is the trade this module's governing rule asks for.
+  // Measured in query-fill-label-digits.test.js, the only thing watching it.
   {
     let norm = "";
     const at = [];                    // norm index -> index in `text`
@@ -588,10 +569,9 @@ export function queryFill(query, rows, opts) {
     for (const row of rows) {
       const label = String(row.l || "").trim();
       if (!/\d/.test(label)) continue;
-      // Through the SAME rewrite the question went through, or the two sides
-      // are not comparable: "$100k" in a label becomes "100 usdk" in the text,
-      // so a needle built from the raw label ("rate on first 100k") could
-      // never be found in it. That was 3 of the 4 cases left.
+      // Through the SAME rewrite the question took, or the sides are not
+      // comparable: "$100k" becomes "100 usdk", so a needle built from the raw
+      // label was never found.
       const words = rewriteQuery(label, protect, skip).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
       // Two words at least, and one of them has to be the number: a one-word
       // label cannot spend a digit, and a label with no digit has none to spend.
@@ -1619,17 +1599,13 @@ export function queryFill(query, rows, opts) {
       if (needsName && !nameNear) continue;
       if (isNegated(optText, at)) continue;
       // An option word sitting INSIDE another field's label is that label's
-      // word, not this select's choice -- the same reasoning as `ownsUnit`
-      // above. `steam_basis` offers "pressure" and a sibling field is labelled
-      // "Steam specific volume at pressure", so a reader naming the volume
-      // ("specific volume at pressure 13.7") set the MODE, and the tile then
-      // demanded a pressure the question never carried. Five steam tiles
-      // answered that way (2026-11-26).
-      //
-      // Narrow on purpose: the veto needs the two words before the match to
-      // belong to that sibling's label too, so the phrase really is the
-      // label being quoted. "steam basis pressure" still selects the mode,
-      // because "basis" is no sibling's word.
+      // word, not this select's choice -- the same reasoning as `ownsUnit`.
+      // `steam_basis` offers "pressure" beside a field labelled "Steam
+      // specific volume at pressure", so naming the volume set the MODE and
+      // five steam tiles then demanded a pressure the question never carried.
+      // Narrow: the two words before the match must belong to that sibling's
+      // label too, and not to this row's own, so "steam basis pressure" still
+      // selects the mode. See query-fill-extra-fills.test.js.
       {
         const before = optText.slice(0, at).toLowerCase().match(/([a-z]+)[^a-z]+([a-z]+)[^a-z]*$/);
         if (before) {
@@ -1727,24 +1703,20 @@ export function queryFill(query, rows, opts) {
     if (!claimed.has(qi) && !suppressed.has(qi)) unmatched.push(String(qty.value) + (qty.unit ? " " + qty.unit : ""));
   });
 
-  // A LABEL THAT IS A CODE: "C1", "C2", "V2", "A260", "A280".
+  // A LABEL THAT IS A CODE: "C1", "C2", "V2", "A260", "b2".
   //
-  // Both label terms and query words have their digits stripped, so every one
-  // of those reduces to a bare letter -- and then c1 and c2 reduce to the SAME
-  // letter, so there is no term that can tell them apart. molarity-dilution
-  // and nucleic-acid-a260 recovered NOTHING from a question phrased out of
-  // their own worked examples (2026-11-26).
+  // Label terms and query words both have their digits stripped, so each of
+  // those reduces to a bare letter -- and c1 and c2 then reduce to the SAME
+  // one, so no term can tell them apart. molarity-dilution, nucleic-acid-a260
+  // and linear-system-2x2 recovered NOTHING from their own examples.
   //
-  // The single-letter rule above is the precedent: a letter is admitted only
-  // where the reader clearly wrote it as a name, standing alone immediately
-  // before its own number. The same evidence is required here, and three more
-  // things, because a code is a stronger claim than a letter:
-  //   -- the whole label IS the code, not a phrase containing one, so this
-  //      cannot fire on "Point 1 x" or "Flow at 20 mA";
-  //   -- the code is UNIQUE among this tile's number fields, so a tile that
-  //      writes the same code twice is left alone;
-  //   -- the field is still unfilled, so this can only add a reading, never
-  //      overturn one an earlier rule arrived at with better evidence.
+  // The single-letter rule above is the precedent. A code is a stronger claim,
+  // so it asks for more: the whole label must BE the code (not a phrase
+  // containing one, so "Point 1 x" cannot fire), the code must be unique among
+  // this tile's number fields, and the field must still be unfilled -- the rule
+  // can only add a reading, never overturn one. Measured in
+  // query-fill-code-labels.test.js, which is its ONLY guard: measure-query-fill
+  // drops digit-bearing label words, so it cannot see this rule at all.
   {
     const codeOf = (l) => {
       const flat = String(l || "").toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
@@ -1761,12 +1733,9 @@ export function queryFill(query, rows, opts) {
       if (r.d in filled) continue;
       const code = codeOf(r.l);
       if (!code || seen.get(code) !== 1) continue;
-      // Only "=" or ":" may sit between the code and its number. A HYPHEN must
-      // not: the single-letter rule allows one, and borrowing that here read
-      // "b2 -1" as the separator plus 1 and filled +1 for a coefficient of -1
-      // (linear-system-2x2, caught by the targeted check below -- the catalog
-      // sweep cannot see this rule at all, because its phrasing drops a label
-      // word containing a digit).
+      // Only "=" or ":" between a code and its number, never a HYPHEN: the
+      // single-letter rule allows one, and borrowing that read "b2 -1" as a
+      // separator plus 1, filling +1 for a coefficient of -1.
       const re = new RegExp("(?:^|[^a-z0-9])" + code + "\\s*(?:[=:]\\s*)?(-?\\d+(?:\\.\\d+)?)", "i");
       const m = re.exec(text);
       if (m) filled[r.d] = m[1];
