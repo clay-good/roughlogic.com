@@ -431,7 +431,26 @@ function argAt(src, from, n) {
 // Find `NAME = makeSelect("label", "id", OPTS)` / `makeNumber("label","id",ATTRS)`
 // declarations in a render function body, keyed by the local variable NAME.
 // `ns` is the renderer module's namespace, used to resolve non-literal OPTS.
-function parseFields(body, ns, aliases = DEFAULT_ALIASES) {
+// A select whose options come from a MODULE-LOCAL helper, e.g.
+//   makeSelect("AWG", "wa-awg", awgOptions())
+// where `function awgOptions() { return [...].map(v => ({ value: v, label: v })); }`
+// sits in the module but is not exported. `evalOptions` resolves names against
+// the module's EXPORTS, so it found nothing and the whole field was dropped --
+// seven selects advertised an `awg` input to agents with no label and no list of
+// valid sizes. Exporting the helper is the wrong fix: it would enrol a UI
+// function in the "exported calculator functions" population three documents
+// count. Instead, find the helper in the module SOURCE and evaluate the
+// expression it returns, in the same sandbox and under the same denials.
+function resolveLocalHelper(expr, modSrc, ns) {
+  if (!modSrc) return null;
+  const call = /^\s*([A-Za-z_$][\w$]*)\s*\(\s*\)\s*$/.exec(expr);
+  if (!call) return null;
+  const decl = new RegExp("function\\s+" + call[1].replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\s*\\(\\s*\\)\\s*\\{\\s*return\\s+([\\s\\S]*?);\\s*\\}", "m").exec(modSrc);
+  if (!decl) return null;
+  return evalOptions(decl[1], ns || {});
+}
+
+function parseFields(body, ns, aliases = DEFAULT_ALIASES, modSrc = null) {
   const fields = new Map();
   // makeSelect: the options argument is balanced-parsed, then evaluated against
   // the module namespace; a literal array falls back to the regex scrape.
@@ -440,7 +459,7 @@ function parseFields(body, ns, aliases = DEFAULT_ALIASES) {
   while ((m = re.exec(body))) {
     const expr = argAt(body, m.index + m[0].length, 0);
     if (expr === null) continue;
-    const options = (ns ? evalOptions(expr, ns) : null) || parseOptions(expr);
+    const options = (ns ? evalOptions(expr, ns) : null) || resolveLocalHelper(expr, modSrc, ns) || parseOptions(expr);
     fields.set(m[1], { kind: "select", label: JSON.parse(m[2]), options });
   }
   // makeNumber(label, id[, attrs]) -- three args (the id is required); attrs is
@@ -570,6 +589,12 @@ async function main() {
     return a;
   };
   const imp = async (rel) => { const u = new URL(rel, CMAP_URL).href; let m = modCache.get(u); if (!m) { m = await import(u); modCache.set(u, m); } return m; };
+  const srcCache = new Map();
+  const moduleSource = (rel) => {
+    let s = srcCache.get(rel);
+    if (s === undefined) { try { s = readFileSync(new URL(rel, CMAP_URL), "utf8"); } catch { s = null; } srcCache.set(rel, s); }
+    return s;
+  };
 
   const emitted = {};
   const labels = {};
@@ -594,7 +619,7 @@ async function main() {
     if (Object.keys(unitMap).length) outUnits[id] = unitMap;
     const boolMap = parseOutputBooleans(body, aliases);
     if (Object.keys(boolMap).length) outBools[id] = boolMap;
-    const fields = parseFields(body, rmod, aliases);
+    const fields = parseFields(body, rmod, aliases, moduleSource(rreg.module));
     const callMap = parseComputeCall(body);
     const params = await computeParams(COMPUTE_MAP[id]);
     // Labels first, and from the loose map as well: they are display-only, so
