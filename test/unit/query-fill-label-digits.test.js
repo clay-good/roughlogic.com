@@ -14,7 +14,7 @@
 // either way, because that harness never writes a label's digits.
 //
 // Measured over every tile whose labels carry a digit, phrased with the label
-// written out in full: 75 wrong values before the rule, 4 after.
+// written out in full: 75 wrong values before the rule, 0 after.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -38,15 +38,14 @@ test("a label written out in full does not hand its own numbers to the fill", as
   const first = new Map();
   for (const r of exampleRows) if (!first.has(r.tile_id)) first.set(r.tile_id, r);
 
-  // Labels whose punctuation defeats the span match: the words are joined with
-  // at most three non-alphanumerics, and these need more. Named rather than
-  // left in a count, so a FIFTH has to be looked at.
-  const KNOWN = [
-    "surety-bond-premium.rate1_per_k",   // "Rate on first $100k"
-    "surety-bond-premium.rate2_per_k",   // "Rate on next $400k"
-    "surety-bond-premium.rate3_per_k",   // "Rate above $500k"
-    "concrete-premix-bags.bag_yield_ft3", // label embeds a table: "80lb 0.60, 60lb 0.45, ..."
-  ];
+  // NOTHING is exempt. The list held four labels whose punctuation defeated
+  // the span match -- "Rate on first $100k", "Rate on next $400k", "Rate above
+  // $500k" and a label embedding its own lookup table, "Bag yield (ft3): 80lb
+  // 0.60, 60lb 0.45" -- until the match was done on a normalised copy of the
+  // text with an index map, and the label was put through the SAME rewrite the
+  // question goes through. "$100k" becomes "100 usdk" in a rewritten question,
+  // so a needle built from the raw label could never be found in it.
+  const KNOWN = [];
 
   const same = (got, want) => {
     const a = Number(got), b = Number(want);

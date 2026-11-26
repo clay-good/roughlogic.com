@@ -567,22 +567,46 @@ export function queryFill(query, rows, opts) {
   // either; measured, not assumed.
   //
   // Measured on 236 tiles whose labels carry a digit, phrased with the label
-  // written out in full: 75 wrong values before this, 4 after. The two that
-  // remain are labels whose punctuation defeats the span match -- "Rate on
-  // first $100k" and a label that embeds its own lookup table, "Bag yield
-  // (ft3): 80lb 0.60, 60lb 0.45" -- and they are listed in
-  // test/unit/query-fill-label-digits.test.js rather than left unnamed.
-  for (const row of rows) {
-    const label = String(row.l || "").trim();
-    if (!/\d/.test(label) || label.length < 4) continue;
-    const words = label.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
-    if (words.length < 2 || !words.some((w) => /\d/.test(w))) continue;
-    const pattern = words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("[^a-z0-9]{0,3}");
-    const re = new RegExp(pattern, "gi");
-    let m;
-    while ((m = re.exec(text))) {
-      const from = m.index, to = m.index + m[0].length;
-      quantities.forEach((qty, qi) => { if (qty.index >= from && qty.end <= to) suppressed.add(qi); });
+  // written out in full: 75 wrong values before this, 0 after -- held there by
+  // test/unit/query-fill-label-digits.test.js, which exempts nothing.
+  // Matched on a NORMALISED copy with an index map, rather than a regex over
+  // the raw text with a tolerance for punctuation. The tolerant version read
+  // "Flow at 4 mA" but not "Rate on first $100k" or "Bag yield (ft3): 80lb
+  // 0.60, 60lb 0.45" -- a label that embeds its own lookup table -- and those
+  // were 4 of the 75 wrong values it was written to stop. Collapsing every run
+  // of non-alphanumerics to one space treats all three alike, and keeping the
+  // map means the span still lands on real positions in the real text.
+  {
+    let norm = "";
+    const at = [];                    // norm index -> index in `text`
+    let space = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (/[a-z0-9]/i.test(c)) { norm += c.toLowerCase(); at.push(i); space = false; continue; }
+      if (!space && norm) { norm += " "; at.push(i); space = true; }
+    }
+    for (const row of rows) {
+      const label = String(row.l || "").trim();
+      if (!/\d/.test(label)) continue;
+      // Through the SAME rewrite the question went through, or the two sides
+      // are not comparable: "$100k" in a label becomes "100 usdk" in the text,
+      // so a needle built from the raw label ("rate on first 100k") could
+      // never be found in it. That was 3 of the 4 cases left.
+      const words = rewriteQuery(label, protect, skip).toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+      // Two words at least, and one of them has to be the number: a one-word
+      // label cannot spend a digit, and a label with no digit has none to spend.
+      if (words.length < 2 || !words.some((w) => /\d/.test(w))) continue;
+      const needle = words.join(" ");
+      if (process.env.QF_DEBUG2) console.error("NEEDLE", JSON.stringify(needle), "IN", JSON.stringify(norm.slice(0,120)), norm.includes(needle));
+      for (let from = norm.indexOf(needle); from !== -1; from = norm.indexOf(needle, from + 1)) {
+        // Whole words only: "at 4 ma" must not match inside "at 44 man".
+        const before = from === 0 ? " " : norm[from - 1];
+        const afterIdx = from + needle.length;
+        const after = afterIdx >= norm.length ? " " : norm[afterIdx];
+        if (before !== " " || after !== " ") continue;
+        const lo = at[from], hi = at[afterIdx - 1];
+        quantities.forEach((qty, qi) => { if (qty.index >= lo && qty.end <= hi + 1) suppressed.add(qi); });
+      }
     }
   }
   const filled = {};
