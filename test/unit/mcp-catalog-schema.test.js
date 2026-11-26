@@ -800,3 +800,61 @@ test("every advertised input carries a usable `key`, whichever route described i
   for (const f of d.inputs) assert.equal(f.key, f.name, "key and its legacy alias agree");
   assert.ok(d.inputs.some((f) => f.key === "soiling"), "and the keys are the real parameters");
 });
+
+// The calculator's own words, on the inputs that had none.
+//
+// 102 advertised inputs carried no human text at all: `concrete.length_ft` came
+// back as a bare key while the page beside it said "Length (ft)". The ones that
+// actually cost an agent the call were the list-shaped inputs, which said
+// nothing about their format -- nothing in `motors` tells a caller it wants
+// "one per line as FLC,branch-device (A)". The website's tile shells and
+// build-field-index already read those captions; describe() was the surface
+// withholding them.
+test("an input with no schema label still gets the caption its page prints", async () => {
+  const { describe } = await import("../../mcp/catalog.mjs");
+
+  const concrete = await describe({ id: "concrete" });
+  const len = concrete.inputs.find((f) => f.key === "length_ft");
+  assert.equal(len.kind, null, "the extractor could not resolve this one's control");
+  assert.equal(len.label, "Length (ft)", "but the page names it, so the door does too");
+
+  // The payoff case: a list input whose format an agent cannot guess.
+  const motors = (await describe({ id: "motor-feeder-multiple" })).inputs.find((f) => f.key === "motors");
+  assert.equal(motors.label, "Motors, one per line as FLC,branch-device (A)");
+  const cuts = (await describe({ id: "bar-nesting" })).inputs.find((f) => f.key === "cut_list");
+  assert.equal(cuts.label, "Cut list, one line per size as length,quantity");
+
+  // A caption is only ever looked UP by a key the compute signature already
+  // proves real. It must never introduce a key -- that is what inputLabels'
+  // own note warns about, since a field `run` cannot honor would be an
+  // advertised input that does not exist. Checked across the catalog.
+  const { RENDERER_MAP } = await import("../fixtures/renderer-map.js");
+  const { COMPUTE_MAP } = await import("../fixtures/compute-map.js");
+  const { BESPOKE_LABELS } = await import("../fixtures/bespoke-labels.js");
+  const invented = [];
+  let captioned = 0, textless = 0, fields = 0;
+  for (const id of Object.keys(RENDERER_MAP)) {
+    let d;
+    try { d = await describe({ id }); } catch { continue; }
+    if (!Array.isArray(d.inputs)) continue;
+    const exKeys = new Set(Object.keys((d.example && d.example.inputs) || {}));
+    const labelKeys = new Set(Object.keys(BESPOKE_LABELS[id] || {}));
+    for (const f of d.inputs) {
+      fields++;
+      const hasText = typeof f.label === "string" && !!f.label.trim();
+      if (!hasText) textless++;
+      else if (f.kind == null) captioned++;
+      // A key that exists ONLY in the label map, and is neither a compute
+      // parameter nor a key the worked example sends, would be invented text.
+      if (!exKeys.has(f.key) && labelKeys.has(f.key) && f.kind == null && !COMPUTE_MAP[id]) {
+        invented.push(`${id}.${f.key}`);
+      }
+    }
+  }
+  assert.deepEqual(invented, [], "no advertised key comes from the label maps alone");
+  assert.ok(captioned >= 100, `page captions reach the door (${captioned} kind-less inputs carry one)`);
+  assert.ok(
+    textless <= 196,
+    `inputs with no human text may only shrink: ${textless} of ${fields} (was 296 before the captions, 196 after)`,
+  );
+});

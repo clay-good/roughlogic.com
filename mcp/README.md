@@ -172,7 +172,13 @@ A tile whose renderer declares a field schema (`inputs_source: "renderer"`,
 the 40 described from their compute signature instead carry `name` as a legacy
 alias of `key` and no label. Until 2026-11-26 those 40 carried `name` ALONE, so
 an agent reading the documented `key` -- as the published outputSchema tells it
-to -- got `undefined` for 105 inputs and had no name to send. A calculator with a field schema reports its
+to -- got `undefined` for 105 inputs and had no name to send. Where the extractor
+could not resolve a field's control, the descriptor still carries the **caption
+the calculator prints beside that field on its own page** (100 inputs, added the
+same day): `concrete.length_ft` reads "Length (ft)", and -- the ones that cost a
+caller the call -- a list input states its format, as in `motors` -> "Motors,
+one per line as FLC,branch-device (A)". A caption is only ever looked up by a
+key the compute signature already proves real; it never introduces a field. A calculator with a field schema reports its
 **display lines** -- the rows a person reads down the page -- so `outputs_source`
 is `renderer`, the keys are the renderer's own line ids, and `run_calculator`
 fills each one's `display` with the formatted string the page shows ("24.0 in

@@ -856,6 +856,32 @@ export async function search({ query = "", trade = "", limit = 30 } = {}) {
   };
 }
 
+// The caption the calculator prints beside a field on its own page, for an
+// input the door would otherwise advertise with no human text at all.
+//
+// 102 inputs were in that state: `concrete.length_ft` came back as a bare key
+// while the page beside it said "Length (ft)", and -- the ones that actually
+// cost an agent the call -- every list-shaped input said nothing about its
+// format. "Motors, one per line as FLC,branch-device (A)", "Cut list, one line
+// per size as length,quantity", "Courses, one per line as azimuth_deg,distance
+// (>= 2)": an agent cannot guess any of that from `motors`, and the door had it
+// all along. The website's tile shells and build-field-index already read these
+// captions; `describe` was the surface withholding them.
+//
+// WHY THIS IS SAFE HERE, where `inputLabels`' own note says the extracted
+// labels must stay out of the input list: that rule guards against taking KEYS
+// from the label maps, since a caption naming a field `run` cannot honor would
+// advertise an input that does not exist. Nothing here takes a key from them.
+// Every key is already a destructured parameter of the runnable compute, read
+// off the signature, and only its label is looked up. That is the input-side
+// form of the discipline `captionedOutputs` applies on the output side: caption
+// only what the tile is observed to carry.
+function pageCaption(id, key) {
+  const l = (BESPOKE_LABELS[id] && BESPOKE_LABELS[id][key])
+    || (CURATED_INPUT_LABELS[id] && CURATED_INPUT_LABELS[id][key]);
+  return typeof l === "string" && l.trim() ? l.trim() : null;
+}
+
 export async function describe({ id } = {}) {
   const { COMPUTE_MAP, RENDERER_MAP, examples, byId, modCache } = await load();
   const meta = byId.get(id);
@@ -885,12 +911,13 @@ export async function describe({ id } = {}) {
       const known = new Set(schema.inputs.map((f) => f.key));
       const extra = introspectInputs(fn)
         .filter((p) => !known.has(p.name))
-        .map((p) => ({ key: p.name, label: null, kind: null, options: null, default: p.default ?? null, attrs: null }));
+        .map((p) => ({ key: p.name, label: pageCaption(id, p.name), kind: null, options: null, default: p.default ?? null, attrs: null }));
       out.inputs = extra.length ? [...schema.inputs, ...extra] : schema.inputs;
       out.outputs = describeOutputs(schema);
       out.inputs_source = "renderer";
     } else {
-      out.inputs = introspectInputs(fn);
+      out.inputs = introspectInputs(fn)
+        .map((p) => { const l = pageCaption(id, p.name); return l ? { ...p, label: l } : p; });
       out.inputs_source = "compute";
     }
     if (!out.outputs) {
