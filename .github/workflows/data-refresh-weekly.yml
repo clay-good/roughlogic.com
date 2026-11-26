@@ -52,10 +52,14 @@ jobs:
         run: npm run test:unit
       # A pull request opened by a workflow using GITHUB_TOKEN does not trigger
       # further workflow runs: every data-refresh PR sits at `action_required`
-      # with a 0s CI run that never executes. So the 57 static gates DO NOT run
+      # with a 0s CI run that never executes. So the static gates DO NOT run
       # on a refresh unless somebody clicks approve, and nobody does -- for
       # months the only checks a refresh faced were data:verify and the unit
-      # tests, two of fifty-nine. The whole point of check-manifests,
+      # tests, a couple out of the whole lint chain. (That chain was 59 gates
+      # when this was written and is longer now; the figure is left out on
+      # purpose, because nothing anchors a count inside a workflow comment and
+      # the two that were here had already rotted.) The whole point of
+      # check-manifests,
       # check-citation-freshness, check-verified-on-ledger and the base-TIP
       # provenance check is the data path, and none of them had ever seen it.
       # Run them here, where the run is triggered by `schedule` and executes.

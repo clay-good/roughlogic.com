@@ -17,6 +17,13 @@
 // leading question word, a leading article, a trailing noun), because the full
 // sweep over all 1,804 costs about as much as the other three sets combined.
 // Run it in full with `node scripts/measure-ranking.mjs --asked`.
+//
+// AND THE FULL SWEEP WAS RUN, 2026-11-25: 6,855 rows, 6,855 of them top-1,
+// 100.00%, zero misses. Worth recording, because a sampled gate is a claim
+// about the part it does not look at, and this one had never been checked
+// against the whole. It holds -- the stride is costing nothing in coverage
+// today. Re-run the full sweep after a tokenizer or normalizeQuery change,
+// where the sample is exactly what would not notice a narrow regression.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { askedRows, measureAsked } from "../../scripts/measure-ranking.mjs";

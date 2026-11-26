@@ -315,6 +315,13 @@ test("the MCP door and the tile page agree on the declination", async () => {
 // An exact term is now resolved from the corpus. The full sweep is
 // scripts/measure-alias-door.mjs, about six minutes; these are the six, plus a
 // deterministic slice so the property is not only pinned where it broke.
+//
+// FULL SWEEP RE-RUN 2026-11-25, because the corpus has grown since those six
+// were found and this test pins a SAMPLE of it: 23,637 unambiguous curated
+// terms, 23,637 reached their tile, 0 did not, in 253s. The six still hold and
+// the larger corpus has added no new one. A pinned sample says nothing about
+// the terms added after it was written, so re-run the sweep after a batch of
+// aliases rather than trusting these six to speak for them.
 test("a curated alias reaches its own tile, even when the ranker buries it", async () => {
   const { answerQuery } = await import("../../mcp/catalog.mjs");
   const REGRESSIONS = [
