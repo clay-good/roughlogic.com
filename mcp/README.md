@@ -308,6 +308,16 @@ gap in the *catalog's* declarations rather than in the door, and it is worth
 knowing the size of before trusting a clean sweep: a tile that reports no
 violation may simply have nothing to violate.
 
+There is a second limit worth stating plainly: **a range warning cannot reach a
+value inside a list input.** A list arrives as one field whose `attrs` are null,
+so `validateNumbers` has no bound to compare an element against -- 75 tiles
+bound more boxes on their page than the door holds bounded fields for, 327
+boxes in all, nearly all of them list rows. The computes themselves are the only
+check there, and they refuse 68 of 84 negated elements; the two that did not
+were fixed on 2026-11-26 (a negative trip returned a negative mileage
+deduction, a negative line section a negative refrigerant charge) and the
+surface is now swept by `test/unit/sign-typo-guard.test.js`.
+
 A curated alias is the other kind of address, and it was reachable only if the
 ranker already agreed. `answer_query`'s rule for the alias corpus has always
 been *"a human wrote that phrase against that tile; nothing here outranks it"* --

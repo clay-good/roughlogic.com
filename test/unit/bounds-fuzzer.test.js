@@ -60835,7 +60835,15 @@ test("hardening slice 17 (kitchen, real estate, accounting)", async () => {
   assert.ok(RE.computeGrossRentMultiplier({ price: 500000, rent: 4000, rent_basis: "weekly" }).error);
   // accounting
   assert.ok(AC.computeSection179({ ...AC.section179Example.inputs, business_use_pct: 50 }).error);
-  assert.ok(AC.computeMileageRollup({ trips: [{ miles: -40 }], tax_year: 2025 }).error);
+  // This asserted on `{ miles: -40 }` until 2026-11-26 and passed -- because
+  // the guard it was checking ALSO read `t.miles`, while the loop that sums the
+  // trips has always read `t.business_miles`. Test and guard shared one wrong
+  // sub-key, so they agreed with each other and the real field was unguarded:
+  // a negative trip returned a negative mileage deduction. Both now use the key
+  // the compute reads, and the dead key is asserted to be just that -- an
+  // unknown sub-key, which the compute ignores rather than refusing.
+  assert.ok(AC.computeMileageRollup({ trips: [{ business_miles: -40 }], tax_year: 2025 }).error);
+  assert.ok(!AC.computeMileageRollup({ trips: [{ miles: -40 }], tax_year: 2025 }).error, "`miles` is not a sub-key this compute reads");
   assert.match(AC.computeEstimatedTax({ projected_current_tax: 20000, prior_year_tax: 0 }).notice, /PRIOR-YEAR TAX IS \$0/);
   const be = AC.computeBreakeven({ fixed_costs: 50000, variable_cost_per_unit: 8, sale_price_per_unit: 20, target_units: 3000 });
   assert.equal(be.below_breakeven, true);

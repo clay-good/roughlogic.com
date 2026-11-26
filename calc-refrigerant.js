@@ -359,6 +359,14 @@ export const CHARGE_OZ_PER_FT = {
 export function computeRefrigerantCharge({ refrigerant, sections = [] }) {
   const table = CHARGE_OZ_PER_FT[refrigerant];
   if (!table) return { error: "Unknown refrigerant." };
+  // A negative section length returned a NEGATIVE CHARGE: -10.25 oz on the
+  // worked example, with the section itself reported at -15 oz. The page
+  // cannot produce one (each length box carries min="0"), and the agent door
+  // cannot warn about one, because the whole list arrives as a single field
+  // whose attrs are null -- so nothing stood between a typo and a technician.
+  if (Array.isArray(sections) && sections.some((s) => Number(s && s.length_ft) < 0)) {
+    return { error: "A line-section length cannot be negative (ft)." };
+  }
   let total = 0;
   const detail = [];
   for (const s of sections) {

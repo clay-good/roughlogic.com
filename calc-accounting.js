@@ -680,8 +680,18 @@ export const cccExample = { inputs: { dso: 45, dio: 60, dpo: 30 } };
 //  amount = miles * rate stays a dimensionless dollar aggregate
 //  per the §7.1 monetary convention.)
 export function computeMileageRollup({ trips = [], tax_year = 2026 }) {
-  if (Array.isArray(trips) && trips.some((t) => !t || Number(t.miles) < 0 || !Number.isFinite(Number(t.miles ?? 0)))) return { error: "Each trip needs a mileage of zero or more." };
   if (!Array.isArray(trips)) return { error: "Trips must be an array." };
+  // This guard read `t.miles` until 2026-11-26, and the loop below has always
+  // read `t.business_miles` -- so it guarded a sub-key nothing in this project
+  // produces or consumes, and its stated rule had never once fired. The
+  // predicate collapsed to `!t`: only a null row was caught. A negative trip
+  // came through and returned a NEGATIVE deductible (-$16.80 on the worked
+  // example) while inflating implied personal miles from 1 to 85.
+  //
+  // Same shape as the truss-capacity defect check-list-inputs.mjs was written
+  // for -- a key the compute never reads -- except on the GUARD rather than on
+  // the data, where no reachability test was looking.
+  if (trips.some((t) => !t || Number(t.business_miles) < 0 || !Number.isFinite(Number(t.business_miles ?? 0)))) return { error: "Each trip needs business miles of zero or more." };
   const rate_row = STANDARD_MILEAGE_RATES[tax_year];
   if (!rate_row) return { error: "Tax year " + tax_year + " not bundled." };
   const rate = rate_row.business;

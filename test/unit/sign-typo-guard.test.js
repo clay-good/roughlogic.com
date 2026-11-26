@@ -225,3 +225,92 @@ test("a field declaring min >= 0 does not answer a negative with an impossible m
     `${bad.length} field(s) declare a minimum and answer a negative with a quantity that cannot exist:\n  ` + bad.join("\n  "),
   );
 });
+
+// A negative INSIDE a list input -- the surface neither guard was looking at.
+//
+// Both tests above iterate `describe().inputs` and probe a field whose example
+// value is a NUMBER. A list input's value is an array, so every one of them was
+// skipped. Nothing else covered it either: check-list-inputs.mjs tests that
+// each value inside a row REACHES the calculation, not that an impossible one
+// is refused.
+//
+// Neither surface stops it. The page cannot produce a negative there (each box
+// it renders for a row carries min="0"), and `run_calculator` cannot warn about
+// one, because the whole list arrives as a single field whose `attrs` are null
+// -- validateNumbers reads `field.attrs` and returns early. 75 tiles bound more
+// boxes on the page than the door has bounded fields, 327 boxes in all, and
+// they are overwhelmingly list rows.
+//
+// Two of 84 probes answered with a quantity that cannot exist:
+//   mileage-rollup   a negative trip returned a NEGATIVE deductible (-$16.80)
+//                    and inflated implied personal miles from 1 to 85. It had
+//                    a guard -- keyed to `t.miles`, while the loop reads
+//                    `t.business_miles`, so the rule it states had never once
+//                    fired. The same wrong-sub-key shape check-list-inputs.mjs
+//                    exists for, on the guard instead of the data.
+//   refrigerant-charge  a negative section length returned a NEGATIVE CHARGE,
+//                    -10.25 oz, with the section itself at -15 oz.
+test("a negative inside a list row does not come back as an impossible magnitude", async () => {
+  const { rows } = JSON.parse(await readFile(FIXTURE, "utf8"));
+  const first = new Map();
+  for (const r of rows) if (!first.has(r.tile_id)) first.set(r.tile_id, r);
+
+  const bad = [];
+  let tiles = 0, probes = 0;
+  for (const [id, row] of first) {
+    const reg = COMPUTE_MAP[id];
+    if (!reg) continue;
+    const lists = Object.entries(row.inputs || {}).filter(([, v]) => Array.isArray(v) && v.length);
+    if (!lists.length) continue;
+    const fn = (await importCalc(reg.module))[reg.fn];
+    let base;
+    try { base = fn({ ...row.inputs }); } catch { continue; }
+    if (!base || base.error) continue;
+    tiles += 1;
+
+    for (const [key, arr] of lists) {
+      // Exactly one numeric leaf of the first row, so a normalised quantity
+      // cannot cancel the perturbation out -- the ONE ELEMENT, NOT ALL rule
+      // check-list-inputs.mjs learned the same way.
+      const el = arr[0];
+      const variants = [];
+      if (typeof el === "number" && el > 0) {
+        const copy = arr.slice();
+        copy[0] = -el;
+        variants.push([`${key}[0]`, copy]);
+      } else if (typeof el === "string" && /^-?[\d.]+$/.test(el) && Number(el) > 0) {
+        const copy = arr.slice();
+        copy[0] = String(-Number(el));
+        variants.push([`${key}[0]`, copy]);
+      } else if (el && typeof el === "object") {
+        for (const [sk, sv] of Object.entries(el)) {
+          if (typeof sv !== "number" || !(sv > 0)) continue;
+          const copy = arr.map((x) => ({ ...x }));
+          copy[0][sk] = -sv;
+          variants.push([`${key}[0].${sk}`, copy]);
+        }
+      }
+
+      for (const [label, copy] of variants) {
+        probes += 1;
+        let r;
+        try { r = fn({ ...row.inputs, [key]: copy }); } catch { continue; }
+        if (!r || r.error) continue;
+        for (const [k, val] of Object.entries(r)) {
+          if (typeof val !== "number" || !(val < 0)) continue;
+          if (SIGNED_OUTPUT.test(k)) continue;
+          if (typeof base[k] === "number" && base[k] < 0) continue;
+          bad.push(`${id}::${label} -> ${k}=${val} (was ${base[k]})`);
+          break;
+        }
+      }
+    }
+  }
+
+  assert.ok(tiles > 40, `the list-taking tiles are swept (${tiles} tiles, ${probes} probes)`);
+  assert.deepEqual(
+    bad,
+    [],
+    `${bad.length} list input(s) answered a negative element with a quantity that cannot exist:\n  ` + bad.join("\n  "),
+  );
+});
