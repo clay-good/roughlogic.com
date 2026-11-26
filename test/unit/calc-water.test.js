@@ -17,6 +17,71 @@ const close = (a, b, tol = 0.01) => Math.abs(a - b) <= tol;
 // 210 Pounds formula
 test("Pounds: example yields finite (chlorine gas is 100% pure, so product = pure)", () => { const r = computePoundsFormula(poundsFormulaExample.inputs); assert.ok(r.pure_lb_day > 0); assert.equal(r.product_lb_day, r.pure_lb_day); });
 test("Pounds: 5 MGD * 2 mg/L * 8.34 = 83.4 lb/day", () => { const r = computePoundsFormula({ flow_mgd: 5, dose_mg_l: 2, chemical: "chlorine_gas" }); assert.ok(close(r.pure_lb_day, 83.4, 0.01)); });
+// spec-v4 asked for "a regression test that catches a chemical-purity dosing
+// error (a common field mistake)", and the 12.5%-bleach case below is it: feed
+// the product as if it were pure chemical and a plant doses an eighth of what
+// it intended. Two of the seven chemicals were exercised that way, and the one
+// carrying the subtler factor was not.
+//
+// fluorosilicic acid is dosed as the FLUORIDE ION, not as the acid, so its
+// effective strength is the 23% solution times `afi: 0.792` -- the available
+// fluoride mass fraction of H2SiF6, which works out to 0.79110 from atomic
+// masses and is published rounded to 79.2%. Nothing tested it, so dropping
+// `afi` would have left fluoride feed 26% light with every other test green.
+// This covers all seven against the one relationship the formula promises:
+// the product feed is the pure dose divided by the effective strength.
+test("spec-v4: every chemical's product feed is its pure dose over its effective strength", () => {
+  for (const [key, chem] of Object.entries(CHEMICAL_PURITY)) {
+    const r = computePoundsFormula({ flow_mgd: 1, dose_mg_l: 1, chemical: key });
+    assert.ok(r && !r.error, `${key} should dose: ${r && r.error}`);
+    const effective = (chem.pct / 100) * (chem.afi ?? 1);
+    assert.ok(effective > 0 && effective <= 1, `${key} effective strength out of range: ${effective}`);
+    assert.ok(
+      close(r.product_lb_day / r.pure_lb_day, 1 / effective, 1e-9),
+      `${key}: product/pure is ${r.product_lb_day / r.pure_lb_day}, expected ${1 / effective}`,
+    );
+    // A product weaker than pure needs MORE of it, never less.
+    assert.ok(r.product_lb_day >= r.pure_lb_day - 1e-12, `${key} product feed must not fall below the pure dose`);
+    assert.equal(r.purity_pct, chem.pct, `${key} reports the solution strength it was given`);
+  }
+});
+
+// The ratio test above is self-consistent BY CONSTRUCTION: it derives the
+// expected ratio from the same `pct` it is checking, so it catches a dropped
+// `afi` -- which is a change to the formula -- and cannot catch a mistyped
+// strength. Seeding it proved that: ferric chloride at 83% instead of 38%
+// passed. The independent figure is already on hand, because each label states
+// its own strength, so the constant is held against the words beside it.
+test("spec-v4: a chemical's purity matches the strength printed in its own label", () => {
+  const unchecked = [];
+  for (const [key, chem] of Object.entries(CHEMICAL_PURITY)) {
+    const stated = /(\d+(?:\.\d+)?)\s*%/.exec(chem.label);
+    if (!stated) { unchecked.push(key); continue; }
+    assert.equal(
+      chem.pct, Number(stated[1]),
+      `${key}: the table says ${chem.pct}% and its label says ${stated[1]}% -- one of them is wrong`,
+    );
+  }
+  // The two with no percentage in the label are the ones dosed as-is, and both
+  // are 100%: chlorine gas, and dry alum fed by weight. Listed so a new
+  // chemical arriving without a strength in its label has to be looked at.
+  assert.deepEqual(unchecked.sort(), ["alum_dry", "chlorine_gas"]);
+  for (const key of unchecked) assert.equal(CHEMICAL_PURITY[key].pct, 100, `${key} is dosed as-is, so it is 100%`);
+});
+
+// The fluoride case on its own, because it is the one the ratio alone would not
+// explain: 23% acid at a 0.792 available-fluoride fraction is 18.216% effective,
+// so a 1 mg/L fluoride dose on 1 MGD needs about 45.8 lb/day of product against
+// 8.34 lb/day of fluoride ion. Without `afi` it would read 36.3 lb/day.
+test("spec-v4: fluorosilicic acid is dosed as the fluoride ion, not as the acid", () => {
+  const r = computePoundsFormula({ flow_mgd: 1, dose_mg_l: 1, chemical: "fluorosilicic_acid" });
+  assert.ok(close(r.pure_lb_day, 8.34, 0.01), "the pure fluoride-ion dose is the plain pounds formula");
+  assert.ok(close(r.product_lb_day, 45.784, 0.01), `product feed was ${r.product_lb_day}`);
+  // Guard the factor itself: the acid-only figure is what dropping it gives.
+  const acidOnly = r.pure_lb_day / 0.23;
+  assert.ok(r.product_lb_day > acidOnly * 1.2, "the available-fluoride factor must still be applied");
+});
+
 test("Pounds: 12.5% bleach needs 8x product feed", () => { const r = computePoundsFormula({ flow_mgd: 1, dose_mg_l: 1, chemical: "sodium_hypochlorite" }); assert.ok(close(r.product_lb_day / r.pure_lb_day, 8, 0.01)); });
 test("Pounds: 100% chlorine product equals pure", () => { const r = computePoundsFormula({ flow_mgd: 1, dose_mg_l: 1, chemical: "chlorine_gas" }); assert.equal(r.product_lb_day, r.pure_lb_day); });
 test("Pounds: unknown chemical errors", () => { const r = computePoundsFormula({ flow_mgd: 1, dose_mg_l: 1, chemical: "bleach2" }); assert.ok(r.error); });
