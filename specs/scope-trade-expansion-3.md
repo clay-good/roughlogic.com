@@ -1,6 +1,10 @@
 # Scope: The 2026-09-11 Trade Expansion (specs v1750-v1850, 101 New Tiles)
 
-> **Status: ACTIVE (updated 2026-09-13). 33 of 101 tiles are wired; catalog 2,082 -> 2,115.**
+> **Status: COMPLETE. All 101 numbered specs are LANDED, none cut.** The line below
+> records the state on 2026-09-13, when 33 of 101 were wired and the catalog stood at
+> 2,082 -> 2,115; wiring closed on 2026-09-18 and the catalog is 2,288 today. The status
+> read ACTIVE until 2026-11-26, which told a reader 68 tiles were still to wire.
+> **On 2026-09-13: 33 of 101 tiles wired; catalog 2,082 -> 2,115.**
 > All 101 spec files exist (`spec-v1750.md` through `spec-v1850.md`) and are pushed.
 > Wired bands: data center v1800-v1808, metal finishing v1824-v1827, building automation v1818-v1823,
 > snow and ice management v1845-v1850, and fiber-optic outside plant v1837-v1844.

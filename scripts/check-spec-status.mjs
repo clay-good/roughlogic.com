@@ -230,6 +230,44 @@ async function main() {
       + "behaviour is held, or correct the status.");
   }
 
+  // A PROGRAM CHARTER CANNOT CLAIM WORK THAT IS DONE.
+  //
+  // specs/scope-*.md are the "what are we building" surface: each names a range
+  // of numbered specs and carries its own status. This gate globs only
+  // `spec-v\d+.md`, so it never read them -- and on 2026-11-26 three were stale
+  // after their programs closed. scope-trade-expansion said PROPOSED with 95
+  // LANDED and 5 CUT behind it; scope-trade-expansion-3 said ACTIVE with "33 of
+  // 101 tiles wired" against 101 LANDED; and scope-trade-expansion-2 said
+  // IN PROGRESS on the line directly above a line reading "COMPLETE. All 38
+  // bands have landed" -- the body was updated when the bands shipped and the
+  // status field was not. Between them they told a reader 468 tiles were still
+  // to come. So: a charter whose whole range is terminal must say so.
+  for (const name of readdirSync(join(ROOT, "specs"))) {
+    if (!/^scope-.*\.md$/.test(name)) continue;
+    const text = readFileSync(join(ROOT, "specs", name), "utf8");
+    const declared = /Status:\s*\*{0,2}([A-Z][A-Z ]*)/.exec(text);
+    if (!declared) continue;
+    const word = declared[1].trim().split(" ")[0];
+    if (["COMPLETE", "LANDED", "CLOSED", "CUT", "ADOPTED"].includes(word)) continue;
+    // The range the charter names, e.g. "specs v1350-v1449".
+    const range = /specs?\s+v(\d+)\s*[-\u2013]\s*v(\d+)/i.exec(text);
+    if (!range) continue;
+    const [lo, hi] = [Number(range[1]), Number(range[2])];
+    let open = 0, total = 0;
+    for (let v = lo; v <= hi; v++) {
+      let spec;
+      try { spec = readFileSync(join(ROOT, "specs", "spec-v" + v + ".md"), "utf8"); } catch { continue; }
+      total += 1;
+      const st = parseStatus(spec);
+      if (!st || !["LANDED", "CUT"].includes(st.word)) open += 1;
+    }
+    if (total > 0 && open === 0) {
+      errors.push(
+        "specs/" + name + ": says " + word + " but all " + total + " specs in v" + lo + "-v" + hi
+        + " are LANDED or CUT. A charter is how a reader learns what is left to build; mark it COMPLETE.");
+    }
+  }
+
   if (errors.length > 0) {
     for (const e of errors.slice(0, 25)) console.error("ERROR: " + e);
     if (errors.length > 25) console.error("ERROR: ... and " + (errors.length - 25) + " more.");

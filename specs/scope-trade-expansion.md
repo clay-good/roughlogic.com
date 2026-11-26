@@ -1,6 +1,9 @@
 # Scope: The 2026-08-26 Trade Expansion (specs v1350-v1449, 100 New Tiles)
 
-> **Status: PROPOSED (2026-08-26). Program charter, no catalog change of its own.**
+> **Status: COMPLETE. Program charter, no catalog change of its own.** Proposed
+> 2026-08-26; every one of the 100 numbered specs is terminal -- 95 LANDED and 5 CUT.
+> The status line read PROPOSED until 2026-11-26, long after the last band shipped,
+> which told a reader 100 tiles were still to come.
 > Inherits the spec-v106 trades-only charter and every convention through spec-v1349.
 > Each of the 100 tiles is specified in its own file, `spec-v1350.md` through `spec-v1449.md`.
 
