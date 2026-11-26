@@ -130,7 +130,8 @@ export function computeWireAmpacity({ awg, material, insulation_rating_C, ambien
 
 export const wireAmpacityExample = {
   inputs: { awg: "12", material: "copper", insulation_rating_C: 75, ambient_C: 30, bundle_count: 1 },
-  expectedRange: { min: 18, max: 35 },
+  // Normalised 2026-11-26: the band named no output at all; it bounds ampacity_A.
+  expectedRange: { ampacity_A: { min: 18, max: 35 } },
 };
 
 // --- Utility 3: Voltage Drop ---

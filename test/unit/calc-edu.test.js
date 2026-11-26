@@ -113,9 +113,9 @@ test("computeReadability: bundled example paragraph scores in expected bands", (
   const e = readabilityExample.expected;
   assert.equal(r.sentences, e.sentences);
   assert.ok(r.words >= e.words_min && r.words <= e.words_max, "words " + r.words);
-  assert.ok(r.flesch_kincaid_grade_level >= e.fkgl_min && r.flesch_kincaid_grade_level <= e.fkgl_max,
+  assert.ok(r.flesch_kincaid_grade_level >= e.flesch_kincaid_grade_level_min && r.flesch_kincaid_grade_level <= e.flesch_kincaid_grade_level_max,
     "FKGL " + r.flesch_kincaid_grade_level);
-  assert.ok(r.flesch_reading_ease >= e.fre_min && r.flesch_reading_ease <= e.fre_max,
+  assert.ok(r.flesch_reading_ease >= e.flesch_reading_ease_min && r.flesch_reading_ease <= e.flesch_reading_ease_max,
     "FRE " + r.flesch_reading_ease);
   assert.equal(r.reliable, true);
 });

@@ -80,8 +80,9 @@ test("Ohm's Law: insufficient inputs returns error", () => {
 test("Wire ampacity returns positive for AWG 12 copper at 75 C, 30 C ambient", () => {
   const r = computeWireAmpacity(wireAmpacityExample.inputs);
   assert.ok(r.ampacity_A > 0);
-  assert.ok(r.ampacity_A >= wireAmpacityExample.expectedRange.min);
-  assert.ok(r.ampacity_A <= wireAmpacityExample.expectedRange.max);
+  // The band named no output until 2026-11-26; it is now keyed by the one it bounds.
+  assert.ok(r.ampacity_A >= wireAmpacityExample.expectedRange.ampacity_A.min);
+  assert.ok(r.ampacity_A <= wireAmpacityExample.expectedRange.ampacity_A.max);
 });
 
 test("Wire ampacity: lower insulation rating -> lower ampacity", () => {

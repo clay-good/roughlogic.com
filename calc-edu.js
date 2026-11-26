@@ -161,8 +161,10 @@ export const readabilityExample = {
   expected: {
     sentences: 7,
     words_min: 60, words_max: 70,
-    fkgl_min: 5.0, fkgl_max: 11.0,
-    fre_min: 50.0, fre_max: 85.0,
+    // Normalised 2026-11-26: fkgl / fre were abbreviations the compute does
+    // not use, so these four bounds named nothing and went unchecked.
+    flesch_kincaid_grade_level_min: 5.0, flesch_kincaid_grade_level_max: 11.0,
+    flesch_reading_ease_min: 50.0, flesch_reading_ease_max: 85.0,
   },
 };
 
@@ -298,7 +300,8 @@ export function computeStatistics({ values }) {
 
 export const statisticsExample = {
   inputs: { values: "2, 4, 4, 4, 5, 5, 7, 9" },
-  expected: { count: 8, mean: 5, median: 4.5, sd_sample_value: 2.138 },
+  // Normalised 2026-11-26: `sd_sample_value` -> the `_approx` convention (1%).
+  expected: { count: 8, mean: 5, median: 4.5, sd_sample_approx: 2.138 },
 };
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }
@@ -1268,7 +1271,8 @@ export function computeLexileBand({ grade }) {
 
 export const lexileBandExample = {
   inputs: { grade: "5" },
-  expected: { selected_typical: "830L - 1010L" },
+  // Normalised 2026-11-26: `selected_typical` -> the nested `selected.typical`.
+  expected: { "selected.typical": "830L - 1010L" },
 };
 
 // dims: in { dom: dimensionless } out: { dom_side_effect: dimensionless }

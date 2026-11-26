@@ -152,9 +152,11 @@ test("Sales tax: custom rate overrides state", () => {
 test("Tip out example: 600 across 8/4/4 -> 300/150/150", () => {
   const r = computeTipOut(tipOutExample.inputs);
   assert.equal(r.splits.length, 3);
-  assert.ok(close(r.splits[0].share, tipOutExample.expected.A, 1e-9));
-  assert.ok(close(r.splits[1].share, tipOutExample.expected.B, 1e-9));
-  assert.ok(close(r.splits[2].share, tipOutExample.expected.C, 1e-9));
+  // The example's keys became dotted paths on 2026-11-26 (`A` named nothing the
+  // compute returns, so the inline claim was unreadable and unchecked).
+  assert.ok(close(r.splits[0].share, tipOutExample.expected["splits.0.share"], 1e-9));
+  assert.ok(close(r.splits[1].share, tipOutExample.expected["splits.1.share"], 1e-9));
+  assert.ok(close(r.splits[2].share, tipOutExample.expected["splits.2.share"], 1e-9));
 });
 
 test("Tip out: empty members returns error", () => {

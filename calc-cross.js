@@ -346,7 +346,14 @@ export function computeTipOut({ total_amount, members }) {
 
 export const tipOutExample = {
   inputs: { total_amount: 600, members: [{ name: "A", hours: 8 }, { name: "B", hours: 4 }, { name: "C", hours: 4 }] },
-  expected: { A: 300, B: 150, C: 150 },
+  // Normalised 2026-11-26: A / B / C named nothing the compute returns. They are
+  // the per-person shares in `splits`, so each is now a dotted path, and the
+  // name is asserted beside the share so the pairing is checked too.
+  expected: {
+    "splits.0.name": "A", "splits.0.share": 300,
+    "splits.1.name": "B", "splits.1.share": 150,
+    "splits.2.name": "C", "splits.2.share": 150,
+  },
 };
 
 // --- Renderers ---

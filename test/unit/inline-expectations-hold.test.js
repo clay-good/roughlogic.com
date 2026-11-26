@@ -44,12 +44,33 @@ const NEEDS_A_SHARD = new Set(["hudFmrExample", "loanLimitsExample"]);
 //   expected:      { count: number }             the one array output's length
 //   expectedRange: { key: { min?, max? } }       a band on result[key]
 //   expectedRange: { key_min: n, key_max: n }    the same band, flattened
+// Plus a dotted path into a nested result (`selected.typical`,
+// `splits.0.share`) and `_key_count` for an object's key count.
+//
 // A claim this schema cannot read is a FAILURE, not a skip: an unreadable
 // declaration is exactly the kind that drifts.
 function arrayOutputLength(result) {
   const arrays = Object.entries(result).filter(([, v]) => Array.isArray(v));
   return arrays.length === 1 ? arrays[0][1].length : null;
 }
+// A DOTTED PATH reaches into a nested result: `selected.typical`,
+// `splits.0.share`. Added 2026-11-26 so a claim about a nested value can be
+// written in the schema instead of inventing a flat alias for it.
+function atPath(result, path) {
+  let node = result;
+  for (const seg of path.split(".")) {
+    if (node === null || node === undefined) return undefined;
+    if (Array.isArray(node)) {
+      if (!/^\d+$/.test(seg)) return undefined;
+      node = node[Number(seg)];
+    } else if (typeof node === "object") {
+      if (!(seg in node)) return undefined;
+      node = node[seg];
+    } else return undefined;
+  }
+  return node;
+}
+const hasPath = (result, path) => path.includes(".") && atPath(result, path) !== undefined;
 function readClaim(result, declared, value, isRange) {
   // A flattened bound reads the same in either block: readabilityExample puts
   // `words_min` / `fkgl_max` under `expected`, conduitFillExample puts a band
@@ -64,15 +85,26 @@ function readClaim(result, declared, value, isRange) {
     // A boolean under expectedRange is not a band: conduitFillExample declares
     // `pass: true` beside its fill-percent band.
     if (declared in result && typeof value === "boolean") return [{ key: declared, got: result[declared], cmp: "exact" }];
-    if (declared in result && value && typeof value === "object") {
+    const node = declared in result ? result[declared] : (hasPath(result, declared) ? atPath(result, declared) : undefined);
+    if (node !== undefined && value && typeof value === "object") {
       const out = [];
-      if (value.min !== undefined) out.push({ key: declared, got: result[declared], cmp: { min: value.min } });
-      if (value.max !== undefined) out.push({ key: declared, got: result[declared], cmp: { max: value.max } });
+      if (value.min !== undefined) out.push({ key: declared, got: node, cmp: { min: value.min } });
+      if (value.max !== undefined) out.push({ key: declared, got: node, cmp: { max: value.max } });
       return out.length ? out : null;
     }
     return null;
   }
   if (declared in result) return [{ key: declared, got: result[declared], cmp: "exact" }];
+  if (hasPath(result, declared)) return [{ key: declared, got: atPath(result, declared), cmp: "exact" }];
+  if (declared.endsWith("_key_count")) {
+    // An object output's KEY count, which is what a "how many trades" claim
+    // means. Distinct from _count, which is an array's length.
+    const base = declared.slice(0, -"_key_count".length);
+    const node = result[base];
+    if (node && typeof node === "object" && !Array.isArray(node)) {
+      return [{ key: "Object.keys(" + base + ").length", got: Object.keys(node).length, cmp: "exact" }];
+    }
+  }
   if (declared.endsWith("_approx")) {
     const base = declared.slice(0, -"_approx".length);
     if (base in result) return [{ key: base, got: result[base], cmp: "approx" }];
@@ -148,26 +180,27 @@ test("every inline expected / expectedRange this gate can reach holds", async ()
 
   assert.ok(examples > 150, `only ${examples} examples carried an inline expectation; did the shape change?`);
   assert.deepEqual(violated, [], "an inline expectation its own compute does not satisfy");
-  // THE SHAPE ZOO, PINNED RATHER THAN PARSED. Beyond the six shapes above there
-  // are at least five more, each used once or twice: tipOutExample maps
-  // `splits[].name` to `splits[].share`; lexileBandExample's `selected_typical`
-  // means `selected.typical`; statisticsExample uses a `_value` suffix for an
-  // approximate figure; inspectionChecklistExample's `count` means the number of
-  // TRADE KEYS in a nested object, not an array length; wireAmpacityExample
-  // declares a bare `{ min, max }` naming no output at all; readabilityExample
-  // abbreviates its keys (`fkgl_min` for flesch_kincaid_grade_level,
-  // `fre_min` for flesch_reading_ease); and labSafetyExample's `picto_count`
-  // and `tree_steps` count entries inside nested objects. Fourteen claims
-  // across eight examples.
+  // THE SHAPE ZOO IS CLOSED. These declarations were in twelve ad-hoc shapes,
+  // because nothing had ever read them generically. Eight examples carried the
+  // fourteen claims no schema could reach, and each was translated to the
+  // conventions above rather than parsed around:
   //
-  // Writing a parser for eleven shapes would be building a gate around an
-  // accident. Normalising all 167 declarations onto one schema is the right fix
-  // and is a campaign of its own -- each needs a faithful translation, and a
-  // careless one changes what a publisher claimed, which is worse than leaving
-  // it unenforced. So the count is pinned here instead: it cannot grow, which
-  // makes a twelfth shape fail rather than pass, and it shrinks as declarations
-  // are normalised.
-  assert.equal(unreadable.length, 14, `unreadable inline expectations moved from 14 to ${unreadable.length}:\n${unreadable.join("\n")}`);
+  //   tipOutExample            A / B / C      -> splits.N.name + splits.N.share
+  //   lexileBandExample        selected_typical -> "selected.typical"
+  //   readabilityExample       fkgl_* / fre_* -> the real output names
+  //   statisticsExample        sd_sample_value -> sd_sample_approx
+  //   wireAmpacityExample      bare { min, max } -> { ampacity_A: { ... } }
+  //   inspectionChecklistExample  count       -> trades_key_count
+  //   labSafetyExample         picto_count / tree_steps -> pictograms_count /
+  //                                               decision_tree_count
+  //
+  // Every translation preserved the claim; `tipOutExample` is now stronger,
+  // since the name is asserted beside the share. Two of them were VALUES that
+  // were right all along -- labSafetyExample reads its numbers straight off the
+  // source lists -- which is exactly how an unreadable claim stays plausible.
+  //
+  // Held at zero: a thirteenth shape is a failure here, not a silent skip.
+  assert.equal(unreadable.length, 0, `an inline expectation this schema cannot read -- translate it to a documented convention rather than widening the parser:\n${unreadable.join("\n")}`);
   // Held at the measured size. An example the naming rule cannot reach is not a
   // finding -- but a NEW one is, because it would arrive unchecked.
   assert.equal(unreachable.length, 35, `examples the naming rule cannot reach moved from 35 to ${unreachable.length}:\n${unreachable.join("\n")}`);

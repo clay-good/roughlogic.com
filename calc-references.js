@@ -96,7 +96,9 @@ export const INSPECTION_CHECKLISTS = {
 // (Pure categorical per-trade inspection checklist lookup.)
 export function computeInspectionChecklist() { return { trades: INSPECTION_CHECKLISTS }; }
 
-export const inspectionChecklistExample = { inputs: {}, expected: { count: Object.keys(INSPECTION_CHECKLISTS).length } };
+// `count` meant the number of TRADE keys, not an array length, so nothing could
+// read it; normalised 2026-11-26 to the _key_count convention.
+export const inspectionChecklistExample = { inputs: {}, expected: { trades_key_count: Object.keys(INSPECTION_CHECKLISTS).length } };
 
 // --- Utility 117: Utility Locator and Emergency Contacts ---
 
@@ -562,7 +564,11 @@ export const SPILL_DECISION_TREE = [
 // dims: in { args: dimensionless } out: { pictograms: dimensionless, decision_tree: dimensionless }
 // (Pure categorical GHS-pictogram and spill-response reference.)
 export function computeLabSafety() { return { pictograms: GHS_PICTOGRAMS, decision_tree: SPILL_DECISION_TREE }; }
-export const labSafetyExample = { inputs: {}, expected: { picto_count: GHS_PICTOGRAMS.length, tree_steps: SPILL_DECISION_TREE.length } };
+// Both keys named outputs the compute does not return; normalised 2026-11-26 to
+// the _count convention on the real ones. The VALUES were right all along --
+// they are live references to the source lists -- which is exactly how an
+// unreadable claim stays plausible.
+export const labSafetyExample = { inputs: {}, expected: { pictograms_count: GHS_PICTOGRAMS.length, decision_tree_count: SPILL_DECISION_TREE.length } };
 
 // --- v5 Renderers ---
 
