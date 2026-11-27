@@ -14,6 +14,7 @@ import {
   computeWindPressure,
   computeSnowLoad,
   computeAnchorEmbedment,
+  computeAsceLiveLoadReduction,
   SOIL_BEARING_PSF,
   PAINT_COVERAGE_FT2_PER_GAL,
   MASONRY_UNIT_FACE_IN,
@@ -696,4 +697,53 @@ test("drywall takes a room: walls 2 x (L + W) x H plus the ceiling", () => {
   assert.equal(computeDrywall({ wall_area_ft2: 1200, ceiling_area_ft2: 600, room_length_ft: 12, room_width_ft: 14, wall_height_ft: 8 }).sheets, 62);
   assert.ok("error" in computeDrywall({ room_length_ft: 12 }));
   assert.ok("error" in computeDrywall({ room_length_ft: -12, room_width_ft: 14, wall_height_ft: 8 }));
+});
+
+// Five of the seven ASCE 7 live-load element factors were held by nothing:
+// seeding `exterior_column` to 2, `edge_column_cant` to 2, `corner_column_cant`
+// to 4, `edge_beam` to 4 or `other` to 4 passed every test that touches this
+// tile. Only `interior_column` and `interior_beam` were pinned, and only
+// because an example and a bounds case happen to use them.
+//
+// The direction of the error matters here: KLL appears under the square root
+// of L = L0 (0.25 + 15/sqrt(KLL x AT)), so a factor that reads too HIGH permits
+// too much reduction and under-designs the member. Raising `other` from 1 to 4
+// halves the 15/sqrt term.
+//
+// The table is not exported, so each factor is recovered from the KLL the
+// compute returns -- the figure the page actually uses -- and the citation is
+// held to still name each group beside its own factor, so neither surface can
+// be edited alone.
+test("ASCE live-load reduction: every member type carries its Table 4.7-1 factor, and the citation still says so", async () => {
+  const { CITATIONS } = await import("../../citations.js");
+  // ASCE 7 Table 4.7-1, live-load element factor KLL.
+  const TABLE_4_7_1 = {
+    interior_column: 4,
+    exterior_column: 4,      // without cantilever slabs
+    edge_column_cant: 3,
+    corner_column_cant: 2,
+    edge_beam: 2,            // without cantilever slabs
+    interior_beam: 2,
+    other: 1,                // includes one-way and two-way slabs
+  };
+  for (const [member_type, kll] of Object.entries(TABLE_4_7_1)) {
+    const r = computeAsceLiveLoadReduction({
+      unreduced_load_psf: 50, tributary_area_ft2: 400, member_type, floors_supported: "one",
+    });
+    assert.ok(!r.error, `${member_type}: ${r.error}`);
+    assert.equal(r.KLL, kll, `KLL for ${member_type}`);
+  }
+
+  // The citation groups the same seven members into four factors. Each group
+  // is tied to its own number, not merely present somewhere in the prose.
+  const prose = [CITATIONS["asce-live-load-reduction"].editionNote, CITATIONS["asce-live-load-reduction"].edition]
+    .filter(Boolean).join(" ");
+  for (const re of [
+    /interior and exterior columns 4/,
+    /edge columns with cantilever slabs 3/,
+    /corner columns with cantilever slabs and edge\/interior beams 2/,
+    /other members including one- and two-way slabs 1/,
+  ]) {
+    assert.match(prose, re, `the asce-live-load-reduction citation no longer states this group beside its factor (/${re.source}/)`);
+  }
 });
