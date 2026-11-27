@@ -47115,6 +47115,37 @@ test("bounds: spec-v1612 computeIntersectionSightTriangle -- the truck gap is 13
 });
 
 import { computePavementStructuralNumber as _v1613 } from "../../calc-civil.js";
+// The test below supplies all three layer coefficients EXPLICITLY, so it checks
+// the arithmetic and never the shipped defaults. Seeding 0.44 -> 0.40,
+// 0.14 -> 0.10 or 0.11 -> 0.08 passed every test in the repository, and those
+// defaults are what a reader gets for any field left blank.
+//
+// The tile's citation names all three ("asphalt about 0.44, crushed base about
+// 0.14, subbase about 0.11") and also states the trade they imply -- "an inch of
+// asphalt is worth roughly three inches of crushed base and four of subbase" --
+// which is 0.44/0.14 = 3.14 and 0.44/0.11 = 4. Both the defaults and that
+// derived claim are pinned here, and the citation is required to keep saying it,
+// so neither surface can be edited alone.
+test("bounds: spec-v1613 computePavementStructuralNumber ships the AASHTO 93 layer coefficients its citation names", async () => {
+  const { CITATIONS } = await import("../../citations.js");
+  // One inch of each layer, no coefficients supplied: each layer's structural
+  // number IS its default coefficient (drainage defaults to 1.0).
+  const d = _v1613({ ac_thickness_in: 1, base_thickness_in: 1, subbase_thickness_in: 1 });
+  assert.ok(!d.error, d.error);
+  assert.ok(Math.abs(d.sn_surface - 0.44) < 1e-12, `default asphalt coefficient: ${d.sn_surface}`);
+  assert.ok(Math.abs(d.sn_base - 0.14) < 1e-12, `default base coefficient: ${d.sn_base}`);
+  assert.ok(Math.abs(d.sn_subbase - 0.11) < 1e-12, `default subbase coefficient: ${d.sn_subbase}`);
+  // The substitution the coefficients exist to express, as the citation states it.
+  assert.ok(Math.abs(d.base_per_inch_of_ac_in - 0.44 / 0.14) < 1e-12, `base per inch of AC: ${d.base_per_inch_of_ac_in}`);
+  assert.ok(Math.abs(d.subbase_per_inch_of_ac_in - 4) < 1e-12, `subbase per inch of AC: ${d.subbase_per_inch_of_ac_in}`);
+
+  const prose = [CITATIONS["pavement-structural-number"].edition, CITATIONS["pavement-structural-number"].editionNote]
+    .filter(Boolean).join(" ");
+  for (const re of [/asphalt about 0\.44/, /crushed base about 0\.14/, /subbase about 0\.11/]) {
+    assert.match(prose, re, `the pavement-structural-number citation no longer states this coefficient (/${re.source}/)`);
+  }
+});
+
 test("bounds: spec-v1613 computePavementStructuralNumber -- 3.14 in of base per inch of asphalt", () => {
   const base = { ac_thickness_in: 4, ac_coefficient: 0.44, base_thickness_in: 8, base_coefficient: 0.14, base_drainage: 1.0, subbase_thickness_in: 10, subbase_coefficient: 0.11, subbase_drainage: 0.8, required_sn: 3.0 };
   const r = _v1613(base);
