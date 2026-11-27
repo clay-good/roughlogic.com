@@ -600,6 +600,22 @@ async function main() {
   // SAME FILE said 2,288 of 2,288 ninety lines later.
   checked += checkPattern(mcpReadme, /checked for all ([\d,]+) tiles on/g, live.tiles, "both-doors tile count (mcp/README.md)", errors);
 
+  // test/fixtures/worked-examples.json describes its own coverage in prose, and
+  // that prose is what a contributor reads to learn whether a missing row is
+  // tolerated. It said coverage was "a starter set" and that the lint "does not
+  // (yet) fail CI on missing rows" until 2026-11-26 -- while coverage stood at
+  // 2,288 of 2,288 and the lint had been fail-on-missing since 2026-05-18. The
+  // claim told a contributor the opposite of what the gate does, so the figure
+  // is anchored to the live tile count here, once per sentence.
+  const workedExamples = await readFile(resolve(ROOT, "test", "fixtures", "worked-examples.json"), "utf8");
+  // Each of the two sentences is anchored on wording unique to it. A single
+  // shared pattern was not enough and seeding said so: with the phrase stated
+  // twice, deleting one copy still left a match and the gate stayed green.
+  checked += checkPattern(workedExamples, /is COMPLETE: coverage is ([\d,]+) of [\d,]+ tiles/g, live.tiles, "worked-example coverage, _comment (worked-examples.json)", errors);
+  checked += checkPattern(workedExamples, /is COMPLETE: coverage is [\d,]+ of ([\d,]+) tiles/g, live.tiles, "worked-example coverage denominator, _comment (worked-examples.json)", errors);
+  checked += checkPattern(workedExamples, /target is MET: coverage is ([\d,]+) of [\d,]+ tiles/g, live.tiles, "worked-example coverage, _coverage_target (worked-examples.json)", errors);
+  checked += checkPattern(workedExamples, /target is MET: coverage is [\d,]+ of ([\d,]+) tiles/g, live.tiles, "worked-example coverage denominator, _coverage_target (worked-examples.json)", errors);
+
   // mcp/README.md quotes the query-fill corpus size in a fourth place. d073f51a
   // refreshed the figures that had gone stale when the corpus moved and missed
   // this one, which still read 1,763 -- the corpus size from 2026-09-01. It is
